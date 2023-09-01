@@ -26,9 +26,9 @@ public class ChapterController {
     }
 
     @GetMapping
-    public List<Chapter> findAllByUser(Authentication authentication) {
+    public List<Chapter> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return chapterFacade.findAllByUser(userId);
+        return chapterFacade.findAllByUser(ids, userId);
     }
 
     @PutMapping
@@ -42,5 +42,12 @@ public class ChapterController {
     public void delete(@PathVariable Long chapterId, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         chapterFacade.delete(chapterId, userId);
+    }
+
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteInBatch(@RequestBody List<Long> ids, Authentication authentication) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        chapterFacade.deleteInBatch(ids, userId);
     }
 }

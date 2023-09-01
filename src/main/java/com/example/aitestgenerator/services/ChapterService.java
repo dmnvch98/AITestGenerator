@@ -30,10 +30,12 @@ public class ChapterService {
         log.info("Updating chapter.Chapter ID: {}", chapter.getId());
         return chapterRepository.save(chapter);
     }
+
     public void delete(Chapter chapter) {
         log.info("Deleting chapter. Chapter ID: {}", chapter.getId());
         chapterRepository.delete(chapter);
     }
+
     public Chapter findAllById(Long id) {
         log.info("Finding chapter by ID: {}", id);
         return chapterRepository.findAllById(id);
@@ -44,7 +46,13 @@ public class ChapterService {
         return chapterRepository.findAllByUser(user);
     }
 
+    public List<Chapter> findByIdInAndUser(List<Long> ids, User user) {
+        log.info("Finding all chapters by chapter Ids and user. User ID: {} . Chapter IDs: {}", user.getId(), ids);
+        return chapterRepository.findByIdInAndUser(ids, user);
+    }
 
-
+    public void deleteInBatch(List<Chapter> chapters) {
+        chapterRepository.deleteAll(chapters);
+    }
 
 }
