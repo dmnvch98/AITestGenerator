@@ -43,4 +43,8 @@ public class TestService {
         log.info("Finding test by ID {} for user. User Id: {}", testId, user.getId());
         return testRepository.findTestByIdAndUser(testId, user);
     }
+
+    public Test findTestById(Long testId) {
+        return testRepository.findById(testId).orElse(null);
+    }
 }

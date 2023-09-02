@@ -1,6 +1,6 @@
-package com.example.aitestgenerator.interfaces;
+package com.example.aitestgenerator.facades;
 
-import com.example.aitestgenerator.dto.GenerateTestRequestDto;
+import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.Chapter;
 import com.example.aitestgenerator.models.Test;
@@ -47,5 +47,9 @@ public class TestFacade {
     public List<Test> findAllByUser(Long userId) {
         User user = userService.findUserById(userId);
         return testService.findAllByUser(user);
+    }
+
+    public Test findTestById(Long testId) {
+        return testService.findTestById(testId);
     }
 }

@@ -133,7 +133,8 @@ export const useChapterStore = create<UserChapters>((set: any, get: any) => ({
 
         const response = await ChapterService.updateChapter(updatedChapter);
         if (response) {
-            set({chapterUpdatedFlag: true, selectedChapter: null})
+            set({chapterUpdatedFlag: true, selectedChapter: response, newChapterTitle: response.title, newTextContent: response.text.content})
+
             return true;
         }
         return false;

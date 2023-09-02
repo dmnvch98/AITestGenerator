@@ -1,8 +1,8 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
-import com.example.aitestgenerator.dto.GenerateTestRequestDto;
-import com.example.aitestgenerator.interfaces.TestFacade;
+import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
+import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.services.TestService;
 import com.fasterxml.jackson.core.JsonProcessingException;

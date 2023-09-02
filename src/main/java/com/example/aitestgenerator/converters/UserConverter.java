@@ -1,7 +1,7 @@
 package com.example.aitestgenerator.converters;
 
-import com.example.aitestgenerator.dto.CreateUserRequestDto;
-import com.example.aitestgenerator.dto.CreateUserResponseDto;
+import com.example.aitestgenerator.dto.users.CreateUserRequestDto;
+import com.example.aitestgenerator.dto.users.CreateUserResponseDto;
 import com.example.aitestgenerator.models.User;
 import org.mapstruct.Mapper;
 

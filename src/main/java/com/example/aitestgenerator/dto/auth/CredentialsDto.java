@@ -1,4 +1,4 @@
-package com.example.aitestgenerator.dto;
+package com.example.aitestgenerator.dto.auth;
 
 import lombok.Builder;
 import lombok.Value;

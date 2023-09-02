@@ -6,7 +6,6 @@ import lombok.extern.jackson.Jacksonized;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(name = "chapters")
 @Getter
@@ -31,6 +30,11 @@ public class Chapter {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "text_id")
     private Text text;
+
+    @ManyToOne
+    @JoinColumn(name = "test_id")
+    private Test test;
+
 
     @Override
     public String toString() {

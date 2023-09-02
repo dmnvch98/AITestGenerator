@@ -1,9 +1,10 @@
-import {Alert, Box, Button, Container, Snackbar, TextField} from "@mui/material";
-import {useChapterStore} from "../zustand/chapterStore";
+import {Alert, Box, Button, Snackbar, TextField} from "@mui/material";
+import {useChapterStore} from "../../zustand/chapterStore";
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import React, {useState} from "react";
+import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 
-export const AddChapter = () => {
+export const AddChapterContent = () => {
     const saveChapter = useChapterStore(state => state.saveChapter);
     const setTitle = useChapterStore(state => state.setTitle);
     const setContent = useChapterStore(state => state.setContent);
@@ -20,9 +21,9 @@ export const AddChapter = () => {
     }
 
     return (
-        <Container>
+        <>
             <Box sx={{mt: 2}}>
-                <Box sx={{width: '50%'}}>
+                <Box>
                     <TextField
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
@@ -37,14 +38,23 @@ export const AddChapter = () => {
                     sx={{mt: 5}}
                     maxRows="20"/>
             </Box>
-            <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 2}}>
+            <Box sx={{display: 'flex', mt: 2, marginLeft: "auto", width: '50%'}}>
+                <Button
+                    variant="outlined"
+                    sx={{flex: 1, marginRight: 2}}
+                    onClick={() => navigate("/chapters")}
+                >
+                    Back to chapters
+                </Button>
                 <Button
                     variant="contained"
-                    sx={{width:'15%'}}
+                    sx={{flex: 1}}
                     onClick={handleSave}
                 >
-                    Save</Button>
+                    Save
+                </Button>
             </Box>
+
             <Snackbar
                 open={unsuccessfulSave}
                 autoHideDuration={3000}
@@ -54,6 +64,9 @@ export const AddChapter = () => {
                     Some error occurred when saving chapter
                 </Alert>
             </Snackbar>
-        </Container>
+        </>
     );
 }
+
+export const AddChapter = () => {
+    return <LoggedInUserPage mainContent={<AddChapterContent/>}/>;}

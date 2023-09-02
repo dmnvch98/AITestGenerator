@@ -2,10 +2,11 @@ import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import './App.css';
 import LoginPage from "./pages/LoginPage";
-import {Chapters} from "./pages/Chapters";
-import {AddChapter} from "./pages/AddChapter";
-import {ChapterPage} from "./pages/ChapterPage";
+import {Chapters} from "./pages/chapters/Chapters";
+import {AddChapter} from "./pages/chapters/AddChapter";
 import {createTheme, ThemeProvider} from "@mui/material";
+import {ChapterPage} from "./pages/chapters/ChapterPage";
+import {SidebarHeader} from "./components/main/SidebarHeader";
 
 function App() {
     const theme = createTheme({
@@ -35,9 +36,10 @@ function App() {
                 <div className="App">
                     <Routes>
                         <Route path="/chapters" element={<Chapters/>}/>
-                        <Route path="/" element={<LoginPage/>}/>
+                        <Route path="/sign-in" element={<LoginPage/>}/>
                         <Route path="/add-chapter" element={<AddChapter/>}/>
                         <Route path="/chapters/:id" element={<ChapterPage/>}/>
+                        <Route path="/header" element={<SidebarHeader/>}/>
                     </Routes>
                 </div>
             </Router>

@@ -1,8 +1,8 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.jwt.Jwt;
-import com.example.aitestgenerator.dto.CredentialsDto;
-import com.example.aitestgenerator.dto.JwtResponse;
+import com.example.aitestgenerator.dto.auth.CredentialsDto;
+import com.example.aitestgenerator.dto.auth.JwtResponse;
 import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.services.UserService;
 import lombok.RequiredArgsConstructor;

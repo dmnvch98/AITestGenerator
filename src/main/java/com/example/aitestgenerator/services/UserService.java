@@ -2,9 +2,9 @@ package com.example.aitestgenerator.services;
 
 import com.example.aitestgenerator.config.security.PasswordConfig;
 import com.example.aitestgenerator.converters.UserConverter;
-import com.example.aitestgenerator.dto.CreateUserRequestDto;
-import com.example.aitestgenerator.dto.CreateUserResponseDto;
-import com.example.aitestgenerator.dto.CredentialsDto;
+import com.example.aitestgenerator.dto.users.CreateUserRequestDto;
+import com.example.aitestgenerator.dto.users.CreateUserResponseDto;
+import com.example.aitestgenerator.dto.auth.CredentialsDto;
 import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.repositories.UserRepository;
@@ -43,13 +43,9 @@ public class UserService {
         }
     }
 
-    public CreateUserResponseDto save(CreateUserRequestDto userDto) {
-        log.info("Saving user: {}", userDto);
-        User user = userConverter.createUserDtoToUser(userDto);
-        String hashedPassword = passwordConfig.passwordEncoder().encode(userDto.getPassword());
-        user.setPassword(hashedPassword);
-        user = userRepository.save(user);
-        return userConverter.userToCreateUserResponseDto(user);
+    public User save(User user) {
+        log.info("Saving user. Email: {}", user.getEmail());
+        return userRepository.save(user);
     }
 
     public User findUserById(Long id) {

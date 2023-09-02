@@ -16,8 +16,9 @@ class ChapterService {
     getUserChaptersByIdsIn = async (ids: number[]) => {
         try {
             const response = await customAxios.get("http://localhost:8080/api/v1/chapters", {
-                params: { ids: ids.join(',') }
-            });            return response.data;
+                params: {ids: ids.join(',')}
+            });
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);
@@ -57,7 +58,7 @@ class ChapterService {
     updateChapter = async (chapter: Chapter) => {
         try {
             const response = await customAxios.put("http://localhost:8080/api/v1/chapters/", chapter);
-            return response.status == 200;
+            return response.data
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

@@ -1,16 +1,18 @@
-package com.example.aitestgenerator.dto;
+package com.example.aitestgenerator.dto.users;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserResponseDto {
-    private Long id;
+@ToString
+public class CreateUserRequestDto {
     private String email;
     private String firstName;
     private String lastName;
+    private String password;
     private String role;
 }

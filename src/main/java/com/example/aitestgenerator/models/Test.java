@@ -32,11 +32,13 @@ public class Test implements CheckableForEmptiness {
     @JsonProperty("questions")
     private List<Question> questions;
 
+    @ManyToOne
+    @JoinColumn(name = "chapter_id")
+    private Chapter chapter;
 
     @Override
     @JsonIgnore
     public boolean isEmpty() {
         return id == null && user == null && title == null && (questions == null || questions.isEmpty());
     }
-
 }
