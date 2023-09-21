@@ -1,20 +1,20 @@
 import {Alert, Box, Button, Snackbar, TextField} from "@mui/material";
-import {useChapterStore} from "../../zustand/chapterStore";
+import {useTextStore} from "../../store/textStore";
 import {useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 
 export const AddChapterContent = () => {
-    const saveChapter = useChapterStore(state => state.saveChapter);
-    const setTitle = useChapterStore(state => state.setTitle);
-    const setContent = useChapterStore(state => state.setContent);
+    const saveChapter = useTextStore(state => state.saveText);
+    const setTitle = useTextStore(state => state.setTitle);
+    const setContent = useTextStore(state => state.setContent);
     const [unsuccessfulSave, setUnsuccessfulSave] = useState(false);
     const navigate = useNavigate();
 
     const handleSave = async () => {
         const savedSuccessfully = await saveChapter();
         if (savedSuccessfully) {
-            navigate('/chapters');
+            navigate('/texts');
         } else {
             setUnsuccessfulSave(!unsuccessfulSave);
         }
@@ -68,5 +68,5 @@ export const AddChapterContent = () => {
     );
 }
 
-export const AddChapter = () => {
+export const AddText = () => {
     return <LoggedInUserPage mainContent={<AddChapterContent/>}/>;}

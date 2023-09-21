@@ -2,12 +2,10 @@ package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.exceptions.AppException;
-import com.example.aitestgenerator.models.Chapter;
 import com.example.aitestgenerator.models.Test;
-import com.example.aitestgenerator.models.User;
-import com.example.aitestgenerator.services.ChapterService;
+import com.example.aitestgenerator.models.Text;
 import com.example.aitestgenerator.services.TestService;
-import com.example.aitestgenerator.services.UserService;
+import com.example.aitestgenerator.services.TextService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,24 +17,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TestFacade {
     private final TestService testService;
-    private final UserService userService;
-    private final ChapterService chapterService;
+    private final TextService textService;
 
     public Test generateTestAndSave(Long userId, GenerateTestRequestDto dto) throws JsonProcessingException {
-        User user = userService.findUserById(userId);
-        Chapter chapter = chapterService.findAllById(dto.getChapterId());
-
-        if (user.getId().equals(chapter.getUser().getId())) {
-            Test test = testService.generateTest(chapter, dto.getMinQuestionNumber(), dto.getMaxQuestionNumber());
-            test.setUser(user);
-            return testService.saveTest(test);
-        }
-        throw new AppException("Not allowed", HttpStatus.FORBIDDEN);
+        Text text = textService.findAllByIdAndUserId(dto.getTextId(), userId);
+        Test test = testService.generateTest(text, dto.getMinQuestionNumber(), dto.getMaxQuestionNumber());
+        test.setUserId(userId);
+        test.setTextId(text.getId());
+        return testService.saveTest(test);
     }
 
     public void deleteTest(Long testId, Long userId) {
-        User user = userService.findUserById(userId);
-        Test test = testService.findTestByIdAndUser(testId, user);
+        Test test = testService.findTestByIdAndUserId(testId, userId);
         if (test != null) {
             testService.deleteTest(test);
         } else {
@@ -45,11 +37,10 @@ public class TestFacade {
     }
 
     public List<Test> findAllByUser(Long userId) {
-        User user = userService.findUserById(userId);
-        return testService.findAllByUser(user);
+        return testService.findAllByUserId(userId);
     }
 
-    public Test findTestById(Long testId) {
-        return testService.findTestById(testId);
+    public Test findTestById(Long testId, Long userId) {
+        return testService.findTestByIdAndUserId(testId, userId);
     }
 }

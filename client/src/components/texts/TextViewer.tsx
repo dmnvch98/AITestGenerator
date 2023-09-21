@@ -1,18 +1,18 @@
 import {Box, Paper, Typography} from "@mui/material";
 import React from "react";
-import {useChapterStore} from "../../zustand/chapterStore";
+import {useTextStore} from "../../store/textStore";
 
-export const ChapterViewer = () => {
-    const chapter = useChapterStore((state) => state.selectedChapter);
+export const TextViewer = () => {
+    const text = useTextStore((state) => state.selectedText);
 
     return (
         <>
             <Paper sx={{p: 2}}>
                 <Box>
-                    <Typography variant='h4' align='left'>{chapter?.title}</Typography>
+                    <Typography variant='h4' align='left'>{text?.title}</Typography>
                 </Box>
                 <Typography gutterBottom align='left' sx={{mt: 4}}>
-                    {chapter?.text.content}
+                    {text?.content}
                 </Typography>
             </Paper>
         </>

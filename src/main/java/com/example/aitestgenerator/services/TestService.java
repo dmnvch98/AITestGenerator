@@ -1,14 +1,16 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.models.Chapter;
+import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.Test;
-import com.example.aitestgenerator.models.User;
+import com.example.aitestgenerator.models.Text;
 import com.example.aitestgenerator.repositories.TestRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,14 +26,14 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Chapter chapter, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
-        log.info("Generating test for chapter. Chapter ID '{}', min question number: {}, max question number: {}", chapter.getId(), minQuestionNumber, maxQuestionNumber);
-        return testGenerator.generateTest(chapter, minQuestionNumber, maxQuestionNumber);
+    public Test generateTest(Text text, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
+        log.info("Generating test for chapter. Chapter ID '{}', min question number: {}, max question number: {}", text.getId(), minQuestionNumber, maxQuestionNumber);
+        return testGenerator.generateTest(text, minQuestionNumber, maxQuestionNumber);
     }
 
-    public List<Test> findAllByUser(User user) {
-        log.info("Finding all tests for user. User ID: {}", user.getId());
-        return testRepository.findAllByUser(user);
+    public List<Test> findAllByUserId(Long userId) {
+        log.info("Finding all tests for user. User ID: {}", userId);
+        return testRepository.findAllByUserId(userId);
     }
 
     public void deleteTest(Test test) {
@@ -39,12 +41,10 @@ public class TestService {
         testRepository.delete(test);
     }
 
-    public Test findTestByIdAndUser(Long testId, User user) {
-        log.info("Finding test by ID {} for user. User Id: {}", testId, user.getId());
-        return testRepository.findTestByIdAndUser(testId, user);
-    }
-
-    public Test findTestById(Long testId) {
-        return testRepository.findById(testId).orElse(null);
+    public Test findTestByIdAndUserId(Long testId, Long userId) {
+        log.info("Finding test by ID {} for user. User Id: {}", testId, userId);
+        return testRepository.findTestByIdAndUserId(testId, userId)
+            .orElseThrow(() -> new AppException(
+                String.format("Test with Id %d not found for user with id: %d", testId, userId), HttpStatus.NOT_FOUND));
     }
 }

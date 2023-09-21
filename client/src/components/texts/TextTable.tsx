@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {Chapter, useChapterStore} from "../../zustand/chapterStore";
+import {UserText, useTextStore} from "../../store/textStore";
 import {Box, Button, IconButton, Menu, MenuItem} from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
+import Typography from "@mui/material/Typography";
 
-const Actions = ({chapter}: { chapter: Chapter }) => {
+const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const deleteChapter = useChapterStore(state => state.deleteChapter);
+    const deleteText = useTextStore(state => state.deleteText);
     const navigate = useNavigate();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -18,17 +19,17 @@ const Actions = ({chapter}: { chapter: Chapter }) => {
     };
 
     const handleEditClick = () => {
-        navigate("/chapters/" + chapter.id + "?edit=true");
+        navigate("/texts/" + text.id + "?edit=true");
         handleClose();
     }
 
     const handleDeleteClick = () => {
-        deleteChapter(chapter.id as number);
+        deleteText(text.id as number);
         handleClose();
     };
 
     const handleViewClick = () => {
-        navigate("/chapters/" + chapter.id);
+        navigate("/texts/" + text.id);
     }
 
     return (
@@ -50,38 +51,35 @@ const Actions = ({chapter}: { chapter: Chapter }) => {
     );
 };
 
-export const ChapterTable = () => {
-    const userChapters = useChapterStore((state) => state.chapters);
-    const deleteInBatch = useChapterStore((state) => state.deleteInBatch);
-    const setSelectedIdsToArray = useChapterStore((state) => state.setSelectedIdsToArray);
-    const selectedChapterIds = useChapterStore((state) => state.selectedChapterIds);
+export const TextTable = () => {
+    const userTexts = useTextStore((state) => state.texts);
+    const deleteInBatch = useTextStore((state) => state.deleteInBatch);
+    const setSelectedIdsToArray = useTextStore((state) => state.setSelectedIdsToArray);
+    const selectedTextIds = useTextStore((state) => state.selectedTextIds);
     const navigate = useNavigate();
 
     const [columnWidths, setColumnWidths] = useState<{ [field: string]: number }>({
-        id: 10, // Процент ширины для поля 'id'
-        title: 60, // Процент ширины для поля 'title'
-        actions: 30, // Процент ширины для поля 'actions'
+        id: 10,
+        title: 50,
+        actions: 30,
+        test:10
     });
 
-    // Обработчик изменения размера окна
     const handleResize = () => {
-        // Рассчитываем ширину столбцов в зависимости от текущей ширины экрана
         const windowWidth = window.innerWidth;
         setColumnWidths({
             id: (10 / 100) * windowWidth,
-            title: (60 / 100) * windowWidth,
+            title: (50 / 100) * windowWidth,
             actions: (30 / 100) * windowWidth,
+            test: (10 / 100) * windowWidth,
         });
     };
 
     useEffect(() => {
-        // Устанавливаем начальные значения ширины столбцов при загрузке
         handleResize();
 
-        // Добавляем обработчик события изменения размера окна
         window.addEventListener('resize', handleResize);
 
-        // Убираем обработчик события при размонтировании компонента
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -91,20 +89,31 @@ export const ChapterTable = () => {
         { field: 'id', headerName: 'ID', width: columnWidths.id },
         {
             field: 'title',
-            headerName: 'Chapter title',
+            headerName: 'Text title',
             width: columnWidths.title,
+        },
+        {
+            field: 'test',
+            headerName: 'Test Exists',
+            width: columnWidths.test,
+            renderCell: (params) => {
+                const text: UserText = params.row;
+                return text.testIds
+                    ? <Typography color="darkgreen">Yes</Typography>
+                    : <Typography color="error">No</Typography>
+            },
         },
         {
             field: 'actions',
             headerName: 'Actions',
             width: columnWidths.actions,
             renderCell: (params) => {
-                const chapter: Chapter = params.row;
+                const text: UserText = params.row;
 
                 return (
                     <Box>
                         <IconButton>
-                            <Actions chapter={chapter} />
+                            <Actions text={text} />
                         </IconButton>
                     </Box>
                 );
@@ -117,7 +126,7 @@ export const ChapterTable = () => {
     return (
         <Box style={{ width: '100%' }}>
             <DataGrid
-                rows={userChapters}
+                rows={userTexts}
                 columns={columns}
                 initialState={{
                     pagination: {
@@ -135,22 +144,22 @@ export const ChapterTable = () => {
                 <Button
                     sx={{ mr: 2 }}
                     variant="outlined"
-                    onClick={() => navigate('/add-chapter')}
+                    onClick={() => navigate('/add-text')}
                 >
-                    Add Chapter
+                    Add Text
                 </Button>
 
                 <Button
                     sx={{ mr: 2 }}
                     variant="outlined"
-                    disabled={selectedChapterIds.length === 0}
+                    disabled={selectedTextIds.length === 0}
                 >
                     Generate test
                 </Button>
 
                 <Button
                     variant="outlined"
-                    disabled={selectedChapterIds.length === 0}
+                    disabled={selectedTextIds.length === 0}
                     color="error"
                     onClick={deleteInBatch}
                 >

@@ -1,9 +1,9 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
-import com.example.aitestgenerator.facades.ChapterFacade;
-import com.example.aitestgenerator.models.Chapter;
-import com.example.aitestgenerator.services.ChapterService;
+import com.example.aitestgenerator.dto.texts.TextResponseDto;
+import com.example.aitestgenerator.facades.TextFacade;
+import com.example.aitestgenerator.models.Text;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -12,42 +12,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/chapters")
+@RequestMapping("/api/v1/texts")
 @RequiredArgsConstructor
-public class ChapterController {
-    private final ChapterService chapterService;
-    private final ChapterFacade chapterFacade;
+public class TextController {
+    private final TextFacade textFacade;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Chapter save(@RequestBody Chapter chapter, Authentication authentication) {
+    public Text save(@RequestBody Text text, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return chapterService.save(chapter, userId);
+        return textFacade.save(text, userId);
     }
 
     @GetMapping
-    public List<Chapter> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
+    public List<TextResponseDto> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return chapterFacade.findAllByUser(ids, userId);
+        return textFacade.findAllByUser(ids, userId);
     }
 
     @PutMapping
-    public Chapter update(@RequestBody Chapter chapter, Authentication authentication) {
+    public TextResponseDto update(@RequestBody Text text, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return chapterFacade.update(chapter, userId);
+        return textFacade.update(text, userId);
     }
 
     @DeleteMapping("/{chapterId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long chapterId, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        chapterFacade.delete(chapterId, userId);
+        textFacade.delete(chapterId, userId);
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInBatch(@RequestBody List<Long> ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        chapterFacade.deleteInBatch(ids, userId);
+        textFacade.deleteInBatch(ids, userId);
     }
 }

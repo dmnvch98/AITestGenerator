@@ -4,20 +4,29 @@ import lombok.*;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(name = "texts")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Text {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
+    @Column(name = "user_id")
+    Long userId;
+    @Column(name = "title")
+    String title;
+    @Column(name = "content")
+    String content;
 
-    @Column(nullable = false)
-    private String content;
-
+    @Override
+    public String toString() {
+        return "Text{" +
+            "title='" + title + '\'' +
+            ", content='" + content + '\'' +
+            '}';
+    }
 }

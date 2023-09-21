@@ -4,7 +4,7 @@ import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
-import com.example.aitestgenerator.services.TestService;
+import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,13 +17,18 @@ import java.util.List;
 @RequestMapping("/api/v1/tests")
 @RequiredArgsConstructor
 public class TestController {
-    private final TestService testService;
     private final TestFacade testFacade;
 
     @GetMapping("/my")
     public List<Test> findAllByUserId(Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findAllByUser(userId);
+    }
+
+    @GetMapping("/{id}")
+    public Test findAllById(Authentication authentication, @PathVariable Long id) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.findTestById(id, userId);
     }
 
     @PostMapping

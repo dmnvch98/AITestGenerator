@@ -1,11 +1,11 @@
 import {AxiosError} from "axios";
 import customAxios from "../interceptors/custom_axios";
-import {Chapter} from "../zustand/chapterStore";
+import {UserText} from "../store/textStore";
 
-class ChapterService {
-    getAllUserChapters = async () => {
+class TextService {
+    getAllUserTexts = async () => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/chapters");
+            const response = await customAxios.get("http://localhost:8080/api/v1/texts");
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -13,9 +13,9 @@ class ChapterService {
         }
     }
 
-    getUserChaptersByIdsIn = async (ids: number[]) => {
+    getUserTextsByIdsIn = async (ids: number[]) => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/chapters", {
+            const response = await customAxios.get("http://localhost:8080/api/v1/texts", {
                 params: {ids: ids.join(',')}
             });
             return response.data;
@@ -25,9 +25,9 @@ class ChapterService {
         }
     }
 
-    saveChapter = async (chapter: Chapter) => {
+    saveText = async (text: UserText) => {
         try {
-            const response = await customAxios.post("http://localhost:8080/api/v1/chapters", chapter);
+            const response = await customAxios.post("http://localhost:8080/api/v1/texts", text);
             return response.status == 201;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -35,9 +35,9 @@ class ChapterService {
         }
     }
 
-    deleteChapter = async (id: number) => {
+    deleteText = async (id: number) => {
         try {
-            const response = await customAxios.delete("http://localhost:8080/api/v1/chapters/" + id);
+            const response = await customAxios.delete("http://localhost:8080/api/v1/texts/" + id);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -47,7 +47,7 @@ class ChapterService {
 
     deleteInBatch = async (ids: number[]) => {
         try {
-            const response = await customAxios.patch("http://localhost:8080/api/v1/chapters/", ids);
+            const response = await customAxios.patch("http://localhost:8080/api/v1/texts/", ids);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -55,9 +55,9 @@ class ChapterService {
         }
     }
 
-    updateChapter = async (chapter: Chapter) => {
+    updateText = async (text: UserText) => {
         try {
-            const response = await customAxios.put("http://localhost:8080/api/v1/chapters/", chapter);
+            const response = await customAxios.put("http://localhost:8080/api/v1/texts/", text);
             return response.data
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -66,4 +66,4 @@ class ChapterService {
     }
 }
 
-export default new ChapterService();
+export default new TextService();

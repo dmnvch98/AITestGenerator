@@ -1,23 +1,23 @@
 import {Alert, Box, Button, Container, Snackbar} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {useChapterStore} from "../../zustand/chapterStore";
-import {ChapterEditor} from "../../components/chapters/ChapterEditor";
-import {ChapterViewer} from "../../components/chapters/ChapterViewer";
+import {useTextStore} from "../../store/textStore";
+import {TextEditor} from "../../components/texts/TextEditor";
+import {TextViewer} from "../../components/texts/TextViewer";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 
-export const ChapterPageContent = () => {
+export const TextPageContent = () => {
     const {id} = useParams();
     const [isEditing, setIsEditing] = useState(false);
 
-    const chapters = useChapterStore(state => state.chapters);
-    const setTitle = useChapterStore(state => state.setTitle);
-    const setContent = useChapterStore(state => state.setContent);
-    const chapterUpdatedFlag = useChapterStore(state => state.chapterUpdatedFlag);
-    const toggleChapterUpdatedFlag = useChapterStore(state => state.toggleChapterUpdatedFlag);
-    const getUserChaptersByIdsIn = useChapterStore(state => state.getUserChaptersByIdsIn);
-    const selectChapter = useChapterStore(state => state.selectChapter);
-    const updateChapter = useChapterStore(state => state.updateChapter);
+    const texts = useTextStore(state => state.texts);
+    const setTitle = useTextStore(state => state.setTitle);
+    const setContent = useTextStore(state => state.setContent);
+    const textUpdatedFlag = useTextStore(state => state.textUpdatedFlag);
+    const toggleTextUpdatedFlag = useTextStore(state => state.toggleTextUpdatedFlag);
+    const getUserTextsByIdIn = useTextStore(state => state.getUserTextsByIdIn);
+    const selectText = useTextStore(state => state.selectText);
+    const updateText = useTextStore(state => state.updateText);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -29,21 +29,21 @@ export const ChapterPageContent = () => {
     }, [location.search]);
 
     useEffect(() => {
-        if (chapters.length === 0) {
-            getUserChaptersByIdsIn([Number(id)]).then(() => {
-                loadChapterData(Number(id));
+        if (texts.length === 0) {
+            getUserTextsByIdIn([Number(id)]).then(() => {
+                loadTextData(Number(id));
             });
         } else {
-            loadChapterData(Number(id));
+            loadTextData(Number(id));
         }
-    }, [id, chapters]);
+    }, [id, texts]);
 
-    const loadChapterData = (id: number) => {
-        const chapter = chapters.find(ch => ch.id === id);
-        if (chapter) {
-            selectChapter(chapter);
-            setTitle(chapter.title);
-            setContent(chapter.text.content);
+    const loadTextData = (id: number) => {
+        const text = texts.find(ch => ch.id === id);
+        if (text) {
+            selectText(text);
+            setTitle(text.title);
+            setContent(text.content);
         }
     };
 
@@ -51,14 +51,14 @@ export const ChapterPageContent = () => {
         <>
             <Container>
                 <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                    {isEditing ? <ChapterEditor/> : <ChapterViewer/>}
+                    {isEditing ? <TextEditor/> : <TextViewer/>}
                     <Box sx={{display: 'flex', mt: 2, marginLeft: "auto", width: '40%'}}>
                         <Button
                             variant="outlined"
                             sx={{flex: 1, marginRight: 2, display: isEditing ? 'none' : 'block'}}
-                            onClick={() => navigate("/chapters")}
+                            onClick={() => navigate("/texts")}
                         >
-                            Back to chapters
+                            Back to texts
                         </Button>
                         <Button
                             variant="contained"
@@ -78,7 +78,7 @@ export const ChapterPageContent = () => {
                             variant="contained"
                             sx={{flex: 1, display: isEditing ? 'block' : 'none'}}
                             onClick={() => {
-                                updateChapter();
+                                updateText();
                                 setIsEditing(!isEditing)
                             }}
                         >
@@ -88,9 +88,9 @@ export const ChapterPageContent = () => {
                 </Box>
 
                 <Snackbar
-                    open={chapterUpdatedFlag}
+                    open={textUpdatedFlag}
                     autoHideDuration={3000}
-                    onClose={toggleChapterUpdatedFlag}
+                    onClose={toggleTextUpdatedFlag}
                 >
                     <Alert severity="success">
                         Updated
@@ -100,6 +100,6 @@ export const ChapterPageContent = () => {
         </>
     );
 };
-export const ChapterPage = () => {
-    return <LoggedInUserPage mainContent={<ChapterPageContent/>}/>;
+export const TextPage = () => {
+    return <LoggedInUserPage mainContent={<TextPageContent/>}/>;
 }

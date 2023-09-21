@@ -16,7 +16,7 @@ function LoginPage() {
 
             if (response.status === 200) {
                 localStorage.setItem("JWT", response.data.accessToken);
-                navigate('/chapters');
+                navigate('/texts');
             }
         } catch (error) {
             console.error('Login error:', error);

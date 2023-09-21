@@ -1,7 +1,7 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.models.Chapter;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -24,12 +24,10 @@ public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
 
-    public Test generateTest(Chapter chapter, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
+    public Test generateTest(Text text, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
         String request = readFileContents("ai_prompts/generate_test.txt");
 
-        log.info("Generating test for chapter '{}', min question number: {}, max question number: {}", chapter.toString(), minQuestionNumber, maxQuestionNumber);
-
-        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, chapter.toString(), minQuestionNumber, maxQuestionNumber);
+        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text, minQuestionNumber, maxQuestionNumber);
 
         ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
 
@@ -38,9 +36,9 @@ public class TestGenerator {
         return parseTestFromJson(testJson);
     }
 
-    private ChatCompletionRequest buildChatCompletionRequest(String request, String chapter, Integer minQuestionNumber, Integer maxQuestionNumber) {
+    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text, Integer minQuestionNumber, Integer maxQuestionNumber) {
         ChatMessage taskPrompt = createChatMessage(request, "user");
-        ChatMessage userTextPrompt = createChatMessage(chapter, "user");
+        ChatMessage userTextPrompt = createChatMessage(text.toString(), "user");
         ChatMessage questionNumberPrompt = createChatMessage("Минимальное количество вопросов " + minQuestionNumber
             + "\n Максимальное число вопросов " + maxQuestionNumber, "user");
 
@@ -70,7 +68,7 @@ public class TestGenerator {
             question.getAnswerOptions().forEach(answerOption -> answerOption.setQuestion(question));
         });
 
-        log.info("Test parsing complete.");
+        log.info("Test parsing complete. Test id: {}", test.getId());
 
         return test;
     }

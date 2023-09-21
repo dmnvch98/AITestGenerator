@@ -110,9 +110,9 @@ export const SidebarHeader = ({ children }: any) => {
             redirect: '/tests',
         },
         {
-            name: 'Chapters',
+            name: 'Texts',
             icon: <TextSnippetIcon />,
-            redirect: '/chapters',
+            redirect: '/texts',
         },
         {
             name: 'Balance',
