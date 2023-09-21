@@ -42,7 +42,7 @@ export const AddChapterContent = () => {
                 <Button
                     variant="outlined"
                     sx={{flex: 1, marginRight: 2}}
-                    onClick={() => navigate("/chapters")}
+                    onClick={() => navigate("/texts")}
                 >
                     Back to chapters
                 </Button>
