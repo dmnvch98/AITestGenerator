@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.aitestgenerator.utils.Utils.countTokens;
@@ -33,33 +34,49 @@ public class TestGenerator {
 
         String testJson = chatCompletionResult.getChoices().get(0).getMessage().getContent();
 
-        return parseTestFromJson(testJson);
+        return parseTestFromJson(testJson, text.getId());
     }
 
     private ChatCompletionRequest buildChatCompletionRequest(String request, Text text, Integer minQuestionNumber, Integer maxQuestionNumber) {
-        ChatMessage taskPrompt = createChatMessage(request, "user");
-        ChatMessage userTextPrompt = createChatMessage(text.toString(), "user");
-        ChatMessage questionNumberPrompt = createChatMessage("Минимальное количество вопросов " + minQuestionNumber
-            + "\n Максимальное число вопросов " + maxQuestionNumber, "user");
+        List<ChatMessage> messages = new ArrayList<>();
 
-        int maxTokens = 8000 - countTokens(request + userTextPrompt);
+        ChatMessage taskPrompt = createChatMessage(request);
+        ChatMessage userTextPrompt = createChatMessage(text.toString());
+
+        messages.add(taskPrompt);
+        messages.add(userTextPrompt);
+
+        if (minQuestionNumber != null) {
+            ChatMessage minQuestionsNumberPrompt = createChatMessage("Минимальное количество вопросов "
+                + minQuestionNumber);
+            messages.add(minQuestionsNumberPrompt);
+        }
+
+        if (maxQuestionNumber != null) {
+            ChatMessage maxQuestionsNumberPrompt = createChatMessage("Максимальное количество вопросов "
+                + minQuestionNumber);
+            messages.add(maxQuestionsNumberPrompt);
+        }
+
+        int maxTokens = 16000 - countTokens(request + userTextPrompt);
+
         return ChatCompletionRequest.builder()
             .model("gpt-3.5-turbo-16k")
-            .messages(List.of(taskPrompt, userTextPrompt, questionNumberPrompt))
+            .messages(messages)
             .maxTokens(maxTokens)
             .temperature(0.5)
             .build();
     }
 
-    private ChatMessage createChatMessage(String content, String role) {
+    private ChatMessage createChatMessage(String content) {
         ChatMessage message = new ChatMessage();
         message.setContent(content);
-        message.setRole(role);
+        message.setRole("user");
         return message;
     }
 
-    private Test parseTestFromJson(String testJson) throws JsonProcessingException {
-        log.info("Parsing test from JSON...");
+    private Test parseTestFromJson(String testJson, Long textId) throws JsonProcessingException {
+        log.info("Parsing test from JSON. Text id: {}", textId);
 
         Test test = objectMapper.readValue(testJson, Test.class);
 
@@ -68,7 +85,7 @@ public class TestGenerator {
             question.getAnswerOptions().forEach(answerOption -> answerOption.setQuestion(question));
         });
 
-        log.info("Test parsing complete. Test id: {}", test.getId());
+        log.info("Test parsing for text is completed. Text id: {}", textId);
 
         return test;
     }

@@ -1,5 +1,4 @@
 package com.example.aitestgenerator.models;
-import com.example.aitestgenerator.interfaces.CheckableForEmptiness;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AnswerOption implements CheckableForEmptiness {
+public class AnswerOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,10 +30,4 @@ public class AnswerOption implements CheckableForEmptiness {
     @Column(name = "is_correct")
     @JsonProperty("isCorrect")
     private Boolean isCorrect;
-
-    @Override
-    @JsonIgnore
-    public boolean isEmpty() {
-        return id == null && question == null && optionText == null && isCorrect == null;
-    }
 }

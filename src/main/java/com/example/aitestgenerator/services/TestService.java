@@ -47,4 +47,9 @@ public class TestService {
             .orElseThrow(() -> new AppException(
                 String.format("Test with Id %d not found for user with id: %d", testId, userId), HttpStatus.NOT_FOUND));
     }
+
+    public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
+
+        return testRepository.findAllByIdInAndUserId(testIds, userId);
+    }
 }

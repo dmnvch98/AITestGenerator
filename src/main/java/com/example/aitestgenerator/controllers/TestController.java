@@ -19,10 +19,10 @@ import java.util.List;
 public class TestController {
     private final TestFacade testFacade;
 
-    @GetMapping("/my")
-    public List<Test> findAllByUserId(Authentication authentication) {
+    @GetMapping
+    public List<Test> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.findAllByUser(userId);
+        return testFacade.findAllByUser(ids, userId);
     }
 
     @GetMapping("/{id}")

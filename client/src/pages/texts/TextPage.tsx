@@ -23,8 +23,11 @@ export const TextPageContent = () => {
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
-        if (searchParams.get("edit") === "true") {
+        let isEditParamPresent = searchParams.get("edit");
+        if (isEditParamPresent !== null && isEditParamPresent !== "false") {
             setIsEditing(true);
+        } else {
+            setIsEditing(false);
         }
     }, [location.search]);
 

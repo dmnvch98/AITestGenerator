@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -36,9 +37,15 @@ public class TestFacade {
         }
     }
 
-    public List<Test> findAllByUser(Long userId) {
+    public List<Test> findAllByUser(Long[] testIds, Long userId) {
+        if (testIds != null && testIds.length > 0) {
+            return testService
+                .findAllByIdInAndUserId(Arrays.asList(testIds), userId);
+
+        }
         return testService.findAllByUserId(userId);
     }
+
 
     public Test findTestById(Long testId, Long userId) {
         return testService.findTestByIdAndUserId(testId, userId);
