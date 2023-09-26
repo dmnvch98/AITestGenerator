@@ -44,7 +44,7 @@ function App() {
                         <Route path="/texts/:id" element={<TextPage/>}/>
                         <Route path="/tests" element={<Tests/>}/>
                         <Route path="/tests/:id" element={<TestPageView/>}/>
-                        <Route path="/tests/:id/pass" element={<TestPass/>}/>
+                        <Route path="/tests/pass" element={<TestPass/>}/>
                         <Route path="/tests/result" element={<TestResults/>}/>
                     </Routes>
                 </div>

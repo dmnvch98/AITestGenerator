@@ -6,6 +6,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import {useTestStore} from "../../store/tests/testStore";
+import {DoneLabel} from "../utils/DoneLabel";
+import {NoLabel} from "../utils/NoLabel";
 
 const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -55,7 +57,7 @@ const Actions = ({text}: { text: UserText }) => {
                 <MenuItem onClick={handleViewClick}>View</MenuItem>
                 <MenuItem onClick={handleEditClick}>Edit</MenuItem>
                 <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-                <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>GenerateTest</MenuItem>
+                <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>Generate Test</MenuItem>
             </Menu>
         </div>
     );
@@ -111,14 +113,13 @@ export const TextTable = () => {
             renderCell: (params) => {
                 const text: UserText = params.row;
                 return text.testIds
-                    ? <Typography color="darkgreen">Yes</Typography>
-                    : <Typography color="error">No</Typography>
+                    ? <DoneLabel/>
+                    : <NoLabel/>
             },
         },
         {
             field: 'actions',
             headerName: 'Actions',
-            // width: columnWidths.actions,
             renderCell: (params) => {
                 const text: UserText = params.row;
 

@@ -1,54 +1,22 @@
-import React from "react";
-import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
-import { usePassTestStore } from "../../store/tests/passTestStore";
-import {
-    Container,
-    Typography,
-    Table,
-    TableContainer,
-    TableHead,
-    TableBody,
-    TableRow,
-    TableCell,
-    Button,
-} from "@mui/material";
+import React, {useEffect} from "react";
+import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import {usePassTestStore} from "../../store/tests/passTestStore";
+import {TestResultTable} from "../../components/tests/TestResultTable";
+import {Box, Typography} from "@mui/material";
 
 const TestResultContent = () => {
-    const answers = usePassTestStore((state) => state.answers);
-    const totalQuestions = answers.length;
-    const passedQuestions = answers.filter((answer) => answer.isPassed).length;
-    console.log(answers)
-
+    const testResults = usePassTestStore((state) => state.testResults);
+    useEffect(() => {console.log(testResults)}, [])
     return (
-        <Container>
-            <Typography variant="h4" align='left'>Результаты теста</Typography>
-            <Typography align='left'>
-                Пройдено вопросов: {passedQuestions} из {totalQuestions}
-            </Typography>
-
-            <TableContainer>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Question Number</TableCell>
-                            <TableCell>Is Passed</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {answers.map((answer, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{answer.questionNumber}</TableCell>
-                                <TableCell>{answer.isPassed ? "Yes" : "No"}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-        </Container>
+        <>
+            <Box>
+                <Typography variant="h4" align='left' sx={{mb: 2}}>Результаты теста</Typography>
+                {testResults.map(testResult => <TestResultTable testResult={testResult}/>)}
+            </Box>
+        </>
     );
 };
 
 export const TestResults = () => {
-    return <LoggedInUserPage mainContent={<TestResultContent />} />;
+    return <LoggedInUserPage mainContent={<TestResultContent/>}/>;
 };

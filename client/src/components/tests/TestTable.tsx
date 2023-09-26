@@ -1,13 +1,15 @@
 import React from 'react';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {Box, IconButton, Menu, MenuItem} from "@mui/material";
+import {Box, Button, IconButton, Menu, MenuItem} from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
 import {UserTest, useTestStore} from "../../store/tests/testStore";
+import {usePassTestStore} from "../../store/tests/passTestStore";
 
 const Actions = ({test}: { test: UserTest }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const deleteTest = useTestStore(state => state.deleteTest);
+    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
     const navigate = useNavigate();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,7 +28,8 @@ const Actions = ({test}: { test: UserTest }) => {
     }
 
     const handlePassClick = () => {
-        navigate("/tests/" + test.id + "/pass");
+        setTestIdsToPass([test.id])
+        navigate("/tests/pass");
     }
 
     return (
@@ -49,7 +52,9 @@ const Actions = ({test}: { test: UserTest }) => {
 };
 
 export const TestTable = () => {
+    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
     const userTests = useTestStore(state => state.tests);
+    const navigate = useNavigate();
 
     const columns: GridColDef[] = [
         {
@@ -91,12 +96,22 @@ export const TestTable = () => {
                     },
                 }}
                 onRowSelectionModelChange={(ids) => {
-                    // setSelectedIdsToArray(ids as number[]);
+                    setTestIdsToPass(ids as number[]);
                 }}
                 pageSizeOptions={[5, 10, 15]}
                 checkboxSelection
                 disableRowSelectionOnClick
             />
+            <Box display="flex" sx={{mt: 2}} justifyContent="flex-start">
+                <Button
+                    sx={{mr: 2}}
+                    variant="outlined"
+                    onClick={() => navigate("/tests/pass")}
+                >
+                    Pass selected
+                </Button>
+
+            </Box>
         </Box>
 
 

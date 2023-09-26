@@ -1,50 +1,59 @@
 import { useEffect, useState } from "react";
 import { useTestStore } from "../../store/tests/testStore";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {QAP} from "../../components/tests/QAP";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import {usePassTestStore} from "../../store/tests/passTestStore";
 
 const TestPassContent = () => {
-    const {id} = useParams();
-    const selectedTest = useTestStore(state => state.selectedTest);
+    const testIdsToPass = usePassTestStore(state => state.testIdsToPass);
+    const testToPass = usePassTestStore(state => state.testToPass);
+    const setTestsToPass = usePassTestStore(state => state.setTestsToPass);
+    const saveTestResult = usePassTestStore(state => state.saveTestResult);
     const getUserTestsByIdIn = useTestStore(state => state.getUserTestsByIdIn);
-    const selectTest = useTestStore(state => state.selectTest);
     const tests = useTestStore(state => state.tests);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (tests.length === 0) {
-            getUserTestsByIdIn([Number(id)]).then(() => {
-                loadTestData(Number(id));
-            });
+            getUserTestsByIdIn(testIdsToPass).then(() => {setTestsToPass(tests)});
         } else {
-            loadTestData(Number(id));
+            setTestsToPass(tests.filter(t => testIdsToPass.includes(t.id)));
         }
-    }, [id, tests]);
+    }, [tests]);
 
-    const loadTestData = (id: number) => {
-        const test = tests.find(test => test.id === id);
-        if (test) {
-            selectTest(test);
-        }
-    };
-
+    const [currentTestId, setCurrentTestId] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     const handleNextQuestion = () => {
-        if (selectedTest && (currentQuestionIndex < selectedTest.questions.length - 1)) {
+        const currentTest = testToPass[currentTestId];
+
+        // Check if there are more questions in the current test
+        if (currentTest && currentQuestionIndex < currentTest.questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-            navigate("/tests/result")
+            saveTestResult(currentTest.title);
+            // If there are no more questions in the current test
+            if (currentTestId < testToPass.length - 1) {
+                // Move to the next test
+                setCurrentTestId(currentTestId + 1);
+                // Reset the question index to the first question of the next test
+                setCurrentQuestionIndex(0);
+            } else {
+                // If there are no more tests, navigate to the results page
+                navigate("/tests/result");
+            }
         }
     };
 
+
     return (
         <>
-            {selectedTest && (
+            {testToPass.length > 0 && (
                 <QAP
-                    question={selectedTest.questions[currentQuestionIndex]}
+                    question={testToPass[currentTestId].questions[currentQuestionIndex]}
                     questionNumber={currentQuestionIndex + 1}
+                    allQuestionsNumber={testToPass[currentTestId].questions.length}
                     onNextQuestion={handleNextQuestion}
                 />
             )}

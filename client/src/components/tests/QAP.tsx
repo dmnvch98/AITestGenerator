@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Button, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
@@ -6,16 +6,35 @@ import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore"
 export const QAP = ({
                         question,
                         questionNumber,
+                        allQuestionsNumber,
                         onNextQuestion
                     }: {
     question: Question;
     onNextQuestion: () => void;
     questionNumber: number;
+    allQuestionsNumber: number;
 
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
     const [accepted, setAccepted] = useState(false);
+    const [nextClickedCounter, setNextClickedCounter] = useState<number>(0);
     const addAnswer = usePassTestStore(state => state.addAnswer);
+
+    useEffect(() => {
+        if (nextClickedCounter == 1 && selectedOptions.length > 0) {
+            setAccepted(true)
+            handleAccept();
+        } else if (nextClickedCounter == 1 && selectedOptions.length == 0) {
+            setAccepted(true)
+            handleAccept();
+            onNextQuestion();
+        }  else if (nextClickedCounter == 2 && selectedOptions.length > 0) {
+            setAccepted(true)
+            handleAccept();
+            onNextQuestion();
+        }
+        setNextClickedCounter(0)
+    }, [nextClickedCounter])
 
     const getOptionColor = (option: AnswerOption) => {
         if (!accepted && isOptionSelected(option.id)) {
@@ -30,25 +49,33 @@ export const QAP = ({
     const isOptionSelected = (optionId: number) => selectedOptions.includes(optionId);
 
     const handleOptionSelect = (optionId: number) => {
-        if (selectedOptions.includes(optionId)) {
-            setSelectedOptions((prevSelectedOptions) =>
-                prevSelectedOptions.filter((id) => id !== optionId)
-            );
-        } else {
-            setSelectedOptions((prevSelectedOptions) => [
-                ...prevSelectedOptions,
-                optionId
-            ]);
+        if (!accepted) {
+            if (selectedOptions.includes(optionId)) {
+                setSelectedOptions((prevSelectedOptions) =>
+                    prevSelectedOptions.filter((id) => id !== optionId)
+                );
+            } else {
+                setSelectedOptions((prevSelectedOptions) => [
+                    ...prevSelectedOptions,
+                    optionId
+                ]);
+            }
         }
     }
 
     const handleAccept = () => {
-        setAccepted(!accepted);
+        setAccepted(false);
         let questionAnswer: QuestionAnswer = {
             questionNumber: questionNumber,
             isPassed: isAnswerCorrect()
         }
         addAnswer(questionAnswer);
+    }
+
+    const handleNext = () => {
+        setNextClickedCounter(nextClickedCounter + 1);
+        console.log(nextClickedCounter);
+
     }
 
     const isAnswerCorrect = (): boolean => {
@@ -65,13 +92,16 @@ export const QAP = ({
     return (
         <>
             <Box sx={{mb: 2}}>
-                <Typography variant='h5' align='left'>Вопрос {questionNumber}: {question.questionText}</Typography>
+                <Typography variant='h5'
+                            align='left'>Вопрос {questionNumber} из {allQuestionsNumber}: {question.questionText}</Typography>
             </Box>
 
-            <Box>
+            <Box sx={{
+                width: "50%",
+                margin: "0 auto"
+            }}>
                 {question.answerOptions.map((option) => (
-                    <Box key={option.id} sx={{ width: "50%",
-                        margin: "0 auto",
+                    <Box key={option.id} sx={{
                         mb: 2,
                         borderRadius: 1,
                         border: "2px solid " + getOptionColor(option)
@@ -87,27 +117,25 @@ export const QAP = ({
                         </Paper>
                     </Box>
                 ))}
-            </Box>
 
-            <Box>
-                <Button
-                    variant='contained'
-                    onClick={() => handleAccept()}
-                    sx={{width: "25%"}}
-                    size='large'>
-                    Accept
-                </Button>
-                <Button
-                    variant='contained'
-                    onClick={() => {
-                        onNextQuestion();
-                        setAccepted(!accepted)
-                        setSelectedOptions([])
-                    }}
-                    sx={{width: "25%"}}
-                    size='large'>
-                    Next
-                </Button>
+                <Box>
+                    {/*<Button*/}
+                    {/*    variant='contained'*/}
+                    {/*    onClick={() => handleAccept()}*/}
+                    {/*    sx={{width: "50%", mr: 1}}*/}
+                    {/*    size='large'*/}
+                    {/*>*/}
+                    {/*    Accept*/}
+                    {/*</Button>*/}
+                    <Button
+                        variant='contained'
+                        onClick={handleNext}
+                        size='large'
+                        fullWidth
+                    >
+                        Next
+                    </Button>
+                </Box>
             </Box>
         </>
     )
