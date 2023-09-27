@@ -1,19 +1,28 @@
 import React, {useState} from "react";
-import {Box, Button, Paper, Typography} from "@mui/material";
+import {Box, Button, ListItemText, ListSubheader, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
 import {appColors} from "../../colors/appColors";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
 
 export const QAP = ({
                         question,
                         questionNumber,
                         allQuestionsNumber,
-                        onNextQuestion
+                        onNextQuestion,
+                        testTitle,
+                        currentTestNumber,
+                        allTestsNumber,
                     }: {
     question: Question;
     onNextQuestion: () => void;
     questionNumber: number;
     allQuestionsNumber: number;
+    testTitle: string,
+    currentTestNumber: number,
+    allTestsNumber: number
 
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
@@ -85,6 +94,9 @@ export const QAP = ({
             <Box sx={{mb: 2}}>
                 <Typography variant='h5'
                             align='left'>Вопрос {questionNumber} из {allQuestionsNumber}: {question.questionText}</Typography>
+                <Typography align='left' sx={{mt: 1}}>Тема теста: {testTitle}</Typography>
+                <Typography align='left' sx={{mt: 1}}>Тест {currentTestNumber} из {allTestsNumber}</Typography>
+
             </Box>
 
             <Box sx={{
@@ -120,6 +132,7 @@ export const QAP = ({
                     </Button>
                 </Box>
             </Box>
+
         </>
     )
 }

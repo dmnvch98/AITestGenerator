@@ -1,7 +1,6 @@
 import {TestResult} from "../../store/tests/passTestStore";
 import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import React from "react";
-import Divider from "@mui/material/Divider";
 import {DoneLabel} from "../utils/DoneLabel";
 import {NoLabel} from "../utils/NoLabel";
 
@@ -24,7 +23,7 @@ export const TestResultTable = ({testResult}: { testResult: TestResult }) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Question Number</TableCell>
-                                <TableCell>Is Passed</TableCell>
+                                <TableCell>Passed</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

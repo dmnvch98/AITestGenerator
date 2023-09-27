@@ -4,7 +4,6 @@ import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
-import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,5 +41,11 @@ public class TestController {
     public void deleteTest(Authentication authentication, @PathVariable Long testId) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         testFacade.deleteTest(testId, userId);
+    }
+
+    @PatchMapping
+    public Test updateTest(Authentication authentication, @RequestBody Test updatedTest) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.updateTest(updatedTest, userId);
     }
 }

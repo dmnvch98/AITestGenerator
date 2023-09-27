@@ -3,6 +3,7 @@ import {useEffect} from "react";
 import {useTestStore} from "../../store/tests/testStore";
 import {TestTable} from "../../components/tests/TestTable";
 import {Alert, Snackbar} from "@mui/material";
+import Typography from "@mui/material/Typography";
 
 const TestsContent = () => {
     const getAllUserTests = useTestStore(state => state.getAllUserTests);
@@ -14,6 +15,9 @@ const TestsContent = () => {
     }, [])
     return (
         <>
+            <Typography variant="h5" align="left" sx={{mb: 2}}>
+                Saved Tests
+            </Typography>
             <TestTable/>
             <Snackbar
                 open={testDeletedFlag}

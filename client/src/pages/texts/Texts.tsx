@@ -3,6 +3,7 @@ import {Alert, Box, Snackbar} from "@mui/material";
 import {useEffect} from "react";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import {TextTable} from "../../components/texts/TextTable";
+import Typography from "@mui/material/Typography";
 
 const ChaptersContent = () => {
     const textSavedFlag: boolean = useTextStore(state => state.textSavedFlag);
@@ -17,6 +18,10 @@ const ChaptersContent = () => {
 
     return (
         <>
+            <Typography variant="h5" align="left" sx={{mb: 2}}>
+                Saved Texts
+            </Typography>
+
             <Box>
                 <TextTable/>
             </Box>

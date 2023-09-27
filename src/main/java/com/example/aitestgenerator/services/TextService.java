@@ -38,7 +38,7 @@ public class TextService {
 
     public void delete(Long id, Long userId) {
         log.info("deleting text. Text id: {}. User id: {}", id, userId);
-        Text existingText = findAllByIdAndUserId(id, userId);
+        Text existingText = findAllByIdAndUserIdOrThrow(id, userId);
 
         textRepository.delete(existingText);
     }
@@ -46,7 +46,7 @@ public class TextService {
     public Text update(Text text, Long userId) {
         log.info("Updating text.Text ID: {}", text.getId());
 
-        findAllByIdAndUserId(text.getId(), userId);
+        findAllByIdAndUserIdOrThrow(text.getId(), userId);
 
         text.setUserId(userId);
 
@@ -72,7 +72,7 @@ public class TextService {
         return existingUserTexts;
     }
 
-    public Text findAllByIdAndUserId(Long textId, Long userId) {
+    public Text findAllByIdAndUserIdOrThrow(Long textId, Long userId) {
         Text text = textRepository.findAllByIdAndUserId(textId, userId);
         if (text == null) {
             throw new AppException("Text not found for user. Text Id: " + textId + ". User id: " + userId,

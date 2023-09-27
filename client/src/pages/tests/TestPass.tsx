@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import {Question, useTestStore} from "../../store/tests/testStore";
+import {useTestStore} from "../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
 import {QAP} from "../../components/tests/QAP";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
+import {usePassTestStore} from "../../store/tests/passTestStore";
 
 const TestPassContent = () => {
     const testIdsToPass = usePassTestStore(state => state.testIdsToPass);
@@ -55,6 +55,9 @@ const TestPassContent = () => {
                     questionNumber={currentQuestionIndex + 1}
                     allQuestionsNumber={testToPass[currentTestId].questions.length}
                     onNextQuestion={handleNextQuestion}
+                    testTitle={testToPass[currentTestId].title}
+                    currentTestNumber={currentTestId + 1}
+                    allTestsNumber={testToPass.length}
                 />
             )}
         </>

@@ -21,7 +21,7 @@ public class TestFacade {
     private final TextService textService;
 
     public Test generateTestAndSave(Long userId, GenerateTestRequestDto dto) throws JsonProcessingException {
-        Text text = textService.findAllByIdAndUserId(dto.getTextId(), userId);
+        Text text = textService.findAllByIdAndUserIdOrThrow(dto.getTextId(), userId);
         Test test = testService.generateTest(text, dto.getMinQuestionNumber(), dto.getMaxQuestionNumber());
         test.setUserId(userId);
         test.setTextId(text.getId());
@@ -29,7 +29,7 @@ public class TestFacade {
     }
 
     public void deleteTest(Long testId, Long userId) {
-        Test test = testService.findTestByIdAndUserId(testId, userId);
+        Test test = testService.findAllByIdAndUserIdOrThrow(testId, userId);
         if (test != null) {
             testService.deleteTest(test);
         } else {
@@ -48,6 +48,10 @@ public class TestFacade {
 
 
     public Test findTestById(Long testId, Long userId) {
-        return testService.findTestByIdAndUserId(testId, userId);
+        return testService.findAllByIdAndUserIdOrThrow(testId, userId);
+    }
+
+    public Test updateTest(Test updatedTest, Long userId) {
+        return testService.update(updatedTest, userId);
     }
 }
