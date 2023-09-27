@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useTestStore } from "../../store/tests/testStore";
+import {Question, useTestStore} from "../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
 import {QAP} from "../../components/tests/QAP";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {usePassTestStore} from "../../store/tests/passTestStore";
+import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
 
 const TestPassContent = () => {
     const testIdsToPass = usePassTestStore(state => state.testIdsToPass);

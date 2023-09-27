@@ -10,6 +10,7 @@ import {Tests} from "./pages/tests/Tests";
 import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResult";
+import {appColors} from "./colors/appColors";
 
 function App() {
     const theme = createTheme({
@@ -20,15 +21,15 @@ function App() {
         },
         palette: {
             primary: {
-                main: '#a3ccbe',
-                light: '#a3ccbe',
-                dark: '#44734b',
+                main: appColors.primary.main,
+                light: appColors.primary.light,
+                dark: appColors.primary.dark,
             },
             secondary: {
-                main: '#f50057',
+                main: appColors.secondary.main,
             },
             error: {
-                main: '#e57373'
+                main: appColors.error.main
             }
         },
     });

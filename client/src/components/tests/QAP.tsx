@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Box, Button, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
+import {appColors} from "../../colors/appColors";
 
 export const QAP = ({
                         question,
@@ -17,60 +18,67 @@ export const QAP = ({
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
     const [answered, setAnswered] = useState(false);
+    const [acceptCalled, setAcceptCalled] = useState(false);
     const addAnswer = usePassTestStore(state => state.addAnswer);
 
     const handleNext = () => {
         if (answered || selectedOptions.length === 0) {
-            setAnswered(false);
             onNextQuestion();
+            setAnswered(false);
+            setSelectedOptions([])
+            setAcceptCalled(false);
         } else {
             setAnswered(true);
-            handleAccept();
         }
+        accept();
     };
 
     const getOptionColor = (option: AnswerOption) => {
         if (!answered && isOptionSelected(option.id)) {
-            return "#999"
+            return appColors.primary.default
         } else if (answered && option.isCorrect) {
-            return "#a3ccbe"
+            return appColors.primary.main
         } else if (answered && isOptionSelected(option.id) && !option.isCorrect) {
-            return "#e57373"
+            return appColors.error.main
         }
+        return 'transparent';
     };
 
     const isOptionSelected = (optionId: number) => selectedOptions.includes(optionId);
 
     const handleOptionSelect = (optionId: number) => {
         if (!answered) {
-            setSelectedOptions(prevSelectedOptions => {
-                if (prevSelectedOptions.includes(optionId)) {
-                    return prevSelectedOptions.filter(id => id !== optionId);
-                } else {
-                    return [...prevSelectedOptions, optionId];
-                }
-            });
+            setSelectedOptions(prevSelectedOptions =>
+                prevSelectedOptions.includes(optionId)
+                    ? prevSelectedOptions.filter(id => id !== optionId)
+                    : [...prevSelectedOptions, optionId]
+            );
         }
     };
 
-    const handleAccept = () => {
-        const questionAnswer: QuestionAnswer = {
-            questionNumber: questionNumber,
-            isPassed: isAnswerCorrect()
-        };
-        addAnswer(questionAnswer);
+
+    const accept = () => {
+        if (!acceptCalled) {
+            const questionAnswer: QuestionAnswer = {
+                questionNumber: questionNumber,
+                isPassed: isAnswerCorrect()
+            };
+            addAnswer(questionAnswer);
+            setAcceptCalled(true)
+        }
     };
 
     const isAnswerCorrect = (): boolean => {
-        if (question.answerOptions.filter(op => op.isCorrect).length !== selectedOptions.length) {
-            return false;
-        }
-
-        return question.answerOptions
+        const correctOptionIds = question.answerOptions
             .filter(op => op.isCorrect)
-            .map(op => op.id)
-            .every((element) => selectedOptions.includes(element));
-    }
+            .map(op => op.id);
+
+        return (
+            correctOptionIds.length === selectedOptions.length &&
+            correctOptionIds.every(id => selectedOptions.includes(id))
+        );
+    };
+
 
     return (
         <>
@@ -87,7 +95,7 @@ export const QAP = ({
                     <Box key={option.id} sx={{
                         mb: 2,
                         borderRadius: 1,
-                        border: "2px solid " + getOptionColor(option)
+                        border: `2px solid ${getOptionColor(option)}`
                     }}>
                         <Paper
                             onClick={() => handleOptionSelect(option.id)}

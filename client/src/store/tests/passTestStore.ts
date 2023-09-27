@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {UserTest} from "./testStore";
+import {AnswerOption, UserTest} from "./testStore";
 
 export interface TestResult {
     testTitle: string,
@@ -20,12 +20,20 @@ export interface PassTest {
     setTestsToPass: (selectedTestsToPass: UserTest[]) => void,
     answers: QuestionAnswer[],
     addAnswer: (questionAnswer: QuestionAnswer) => void,
+    // selectedOptions: AnswerOption[],
+    selectedOptionIds: number[],
+    setSelectedOptionIds: (selectedOptionIds: number[]) => void;
+    // setSelectedOptions: (selectedOptions: AnswerOption[]) => void;
 }
 
 export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
     testResults: [],
     testIdsToPass: [],
     testToPass: [],
+    selectedOptionIds: [],
+    setSelectedOptionIds: (selectedOptionIds: number[]) => {
+        set({selectedOptions: selectedOptionIds})
+    },
     saveTestResult: (title: string) => {
         let testResult: TestResult = {
             testTitle: title,
@@ -47,7 +55,6 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
     answers: [],
     addAnswer: (questionAnswer: QuestionAnswer) => {
         set({answers: [...get().answers, questionAnswer]});
-        console.log(get().answers)
     }
 }))
 

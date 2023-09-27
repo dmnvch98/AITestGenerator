@@ -4,7 +4,6 @@ import {UserText, useTextStore} from "../../store/textStore";
 import {Box, Button, IconButton, Menu, MenuItem} from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
-import Typography from "@mui/material/Typography";
 import {useTestStore} from "../../store/tests/testStore";
 import {DoneLabel} from "../utils/DoneLabel";
 import {NoLabel} from "../utils/NoLabel";
