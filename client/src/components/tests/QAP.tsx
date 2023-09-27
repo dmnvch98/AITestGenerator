@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Box, Button, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
@@ -16,32 +16,25 @@ export const QAP = ({
 
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
-    const [accepted, setAccepted] = useState(false);
-    const [nextClickedCounter, setNextClickedCounter] = useState<number>(0);
+    const [answered, setAnswered] = useState(false);
     const addAnswer = usePassTestStore(state => state.addAnswer);
 
-    useEffect(() => {
-        if (nextClickedCounter == 1 && selectedOptions.length > 0) {
-            setAccepted(true)
-            handleAccept();
-        } else if (nextClickedCounter == 1 && selectedOptions.length == 0) {
-            setAccepted(true)
-            handleAccept();
+    const handleNext = () => {
+        if (answered || selectedOptions.length === 0) {
+            setAnswered(false);
             onNextQuestion();
-        }  else if (nextClickedCounter == 2 && selectedOptions.length > 0) {
-            setAccepted(true)
+        } else {
+            setAnswered(true);
             handleAccept();
-            onNextQuestion();
         }
-        setNextClickedCounter(0)
-    }, [nextClickedCounter])
+    };
 
     const getOptionColor = (option: AnswerOption) => {
-        if (!accepted && isOptionSelected(option.id)) {
+        if (!answered && isOptionSelected(option.id)) {
             return "#999"
-        } else if (accepted && option.isCorrect) {
+        } else if (answered && option.isCorrect) {
             return "#a3ccbe"
-        } else if (accepted && isOptionSelected(option.id) && !option.isCorrect) {
+        } else if (answered && isOptionSelected(option.id) && !option.isCorrect) {
             return "#e57373"
         }
     };
@@ -49,34 +42,24 @@ export const QAP = ({
     const isOptionSelected = (optionId: number) => selectedOptions.includes(optionId);
 
     const handleOptionSelect = (optionId: number) => {
-        if (!accepted) {
-            if (selectedOptions.includes(optionId)) {
-                setSelectedOptions((prevSelectedOptions) =>
-                    prevSelectedOptions.filter((id) => id !== optionId)
-                );
-            } else {
-                setSelectedOptions((prevSelectedOptions) => [
-                    ...prevSelectedOptions,
-                    optionId
-                ]);
-            }
+        if (!answered) {
+            setSelectedOptions(prevSelectedOptions => {
+                if (prevSelectedOptions.includes(optionId)) {
+                    return prevSelectedOptions.filter(id => id !== optionId);
+                } else {
+                    return [...prevSelectedOptions, optionId];
+                }
+            });
         }
-    }
+    };
 
     const handleAccept = () => {
-        setAccepted(false);
-        let questionAnswer: QuestionAnswer = {
+        const questionAnswer: QuestionAnswer = {
             questionNumber: questionNumber,
             isPassed: isAnswerCorrect()
-        }
+        };
         addAnswer(questionAnswer);
-    }
-
-    const handleNext = () => {
-        setNextClickedCounter(nextClickedCounter + 1);
-        console.log(nextClickedCounter);
-
-    }
+    };
 
     const isAnswerCorrect = (): boolean => {
         if (question.answerOptions.filter(op => op.isCorrect).length !== selectedOptions.length) {
@@ -119,14 +102,6 @@ export const QAP = ({
                 ))}
 
                 <Box>
-                    {/*<Button*/}
-                    {/*    variant='contained'*/}
-                    {/*    onClick={() => handleAccept()}*/}
-                    {/*    sx={{width: "50%", mr: 1}}*/}
-                    {/*    size='large'*/}
-                    {/*>*/}
-                    {/*    Accept*/}
-                    {/*</Button>*/}
                     <Button
                         variant='contained'
                         onClick={handleNext}
