@@ -42,15 +42,17 @@ export interface TestStore {
     setMaxQuestionsNumber: (questionsNumber: number) => void;
     generateTestValidationErrorFlag: boolean;
     setGenerateTestValidationErrorFlag: (flag: boolean) => void;
-
+    selectedTextId: number | undefined,
+    setSelectedTextId: (id: number) => void;
 }
 
 export const useTestStore = create<TestStore>((set: any, get: any) => ({
     tests: [],
     selectedTest: undefined,
-    generateTestFlag: true,
+    generateTestFlag: false,
     maxQuestionsNumber: "",
     generateTestValidationErrorFlag: false,
+    selectedTextId: undefined,
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest})
     },
@@ -89,5 +91,8 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     },
     setGenerateTestValidationErrorFlag: (flag: boolean) => {
         set({generateTestValidationErrorFlag: flag})
+    },
+    setSelectedTextId: (id: number) => {
+        set({selectedTextId: id})
     }
 }))

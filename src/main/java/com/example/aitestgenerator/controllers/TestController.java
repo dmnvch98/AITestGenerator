@@ -33,7 +33,13 @@ public class TestController {
     @PostMapping
     public Test generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) throws JsonProcessingException {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.generateTestAndSave(userId, dto);
+        return testFacade.generateTestAndSave(userId, dto.getTextId());
+    }
+
+    @PostMapping("/additional")
+    public Test generateAdditionalTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) throws JsonProcessingException {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.generateAdditionalTest(userId, dto.getTextId());
     }
 
     @DeleteMapping("/{testId}")

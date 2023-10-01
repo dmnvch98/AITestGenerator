@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.dto.tests.GenerateAdditionalTestDto;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,10 +26,10 @@ public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
 
-    public Test generateTest(Text text, Integer maxQuestionNumber) throws JsonProcessingException {
+    public Test generateTest(Text text) throws JsonProcessingException {
         String request = readFileContents("ai_prompts/generate_test.txt");
 
-        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text, maxQuestionNumber);
+        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text);
 
         ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
 
@@ -37,7 +38,35 @@ public class TestGenerator {
         return parseTestFromJson(testJson, text.getId());
     }
 
-    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text, Integer maxQuestionNumber) {
+    public Test generateAdditionalTest(GenerateAdditionalTestDto testDto, Long textId) throws JsonProcessingException {
+        List<ChatMessage> messages = new ArrayList<>();
+
+        String request = readFileContents("ai_prompts/generate_additional_test.txt");
+
+        ChatMessage taskPrompt = createChatMessage(request);
+
+        String testJson = objectMapper.writeValueAsString(testDto);
+        ChatMessage existingTest = createChatMessage(testJson);
+
+        messages.add(taskPrompt);
+        messages.add(existingTest);
+
+        int maxTokens = 16000 - countTokens(request + testJson);
+
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+            .model("gpt-3.5-turbo-16k")
+            .messages(messages)
+            .maxTokens(maxTokens)
+            .build();
+
+        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
+
+        String newTestJson = chatCompletionResult.getChoices().get(0).getMessage().getContent();
+
+        return parseTestFromJson(newTestJson, textId);
+    }
+
+    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text) {
         List<ChatMessage> messages = new ArrayList<>();
 
         ChatMessage taskPrompt = createChatMessage(request);
@@ -45,12 +74,6 @@ public class TestGenerator {
 
         messages.add(taskPrompt);
         messages.add(userTextPrompt);
-
-        if (maxQuestionNumber != null) {
-            ChatMessage maxQuestionsNumberPrompt = createChatMessage("Максимальное количество вопросов "
-                + maxQuestionNumber);
-            messages.add(maxQuestionsNumberPrompt);
-        }
 
         int maxTokens = 16000 - countTokens(request + userTextPrompt);
 

@@ -12,6 +12,8 @@ const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const deleteText = useTextStore(state => state.deleteText);
     const generateTest = useTestStore(state => state.generateTest);
+    const setSelectedTextId = useTestStore(state => state.setSelectedTextId);
+    const toggleGenerateTestClickedFlag = useTestStore(state => state.toggleGenerateTestFlag);
 
     const navigate = useNavigate();
 
@@ -29,7 +31,9 @@ const Actions = ({text}: { text: UserText }) => {
     }
 
     const handleGenerateTestClick = () => {
-        generateTest(text.id as number)
+        // generateTest(text.id as number)
+        setSelectedTextId(text.id as number)
+        toggleGenerateTestClickedFlag();
         handleClose();
     }
 
@@ -43,7 +47,7 @@ const Actions = ({text}: { text: UserText }) => {
     }
 
     return (
-        <div>
+        <Box>
             <IconButton onClick={handleClick}>
                 <SettingsIcon/>
             </IconButton>
@@ -58,7 +62,7 @@ const Actions = ({text}: { text: UserText }) => {
                 <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
                 <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>Generate Test</MenuItem>
             </Menu>
-        </div>
+        </Box>
     );
 };
 

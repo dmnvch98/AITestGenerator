@@ -2,6 +2,7 @@ package com.example.aitestgenerator.repositories;
 
 import com.example.aitestgenerator.models.Test;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,4 +15,8 @@ public interface TestRepository extends CrudRepository<Test, Long> {
     List<Test> findAllByTextId(Long textId);
 
     List<Test> findAllByIdInAndUserId(List<Long> ids, Long userId);
+
+    List<Test> findAllByTextIdAndUserId(Long textId, Long userId);
+    @Transactional
+    void deleteTestById(Long id);
 }

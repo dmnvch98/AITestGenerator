@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.dto.tests.GenerateAdditionalTestDto;
 import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.AnswerOption;
 import com.example.aitestgenerator.models.Question;
@@ -26,9 +27,14 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Text text, Integer maxQuestionNumber) throws JsonProcessingException {
-        log.info("Generating test for chapter. Chapter ID '{}', max question number: {}", text.getId(), maxQuestionNumber);
-        return testGenerator.generateTest(text, maxQuestionNumber);
+    public Test generateTest(Text text) throws JsonProcessingException {
+        log.info("Generating test for text. Text ID '{}'", text.getId());
+        return testGenerator.generateTest(text);
+    }
+
+    public Test generateAdditionalTest(GenerateAdditionalTestDto test, Long textId) throws JsonProcessingException {
+        log.info("Generating additional test for text. Text ID {}", test);
+        return testGenerator.generateAdditionalTest(test, textId);
     }
 
     public List<Test> findAllByUserId(Long userId) {
@@ -39,6 +45,11 @@ public class TestService {
     public void deleteTest(Test test) {
         log.info("Deleting test. Test ID: {}", test.getId());
         testRepository.delete(test);
+    }
+
+    public void deleteTest(Long testId) {
+        log.info("Deleting test. Test ID: {}", testId);
+        testRepository.deleteTestById(testId);
     }
 
     public Test findAllByIdAndUserIdOrThrow(Long testId, Long userId) {
@@ -82,8 +93,11 @@ public class TestService {
             }
         });
 
-        // Устанавливаем userId и сохраняем обновленный тест
         foundTest.setUserId(userId);
         return testRepository.save(foundTest);
+    }
+
+    public List<Test> findAllByTextIdAndUserId(Long textId, Long userId) {
+        return testRepository.findAllByTextIdAndUserId(textId, userId);
     }
 }
