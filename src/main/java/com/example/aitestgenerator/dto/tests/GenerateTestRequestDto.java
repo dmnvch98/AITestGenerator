@@ -9,6 +9,5 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 public class GenerateTestRequestDto {
     Long textId;
-    Integer minQuestionNumber;
     Integer maxQuestionNumber;
 }

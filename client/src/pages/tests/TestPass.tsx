@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import {useTestStore} from "../../store/tests/testStore";
+import {useEffect, useState} from "react";
+import {Question, useTestStore} from "../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
 import {QAP} from "../../components/tests/QAP";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
@@ -16,7 +16,9 @@ const TestPassContent = () => {
 
     useEffect(() => {
         if (tests.length === 0) {
-            getUserTestsByIdIn(testIdsToPass).then(() => {setTestsToPass(tests)});
+            getUserTestsByIdIn(testIdsToPass).then(() => {
+                setTestsToPass(tests)
+            });
         } else {
             setTestsToPass(tests.filter(t => testIdsToPass.includes(t.id)));
         }
@@ -46,12 +48,18 @@ const TestPassContent = () => {
         }
     };
 
+    const getCurrentQuestion = (): Question => {
+        const question: Question = testToPass[currentTestId].questions[currentQuestionIndex];
+        question.answerOptions.sort(() => Math.random() - 0.5);
+        return question;
+    }
+
 
     return (
         <>
             {testToPass.length > 0 && (
                 <QAP
-                    question={testToPass[currentTestId].questions[currentQuestionIndex]}
+                    question={getCurrentQuestion()}
                     questionNumber={currentQuestionIndex + 1}
                     allQuestionsNumber={testToPass[currentTestId].questions.length}
                     onNextQuestion={handleNextQuestion}
@@ -65,5 +73,5 @@ const TestPassContent = () => {
 };
 
 export const TestPass = () => {
-    return <LoggedInUserPage mainContent={<TestPassContent />}/>;
+    return <LoggedInUserPage mainContent={<TestPassContent/>}/>;
 };

@@ -11,6 +11,7 @@ import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResult";
 import {appColors} from "./colors/appColors";
+import {GenerateTestAskGroup} from "./components/tests/GenerateTestAskGroup";
 
 function App() {
     const theme = createTheme({
@@ -47,6 +48,7 @@ function App() {
                         <Route path="/tests/:id" element={<TestPageView/>}/>
                         <Route path="/tests/pass" element={<TestPass/>}/>
                         <Route path="/tests/result" element={<TestResults/>}/>
+                        <Route path="/tests/generate" element={<GenerateTestAskGroup/>}/>
                     </Routes>
                 </div>
             </Router>

@@ -15,7 +15,7 @@ export interface UserTexts {
     newTextTitle: string;
     newTextContent: string;
     selectedTextIds: number[];
-    saveText: () => Promise<Boolean>;
+    saveText: () => Promise<number | undefined>;
     deleteText: (id: number) => void;
     setTitle: (title: string) => void;
     setContent: (content: string) => void;
@@ -53,7 +53,7 @@ export const useTextStore = create<UserTexts>((set: any, get: any) => ({
         const texts = await TextService.getUserTextsByIdsIn(ids);
         set({texts: texts});
     },
-    saveText: async (): Promise<Boolean> => {
+    saveText: async (): Promise<number | undefined> => {
         const userText: UserText = {
             content: get().newTextContent,
             title: get().newTextTitle,
@@ -64,9 +64,9 @@ export const useTextStore = create<UserTexts>((set: any, get: any) => ({
         const response = await TextService.saveText(userText);
         if (response) {
             set({textSavedFlag: true})
-            return true;
+            return response.id;
         }
-        return false;
+        return undefined;
     },
     deleteText: async (id: number) => {
         const response = await TextService.deleteText(id);

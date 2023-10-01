@@ -35,12 +35,22 @@ export interface TestStore {
     generateTest: (textId: number) => void,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
-    deleteTest: (ids: number) => void
+    deleteTest: (ids: number) => void,
+    generateTestFlag: boolean,
+    toggleGenerateTestFlag: () => void,
+    maxQuestionsNumber: number | string,
+    setMaxQuestionsNumber: (questionsNumber: number) => void;
+    generateTestValidationErrorFlag: boolean;
+    setGenerateTestValidationErrorFlag: (flag: boolean) => void;
+
 }
 
 export const useTestStore = create<TestStore>((set: any, get: any) => ({
     tests: [],
     selectedTest: undefined,
+    generateTestFlag: true,
+    maxQuestionsNumber: "",
+    generateTestValidationErrorFlag: false,
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest})
     },
@@ -48,8 +58,8 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     generateTest: async (textId: number) => {
         let dto: GenerateTestRequestDto = {
             textId: textId,
-            minQuestionNumber: undefined,
-            maxQuestionNumber: undefined
+            minQuestionNumber: get().minQuestionsNumber,
+            maxQuestionNumber: get().maxQuestionsNumber
         }
         await TestService.generateTest(dto);
     },
@@ -71,5 +81,13 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
         const userTests = await TestService.getUserTests(ids)
         set({tests: userTests});
     },
-
+    toggleGenerateTestFlag: () => {
+        set({generateTestFlag: !get().generateTestFlag})
+    },
+    setMaxQuestionsNumber: (questionsNumber: number) => {
+        set({maxQuestionsNumber: questionsNumber})
+    },
+    setGenerateTestValidationErrorFlag: (flag: boolean) => {
+        set({generateTestValidationErrorFlag: flag})
+    }
 }))

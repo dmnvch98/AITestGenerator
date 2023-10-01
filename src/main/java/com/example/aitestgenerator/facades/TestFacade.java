@@ -22,7 +22,7 @@ public class TestFacade {
 
     public Test generateTestAndSave(Long userId, GenerateTestRequestDto dto) throws JsonProcessingException {
         Text text = textService.findAllByIdAndUserIdOrThrow(dto.getTextId(), userId);
-        Test test = testService.generateTest(text, dto.getMinQuestionNumber(), dto.getMaxQuestionNumber());
+        Test test = testService.generateTest(text, dto.getMaxQuestionNumber());
         test.setUserId(userId);
         test.setTextId(text.getId());
         return testService.saveTest(test);

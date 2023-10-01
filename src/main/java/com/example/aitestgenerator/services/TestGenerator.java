@@ -25,10 +25,10 @@ public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
 
-    public Test generateTest(Text text, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
+    public Test generateTest(Text text, Integer maxQuestionNumber) throws JsonProcessingException {
         String request = readFileContents("ai_prompts/generate_test.txt");
 
-        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text, minQuestionNumber, maxQuestionNumber);
+        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text, maxQuestionNumber);
 
         ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
 
@@ -37,7 +37,7 @@ public class TestGenerator {
         return parseTestFromJson(testJson, text.getId());
     }
 
-    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text, Integer minQuestionNumber, Integer maxQuestionNumber) {
+    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text, Integer maxQuestionNumber) {
         List<ChatMessage> messages = new ArrayList<>();
 
         ChatMessage taskPrompt = createChatMessage(request);
@@ -46,15 +46,9 @@ public class TestGenerator {
         messages.add(taskPrompt);
         messages.add(userTextPrompt);
 
-        if (minQuestionNumber != null) {
-            ChatMessage minQuestionsNumberPrompt = createChatMessage("Минимальное количество вопросов "
-                + minQuestionNumber);
-            messages.add(minQuestionsNumberPrompt);
-        }
-
         if (maxQuestionNumber != null) {
             ChatMessage maxQuestionsNumberPrompt = createChatMessage("Максимальное количество вопросов "
-                + minQuestionNumber);
+                + maxQuestionNumber);
             messages.add(maxQuestionsNumberPrompt);
         }
 
@@ -64,7 +58,6 @@ public class TestGenerator {
             .model("gpt-3.5-turbo-16k")
             .messages(messages)
             .maxTokens(maxTokens)
-            .temperature(0.5)
             .build();
     }
 

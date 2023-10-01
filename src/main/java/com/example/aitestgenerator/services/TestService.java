@@ -26,9 +26,9 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Text text, Integer minQuestionNumber, Integer maxQuestionNumber) throws JsonProcessingException {
-        log.info("Generating test for chapter. Chapter ID '{}', min question number: {}, max question number: {}", text.getId(), minQuestionNumber, maxQuestionNumber);
-        return testGenerator.generateTest(text, minQuestionNumber, maxQuestionNumber);
+    public Test generateTest(Text text, Integer maxQuestionNumber) throws JsonProcessingException {
+        log.info("Generating test for chapter. Chapter ID '{}', max question number: {}", text.getId(), maxQuestionNumber);
+        return testGenerator.generateTest(text, maxQuestionNumber);
     }
 
     public List<Test> findAllByUserId(Long userId) {
@@ -59,27 +59,21 @@ public class TestService {
         Test foundTest = findAllByIdAndUserIdOrThrow(updatedTest.getId(), userId);
         foundTest.setTitle(updatedTest.getTitle());
 
-        // Обновляем текст вопросов с использованием стримов
         foundTest.getQuestions().forEach(foundQuestion -> {
-            // Находим соответствующий вопрос в updatedTest
             Question updatedQuestion = updatedTest.getQuestions().stream()
                 .filter(q -> q.getId().equals(foundQuestion.getId()))
                 .findFirst()
                 .orElse(null);
 
-            // Если найден, обновляем текст вопроса
             if (updatedQuestion != null) {
                 foundQuestion.setQuestionText(updatedQuestion.getQuestionText());
 
-                // Обновляем текст вариантов ответов с использованием стримов
                 foundQuestion.getAnswerOptions().forEach(foundAnswerOption -> {
-                    // Находим соответствующий вариант ответа в updatedQuestion
                     AnswerOption updatedAnswerOption = updatedQuestion.getAnswerOptions().stream()
                         .filter(ao -> ao.getId().equals(foundAnswerOption.getId()))
                         .findFirst()
                         .orElse(null);
 
-                    // Если найден, обновляем текст варианта ответа
                     if (updatedAnswerOption != null) {
                         foundAnswerOption.setOptionText(updatedAnswerOption.getOptionText());
                         foundAnswerOption.setIsCorrect(updatedAnswerOption.getIsCorrect());

@@ -28,7 +28,7 @@ class TextService {
     saveText = async (text: UserText) => {
         try {
             const response = await customAxios.post("http://localhost:8080/api/v1/texts", text);
-            return response.status == 201;
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);
