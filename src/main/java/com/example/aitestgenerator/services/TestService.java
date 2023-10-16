@@ -27,9 +27,9 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Text text) throws JsonProcessingException {
+    public Test generateTest(Text text) {
         log.info("Generating test for text. Text ID '{}'", text.getId());
-        return testGenerator.generateTest(text);
+        return testGenerator.start(text);
     }
 
     public Test generateAdditionalTest(GenerateAdditionalTestDto test, Long textId) throws JsonProcessingException {
@@ -40,11 +40,6 @@ public class TestService {
     public List<Test> findAllByUserId(Long userId) {
         log.info("Finding all tests for user. User ID: {}", userId);
         return testRepository.findAllByUserId(userId);
-    }
-
-    public void deleteTest(Test test) {
-        log.info("Deleting test. Test ID: {}", test.getId());
-        testRepository.delete(test);
     }
 
     public void deleteTest(Long testId) {

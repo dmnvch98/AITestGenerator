@@ -100,7 +100,7 @@ export const QAP = ({
             </Box>
 
             <Box sx={{
-                width: "50%",
+                width: "70%",
                 margin: "0 auto"
             }}>
                 {question.answerOptions.map((option) => (
@@ -116,7 +116,7 @@ export const QAP = ({
                                 cursor: 'pointer',
                             }}
                         >
-                            <Typography>{option.optionText}</Typography>
+                            <Typography align="left">{option.optionText}</Typography>
                         </Paper>
                     </Box>
                 ))}

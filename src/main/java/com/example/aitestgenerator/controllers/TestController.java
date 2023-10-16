@@ -18,6 +18,12 @@ import java.util.List;
 public class TestController {
     private final TestFacade testFacade;
 
+    @PostMapping
+    public Test save(@RequestBody Test test, Authentication authentication) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.save(test, userId);
+    }
+
     @GetMapping
     public List<Test> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
@@ -30,8 +36,8 @@ public class TestController {
         return testFacade.findTestById(id, userId);
     }
 
-    @PostMapping
-    public Test generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) throws JsonProcessingException {
+    @PostMapping("/generate")
+    public Test generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.generateTestAndSave(userId, dto.getTextId());
     }

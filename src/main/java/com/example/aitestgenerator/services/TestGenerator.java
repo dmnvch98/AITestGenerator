@@ -10,11 +10,13 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.aitestgenerator.utils.Utils.countTokens;
 import static com.example.aitestgenerator.utils.Utils.readFileContents;
@@ -26,16 +28,47 @@ public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
 
-    public Test generateTest(Text text) throws JsonProcessingException {
-        String request = readFileContents("ai_prompts/generate_test.txt");
+    @SneakyThrows
+    public Test start(Text text) {
+        List<ChatMessage> messages = new ArrayList<>();
 
-        ChatCompletionRequest chatCompletionRequest = buildChatCompletionRequest(request, text);
+        String questions = generateData(messages, readFileContents("ai_prompts/generate_questions.txt"), text.toString());
 
-        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
+        String testJson = generateData(messages, readFileContents("ai_prompts/generate_test.txt"), questions);
 
-        String testJson = chatCompletionResult.getChoices().get(0).getMessage().getContent();
+        return objectMapper.readValue(testJson, Test.class);
+    }
 
-        return parseTestFromJson(testJson, text.getId());
+    private String generateData(List<ChatMessage> messages, String request, String content) {
+        ChatMessage taskPrompt = createChatMessage(request);
+        ChatMessage textPrompt = createChatMessage(content);
+
+        messages.add(taskPrompt);
+        messages.add(textPrompt);
+
+        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
+
+        return extractAnswer(chatCompletionResult);
+    }
+
+    private String extractAnswer(ChatCompletionResult chatCompletionResult) {
+        return chatCompletionResult
+            .getChoices()
+            .get(0)
+            .getMessage()
+            .getContent();
+    }
+
+    private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages) {
+        int maxTokens = 16000 - countTokens(chatMessages.stream().map(ChatMessage::getContent).collect(Collectors.joining()));
+
+        return ChatCompletionRequest.builder()
+            .model("gpt-3.5-turbo-16k-0613")
+            .messages(chatMessages)
+            .maxTokens(maxTokens)
+            .temperature(1.0)
+            .topP(1.0)
+            .build();
     }
 
     public Test generateAdditionalTest(GenerateAdditionalTestDto testDto, Long textId) throws JsonProcessingException {
@@ -59,29 +92,11 @@ public class TestGenerator {
             .maxTokens(maxTokens)
             .build();
 
-        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
+        ChatMessage responseMessage = openAiService.createChatCompletion(chatCompletionRequest).getChoices().get(0).getMessage();
 
-        String newTestJson = chatCompletionResult.getChoices().get(0).getMessage().getContent();
+        String newTestJson = responseMessage.getContent();
 
         return parseTestFromJson(newTestJson, textId);
-    }
-
-    private ChatCompletionRequest buildChatCompletionRequest(String request, Text text) {
-        List<ChatMessage> messages = new ArrayList<>();
-
-        ChatMessage taskPrompt = createChatMessage(request);
-        ChatMessage userTextPrompt = createChatMessage(text.toString());
-
-        messages.add(taskPrompt);
-        messages.add(userTextPrompt);
-
-        int maxTokens = 16000 - countTokens(request + userTextPrompt);
-
-        return ChatCompletionRequest.builder()
-            .model("gpt-3.5-turbo-16k")
-            .messages(messages)
-            .maxTokens(maxTokens)
-            .build();
     }
 
     private ChatMessage createChatMessage(String content) {
@@ -91,19 +106,9 @@ public class TestGenerator {
         return message;
     }
 
-    private Test parseTestFromJson(String testJson, Long textId) throws JsonProcessingException {
-        log.info("Parsing test from JSON. Text id: {}", textId);
-
-        Test test = objectMapper.readValue(testJson, Test.class);
-
-        test.getQuestions().forEach(question -> {
-            question.setTest(test);
-            question.getAnswerOptions().forEach(answerOption -> answerOption.setQuestion(question));
-        });
-
-        log.info("Test parsing for text is completed. Text id: {}", textId);
-
-        return test;
+    @SneakyThrows
+    private Test parseTestFromJson(String testJson, Long textId) {
+        return objectMapper.readValue(testJson, Test.class);
     }
 
 }

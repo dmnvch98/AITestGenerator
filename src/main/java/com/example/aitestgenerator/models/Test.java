@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.models;
 
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Jacksonized
 public class Test {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

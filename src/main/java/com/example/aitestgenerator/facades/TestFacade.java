@@ -22,11 +22,14 @@ public class TestFacade {
     private final TextService textService;
     private final TestConverter testConverter;
 
-    public Test generateTestAndSave(Long userId, Long textId) throws JsonProcessingException {
+    public Test save(Test test, Long userId) {
+        return testService.saveTest(prepareTestToSave(test, userId));
+    }
+
+    public Test generateTestAndSave(Long userId, Long textId) {
         Text text = textService.findAllByIdAndUserIdOrThrow(textId, userId);
         Test test = testService.generateTest(text);
-        setUserIdAndTextId(test, userId, text.getId());
-        return testService.saveTest(test);
+        return testService.saveTest(prepareTestToSave(test, userId, textId));
     }
 
     public Test generateAdditionalTest(Long userId, Long textId) throws JsonProcessingException {
@@ -40,8 +43,7 @@ public class TestFacade {
         GenerateAdditionalTestDto testDto = testConverter.testToDto(foundTests,
             textService.findAllByIdAndUserIdOrThrow(textId, userId).getTitle());
         Test test = testService.generateAdditionalTest(testDto, textId);
-        setUserIdAndTextId(test, userId, textId);
-        return testService.saveTest(test);
+        return testService.saveTest(prepareTestToSave(test, userId, textId));
     }
 
 
@@ -65,9 +67,20 @@ public class TestFacade {
         return testService.update(updatedTest, userId);
     }
 
-    private void setUserIdAndTextId(Test test, Long userId, Long textId) {
+    private Test prepareTestToSave(Test test, Long userId) {
+        test.getQuestions().forEach(question -> {
+            question.setTest(test);
+            question
+                .getAnswerOptions()
+                .forEach(answerOption -> answerOption.setQuestion(question));
+        });
         test.setUserId(userId);
-        test.setTextId(textId);
+        return test;
     }
 
+    private Test prepareTestToSave(Test test, Long userId, Long textId) {
+        prepareTestToSave(test, userId);
+        test.setTextId(textId);
+        return test;
+    }
 }
