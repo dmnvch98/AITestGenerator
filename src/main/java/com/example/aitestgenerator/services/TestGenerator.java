@@ -1,9 +1,7 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.dto.tests.GenerateAdditionalTestDto;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.Text;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -30,21 +28,31 @@ public class TestGenerator {
 
     @SneakyThrows
     public Test start(Text text) {
+        log.info("Starting test generation. Text id: {}, User id: {}", text.getId(), text.getUserId());
+
         List<ChatMessage> messages = new ArrayList<>();
 
-        String questions = generateData(messages, readFileContents("ai_prompts/generate_questions.txt"), text.toString());
+        log.info("Generating Questions. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        String questions = generateData(messages, readFileContents("ai_prompts/generate_questions.txt"), text.toString(), text);
 
-        String testJson = generateData(messages, readFileContents("ai_prompts/generate_test.txt"), questions);
+        log.info("Generating Test. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        String testJson = generateData(messages, readFileContents("ai_prompts/generate_test.txt"), questions, text);
 
-        return objectMapper.readValue(testJson, Test.class);
+        Test test = objectMapper.readValue(testJson, Test.class);
+
+        log.info("Test generation completed. Text id: {}, User id: {}", text.getId(), text.getUserId());
+
+        return test;
     }
 
-    private String generateData(List<ChatMessage> messages, String request, String content) {
+    private String generateData(List<ChatMessage> messages, String request, String content, Text text) {
         ChatMessage taskPrompt = createChatMessage(request);
         ChatMessage textPrompt = createChatMessage(content);
 
         messages.add(taskPrompt);
         messages.add(textPrompt);
+
+        log.info("Sending prompt to AI. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
         ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
 
@@ -60,7 +68,10 @@ public class TestGenerator {
     }
 
     private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages) {
-        int maxTokens = 16000 - countTokens(chatMessages.stream().map(ChatMessage::getContent).collect(Collectors.joining()));
+        int maxTokens = 16000 - countTokens(chatMessages
+            .stream()
+            .map(ChatMessage::getContent)
+            .collect(Collectors.joining()));
 
         return ChatCompletionRequest.builder()
             .model("gpt-3.5-turbo-16k-0613")
@@ -71,44 +82,10 @@ public class TestGenerator {
             .build();
     }
 
-    public Test generateAdditionalTest(GenerateAdditionalTestDto testDto, Long textId) throws JsonProcessingException {
-        List<ChatMessage> messages = new ArrayList<>();
-
-        String request = readFileContents("ai_prompts/generate_additional_test.txt");
-
-        ChatMessage taskPrompt = createChatMessage(request);
-
-        String testJson = objectMapper.writeValueAsString(testDto);
-        ChatMessage existingTest = createChatMessage(testJson);
-
-        messages.add(taskPrompt);
-        messages.add(existingTest);
-
-        int maxTokens = 16000 - countTokens(request + testJson);
-
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-            .model("gpt-3.5-turbo-16k")
-            .messages(messages)
-            .maxTokens(maxTokens)
-            .build();
-
-        ChatMessage responseMessage = openAiService.createChatCompletion(chatCompletionRequest).getChoices().get(0).getMessage();
-
-        String newTestJson = responseMessage.getContent();
-
-        return parseTestFromJson(newTestJson, textId);
-    }
-
     private ChatMessage createChatMessage(String content) {
         ChatMessage message = new ChatMessage();
         message.setContent(content);
         message.setRole("user");
         return message;
     }
-
-    @SneakyThrows
-    private Test parseTestFromJson(String testJson, Long textId) {
-        return objectMapper.readValue(testJson, Test.class);
-    }
-
 }

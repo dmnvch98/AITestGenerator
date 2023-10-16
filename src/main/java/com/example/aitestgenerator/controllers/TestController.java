@@ -4,7 +4,6 @@ import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -24,6 +23,12 @@ public class TestController {
         return testFacade.save(test, userId);
     }
 
+    @PostMapping("/generate")
+    public Test generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.generateTestAndSave(userId, dto.getTextId());
+    }
+
     @GetMapping
     public List<Test> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
@@ -34,18 +39,6 @@ public class TestController {
     public Test findAllById(Authentication authentication, @PathVariable Long id) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findTestById(id, userId);
-    }
-
-    @PostMapping("/generate")
-    public Test generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.generateTestAndSave(userId, dto.getTextId());
-    }
-
-    @PostMapping("/additional")
-    public Test generateAdditionalTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) throws JsonProcessingException {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.generateAdditionalTest(userId, dto.getTextId());
     }
 
     @DeleteMapping("/{testId}")

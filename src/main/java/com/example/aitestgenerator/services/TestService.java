@@ -23,18 +23,13 @@ public class TestService {
     private final TestGenerator testGenerator;
 
     public Test saveTest(Test test) {
-        log.info("Saving test. Test title: {}", test.getTitle());
+        log.info("Saving test. Test title: {}. Text id: {}, User id: {} ", test.getTitle(), test.getTextId(), test.getUserId());
         return testRepository.save(test);
     }
 
     public Test generateTest(Text text) {
         log.info("Generating test for text. Text ID '{}'", text.getId());
         return testGenerator.start(text);
-    }
-
-    public Test generateAdditionalTest(GenerateAdditionalTestDto test, Long textId) throws JsonProcessingException {
-        log.info("Generating additional test for text. Text ID {}", test);
-        return testGenerator.generateAdditionalTest(test, textId);
     }
 
     public List<Test> findAllByUserId(Long userId) {
