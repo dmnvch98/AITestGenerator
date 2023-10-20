@@ -32,22 +32,19 @@ public class TestGenerator {
 
     public Test start(Text text) {
         List<ChatMessage> messages = new ArrayList<>();
-        List<List<String>> questionGroups = splitQuestionsIntoGroups(text, messages);
-
         List<CompletableFuture<Test>> futureTests = new ArrayList<>();
 
-        for (List<String> group : questionGroups) {
-            CompletableFuture<Test> futureTest = generateTestAsync(group, text, messages);
-            futureTests.add(futureTest);
-        }
+        splitQuestionsIntoGroups(text, messages)
+            .forEach(group -> {
+                CompletableFuture<Test> futureTest = generateTestAsync(group, text, messages);
+                futureTests.add(futureTest);
+            });
 
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futureTests.toArray(new CompletableFuture[0]));
 
         return allOf.thenApply(ignored -> {
             List<Question> generatedQuestions = new ArrayList<>();
-            for (CompletableFuture<Test> futureTest : futureTests) {
-                generatedQuestions.addAll(futureTest.join().getQuestions());
-            }
+            futureTests.forEach(futureTest -> generatedQuestions.addAll(futureTest.join().getQuestions()));
 
             return Test.builder()
                 .title(text.getTitle())
