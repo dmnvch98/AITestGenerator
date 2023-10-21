@@ -59,8 +59,6 @@ export const AddChapterContent = () => {
                             labelPlacement="start"
                             sx={{mb: 2, marginLeft: 0}}
                         />
-                        {generateTestFlag && <GenerateTestAskGroup/>}
-
                     </Box>
 
                 </Grid>
