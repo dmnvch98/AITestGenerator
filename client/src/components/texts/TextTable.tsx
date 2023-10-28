@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useTestStore} from "../../store/tests/testStore";
 import {DoneLabel} from "../utils/DoneLabel";
 import {NoLabel} from "../utils/NoLabel";
+import Link from "@mui/material/Link";
 
 const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -104,6 +105,16 @@ export const TextTable = () => {
             field: 'title',
             headerName: 'Text title',
             width: columnWidths.title,
+            renderCell: (params) => {
+                const text: UserText = params.row;
+                return (
+                    <Link color='inherit'
+                          underline='none'
+                          href={`/texts/${text.id}`}>
+                        {text.title}
+                    </Link>
+                );
+            },
         },
         {
             field: 'test',
@@ -136,22 +147,7 @@ export const TextTable = () => {
 
     return (
         <Box >
-            <DataGrid
-                rows={userTexts}
-                columns={columns}
-                initialState={{
-                    pagination: {
-                        paginationModel: {page: 0, pageSize: 10},
-                    },
-                }}
-                onRowSelectionModelChange={(ids) => {
-                    setSelectedIdsToArray(ids as number[]);
-                }}
-                pageSizeOptions={[5, 10, 15]}
-                checkboxSelection
-                disableRowSelectionOnClick
-            />
-            <Box display="flex" sx={{mt: 2}} justifyContent="flex-start">
+            <Box display="flex" sx={{mb: 2}} justifyContent="flex-start">
                 <Button
                     sx={{mr: 2}}
                     variant="outlined"
@@ -169,6 +165,21 @@ export const TextTable = () => {
                     Delete selected
                 </Button>
             </Box>
+            <DataGrid
+                rows={userTexts}
+                columns={columns}
+                initialState={{
+                    pagination: {
+                        paginationModel: {page: 0, pageSize: 10},
+                    },
+                }}
+                onRowSelectionModelChange={(ids) => {
+                    setSelectedIdsToArray(ids as number[]);
+                }}
+                pageSizeOptions={[5, 10, 15]}
+                checkboxSelection
+                disableRowSelectionOnClick
+            />
         </Box>
     );
 };

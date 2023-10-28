@@ -12,6 +12,7 @@ import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResult";
 import {appColors} from "./colors/appColors";
 import {GenerateTestAskGroup} from "./components/tests/GenerateTestAskGroup";
+import {CkTextEditor} from "./components/main/CkTextEditor";
 
 function App() {
     const theme = createTheme({

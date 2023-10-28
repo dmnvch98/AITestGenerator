@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @UtilityClass
 @Slf4j
@@ -30,4 +32,17 @@ public class Utils {
         }
         return null;
     }
+    public static String removeHTMLTags(String htmlText) {
+        if (htmlText == null) {
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile("<[^>]*>");
+        Matcher matcher = pattern.matcher(htmlText);
+
+        return matcher
+            .replaceAll("")
+            .replaceAll("&nbsp;", " ");
+    }
+
 }

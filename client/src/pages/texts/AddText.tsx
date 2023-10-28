@@ -5,11 +5,13 @@ import React, {useState} from "react";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import {GenerateTestAskGroup} from "../../components/tests/GenerateTestAskGroup";
 import {useTestStore} from "../../store/tests/testStore";
+import {CkTextEditor} from "../../components/main/CkTextEditor";
 
 export const AddChapterContent = () => {
     const saveText = useTextStore(state => state.saveText);
     const setTitle = useTextStore(state => state.setTitle);
     const setContent = useTextStore(state => state.setContent);
+    const newTextContent = useTextStore(state => state.newTextContent)
     const generateTestFlag = useTestStore(state => state.generateTestFlag);
     const toggleGenerateTestFlag = useTestStore(state => state.toggleGenerateTestFlag);
     const generateTest = useTestStore(state => state.generateTest);
@@ -42,13 +44,9 @@ export const AddChapterContent = () => {
                         label="Title"
                         variant="standard"/>
                 </Box>
-                <TextField
-                    multiline
-                    fullWidth
-                    variant="outlined"
-                    onChange={(e) => setContent(e.target.value)}
-                    sx={{mt: 5}}
-                    maxRows="20"/>
+                <Box sx={{mt: 2}}>
+                    <CkTextEditor initialText={newTextContent} onTextChange={setContent}/>
+                </Box>
             </Box>
             <Grid container spacing={2} sx={{mt: 2}}>
                 <Grid item xs={6} sm={6} sx={{paddingLeft: 0}}>

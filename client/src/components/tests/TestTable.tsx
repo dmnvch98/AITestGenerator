@@ -87,6 +87,16 @@ export const TestTable = () => {
 
     return (
         <Box>
+            <Box display="flex" sx={{mb: 2}} justifyContent="flex-start">
+                <Button
+                    sx={{mr: 2}}
+                    variant="outlined"
+                    onClick={() => navigate("/tests/pass")}
+                >
+                    Pass selected
+                </Button>
+
+            </Box>
             <DataGrid
                 rows={userTests}
                 columns={columns}
@@ -102,16 +112,6 @@ export const TestTable = () => {
                 checkboxSelection
                 disableRowSelectionOnClick
             />
-            <Box display="flex" sx={{mt: 2}} justifyContent="flex-start">
-                <Button
-                    sx={{mr: 2}}
-                    variant="outlined"
-                    onClick={() => navigate("/tests/pass")}
-                >
-                    Pass selected
-                </Button>
-
-            </Box>
         </Box>
 
 

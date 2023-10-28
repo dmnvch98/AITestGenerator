@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static com.example.aitestgenerator.utils.Utils.countTokens;
-import static com.example.aitestgenerator.utils.Utils.readFileContents;
+import static com.example.aitestgenerator.utils.Utils.*;
 
 @Component
 @RequiredArgsConstructor
@@ -59,7 +58,7 @@ public class TestGenerator {
     private CompletableFuture<QuestionsDto> generateTestAsync(List<String> questionGroup, Text text) {
         return CompletableFuture.supplyAsync(() -> {
             log.info("Generating Test. Text id: {}, User id: {}. Questions: {}", text.getId(), text.getUserId(), questionGroup);
-            TestDto testDto = new TestDto(text.getContent(), questionGroup);
+            TestDto testDto = new TestDto(removeHTMLTags(text.getContent()), questionGroup);
             String testJson = generateData(readFileContents("ai_prompts/generate_test.txt"), testDto.toString());
             try {
                 return objectMapper.readValue(testJson, QuestionsDto.class);
@@ -71,7 +70,7 @@ public class TestGenerator {
 
     private List<List<String>> splitQuestionsIntoGroups(Text text) {
         log.info("Generating questions for text. Text id: {}, User id: {}", text.getId(), text.getUserId());
-        String questions = generateData(readFileContents("ai_prompts/generate_questions.txt"), text.getContent());
+        String questions = generateData(readFileContents("ai_prompts/generate_questions.txt"), removeHTMLTags(text.getContent()));
         return parseQuestionGroups(questions, text);
     }
 

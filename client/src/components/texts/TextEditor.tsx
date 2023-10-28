@@ -1,6 +1,7 @@
 import React from "react";
 import {Box, TextField} from "@mui/material";
 import {useTextStore} from "../../store/textStore";
+import {CkTextEditor} from "../main/CkTextEditor";
 
 
 export const TextEditor = () => {
@@ -18,15 +19,9 @@ export const TextEditor = () => {
                     fullWidth
                     variant="standard"
                 />
-                <TextField
-                    value={newTextContent}
-                    multiline
-                    fullWidth
-                    variant="outlined"
-                    onChange={(e) => setContent(e.target.value)}
-                    sx={{mt: 5}}
-                    maxRows={20}
-                />
+                <Box sx={{mt: 2}}>
+                    <CkTextEditor initialText={newTextContent} onTextChange={setContent}/>
+                </Box>
             </Box>
         </>
     );
