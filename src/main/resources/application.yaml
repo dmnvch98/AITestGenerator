@@ -21,3 +21,4 @@ csrf:
   cookie_domain: localhost
 generate-test:
   questions_group_size: 3
+  max_calls_per_minute: 60

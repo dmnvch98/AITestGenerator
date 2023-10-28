@@ -1,20 +1,30 @@
 package com.example.aitestgenerator.facades;
 
+import com.example.aitestgenerator.models.GenerationStatus;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
+import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import com.example.aitestgenerator.services.TestService;
 import com.example.aitestgenerator.services.TextService;
+import com.example.aitestgenerator.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
 public class TestFacade {
     private final TestService testService;
     private final TextService textService;
+    private final TestGeneratingHistoryService testGeneratingHistoryService;
+
+    private final UserService userService;
 
     public Test save(Test test, Long userId) {
         return testService.saveTest(prepareTestToSave(test, userId));
@@ -22,7 +32,18 @@ public class TestFacade {
 
     public Test generateTestAndSave(Long userId, Long textId) {
         Text text = textService.findAllByIdAndUserIdOrThrow(textId, userId);
-        Test test = testService.generateTest(text);
+
+        TestGeneratingHistory history = TestGeneratingHistory.builder()
+            .generationStart(LocalDateTime.now())
+            .user(userService.findUserById(userId))
+            .text(text)
+            .generationStatus(GenerationStatus.WAITING)
+            .build();
+
+        testGeneratingHistoryService.save(history);
+
+        Test test = testService.generateTest(text, history);
+
         return testService.saveTest(prepareTestToSave(test, userId, textId));
     }
 

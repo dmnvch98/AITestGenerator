@@ -1,13 +1,8 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.dto.tests.GenerateAdditionalTestDto;
 import com.example.aitestgenerator.exceptions.AppException;
-import com.example.aitestgenerator.models.AnswerOption;
-import com.example.aitestgenerator.models.Question;
-import com.example.aitestgenerator.models.Test;
-import com.example.aitestgenerator.models.Text;
+import com.example.aitestgenerator.models.*;
 import com.example.aitestgenerator.repositories.TestRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,9 +22,9 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Text text) {
+    public Test generateTest(Text text, TestGeneratingHistory history) {
         log.info("Generating test for text. Text ID '{}'", text.getId());
-        return testGenerator.start(text);
+        return testGenerator.start(text, history);
     }
 
     public List<Test> findAllByUserId(Long userId) {

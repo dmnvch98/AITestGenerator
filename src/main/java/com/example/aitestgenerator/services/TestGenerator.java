@@ -1,7 +1,8 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.models.Question;
+import com.example.aitestgenerator.models.GenerationStatus;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,18 +10,16 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
-import lombok.*;
-import lombok.extern.jackson.Jacksonized;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import one.util.streamex.StreamEx;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.aitestgenerator.utils.Utils.*;
@@ -31,73 +30,71 @@ import static com.example.aitestgenerator.utils.Utils.*;
 public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
-    @Value("${generate-test.questions_group_size}")
-    public int questionsGroupSize;
+    private final TestGeneratingHistoryService testGeneratingHistoryService;
 
-    public Test start(Text text) {
-        List<CompletableFuture<QuestionsDto>> futureQuestions = splitQuestionsIntoGroups(text)
-            .stream()
-            .map(group -> generateTestAsync(group, text))
-            .toList();
+    public Test start(Text text, TestGeneratingHistory history) {
+        log.info("Starting test generation. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
-        List<Question> generatedQuestions = CompletableFuture.allOf(futureQuestions.toArray(new CompletableFuture[0]))
-            .thenApply(ignored -> futureQuestions.stream()
-                .map(CompletableFuture::join)
-                .map(QuestionsDto::getQuestions)
-                .flatMap(Collection::stream)
-                .toList())
-            .join();
+        history.setGenerationStatus(GenerationStatus.IN_PROCESS);
 
-        return Test.builder()
-            .title(text.getTitle())
-            .questions(generatedQuestions)
-            .userId(text.getUserId())
-            .build();
-    }
+        testGeneratingHistoryService.save(history);
 
-    private CompletableFuture<QuestionsDto> generateTestAsync(List<String> questionGroup, Text text) {
-        return CompletableFuture.supplyAsync(() -> {
-            log.info("Generating Test. Text id: {}, User id: {}. Questions: {}", text.getId(), text.getUserId(), questionGroup);
-            TestDto testDto = new TestDto(removeHTMLTags(text.getContent()), questionGroup);
-            String testJson = generateData(readFileContents("ai_prompts/generate_test.txt"), testDto.toString());
-            try {
-                return objectMapper.readValue(testJson, QuestionsDto.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    private List<List<String>> splitQuestionsIntoGroups(Text text) {
-        log.info("Generating questions for text. Text id: {}, User id: {}", text.getId(), text.getUserId());
-        String questions = generateData(readFileContents("ai_prompts/generate_questions.txt"), removeHTMLTags(text.getContent()));
-        return parseQuestionGroups(questions, text);
-    }
-
-    private List<List<String>> parseQuestionGroups(String questions, Text text) {
-        log.info("Parsing questions from string. Text id: {}, User id: {}", text.getId(), text.getUserId());
-        List<String> questionList = Arrays.asList(questions.split("\n"));
-
-        return StreamEx.ofSubLists(questionList, questionsGroupSize)
-            .toList();
-    }
-
-    private String generateData(String request, String content) {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage textPrompt = createChatMessage(content);
-        ChatMessage taskPrompt = createChatMessage(request);
 
-        messages.add(textPrompt);
-        messages.add(taskPrompt);
+        log.info("Generating Questions. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        String questions = generateData(messages, readFileContents("ai_prompts/generate_questions.txt"), removeHTMLTags(text.toString()), text, history);
 
-        log.info("Sending prompt to AI");
+        log.info("Generating Test. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        String testJson = generateData(messages, readFileContents("ai_prompts/generate_test.txt"), questions, text, history);
 
-        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
+        log.info("Test generation completed. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
-        return extractAnswer(chatCompletionResult);
+        Test test = parseTest(testJson, history)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Some error occurred when generating test. Please contact admin"));
+
+        history.setTest(test);
+        history.setGenerationStatus(GenerationStatus.SUCCESS);
+
+        testGeneratingHistoryService.save(history);
+
+        return test;
     }
 
-    private String extractAnswer(ChatCompletionResult chatCompletionResult) {
+    private Optional<Test> parseTest(String json, TestGeneratingHistory history) {
+        try {
+            Test test = objectMapper.readValue(json, Test.class);
+            if (test.getTitle() == null) {
+                test.setTitle(history.getText().getTitle());
+            }
+            return Optional.of(test);
+        } catch (JsonProcessingException e) {
+            log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
+                history.getUser().getId(), history.getText().getId(), e.getMessage());
+        } finally {
+            history.setOutputTokensCount(countTokens(json));
+            history.setGenerationEnd(LocalDateTime.now());
+            history.setGenerationStatus(GenerationStatus.FAILED);
+            testGeneratingHistoryService.save(history);
+        }
+        return Optional.empty();
+    }
+
+    private String generateData(List<ChatMessage> messages, String request, String content, Text text, TestGeneratingHistory history) {
+        ChatMessage taskPrompt = createChatMessage(request);
+        ChatMessage textPrompt = createChatMessage(content);
+
+        messages.add(taskPrompt);
+        messages.add(textPrompt);
+
+        log.info("Sending prompt to AI. Text id: {}, User id: {}", text.getId(), text.getUserId());
+
+        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages, history));
+
+        return extractAnswer(chatCompletionResult, history);
+    }
+
+    private String extractAnswer(ChatCompletionResult chatCompletionResult, TestGeneratingHistory history) {
         return chatCompletionResult
             .getChoices()
             .get(0)
@@ -105,16 +102,22 @@ public class TestGenerator {
             .getContent();
     }
 
-    private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages) {
-        int maxTokens = 16000 - countTokens(chatMessages
+    private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages, TestGeneratingHistory history) {
+        int tokensCount = countTokens(chatMessages
             .stream()
             .map(ChatMessage::getContent)
             .collect(Collectors.joining()));
+
+        history.setInputTokensCount(tokensCount);
+
+        int maxTokens = 16000 - tokensCount;
 
         return ChatCompletionRequest.builder()
             .model("gpt-3.5-turbo-16k-0613")
             .messages(chatMessages)
             .maxTokens(maxTokens)
+            .temperature(1.0)
+            .topP(1.0)
             .build();
     }
 
@@ -123,25 +126,5 @@ public class TestGenerator {
         message.setContent(content);
         message.setRole("user");
         return message;
-    }
-
-    @Jacksonized
-    @Builder
-    @lombok.Value
-    static class QuestionsDto {
-        List<Question> questions;
-    }
-
-
-    @AllArgsConstructor
-    @lombok.Value
-    static class TestDto {
-        String textContent;
-        List<String> questions;
-        @Override
-        public String toString() {
-            return "text='" + textContent +
-                "\nquestions=" + String.join(" ", questions);
-        }
     }
 }
