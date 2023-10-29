@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 @Slf4j
 public class AppExceptionHandler {
-    //ResponseStatusException
     @ExceptionHandler(AppException.class)
     public ResponseEntity<Error> handleException(AppException e) {
         log.warn(e.getMessage());

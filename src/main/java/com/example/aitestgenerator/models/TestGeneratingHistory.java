@@ -26,8 +26,8 @@ public class TestGeneratingHistory {
     private Text text;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
-    private Integer inputTokensCount;
-    private Integer outputTokensCount;
+    private Long inputTokensCount;
+    private Long outputTokensCount;
     @Enumerated(EnumType.STRING)
     private GenerationStatus generationStatus;
 }

@@ -1,6 +1,5 @@
 import {CKEditor} from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import {useState} from "react";
 import {Box} from "@mui/material";
 
 export const CkTextEditor = ({ initialText, onTextChange }:

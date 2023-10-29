@@ -4,12 +4,15 @@ import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.models.TestGeneratingHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/tests")

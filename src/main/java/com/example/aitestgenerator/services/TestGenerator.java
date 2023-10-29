@@ -1,11 +1,13 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.exceptions.exceptionHandler.HandleTimeoutException;
 import com.example.aitestgenerator.models.GenerationStatus;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.Usage;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -16,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +33,11 @@ public class TestGenerator {
     private final OpenAiService openAiService;
     private final TestGeneratingHistoryService testGeneratingHistoryService;
 
+    @HandleTimeoutException
     public Test start(Text text, TestGeneratingHistory history) {
         log.info("Starting test generation. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
+        history.setGenerationStart(getGMT());
         history.setGenerationStatus(GenerationStatus.IN_PROCESS);
 
         testGeneratingHistoryService.save(history);
@@ -71,10 +74,10 @@ public class TestGenerator {
         } catch (JsonProcessingException e) {
             log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
                 history.getUser().getId(), history.getText().getId(), e.getMessage());
+            history.setGenerationStatus(GenerationStatus.FAILED);
         } finally {
             history.setOutputTokensCount(countTokens(json));
-            history.setGenerationEnd(LocalDateTime.now());
-            history.setGenerationStatus(GenerationStatus.FAILED);
+            history.setGenerationEnd(getGMT());
             testGeneratingHistoryService.save(history);
         }
         return Optional.empty();
@@ -90,11 +93,15 @@ public class TestGenerator {
         log.info("Sending prompt to AI. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
         ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages, history));
+//        Usage usage = chatCompletionResult.getUsage();
+//
+//        history.setInputTokensCount(usage.getPromptTokens());
+//        history.setOutputTokensCount(usage.getCompletionTokens());
 
-        return extractAnswer(chatCompletionResult, history);
+        return extractAnswer(chatCompletionResult);
     }
 
-    private String extractAnswer(ChatCompletionResult chatCompletionResult, TestGeneratingHistory history) {
+    private String extractAnswer(ChatCompletionResult chatCompletionResult) {
         return chatCompletionResult
             .getChoices()
             .get(0)

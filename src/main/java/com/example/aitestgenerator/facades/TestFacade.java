@@ -1,6 +1,5 @@
 package com.example.aitestgenerator.facades;
 
-import com.example.aitestgenerator.models.GenerationStatus;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
@@ -11,11 +10,9 @@ import com.example.aitestgenerator.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
@@ -37,7 +34,6 @@ public class TestFacade {
             .generationStart(LocalDateTime.now())
             .user(userService.findUserById(userId))
             .text(text)
-            .generationStatus(GenerationStatus.WAITING)
             .build();
 
         testGeneratingHistoryService.save(history);
