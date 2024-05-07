@@ -1,9 +1,9 @@
 package com.example.aitestgenerator.models;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
-import javax.persistence.*;
 import java.util.List;
 
 @Entity

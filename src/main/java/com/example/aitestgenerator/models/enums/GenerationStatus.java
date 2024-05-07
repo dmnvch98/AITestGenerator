@@ -1,4 +1,4 @@
-package com.example.aitestgenerator.models;
+package com.example.aitestgenerator.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

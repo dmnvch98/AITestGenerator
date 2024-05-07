@@ -1,12 +1,12 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.*;
 import com.example.aitestgenerator.repositories.TestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,9 +22,9 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public Test generateTest(Text text, TestGeneratingHistory history) {
-        log.info("Generating test for text. Text ID '{}'", text.getId());
-        return testGenerator.start(text, history);
+    public Test generateTest(TestGeneratingHistory history) {
+        log.info("Generating test for text. Text ID '{}'", history.getText().getId());
+        return testGenerator.start(history);
     }
 
     public List<Test> findAllByUserId(Long userId) {
@@ -40,8 +40,8 @@ public class TestService {
     public Test findAllByIdAndUserIdOrThrow(Long testId, Long userId) {
         log.info("Finding test by ID {} for user. User Id: {}", testId, userId);
         return testRepository.findTestByIdAndUserId(testId, userId)
-            .orElseThrow(() -> new AppException(
-                String.format("Test with Id %d not found for user with id: %d", testId, userId), HttpStatus.NOT_FOUND));
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, String.format("Test with Id %d not found for user with id: %d", testId, userId)));
     }
 
     public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {

@@ -13,6 +13,7 @@ const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const deleteText = useTextStore(state => state.deleteText);
     const generateTest = useTestStore(state => state.generateTest);
+    const toggleGenerateTestFlag = useTestStore(state => state.toggleGenerateTestFlag);
     const navigate = useNavigate();
 
 
@@ -29,6 +30,7 @@ const Actions = ({text}: { text: UserText }) => {
     }
 
     const handleGenerateTestClick = () => {
+        toggleGenerateTestFlag();
         generateTest(text.id as number)
         handleClose();
     }

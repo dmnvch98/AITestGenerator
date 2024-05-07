@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.config.mvc;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public OpenAiService openAiService () {
-        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(1));
+        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(300));
     }
 
     @Override

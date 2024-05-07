@@ -2,6 +2,7 @@ import {useUserStore} from "../../store/userStore";
 import {useEffect} from "react";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import {Box} from "@mui/material";
+import moment from "moment";
 
 export const TestGenHistoryTable = () => {
     const testGenHistory = useUserStore(state => state.testGenHistory);
@@ -14,8 +15,18 @@ export const TestGenHistoryTable = () => {
     const columns: GridColDef[] = [
         { field: 'testId', headerName: 'Test Id'},
         { field: 'textId', headerName: 'Text id' },
-        { field: 'generationStart', headerName: 'Start time'},
-        { field: 'generationEnd', headerName: 'End time'},
+        {
+            field: 'generationStart',
+            headerName: 'Start time',
+            width: 200,
+            valueFormatter: (params) => moment(params.value).format('YYYY-MM-DD HH:mm:ss'),
+        },
+        {
+            field: 'generationEnd',
+            headerName: 'End time',
+            width: 200,
+            valueFormatter: (params) => moment(params.value).format('YYYY-MM-DD HH:mm:ss'),
+        },
         { field: 'inputTokensCount', headerName: 'Input tokens'},
         { field: 'outputTokensCount', headerName: 'Output tokens'},
         { field: 'generationStatus', headerName: 'Status'},

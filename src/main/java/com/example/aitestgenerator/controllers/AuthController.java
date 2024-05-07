@@ -5,13 +5,12 @@ import com.example.aitestgenerator.dto.auth.CredentialsDto;
 import com.example.aitestgenerator.dto.auth.JwtResponse;
 import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RequestMapping("/api/v1/auth")
 @RestController
@@ -32,7 +31,6 @@ public class AuthController {
             String refreshToken = jwt.generateRefreshToken(user.getEmail());
             user.setRefreshToken(refreshToken);
             userService.updateUser(user);
-
             return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken));
         } else {
             return ResponseEntity.notFound().build();

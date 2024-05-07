@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/texts")
+@RequestMapping("/api/v1/texts/")
 @RequiredArgsConstructor
 public class TextController {
+
     private final TextFacade textFacade;
 
     @PostMapping

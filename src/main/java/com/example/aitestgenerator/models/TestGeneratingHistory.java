@@ -1,8 +1,10 @@
 package com.example.aitestgenerator.models;
 
+import com.example.aitestgenerator.models.enums.FailReason;
+import com.example.aitestgenerator.models.enums.GenerationStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,4 +32,5 @@ public class TestGeneratingHistory {
     private Long outputTokensCount;
     @Enumerated(EnumType.STRING)
     private GenerationStatus generationStatus;
+    private FailReason failReason;
 }

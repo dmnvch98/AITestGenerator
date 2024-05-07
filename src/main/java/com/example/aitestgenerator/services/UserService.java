@@ -1,17 +1,14 @@
 package com.example.aitestgenerator.services;
 
 import com.example.aitestgenerator.config.security.PasswordConfig;
-import com.example.aitestgenerator.converters.UserConverter;
-import com.example.aitestgenerator.dto.users.CreateUserRequestDto;
-import com.example.aitestgenerator.dto.users.CreateUserResponseDto;
 import com.example.aitestgenerator.dto.auth.CredentialsDto;
-import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordConfig passwordConfig;
-    private final UserConverter userConverter;
 
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
@@ -33,13 +29,13 @@ public class UserService {
             .matches(credentialsDto.getPassword(), user.getPassword());
     }
 
-    public void updateUser(User user) {
+    public User updateUser(User user) {
         try {
-            userRepository.save(user);
+            return userRepository.save(user);
         } catch (Exception e) {
-            log.error("An error occurred during updating user refresh token. User ID {} " +
+            log.error("An error occurred during updating user. User ID {} " +
                 "\nError: {}", user.getId(), e.getMessage());
-            throw new AppException("An error occurred during authentication", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred during updating user");
         }
     }
 

@@ -55,4 +55,8 @@ public class Utils {
             .toLocalDateTime();
     }
 
+    public static String getExportedTestName(String testName, String fileFormat) {
+        String truncatedName = testName.length() > 15 ? testName.substring(0, 15) : testName;
+        return truncatedName.replaceAll(" ", "_") + '.' + fileFormat.toLowerCase();
+    }
 }

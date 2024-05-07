@@ -1,12 +1,12 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.exceptions.AppException;
 import com.example.aitestgenerator.models.Text;
 import com.example.aitestgenerator.repositories.TextRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class TextService {
 
         findAllByIdAndUserIdOrThrow(text.getId(), userId);
 
-        text.setUserId(userId);
+//        text.setUserId(userId);
 
         return textRepository.save(text);
     }
@@ -75,8 +75,8 @@ public class TextService {
     public Text findAllByIdAndUserIdOrThrow(Long textId, Long userId) {
         Text text = textRepository.findAllByIdAndUserId(textId, userId);
         if (text == null) {
-            throw new AppException("Text not found for user. Text Id: " + textId + ". User id: " + userId,
-                HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Text not found for user. Text Id: " + textId +
+                ". User id: " + userId);
         }
         return text;
     }

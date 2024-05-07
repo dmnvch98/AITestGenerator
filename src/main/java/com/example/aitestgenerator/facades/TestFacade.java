@@ -38,7 +38,7 @@ public class TestFacade {
 
         testGeneratingHistoryService.save(history);
 
-        Test test = testService.generateTest(text, history);
+        Test test = testService.generateTest(history);
 
         return testService.saveTest(prepareTestToSave(test, userId, textId));
     }

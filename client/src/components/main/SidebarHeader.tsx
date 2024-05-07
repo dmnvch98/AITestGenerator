@@ -21,6 +21,8 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import {TestGenHistory} from "../../pages/history/TestGenHistory";
 
 const drawerWidth = 250;
 
@@ -118,6 +120,11 @@ export const SidebarHeader = ({ children }: any) => {
             name: 'Balance',
             icon: <AccountBalanceWalletIcon />,
             redirect: '/balance',
+        },
+        {
+            name: 'Test generation history',
+            icon: <HistoryEduIcon />,
+            redirect: '/test-gen-history',
         },
     ];
 

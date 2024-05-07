@@ -5,7 +5,7 @@ import {UserText} from "../store/textStore";
 class TextService {
     getAllUserTexts = async () => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/texts");
+            const response = await customAxios.get("http://localhost:8080/api/v1/texts/");
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -15,7 +15,7 @@ class TextService {
 
     getUserTextsByIdsIn = async (ids: number[]) => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/texts", {
+            const response = await customAxios.get("http://localhost:8080/api/v1/texts/", {
                 params: {ids: ids.join(',')}
             });
             return response.data;
@@ -27,7 +27,7 @@ class TextService {
 
     saveText = async (text: UserText) => {
         try {
-            const response = await customAxios.post("http://localhost:8080/api/v1/texts", text);
+            const response = await customAxios.post("http://localhost:8080/api/v1/texts/", text);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

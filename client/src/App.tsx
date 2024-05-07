@@ -11,7 +11,7 @@ import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResult";
 import {appColors} from "./colors/appColors";
-import {TestGenHistoryTable} from "./components/history/TestGenHistoryTable";
+import {TestGenHistory} from "./pages/history/TestGenHistory";
 
 function App() {
     const theme = createTheme({
@@ -36,23 +36,23 @@ function App() {
     });
 
     return (
-        <ThemeProvider theme={theme}>
-            <Router>
-                <div className="App">
-                    <Routes>
-                        <Route path="/texts" element={<Texts/>}/>
-                        <Route path="/sign-in" element={<LoginPage/>}/>
-                        <Route path="/add-text" element={<AddText/>}/>
-                        <Route path="/texts/:id" element={<TextPage/>}/>
-                        <Route path="/tests" element={<Tests/>}/>
-                        <Route path="/tests/:id" element={<TestPageView/>}/>
-                        <Route path="/tests/pass" element={<TestPass/>}/>
-                        <Route path="/tests/result" element={<TestResults/>}/>
-                        <Route path="/test-gen-history" element={<TestGenHistoryTable/>}/>
-                    </Routes>
-                </div>
-            </Router>
-        </ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <Router>
+                    <div className="App">
+                        <Routes>
+                            <Route path="/texts" element={<Texts/>}/>
+                            <Route path="/sign-in" element={<LoginPage/>}/>
+                            <Route path="/add-text" element={<AddText/>}/>
+                            <Route path="/texts/:id" element={<TextPage/>}/>
+                            <Route path="/tests" element={<Tests/>}/>
+                            <Route path="/tests/:id" element={<TestPageView/>}/>
+                            <Route path="/tests/pass" element={<TestPass/>}/>
+                            <Route path="/tests/result" element={<TestResults/>}/>
+                            <Route path="/test-gen-history" element={<TestGenHistory/>}/>
+                        </Routes>
+                    </div>
+                </Router>
+            </ThemeProvider>
     );
 }
 

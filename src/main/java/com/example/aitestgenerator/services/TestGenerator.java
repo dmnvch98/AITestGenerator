@@ -1,10 +1,10 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.exceptions.exceptionHandler.HandleTimeoutException;
-import com.example.aitestgenerator.models.GenerationStatus;
+import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.Text;
+import com.example.aitestgenerator.models.enums.FailReason;
+import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.Usage;
@@ -31,37 +31,66 @@ import static com.example.aitestgenerator.utils.Utils.*;
 public class TestGenerator {
     private final ObjectMapper objectMapper;
     private final OpenAiService openAiService;
-    private final TestGeneratingHistoryService testGeneratingHistoryService;
+    private final TestGeneratingHistoryService historyService;
+    private final TestGeneratingHistoryHolder historyHolder;
 
-    @HandleTimeoutException
-    public Test start(Text text, TestGeneratingHistory history) {
-        log.info("Starting test generation. Text id: {}, User id: {}", text.getId(), text.getUserId());
 
-        history.setGenerationStart(getGMT());
-        history.setGenerationStatus(GenerationStatus.IN_PROCESS);
-
-        testGeneratingHistoryService.save(history);
+    public Test start(TestGeneratingHistory history) {
+        initializeHistory(history);
 
         List<ChatMessage> messages = new ArrayList<>();
 
-        log.info("Generating Questions. Text id: {}, User id: {}", text.getId(), text.getUserId());
-        String questions = generateData(messages, readFileContents("ai_prompts/generate_questions.txt"), removeHTMLTags(text.toString()), text, history);
+        ChatCompletionResult questionsResult = generateQuestions(history, messages);
+        String questions = extractAnswer(questionsResult);
 
-        log.info("Generating Test. Text id: {}, User id: {}", text.getId(), text.getUserId());
-        String testJson = generateData(messages, readFileContents("ai_prompts/generate_test.txt"), questions, text, history);
+        ChatCompletionResult testResult = generateTest(history, messages, questions);
 
-        log.info("Test generation completed. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        handleGenerationResults(history, testResult);
 
+        return history.getTest();
+    }
+
+    private void initializeHistory(TestGeneratingHistory history) {
+        log.info("Starting test generation. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+
+        history.setGenerationStart(getGMT());
+        history.setGenerationStatus(GenerationStatus.IN_PROCESS);
+        historyHolder.setHistory(history);
+        historyService.save(history);
+    }
+
+    private void handleGenerationResults(TestGeneratingHistory history, ChatCompletionResult testResult) {
+        log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+        Usage usage = testResult.getUsage();
+        history.setInputTokensCount(usage.getPromptTokens());
+        history.setOutputTokensCount(usage.getCompletionTokens());
+        history.setGenerationEnd(getGMT());
+
+        historyService.save(history);
+
+        String testJson = extractAnswer(testResult);
         Test test = parseTest(testJson, history)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Some error occurred when generating test. Please contact admin"));
+                "Some error occurred when generating test. Please contact admin or try later"));
 
         history.setTest(test);
         history.setGenerationStatus(GenerationStatus.SUCCESS);
 
-        testGeneratingHistoryService.save(history);
+        historyService.save(history);
+        historyHolder.clearHistory();
+    }
 
-        return test;
+    private ChatCompletionResult generateQuestions(TestGeneratingHistory history, List<ChatMessage> messages) {
+        log.info("Generating Questions. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+        String questionsPrompt = readFileContents("ai_prompts/generate_questions.txt");
+        String textWithoutHTML = removeHTMLTags(history.getText().toString());
+        return generateData(messages, questionsPrompt, textWithoutHTML, history);
+    }
+
+    private ChatCompletionResult generateTest(TestGeneratingHistory history, List<ChatMessage> messages, String questions) {
+        log.info("Generating Test. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+        String testPrompt = readFileContents("ai_prompts/generate_test.txt");
+        return generateData(messages, testPrompt, questions, history);
     }
 
     private Optional<Test> parseTest(String json, TestGeneratingHistory history) {
@@ -75,30 +104,24 @@ public class TestGenerator {
             log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
                 history.getUser().getId(), history.getText().getId(), e.getMessage());
             history.setGenerationStatus(GenerationStatus.FAILED);
+            history.setFailReason(FailReason.PARSE_EXCEPTION);
         } finally {
-            history.setOutputTokensCount(countTokens(json));
-            history.setGenerationEnd(getGMT());
-            testGeneratingHistoryService.save(history);
+            historyService.save(history);
         }
         return Optional.empty();
     }
 
-    private String generateData(List<ChatMessage> messages, String request, String content, Text text, TestGeneratingHistory history) {
+    private ChatCompletionResult generateData(List<ChatMessage> messages, String request, String content, TestGeneratingHistory history) {
         ChatMessage taskPrompt = createChatMessage(request);
         ChatMessage textPrompt = createChatMessage(content);
 
         messages.add(taskPrompt);
         messages.add(textPrompt);
 
-        log.info("Sending prompt to AI. Text id: {}, User id: {}", text.getId(), text.getUserId());
+        log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
-        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(buildChatCompletionRequest(messages, history));
-//        Usage usage = chatCompletionResult.getUsage();
-//
-//        history.setInputTokensCount(usage.getPromptTokens());
-//        history.setOutputTokensCount(usage.getCompletionTokens());
+        return openAiService.createChatCompletion(buildChatCompletionRequest(messages));
 
-        return extractAnswer(chatCompletionResult);
     }
 
     private String extractAnswer(ChatCompletionResult chatCompletionResult) {
@@ -109,13 +132,11 @@ public class TestGenerator {
             .getContent();
     }
 
-    private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages, TestGeneratingHistory history) {
+    private ChatCompletionRequest buildChatCompletionRequest(List<ChatMessage> chatMessages) {
         int tokensCount = countTokens(chatMessages
             .stream()
             .map(ChatMessage::getContent)
             .collect(Collectors.joining()));
-
-        history.setInputTokensCount(tokensCount);
 
         int maxTokens = 16000 - tokensCount;
 

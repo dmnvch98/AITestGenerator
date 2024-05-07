@@ -63,7 +63,7 @@ export const useTextStore = create<UserTexts>((set: any, get: any) => ({
 
         const response = await TextService.saveText(userText);
         if (response) {
-            set({textSavedFlag: true})
+            set({textSavedFlag: true, newTextContent: "", newTextTitle: ""})
             return response.id;
         }
         return undefined;
