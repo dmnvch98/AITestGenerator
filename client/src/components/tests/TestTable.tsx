@@ -1,16 +1,25 @@
 import React from 'react';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {Box, Button, IconButton, Menu, MenuItem} from "@mui/material";
+import {Box, Button, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions} from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
 import {UserTest, useTestStore} from "../../store/tests/testStore";
 import {usePassTestStore} from "../../store/tests/passTestStore";
+import {useExportStore} from "../../store/tests/exportStore";
+import {ExportModal} from "../export/ExportModal";
 
 const Actions = ({test}: { test: UserTest }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const openExportDialog = useExportStore(state => state.modalOpen);
+    const toggleOpenExportDialog = useExportStore(state => state.toggleModelOpen);
+
     const deleteTest = useTestStore(state => state.deleteTest);
     const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
     const navigate = useNavigate();
+    const {
+        selectedTestId, setSelectedTestId,
+        selectedTestTitle, setSelectedTestTitle
+    } = useExportStore();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -32,6 +41,13 @@ const Actions = ({test}: { test: UserTest }) => {
         navigate("/tests/pass");
     }
 
+    const handleExportClick = () => {
+        setSelectedTestId(test.id);
+        setSelectedTestTitle(test.title);
+        toggleOpenExportDialog();
+        console.log(selectedTestId)
+    }
+
     return (
         <div>
             <IconButton onClick={handleClick}>
@@ -46,7 +62,13 @@ const Actions = ({test}: { test: UserTest }) => {
                 <MenuItem onClick={handleViewClick}>View</MenuItem>
                 <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
                 <MenuItem onClick={handlePassClick}>Pass</MenuItem>
+                <MenuItem onClick={handleExportClick}>Export</MenuItem>
             </Menu>
+
+            {/* Модальное окно */}
+            <Dialog open={openExportDialog} onClose={toggleOpenExportDialog}>
+                <ExportModal/>
+            </Dialog>
         </div>
     );
 };

@@ -8,6 +8,8 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DateTimeException;
@@ -57,6 +59,6 @@ public class Utils {
 
     public static String getExportedTestName(String testName, String fileFormat) {
         String truncatedName = testName.length() > 15 ? testName.substring(0, 15) : testName;
-        return truncatedName.replaceAll(" ", "_") + '.' + fileFormat.toLowerCase();
+        return URLEncoder.encode(truncatedName, StandardCharsets.UTF_8) + '.' + fileFormat.toLowerCase();
     }
 }

@@ -4,6 +4,7 @@ import com.example.aitestgenerator.dto.tests.export.ExportTestRequestDto;
 import com.example.aitestgenerator.models.AnswerOption;
 import com.example.aitestgenerator.models.Question;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.services.export.model.ExportedTest;
 import com.example.aitestgenerator.utils.Utils;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -12,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @Component("CSV")
@@ -26,7 +27,7 @@ public class CSVExportService implements ExportService {
     }
 
     @Override
-    public void export(Test test, ExportTestRequestDto requestDto) throws IOException {
+    public ExportedTest export(Test test, ExportTestRequestDto requestDto) throws IOException {
         // Создаем схему с заголовками
         final CsvSchema schema = CsvSchema.builder()
                 .addColumn(requestDto.getQuestionTextLabel())
@@ -35,10 +36,9 @@ public class CSVExportService implements ExportService {
                 .setUseHeader(true)  // Указываем, что нужно использовать заголовок
                 .build();
 
-        final String fileName = Utils.getExportedTestName(test.getTitle(), requestDto.getExportFormat());
-        final File outputFile = new File(requestDto.getFilePath() + fileName);
-        // Пишем данные в файл, используя созданную схему
-        try (SequenceWriter writer = csvMapper.writer(schema).writeValues(outputFile)) {
+        // Используем ByteArrayOutputStream для записи данных в память
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (SequenceWriter writer = csvMapper.writer(schema).writeValues(byteArrayOutputStream)) {
             for (Question question : test.getQuestions()) {
                 for (AnswerOption option : question.getAnswerOptions()) {
                     writer.write(new CsvQuestionFormat(
@@ -49,6 +49,11 @@ public class CSVExportService implements ExportService {
                 }
             }
         }
+
+        return ExportedTest.builder()
+                .bytes(byteArrayOutputStream.toByteArray())
+                .fileName(Utils.getExportedTestName(test.getTitle(), requestDto.getExportFormat()))
+                .build();
     }
 
     // Вспомогательный класс для форматирования данных в CSV

@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {AnswerOption, UserTest} from "./testStore";
+import {UserTest} from "./testStore";
 
 export interface TestResult {
     testTitle: string,

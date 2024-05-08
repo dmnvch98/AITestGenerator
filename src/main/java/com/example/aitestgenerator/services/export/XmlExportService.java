@@ -4,6 +4,7 @@ import com.example.aitestgenerator.dto.tests.export.ExportTestRequestDto;
 import com.example.aitestgenerator.models.AnswerOption;
 import com.example.aitestgenerator.models.Question;
 import com.example.aitestgenerator.models.Test;
+import com.example.aitestgenerator.services.export.model.ExportedTest;
 import com.example.aitestgenerator.utils.Utils;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @Component("XML")
@@ -27,7 +28,7 @@ public class XmlExportService implements ExportService {
     }
 
     @Override
-    public void export(Test test, ExportTestRequestDto requestDto) throws IOException {
+    public ExportedTest export(Test test, ExportTestRequestDto requestDto) throws IOException {
         // Подготовка корневого элемента
         ObjectNode rootNode = xmlMapper.createObjectNode();
 
@@ -52,10 +53,12 @@ public class XmlExportService implements ExportService {
 
         rootNode.set(requestDto.getQuestionsLabel(), questionsNode);
 
-        // Запись XML в файл
-        final String fileName = Utils.getExportedTestName(test.getTitle(), requestDto.getExportFormat());
-        xmlMapper
-                .writerWithDefaultPrettyPrinter()
-                .writeValue(new File(requestDto.getFilePath() + fileName), rootNode);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xmlMapper.writerWithDefaultPrettyPrinter().writeValue(baos, rootNode);
+
+        return ExportedTest.builder()
+                .bytes(baos.toByteArray())
+                .fileName(Utils.getExportedTestName(test.getTitle(), requestDto.getExportFormat()))
+                .build();
     }
 }
