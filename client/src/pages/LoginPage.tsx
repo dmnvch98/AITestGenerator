@@ -55,7 +55,15 @@ function LoginPage() {
             <Typography component="h1" variant="h5">
               Login
             </Typography>
-            <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
+            <Box
+                component="form"
+                onSubmit={(e) => {
+                  e.preventDefault(); // Предотвращаем стандартное поведение отправки формы
+                  handleLogin(); // Вызываем обработчик входа
+                }}
+                noValidate
+                sx={{ mt: 1 }}
+            >
               <TextField
                   variant="outlined"
                   margin="normal"
@@ -67,7 +75,7 @@ function LoginPage() {
                   autoComplete="email"
                   autoFocus
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                   variant="outlined"
@@ -80,14 +88,13 @@ function LoginPage() {
                   id="password"
                   autoComplete="current-password"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
               />
               <Button
-                  type="submit"
+                  type="submit" // Убрано onClick
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
-                  onClick={handleLogin}
               >
                 Login
               </Button>
