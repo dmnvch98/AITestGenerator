@@ -20,8 +20,7 @@ public class TestGeneratingHistory {
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "testId", referencedColumnName = "id")
+    @Transient
     private Test test;
     @ManyToOne
     @JoinColumn(name = "textId", referencedColumnName = "id")

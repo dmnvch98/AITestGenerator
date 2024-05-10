@@ -1,12 +1,10 @@
 package com.example.aitestgenerator.facades;
 
+import com.example.aitestgenerator.models.GenerateTestMessage;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
-import com.example.aitestgenerator.services.TestGeneratingHistoryService;
-import com.example.aitestgenerator.services.TestService;
-import com.example.aitestgenerator.services.TextService;
-import com.example.aitestgenerator.services.UserService;
+import com.example.aitestgenerator.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +18,7 @@ public class TestFacade {
     private final TestService testService;
     private final TextService textService;
     private final TestGeneratingHistoryService testGeneratingHistoryService;
+    private final CommandService commandService;
 
     private final UserService userService;
 
@@ -27,20 +26,24 @@ public class TestFacade {
         return testService.saveTest(prepareTestToSave(test, userId));
     }
 
-    public Test generateTestAndSave(Long userId, Long textId) {
-        Text text = textService.findAllByIdAndUserIdOrThrow(textId, userId);
+    public void generateTestSendMessage(final Long userId, final Long textId) {
+       commandService.sendCommand(GenerateTestMessage.builder().textId(textId).userId(userId).build());
+    }
+
+    public void generateTestReceiveMessage(GenerateTestMessage message) {
+        Text text = textService.findAllByIdAndUserIdOrThrow(message.getUserId(), message.getTextId());
 
         TestGeneratingHistory history = TestGeneratingHistory.builder()
-            .generationStart(LocalDateTime.now())
-            .user(userService.findUserById(userId))
-            .text(text)
-            .build();
+                .generationStart(LocalDateTime.now())
+                .user(userService.findUserById(message.getUserId()))
+                .text(text)
+                .build();
 
         testGeneratingHistoryService.save(history);
 
         Test test = testService.generateTest(history);
 
-        return testService.saveTest(prepareTestToSave(test, userId, textId));
+        testService.saveTest(prepareTestToSave(test, message.getUserId(), message.getTextId()));
     }
 
     public void deleteTest(Long testId, Long userId) {
@@ -63,7 +66,7 @@ public class TestFacade {
         return testService.update(updatedTest, userId);
     }
 
-    private Test prepareTestToSave(Test test, Long userId) {
+    private Test prepareTestToSave(final Test test, final Long userId) {
         test.getQuestions().forEach(question -> {
             question.setTest(test);
             question

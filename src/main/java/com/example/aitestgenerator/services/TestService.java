@@ -23,7 +23,6 @@ public class TestService {
     }
 
     public Test generateTest(TestGeneratingHistory history) {
-        log.info("Generating test for text. Text ID '{}'", history.getText().getId());
         return testGenerator.start(history);
     }
 
@@ -45,7 +44,6 @@ public class TestService {
     }
 
     public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
-
         return testRepository.findAllByIdInAndUserId(testIds, userId);
     }
 

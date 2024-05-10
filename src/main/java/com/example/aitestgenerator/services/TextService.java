@@ -72,7 +72,7 @@ public class TextService {
         return existingUserTexts;
     }
 
-    public Text findAllByIdAndUserIdOrThrow(Long textId, Long userId) {
+    public Text findAllByIdAndUserIdOrThrow(Long userId, Long textId) {
         Text text = textRepository.findAllByIdAndUserId(textId, userId);
         if (text == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Text not found for user. Text Id: " + textId +

@@ -9,3 +9,11 @@ services:
       POSTGRES_DB: test_generator
     ports:
       - "35432:5432"
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs
+    volumes:
+      - ./storage:/etc/localstack/init/ready.d

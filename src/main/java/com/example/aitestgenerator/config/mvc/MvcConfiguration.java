@@ -1,8 +1,6 @@
 package com.example.aitestgenerator.config.mvc;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.theokanning.openai.service.OpenAiService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
