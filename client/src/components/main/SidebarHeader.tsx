@@ -22,7 +22,6 @@ import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
-import {TestGenHistory} from "../../pages/history/TestGenHistory";
 
 const drawerWidth = 250;
 
