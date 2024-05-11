@@ -25,25 +25,12 @@ public class UserFacade {
     private final TestGeneratingHistoryService testGeneratingHistoryService;
     private final TextGenerationHistoryConverter textGenerationHistoryConverter;
 
-
-    public User findUserByEmail(String email) {
-        return userService.findUserByEmail(email);
-    }
-
-    public void updateUser(User user) {
-        userService.updateUser(user);
-    }
-
     public CreateUserResponseDto save(CreateUserRequestDto userDto) {
         User user = userConverter.createUserDtoToUser(userDto);
         String hashedPassword = passwordConfig.passwordEncoder().encode(userDto.getPassword());
         user.setPassword(hashedPassword);
         user = userService.save(user);
         return userConverter.userToCreateUserResponseDto(user);
-    }
-
-    public User findUserById(Long id) {
-        return userService.findUserById(id);
     }
 
     public List<TextGenerationHistoryDto> getTestGenerationHistory(Long userId) {

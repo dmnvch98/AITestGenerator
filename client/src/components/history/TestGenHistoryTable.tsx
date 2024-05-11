@@ -1,8 +1,12 @@
 import {useUserStore} from "../../store/userStore";
-import {useEffect} from "react";
-import {DataGrid, GridColDef} from "@mui/x-data-grid";
-import {Box} from "@mui/material";
-import moment from "moment";
+import React, { useEffect, useState } from 'react';
+import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import DateTimeUtils from '../../utils/DateTimeUtils';
+import { DoneLabel } from '../utils/DoneLabel';
+import { NoLabel } from '../utils/NoLabel';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import TimerIcon from '@mui/icons-material/Timer';
+import Link from '@mui/material/Link';
 
 export const TestGenHistoryTable = () => {
     const testGenHistory = useUserStore(state => state.testGenHistory);
@@ -12,39 +16,71 @@ export const TestGenHistoryTable = () => {
         getTestGenHistory();
     }, [])
 
-    const columns: GridColDef[] = [
-        { field: 'testId', headerName: 'Test Id'},
-        { field: 'textId', headerName: 'Text id' },
-        {
-            field: 'generationStart',
-            headerName: 'Start time',
-            width: 200,
-            valueFormatter: (params) => moment(params.value).format('YYYY-MM-DD HH:mm:ss'),
-        },
-        {
-            field: 'generationEnd',
-            headerName: 'End time',
-            width: 200,
-            valueFormatter: (params) => moment(params.value).format('YYYY-MM-DD HH:mm:ss'),
-        },
-        { field: 'inputTokensCount', headerName: 'Input tokens'},
-        { field: 'outputTokensCount', headerName: 'Output tokens'},
-        { field: 'generationStatus', headerName: 'Status'},
-    ];
+    useEffect(() => {
+        getTestGenHistory();
+
+        const intervalId = setInterval(() => {
+            getTestGenHistory();
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [])
+
+    const getStatusComponent = (status: string) => {
+        switch (status) {
+            case "Waiting":
+                return <TimerIcon/>
+            case "Success":
+                return <DoneLabel />;
+            case "In process":
+                return <CircularProgress size={24}/>;
+            case "Failed":
+                return <NoLabel />;
+            default:
+                return <QuestionMarkIcon />;
+        }
+    };
 
     return (
-        <Box>
-            <DataGrid
-                rows={testGenHistory}
-                columns={columns}
-                initialState={{
-                    pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
-                    },
-                }}
-                pageSizeOptions={[5, 10]}
-                checkboxSelection
-            />
-        </Box>
+        <>
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Test title</TableCell>
+                            <TableCell>Text title</TableCell>
+                            <TableCell>Generation Start</TableCell>
+                            <TableCell>Generation End</TableCell>
+                            <TableCell>Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {testGenHistory.map((th, index) => (
+                            <TableRow key={index}>
+                                <TableCell>
+                                    <Link
+                                        color='inherit'
+                                        underline='none'
+                                        href={`/tests/${th.testId}`}>
+                                        {th.testTitle}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>
+                                    <Link
+                                        color='inherit'
+                                        underline='none'
+                                        href={`/texts/${th.textId}`}>
+                                        {th.textTitle}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>{DateTimeUtils.formatDate(th.generationStart)}</TableCell>
+                                <TableCell>{DateTimeUtils.formatDate(th.generationEnd)}</TableCell>
+                                <TableCell>{getStatusComponent(th.generationStatus)}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </>
     );
 }

@@ -29,8 +29,6 @@ public class QuestionGenerator extends Generator<List<ChatMessage>> {
 
     @Override
     public List<ChatMessage> generateData(TestGeneratingHistory history, List<ChatMessage> messages) throws IOException {
-        initializeHistory(history);
-
         log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
         prepareMessages(history, messages);
 
@@ -55,14 +53,5 @@ public class QuestionGenerator extends Generator<List<ChatMessage>> {
         }
         extractAnswer(result, messages);
         return messages;
-    }
-
-    private void initializeHistory(TestGeneratingHistory history) {
-        log.info("Starting test generation. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
-
-        history.setGenerationStart(getGMT());
-        history.setGenerationStatus(GenerationStatus.IN_PROCESS);
-        historyHolder.setHistory(history);
-        historyService.save(history);
     }
 }

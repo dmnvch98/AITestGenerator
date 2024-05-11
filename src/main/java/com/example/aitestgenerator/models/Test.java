@@ -30,4 +30,5 @@ public class Test {
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<Question> questions;
+
 }

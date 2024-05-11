@@ -11,4 +11,5 @@ public class GenerateTestMessage {
 
     private final long textId;
     private final long userId;
+    private final long historyId;
 }

@@ -3,12 +3,12 @@ import UserService from "../services/UserService";
 
 export interface TestGenHistory {
     id: number,
+    testTitle: string,
     testId: number,
+    textTitle: string,
     textId: number,
     generationStart: Date,
     generationEnd: Date,
-    inputTokensCount: number,
-    outputTokensCount: number,
     generationStatus: string
 }
 

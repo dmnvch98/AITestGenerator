@@ -1,87 +1,135 @@
-import React, { useState } from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { Question, AnswerOption } from "../../store/tests/testStore";
+import React, {useState} from "react";
+import {Box, Button, Paper, Typography} from "@mui/material";
+import {AnswerOption, Question} from "../../store/tests/testStore";
+import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
+import {appColors} from "../../colors/appColors";
 
 export const QuestionAnswersPage = ({
-                                        question,
-                                        onNextQuestion
-                                    }: {
+                        question,
+                        questionNumber,
+                        allQuestionsNumber,
+                        onNextQuestion,
+                        testTitle,
+                        currentTestNumber,
+                        allTestsNumber,
+                    }: {
     question: Question;
     onNextQuestion: () => void;
+    questionNumber: number;
+    allQuestionsNumber: number;
+    testTitle: string,
+    currentTestNumber: number,
+    allTestsNumber: number
+
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
-    const [isAcceptButtonClicked, setIsAcceptButtonClicked] = useState(false);
+    const [answered, setAnswered] = useState(false);
+    const [acceptCalled, setAcceptCalled] = useState(false);
+    const addAnswer = usePassTestStore(state => state.addAnswer);
 
-    const handleOptionSelect = (optionId: number) => {
-        // Проверяем, была ли уже нажата кнопка "Accept"
-        if (isAcceptButtonClicked) {
-            return;
-        }
-
-        // Если выбранный вариант уже есть в массиве selectedOptions, удаляем его
-        if (selectedOptions.includes(optionId)) {
-            setSelectedOptions((prevSelectedOptions) =>
-                prevSelectedOptions.filter((id) => id !== optionId)
-            );
+    const handleNext = () => {
+        if (answered || selectedOptions.length === 0) {
+            onNextQuestion();
+            setAnswered(false);
+            setSelectedOptions([])
+            setAcceptCalled(false);
         } else {
-            // В противном случае, добавляем его в массив
-            setSelectedOptions((prevSelectedOptions) => [
-                ...prevSelectedOptions,
-                optionId
-            ]);
+            setAnswered(true);
         }
+        accept();
+    };
+
+    const getOptionColor = (option: AnswerOption) => {
+        if (!answered && isOptionSelected(option.id)) {
+            return appColors.primary.default
+        } else if (answered && option.isCorrect) {
+            return appColors.primary.main
+        } else if (answered && isOptionSelected(option.id) && !option.isCorrect) {
+            return appColors.error.main
+        }
+        return 'transparent';
     };
 
     const isOptionSelected = (optionId: number) => selectedOptions.includes(optionId);
 
-    const handleAccept = () => {
-        // После нажатия кнопки "Accept" устанавливаем флаг
-        setIsAcceptButtonClicked(true);
-
-        // Проверка правильности выбранных ответов
-        const areSelectedOptionsCorrect = selectedOptions.every((optionId) => {
-            const selectedOption = question.answerOptions.find((option) => option.id === optionId);
-            return selectedOption?.isCorrect || false;
-        });
-
-        // Можете выполнить дополнительную обработку на основе areSelectedOptionsCorrect
-
-        // Переход к следующему вопросу
-        onNextQuestion();
+    const handleOptionSelect = (optionId: number) => {
+        if (!answered) {
+            setSelectedOptions(prevSelectedOptions =>
+                prevSelectedOptions.includes(optionId)
+                    ? prevSelectedOptions.filter(id => id !== optionId)
+                    : [...prevSelectedOptions, optionId]
+            );
+        }
     };
+
+
+    const accept = () => {
+        if (!acceptCalled) {
+            const questionAnswer: QuestionAnswer = {
+                questionNumber: questionNumber,
+                passed: isAnswerCorrect()
+            };
+            addAnswer(questionAnswer);
+            setAcceptCalled(true)
+        }
+    };
+
+    const isAnswerCorrect = (): boolean => {
+        const correctOptionIds = question.answerOptions
+            .filter(op => op.isCorrect)
+            .map(op => op.id);
+
+        return (
+            correctOptionIds.length === selectedOptions.length &&
+            correctOptionIds.every(id => selectedOptions.includes(id))
+        );
+    };
+
 
     return (
         <>
-            <Box sx={{ mb: 2 }}>
-                <Typography>{question.questionText}</Typography>
+            <Box sx={{mb: 2}}>
+                <Typography variant='h5'
+                            align='left'>Вопрос {questionNumber} из {allQuestionsNumber}: {question.questionText}</Typography>
+                <Typography align='left' sx={{mt: 1}}>Тема теста: {testTitle}</Typography>
+                <Typography align='left' sx={{mt: 1}}>Тест {currentTestNumber} из {allTestsNumber}</Typography>
+
             </Box>
-            {question.answerOptions.map((option) => (
-                <Box key={option.id}>
-                    <Paper
-                        onClick={() => handleOptionSelect(option.id)}
-                        sx={{
-                            cursor: isAcceptButtonClicked ? "default" : "pointer",
-                            backgroundColor: isOptionSelected(option.id)
-                                ? option.isCorrect
-                                    ? "#4caf50" // Зеленый для правильного выбора
-                                    : "#f44336" // Красный для неправильного выбора
-                                : "white"
-                        }}
+
+            <Box sx={{
+                width: "70%",
+                margin: "0 auto"
+            }}>
+                {question.answerOptions.map((option) => (
+                    <Box key={option.id} sx={{
+                        mb: 2,
+                        borderRadius: 1,
+                        border: `2px solid ${getOptionColor(option)}`
+                    }}>
+                        <Paper
+                            onClick={() => handleOptionSelect(option.id)}
+                            sx={{
+                                p: 3,
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <Typography align="left">{option.optionText}</Typography>
+                        </Paper>
+                    </Box>
+                ))}
+
+                <Box>
+                    <Button
+                        variant='contained'
+                        onClick={handleNext}
+                        size='large'
+                        fullWidth
                     >
-                        <Typography>{option.optionText}</Typography>
-                    </Paper>
-                </Box>
-            ))}
-            <Box sx={{ mt: 2 }}>
-                {!isAcceptButtonClicked && (
-                    <Button variant="contained" onClick={handleAccept}>
-                        Accept
+                        Next
                     </Button>
-                )}
-                <Button variant="contained" onClick={onNextQuestion}>
-                    Next
-                </Button>
+                </Box>
             </Box>
+
         </>
-    );
-};
+    )
+}

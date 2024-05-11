@@ -1,9 +1,11 @@
 package com.example.aitestgenerator.facades;
 
+import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.GenerateTestMessage;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.Text;
+import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.example.aitestgenerator.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,8 @@ public class TestFacade {
     private final TestService testService;
     private final TestGenerationService testGenerationService;
     private final TextService textService;
-    private final TestGeneratingHistoryService testGeneratingHistoryService;
+    private final TestGeneratingHistoryService historyService;
+    private final TestGeneratingHistoryHolder historyHolder;
     private final CommandService commandService;
 
     private final UserService userService;
@@ -29,23 +32,36 @@ public class TestFacade {
     }
 
     public void generateTestSendMessage(final Long userId, final Long textId) {
-       commandService.sendCommand(GenerateTestMessage.builder().textId(textId).userId(userId).build());
+        Text text = textService.findAllByIdAndUserIdOrThrow(userId, textId);
+
+        final TestGeneratingHistory history = TestGeneratingHistory.builder()
+            .generationStart(LocalDateTime.now())
+            .user(userService.findUserById(userId))
+            .generationStatus(GenerationStatus.WAITING)
+            .text(text)
+            .build();
+
+        historyService.save(history);
+        final GenerateTestMessage message = GenerateTestMessage
+            .builder()
+            .historyId(history.getId())
+            .textId(textId)
+            .userId(userId)
+            .build();
+       commandService.sendCommand(message);
     }
 
     public void generateTestReceiveMessage(GenerateTestMessage message) {
-        Text text = textService.findAllByIdAndUserIdOrThrow(message.getUserId(), message.getTextId());
+        TestGeneratingHistory history = historyService.findByIdAndUserId(message.getHistoryId());
+        history.setGenerationStatus(GenerationStatus.IN_PROCESS);
+        historyService.save(history);
+        historyHolder.setHistory(history);
 
-        TestGeneratingHistory history = TestGeneratingHistory.builder()
-                .generationStart(LocalDateTime.now())
-                .user(userService.findUserById(message.getUserId()))
-                .text(text)
-                .build();
-
-        testGeneratingHistoryService.save(history);
-
-        Test test = testGenerationService.generateTest(history);
+        final Test test = testGenerationService.generateTest(history);
 
         testService.saveTest(prepareTestToSave(test, message.getUserId(), message.getTextId()));
+        history.setTest(test);
+        historyService.save(history);
     }
 
     public void deleteTest(Long testId, Long userId) {

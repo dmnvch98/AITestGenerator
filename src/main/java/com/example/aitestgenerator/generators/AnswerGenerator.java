@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
-import static com.example.aitestgenerator.utils.Utils.getGMT;
 import static com.example.aitestgenerator.utils.Utils.readFileContents;
 
 @Component
@@ -49,10 +51,7 @@ public class AnswerGenerator extends Generator<Test> {
         }
         log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
-        history.setGenerationEnd(getGMT());
-        historyService.save(history);
-
-        history.setTest(testResult);
+        history.setGenerationEnd(LocalDateTime.now(ZoneOffset.UTC));
         history.setGenerationStatus(GenerationStatus.SUCCESS);
 
         historyService.save(history);

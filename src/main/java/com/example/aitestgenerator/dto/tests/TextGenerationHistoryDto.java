@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class TextGenerationHistoryDto {
+
     private Long id;
     private Long userId;
-    private Long testId;
-    private Long textId;
+    private long testId;
+    private String testTitle;
+    private String textTitle;
+    private long textId;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
-    private Integer inputTokensCount;
-    private Integer outputTokensCount;
     private String generationStatus;
 }

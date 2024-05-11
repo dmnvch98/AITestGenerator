@@ -13,8 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,12 +51,6 @@ public class Utils {
         return matcher
             .replaceAll("")
             .replaceAll("&nbsp;", " ");
-    }
-
-    public static LocalDateTime getGMT() {
-        return ZonedDateTime.
-            now(ZoneId.of("GMT"))
-            .toLocalDateTime();
     }
 
     public static String getExportedTestName(String testName, String fileFormat) {

@@ -19,8 +19,7 @@ import retrofit2.HttpException;
 
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
-
-import static com.example.aitestgenerator.utils.Utils.getGMT;
+import java.time.ZoneOffset;
 
 @ControllerAdvice
 @Slf4j
@@ -63,7 +62,7 @@ public class AppExceptionHandler {
     }
 
     private void updateTestGeneratingHistory(TestGeneratingHistory history) {
-        history.setGenerationEnd(getGMT());
+        history.setGenerationEnd(LocalDateTime.now(ZoneOffset.UTC));
         history.setGenerationStatus(GenerationStatus.FAILED);
         historyService.save(history);
         historyHolder.clearHistory();
