@@ -1,6 +1,6 @@
 CREATE TABLE answer_options (
-                                id SERIAL PRIMARY KEY,
-                                question_id INT REFERENCES questions(id),
+                                id BIGINT PRIMARY KEY,
+                                question_id BIGINT REFERENCES questions(id),
                                 option_text TEXT NOT NULL,
                                 is_correct BOOLEAN NOT NULL
 );

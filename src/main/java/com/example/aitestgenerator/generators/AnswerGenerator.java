@@ -49,9 +49,6 @@ public class AnswerGenerator extends Generator<Test> {
         }
         log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
-//        Usage usage = testResult.getUsage();
-//        history.setInputTokensCount(usage.getPromptTokens());
-//        history.setOutputTokensCount(usage.getCompletionTokens());
         history.setGenerationEnd(getGMT());
         historyService.save(history);
 
