@@ -12,8 +12,11 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,7 +35,6 @@ public class TestGenerator {
     private final OpenAiService openAiService;
     private final TestGeneratingHistoryService historyService;
     private final TestGeneratingHistoryHolder historyHolder;
-
 
     public Test start(TestGeneratingHistory history) {
         initializeHistory(history);
@@ -81,17 +83,20 @@ public class TestGenerator {
         historyHolder.clearHistory();
     }
 
+    @SneakyThrows
     private ChatCompletionResult generateQuestions(TestGeneratingHistory history, List<ChatMessage> messages) {
         log.info("Generating Questions. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
         String questionsPrompt = readFileContents("ai_prompts/generate_questions.txt");
         String textWithoutHTML = removeHTMLTags(history.getText().getContent());
-        return generateData(messages, questionsPrompt, textWithoutHTML, history);
+        return generateData(messages, questionsPrompt, textWithoutHTML, history, false);
     }
 
-    private ChatCompletionResult generateTest(TestGeneratingHistory history, List<ChatMessage> messages) {
+    @Retryable(retryFor = JsonProcessingException.class, maxAttempts = 5, backoff = @Backoff(delay = 1000))
+    @SneakyThrows
+    public ChatCompletionResult generateTest(TestGeneratingHistory history, List<ChatMessage> messages) {
         log.info("Generating Test. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
         String testPrompt = readFileContents("ai_prompts/generate_test.txt");
-        return generateData(messages, testPrompt, null, history);
+        return generateData(messages, testPrompt, null, history, true);
     }
 
     private Optional<Test> parseTest(String json, TestGeneratingHistory history) {
@@ -112,7 +117,7 @@ public class TestGenerator {
         return Optional.empty();
     }
 
-    private ChatCompletionResult generateData(List<ChatMessage> messages, String request, String content, TestGeneratingHistory history) {
+    public ChatCompletionResult generateData(List<ChatMessage> messages, String request, String content, TestGeneratingHistory history, boolean validateJson) throws JsonProcessingException {
         ChatMessage taskPrompt = createChatMessage(request);
         ChatMessage questionsPrompt = createChatMessage(content);
 
@@ -123,8 +128,17 @@ public class TestGenerator {
 
         log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
-        return openAiService.createChatCompletion(buildChatCompletionRequest(messages));
-
+        ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
+        if (validateJson) {
+            try {
+                objectMapper.readTree(result.getChoices().get(0).getMessage().getContent());
+            } catch (JsonProcessingException e) {
+                log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
+                        history.getUser().getId(), history.getText().getId(), e.getMessage());
+                throw e;
+            }
+        }
+        return null;
     }
 
     private void extractAnswer(final ChatCompletionResult chatCompletionResult, List<ChatMessage> messages) {

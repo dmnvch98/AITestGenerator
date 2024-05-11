@@ -34,7 +34,7 @@ const TestPassContent = () => {
         if (currentTest && currentQuestionIndex < currentTest.questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-            saveTestResult(currentTest.title);
+            saveTestResult(currentTest.title, currentTest.id);
             // If there are no more questions in the current test
             if (currentTestId < testToPass.length - 1) {
                 // Move to the next test

@@ -11,13 +11,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/export/tests")
+@RequestMapping("/api/v1/tests")
 @RequiredArgsConstructor
 public class ExportController {
 
     private final ExportFacade exportFacade;
 
-    @PostMapping("/{testId}")
+    @PostMapping("/{testId}/export")
     public ResponseEntity<byte[]> export(
             @PathVariable("testId") final long testId,
             @RequestBody ExportTestRequestDto requestDto,

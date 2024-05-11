@@ -9,9 +9,10 @@ import {TextPage} from "./pages/texts/TextPage";
 import {Tests} from "./pages/tests/Tests";
 import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
-import {TestResults} from "./pages/tests/TestResult";
+import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./colors/appColors";
 import {TestGenHistory} from "./pages/history/TestGenHistory";
+import {TestResultSingle} from "./pages/tests/TestResultSingle";
 
 function App() {
     const theme = createTheme({
@@ -48,6 +49,7 @@ function App() {
                             <Route path="/tests/:id" element={<TestPageView/>}/>
                             <Route path="/tests/pass" element={<TestPass/>}/>
                             <Route path="/tests/result" element={<TestResults/>}/>
+                            <Route path="/tests/:testId/result/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenHistory/>}/>
                         </Routes>
                     </div>

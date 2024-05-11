@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TestGeneratingHistoryHolder {
+
     private final ThreadLocal<TestGeneratingHistory> historyThreadLocal = new ThreadLocal<>();
 
     public void clearHistory() {

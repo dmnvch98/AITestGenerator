@@ -15,7 +15,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TestFacade {
+
     private final TestService testService;
+    private final TestGenerationService testGenerationService;
     private final TextService textService;
     private final TestGeneratingHistoryService testGeneratingHistoryService;
     private final CommandService commandService;
@@ -41,7 +43,7 @@ public class TestFacade {
 
         testGeneratingHistoryService.save(history);
 
-        Test test = testService.generateTest(history);
+        Test test = testGenerationService.generateTest(history);
 
         testService.saveTest(prepareTestToSave(test, message.getUserId(), message.getTextId()));
     }

@@ -15,15 +15,10 @@ import java.util.List;
 @Slf4j
 public class TestService {
     private final TestRepository testRepository;
-    private final TestGenerator testGenerator;
 
     public Test saveTest(Test test) {
         log.info("Saving test. Test title: {}. Text id: {}, User id: {} ", test.getTitle(), test.getTextId(), test.getUserId());
         return testRepository.save(test);
-    }
-
-    public Test generateTest(TestGeneratingHistory history) {
-        return testGenerator.start(history);
     }
 
     public List<Test> findAllByUserId(Long userId) {
