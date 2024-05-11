@@ -16,9 +16,9 @@ public class Text {
     Long id;
     @Column(name = "user_id")
     Long userId;
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "text")
     String title;
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "text")
     String content;
 
     @Override

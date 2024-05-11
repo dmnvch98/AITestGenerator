@@ -11,7 +11,7 @@ export interface TestResult {
 
 export interface QuestionAnswer {
     questionNumber: number
-    isPassed: boolean
+    passed: boolean
 }
 
 export interface PassTest {
@@ -29,6 +29,7 @@ export interface PassTest {
     // setSelectedOptions: (selectedOptions: AnswerOption[]) => void;
     singleTestResult: TestResult | undefined;
     getSingleTestResult: (testId: number, resultId: number) => void;
+    getAllUserTestResults: () => void;
 }
 
 export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
@@ -46,6 +47,7 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
             testTitle: title,
             questionAnswers: get().answers
         }
+        console.log(testResult);
         TestResultService.saveTestResult(testResult, testId).then(
             r => {
                 set({
@@ -70,6 +72,10 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
     getSingleTestResult: async (testId: number, resultId: number) => {
         const result: TestResult = await TestResultService.getSingleTestResult(testId, resultId);
         set({singleTestResult: result})
+    },
+    getAllUserTestResults: async () => {
+        const result: TestResult[] = await TestResultService.getAllUserTestResults();
+        set({ testResults: result})
     }
 }))
 

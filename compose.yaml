@@ -10,10 +10,10 @@ services:
     ports:
       - "35432:5432"
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack:3.0.1-arm64
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=sqs
+      - SERVICES=kms,sqs
     volumes:
       - ./storage:/etc/localstack/init/ready.d

@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import HistoryIcon from '@mui/icons-material/History';
 import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
@@ -116,9 +116,9 @@ export const SidebarHeader = ({ children }: any) => {
             redirect: '/texts',
         },
         {
-            name: 'Balance',
-            icon: <AccountBalanceWalletIcon />,
-            redirect: '/balance',
+            name: 'Pass history',
+            icon: <HistoryIcon />,
+            redirect: '/tests/results',
         },
         {
             name: 'Test generation history',

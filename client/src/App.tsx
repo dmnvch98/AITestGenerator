@@ -13,6 +13,7 @@ import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./colors/appColors";
 import {TestGenHistory} from "./pages/history/TestGenHistory";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
+import { UserTestResults } from './pages/tests/UserTestResults';
 
 function App() {
     const theme = createTheme({
@@ -49,7 +50,8 @@ function App() {
                             <Route path="/tests/:id" element={<TestPageView/>}/>
                             <Route path="/tests/pass" element={<TestPass/>}/>
                             <Route path="/tests/result" element={<TestResults/>}/>
-                            <Route path="/tests/:testId/result/:id" element={<TestResultSingle/>} />
+                            <Route path="/tests/results" element={<UserTestResults/>}/>
+                            <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenHistory/>}/>
                         </Routes>
                     </div>

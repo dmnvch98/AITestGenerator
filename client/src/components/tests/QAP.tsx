@@ -1,11 +1,8 @@
 import React, {useState} from "react";
-import {Box, Button, ListItemText, ListSubheader, Paper, Typography} from "@mui/material";
+import {Box, Button, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
 import {appColors} from "../../colors/appColors";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import Divider from "@mui/material/Divider";
 
 export const QAP = ({
                         question,
@@ -70,7 +67,7 @@ export const QAP = ({
         if (!acceptCalled) {
             const questionAnswer: QuestionAnswer = {
                 questionNumber: questionNumber,
-                isPassed: isAnswerCorrect()
+                passed: isAnswerCorrect()
             };
             addAnswer(questionAnswer);
             setAcceptCalled(true)

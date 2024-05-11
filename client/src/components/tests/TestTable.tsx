@@ -1,6 +1,6 @@
 import React from 'react';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {Box, Button, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions} from "@mui/material";
+import {Box, Button, IconButton, Menu, MenuItem, Dialog} from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useNavigate} from "react-router-dom";
 import {UserTest, useTestStore} from "../../store/tests/testStore";
@@ -18,7 +18,7 @@ const Actions = ({test}: { test: UserTest }) => {
     const navigate = useNavigate();
     const {
         selectedTestId, setSelectedTestId,
-        selectedTestTitle, setSelectedTestTitle
+        setSelectedTestTitle
     } = useExportStore();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
