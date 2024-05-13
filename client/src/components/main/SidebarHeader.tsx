@@ -23,7 +23,7 @@ import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 
-const drawerWidth = 250;
+const drawerWidth = 300;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -106,22 +106,22 @@ export const SidebarHeader = ({ children }: any) => {
 
     const tabs: TabIcon[] = [
         {
-            name: 'Tests',
+            name: 'Тесты',
             icon: <LocalLibraryIcon />,
             redirect: '/tests',
         },
         {
-            name: 'Texts',
+            name: 'Тексты',
             icon: <TextSnippetIcon />,
             redirect: '/texts',
         },
         {
-            name: 'Pass history',
+            name: 'История прохождений',
             icon: <HistoryIcon />,
             redirect: '/tests/results',
         },
         {
-            name: 'Test generation history',
+            name: 'История генераций',
             icon: <HistoryEduIcon />,
             redirect: '/test-gen-history',
         },
@@ -159,7 +159,7 @@ export const SidebarHeader = ({ children }: any) => {
                         <Grid item sm={12}>
                             <Box display="flex" justifyContent="space-between">
                                 <Typography variant="h6" noWrap component="div">
-                                    Logo
+                                    ГенТест
                                 </Typography>
                                 <Link href="/sign-in">
                                     <Button
@@ -168,7 +168,7 @@ export const SidebarHeader = ({ children }: any) => {
                                             logout();
                                         }}
                                     >
-                                        Logout
+                                        Выход
                                     </Button>
                                 </Link>
                             </Box>

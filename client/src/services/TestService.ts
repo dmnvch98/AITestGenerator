@@ -6,7 +6,7 @@ class TestService {
     generateTest = async (dto: GenerateTestRequestDto) => {
         try {
             const response = await customAxios.post("http://localhost:8080/api/v1/tests/generate", dto);
-            return response.status == 201;
+            return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

@@ -80,8 +80,6 @@ class UserServiceTest {
         User user = User.builder()
                 .email("test@example.com")
                 .password(passwordConfig.passwordEncoder().encode("password"))
-                .firstName("First name")
-                .lastName("Last name")
                 .build();
         userService.save(user);
     }

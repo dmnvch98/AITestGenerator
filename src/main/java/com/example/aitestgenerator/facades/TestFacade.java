@@ -32,7 +32,7 @@ public class TestFacade {
     }
 
     public void generateTestSendMessage(final Long userId, final Long textId) {
-        Text text = textService.findAllByIdAndUserIdOrThrow(userId, textId);
+        Text text = textService.findAllByIdAndUserIdOrThrow(textId, userId);
 
         final TestGeneratingHistory history = TestGeneratingHistory.builder()
             .generationStart(LocalDateTime.now())

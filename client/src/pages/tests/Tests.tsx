@@ -16,7 +16,7 @@ const TestsContent = () => {
     return (
         <>
             <Typography variant="h5" align="left" sx={{mb: 2}}>
-                Saved Tests
+                Сгенерированные тесты
             </Typography>
             <TestTable/>
             <Snackbar
@@ -25,7 +25,7 @@ const TestsContent = () => {
                 onClose={toggleTestDeletedFlag}
             >
                 <Alert severity="success">
-                    Test(s) successfully deleted
+                    Текст(ы) успешно удалены
                 </Alert>
             </Snackbar>
         </>

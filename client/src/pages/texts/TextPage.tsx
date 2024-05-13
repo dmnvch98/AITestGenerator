@@ -5,19 +5,19 @@ import {useTextStore} from "../../store/textStore";
 import {TextEditor} from "../../components/texts/TextEditor";
 import {TextViewer} from "../../components/texts/TextViewer";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import { useExportStore } from '../../store/tests/exportStore';
 
 export const TextPageContent = () => {
     const {id} = useParams();
     const [isEditing, setIsEditing] = useState(false);
+    const {
+        texts, setTitle,
+        setContent, textUpdatedFlag,
+        toggleTextUpdatedFlag, getUserTextsByIdIn,
+        selectText, updateText,
 
-    const texts = useTextStore(state => state.texts);
-    const setTitle = useTextStore(state => state.setTitle);
-    const setContent = useTextStore(state => state.setContent);
-    const textUpdatedFlag = useTextStore(state => state.textUpdatedFlag);
-    const toggleTextUpdatedFlag = useTextStore(state => state.toggleTextUpdatedFlag);
-    const getUserTextsByIdIn = useTextStore(state => state.getUserTextsByIdIn);
-    const selectText = useTextStore(state => state.selectText);
-    const updateText = useTextStore(state => state.updateText);
+    } = useTextStore();
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -61,21 +61,21 @@ export const TextPageContent = () => {
                             sx={{flex: 1, marginRight: 2, display: isEditing ? 'none' : 'block'}}
                             onClick={() => navigate("/texts")}
                         >
-                            Back to texts
+                            Вернуться к текстам
                         </Button>
                         <Button
                             variant="contained"
                             sx={{flex: 1, display: isEditing ? 'none' : 'block'}}
                             onClick={() => setIsEditing(!isEditing)}
                         >
-                            Edit
+                            Редактировать
                         </Button>
                         <Button
                             variant="outlined"
                             sx={{flex: 1, marginRight: 2, display: isEditing ? 'block' : 'none'}}
                             onClick={() => setIsEditing(!isEditing)}
                         >
-                            Cancel
+                            Отменить
                         </Button>
                         <Button
                             variant="contained"
@@ -85,7 +85,7 @@ export const TextPageContent = () => {
                                 setIsEditing(!isEditing)
                             }}
                         >
-                            Save
+                            Обновить
                         </Button>
                     </Box>
                 </Box>
@@ -96,7 +96,7 @@ export const TextPageContent = () => {
                     onClose={toggleTextUpdatedFlag}
                 >
                     <Alert severity="success">
-                        Updated
+                        Текст успешно обновлен
                     </Alert>
                 </Snackbar>
             </Container>

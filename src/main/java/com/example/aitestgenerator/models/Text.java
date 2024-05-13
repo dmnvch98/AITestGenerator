@@ -1,5 +1,8 @@
 package com.example.aitestgenerator.models;
 
+import java.util.Set;
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,14 +16,15 @@ import lombok.*;
 public class Text {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @Column(name = "user_id")
-    Long userId;
+    private Long userId;
     @Column(name = "title", columnDefinition = "text")
-    String title;
+    private String title;
     @Column(name = "content", columnDefinition = "text")
-    String content;
-
+    private String content;
+    @OneToMany(mappedBy = "text", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TestGeneratingHistory> generatingHistories;
     @Override
     public String toString() {
         return "Text{" +

@@ -55,10 +55,10 @@ const Actions = ({text}: { text: UserText }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleViewClick}>View</MenuItem>
-                <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-                <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-                <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>Generate Test</MenuItem>
+                <MenuItem onClick={handleViewClick}>Открыть</MenuItem>
+                <MenuItem onClick={handleEditClick}>Редактировать</MenuItem>
+                <MenuItem onClick={handleDeleteClick}>Удалить</MenuItem>
+                <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>Сгенерировать тест</MenuItem>
             </Menu>
         </Box>
     );
@@ -71,42 +71,11 @@ export const TextTable = () => {
     const selectedTextIds = useTextStore((state) => state.selectedTextIds);
     const navigate = useNavigate();
 
-    const [columnWidths, setColumnWidths] = useState<{ [field: string]: number }>({
-        id: 10,
-        title: 50,
-        actions: 30,
-        test: 10
-    });
-
-    const handleResize = () => {
-        const windowWidth = window.innerWidth;
-        setColumnWidths({
-            id: (10 / 100) * windowWidth,
-            title: (50 / 100) * windowWidth,
-            actions: (30 / 100) * windowWidth,
-            test: (10 / 100) * windowWidth,
-        });
-    };
-
-    useEffect(() => {
-        handleResize();
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
     const columns: GridColDef[] = [
         {
-            field: 'id',
-            headerName: 'ID',
-        },
-        {
             field: 'title',
-            headerName: 'Text title',
-            width: columnWidths.title,
+            minWidth: 600,
+            headerName: 'Заголовок',
             renderCell: (params) => {
                 const text: UserText = params.row;
                 return (
@@ -120,7 +89,8 @@ export const TextTable = () => {
         },
         {
             field: 'test',
-            headerName: 'Test Exists',
+            minWidth: 300,
+            headerName: 'Тест существут',
             renderCell: (params) => {
                 const text: UserText = params.row;
                 return text.testIds
@@ -130,7 +100,7 @@ export const TextTable = () => {
         },
         {
             field: 'actions',
-            headerName: 'Actions',
+            headerName: 'Действия',
             renderCell: (params) => {
                 const text: UserText = params.row;
 
@@ -155,7 +125,7 @@ export const TextTable = () => {
                     variant="outlined"
                     onClick={() => navigate('/add-text')}
                 >
-                    Add Text
+                    Добавить
                 </Button>
 
                 <Button
@@ -164,7 +134,7 @@ export const TextTable = () => {
                     color="error"
                     onClick={deleteInBatch}
                 >
-                    Delete selected
+                    Удалить выбранное
                 </Button>
             </Box>
             <DataGrid

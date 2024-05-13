@@ -40,7 +40,7 @@ export const AddChapterContent = () => {
                     <TextField
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
-                        label="Title"
+                        label="Заголовок"
                         variant="standard"/>
                 </Box>
                 <Box sx={{mt: 2}}>
@@ -52,7 +52,7 @@ export const AddChapterContent = () => {
                     <Box display="flex" flexDirection="column" alignItems="flex-start">
                         <FormControlLabel
                             control={<Switch checked={generateTestFlag} onChange={toggleGenerateTestFlag}/>}
-                            label="Generate Test"
+                            label="Сгенерировать тест"
                             labelPlacement="start"
                             sx={{mb: 2, marginLeft: 0}}
                         />
@@ -66,7 +66,7 @@ export const AddChapterContent = () => {
                             onClick={() => navigate("/texts")}
                             sx={{ minWidth: "15vw"}}
                         >
-                            Back to chapters
+                            Вернуться к текстам
                         </Button>
                         <Button
                             variant="contained"
@@ -74,7 +74,7 @@ export const AddChapterContent = () => {
                             onClick={handleSave}
                             disabled={generateTestValidationErrorFlag}
                         >
-                            Save
+                            Сохранить
                         </Button>
                     </Box>
 
@@ -88,7 +88,7 @@ export const AddChapterContent = () => {
                 onClose={() => setUnsuccessfulSave(!unsuccessfulSave)}
             >
                 <Alert severity="error">
-                    Some error occurred when saving chapter
+                    Произошла ошибка при сохранении текста
                 </Alert>
             </Snackbar>
         </>

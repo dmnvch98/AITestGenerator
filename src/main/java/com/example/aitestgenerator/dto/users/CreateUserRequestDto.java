@@ -1,18 +1,18 @@
 package com.example.aitestgenerator.dto.users;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.aitestgenerator.config.security.roles.Role;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
+@Builder
 @ToString
+@Getter
 public class CreateUserRequestDto {
     private String email;
-    private String firstName;
-    private String lastName;
     private String password;
-    private String role;
+    @Builder.Default
+    private final Role role = Role.USER;
 }

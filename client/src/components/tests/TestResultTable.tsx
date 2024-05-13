@@ -29,8 +29,8 @@ export const TestResultTable = ({testResult}: { testResult: TestResult }) => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Question Number</TableCell>
-                                <TableCell>Passed</TableCell>
+                                <TableCell>Номер вопроса</TableCell>
+                                <TableCell>Пройден</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

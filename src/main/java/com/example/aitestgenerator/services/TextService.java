@@ -43,12 +43,12 @@ public class TextService {
         textRepository.delete(existingText);
     }
 
-    public Text update(Text text, Long userId) {
+    public Text update(final Text text, final Long userId) {
         log.info("Updating text.Text ID: {}", text.getId());
 
         findAllByIdAndUserIdOrThrow(text.getId(), userId);
 
-//        text.setUserId(userId);
+        text.setUserId(userId);
 
         return textRepository.save(text);
     }
@@ -72,7 +72,7 @@ public class TextService {
         return existingUserTexts;
     }
 
-    public Text findAllByIdAndUserIdOrThrow(Long userId, Long textId) {
+    public Text findAllByIdAndUserIdOrThrow(final Long textId, final Long userId) {
         Text text = textRepository.findAllByIdAndUserId(textId, userId);
         if (text == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Text not found for user. Text Id: " + textId +

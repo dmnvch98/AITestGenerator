@@ -7,6 +7,7 @@ import { NoLabel } from '../utils/NoLabel';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import TimerIcon from '@mui/icons-material/Timer';
 import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
 
 export const TestGenHistoryTable = () => {
     const testGenHistory = useUserStore(state => state.testGenHistory);
@@ -43,15 +44,18 @@ export const TestGenHistoryTable = () => {
 
     return (
         <>
+            <Typography variant="h5" align="left" sx={{ mb: 2 }}>
+                История генерации тестов
+            </Typography>
             <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Test title</TableCell>
-                            <TableCell>Text title</TableCell>
-                            <TableCell>Generation Start</TableCell>
-                            <TableCell>Generation End</TableCell>
-                            <TableCell>Status</TableCell>
+                            <TableCell>Заголовок текста</TableCell>
+                            <TableCell>Заголовок теста</TableCell>
+                            <TableCell>Начало генерации</TableCell>
+                            <TableCell>Конец генерации</TableCell>
+                            <TableCell>Статус</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

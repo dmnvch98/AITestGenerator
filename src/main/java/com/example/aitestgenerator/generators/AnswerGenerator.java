@@ -51,7 +51,7 @@ public class AnswerGenerator extends Generator<Test> {
         }
         log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
-        history.setGenerationEnd(LocalDateTime.now(ZoneOffset.UTC));
+        history.setGenerationEnd(LocalDateTime.now());
         history.setGenerationStatus(GenerationStatus.SUCCESS);
 
         historyService.save(history);

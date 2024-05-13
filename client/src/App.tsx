@@ -14,6 +14,7 @@ import {appColors} from "./colors/appColors";
 import {TestGenHistory} from "./pages/history/TestGenHistory";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
+import SignUp from './pages/SignUp';
 
 function App() {
     const theme = createTheme({
@@ -44,6 +45,7 @@ function App() {
                         <Routes>
                             <Route path="/texts" element={<Texts/>}/>
                             <Route path="/sign-in" element={<LoginPage/>}/>
+                            <Route path="/sign-up" element={<SignUp/>}/>
                             <Route path="/add-text" element={<AddText/>}/>
                             <Route path="/texts/:id" element={<TextPage/>}/>
                             <Route path="/tests" element={<Tests/>}/>

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-
+import java.util.Set;
 
 @Entity
 @Table(name = "questions")
@@ -30,6 +30,6 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @JsonProperty("answerOptions")
-    private List<AnswerOption> answerOptions;
+    private Set<AnswerOption> answerOptions;
 
 }

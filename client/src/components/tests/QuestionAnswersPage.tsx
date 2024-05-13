@@ -125,7 +125,7 @@ export const QuestionAnswersPage = ({
                         size='large'
                         fullWidth
                     >
-                        Next
+                        Дальше
                     </Button>
                 </Box>
             </Box>

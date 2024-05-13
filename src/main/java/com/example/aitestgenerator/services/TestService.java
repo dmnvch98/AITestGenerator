@@ -75,7 +75,4 @@ public class TestService {
         return testRepository.save(foundTest);
     }
 
-    public List<Test> findAllByTextIdAndUserId(Long textId, Long userId) {
-        return testRepository.findAllByTextIdAndUserId(textId, userId);
-    }
 }

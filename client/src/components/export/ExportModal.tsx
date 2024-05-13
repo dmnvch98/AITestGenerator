@@ -28,9 +28,9 @@ export const ExportModal = () => {
 
     return (
         <Box sx={{pb:2}}>
-            <DialogTitle>Export</DialogTitle>
+            <DialogTitle>Экспорт</DialogTitle>
             <DialogContent>
-                <InputLabel id="export-format-label">Export Format</InputLabel>
+                <InputLabel id="export-format-label">Формат файла</InputLabel>
                 <Select
                     labelId="export-format-label"
                     value={exportFormat}
@@ -45,7 +45,7 @@ export const ExportModal = () => {
                 </Select>
 
                 <TextField
-                    label="Questions Label"
+                    label="Метка списка вопросов"
                     variant="outlined"
                     fullWidth
                     value={questionsLabel}
@@ -53,7 +53,7 @@ export const ExportModal = () => {
                     margin="normal"
                 />
                 <TextField
-                    label="Question Text Label"
+                    label="Метка текста вопроса"
                     variant="outlined"
                     fullWidth
                     value={questionTextLabel}
@@ -61,7 +61,7 @@ export const ExportModal = () => {
                     margin="normal"
                 />
                 <TextField
-                    label="Answer Options Label"
+                    label="Метка списка ответов"
                     variant="outlined"
                     fullWidth
                     value={answerOptionsLabel}
@@ -69,7 +69,7 @@ export const ExportModal = () => {
                     margin="normal"
                 />
                 <TextField
-                    label="Option Text Label"
+                    label="Метка текста ответа"
                     variant="outlined"
                     fullWidth
                     value={optionTextLabel}
@@ -77,7 +77,7 @@ export const ExportModal = () => {
                     margin="normal"
                 />
                 <TextField
-                    label="Is Correct Label"
+                    label="Метка корректности ответа"
                     variant="outlined"
                     fullWidth
                     value={isCorrectLabel}
@@ -86,8 +86,8 @@ export const ExportModal = () => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={toggleModelOpen}>Cancel</Button>
-                <Button variant="contained" onClick={handleExport}>Export</Button>
+                <Button onClick={toggleModelOpen}>Отменить</Button>
+                <Button variant="contained" onClick={handleExport}>Экспорт</Button>
             </DialogActions>
         </Box>
 

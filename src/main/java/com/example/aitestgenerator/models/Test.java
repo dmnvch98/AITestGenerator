@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tests")
@@ -29,6 +30,6 @@ public class Test {
     private String title;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
-    private List<Question> questions;
+    private Set<Question> questions;
 
 }

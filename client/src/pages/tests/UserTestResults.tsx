@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { TestResult, usePassTestStore } from '../../store/tests/passTestStore';
 import DateTimeUtils from '../../utils/DateTimeUtils';
 import { useNavigate } from 'react-router-dom';
+import Typography from '@mui/material/Typography';
 
 const UserTestResultsContent = () => {
 
@@ -21,14 +22,17 @@ const UserTestResultsContent = () => {
 
   return (
       <>
+        <Typography variant="h5" align="left" sx={{ mb: 2 }}>
+          История прохождения тестов
+        </Typography>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Test title</TableCell>
-                <TableCell>Date passed</TableCell>
-                <TableCell>Questions</TableCell>
-                <TableCell>Correct</TableCell>
+                <TableCell>Заголовок теста</TableCell>
+                <TableCell>Дата прохождение</TableCell>
+                <TableCell>Кол-во вопросов</TableCell>
+                <TableCell>Кол-во правильных</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -47,7 +51,7 @@ const UserTestResultsContent = () => {
                           variant="outlined"
                           color="primary"
                       >
-                        View Result
+                        Просмотр
                       </Button>
                     </TableCell>
                   </TableRow>

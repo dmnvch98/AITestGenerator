@@ -59,10 +59,10 @@ const Actions = ({test}: { test: UserTest }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleViewClick}>View</MenuItem>
-                <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-                <MenuItem onClick={handlePassClick}>Pass</MenuItem>
-                <MenuItem onClick={handleExportClick}>Export</MenuItem>
+                <MenuItem onClick={handleViewClick}>Просмотр</MenuItem>
+                <MenuItem onClick={handleDeleteClick}>Удалить</MenuItem>
+                <MenuItem onClick={handlePassClick}>Пройти</MenuItem>
+                <MenuItem onClick={handleExportClick}>Экспорт</MenuItem>
             </Menu>
 
             {/* Модальное окно */}
@@ -85,8 +85,8 @@ export const TestTable = () => {
         },
         {
             field: 'title',
-            headerName: 'Text title',
-            width: 0.5 * window.innerWidth,
+            headerName: 'Заголовок',
+            minWidth: 800
         },
         {
             field: 'actions',
@@ -115,7 +115,7 @@ export const TestTable = () => {
                     variant="outlined"
                     onClick={() => navigate("/tests/pass")}
                 >
-                    Pass selected
+                    Пройти выбранное
                 </Button>
 
             </Box>

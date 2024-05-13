@@ -1,56 +1,69 @@
-import {useTextStore} from "../../store/textStore";
-import {Alert, Box, Snackbar} from "@mui/material";
-import {useEffect} from "react";
-import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {TextTable} from "../../components/texts/TextTable";
-import Typography from "@mui/material/Typography";
+import { useTextStore } from '../../store/textStore';
+import { Alert, Box, Snackbar } from '@mui/material';
+import { useEffect } from 'react';
+import { LoggedInUserPage } from '../../components/main/LoggedInUserPage';
+import { TextTable } from '../../components/texts/TextTable';
+import Typography from '@mui/material/Typography';
+import { useTestStore } from '../../store/tests/testStore';
 
 
 const ChaptersContent = () => {
-    const textSavedFlag: boolean = useTextStore(state => state.textSavedFlag);
-    const textDeletedFlag: boolean = useTextStore(state => state.textDeletedFlag);
-    const toggleTextSavedFlag = useTextStore(state => state.toggleTextSavedFlag);
-    const toggleTextDeletedFlag = useTextStore(state => state.toggleTextDeletedFlag);
 
-    const getTexts = useTextStore(state => state.getTexts);
+  const {
+    textSavedFlag, textDeletedFlag,
+    toggleTextSavedFlag, toggleTextDeletedFlag,
+    getTexts
+  } = useTextStore();
 
-    useEffect(() => {
-        getTexts();
-    }, [])
+  const {testGenerationStarted, setTestGenerationStarted} = useTestStore();
 
-    return (
-        <>
-            <Typography variant="h5" align="left" sx={{mb: 2}}>
-                Saved Texts
-            </Typography>
+  useEffect(() => {
+    getTexts();
+  }, []);
 
-            <Box>
-                <TextTable/>
-            </Box>
+  return (
+      <>
+        <Typography variant="h5" align="left" sx={{ mb: 2 }}>
+          Пользовательские тексты
+        </Typography>
 
-            <Snackbar
-                open={textSavedFlag}
-                autoHideDuration={3000}
-                onClose={toggleTextSavedFlag}
-            >
-                <Alert severity="success">
-                    Chapter successfully saved
-                </Alert>
-            </Snackbar>
+        <Box>
+          <TextTable />
+        </Box>
 
-            <Snackbar
-                open={textDeletedFlag}
-                autoHideDuration={3000}
-                onClose={toggleTextDeletedFlag}
-            >
-                <Alert severity="success">
-                    Chapter(s) successfully deleted
-                </Alert>
-            </Snackbar>
-        </>
-    )
-}
+        <Snackbar
+            open={textSavedFlag}
+            autoHideDuration={3000}
+            onClose={toggleTextSavedFlag}
+        >
+          <Alert severity="success">
+            Текст успешно сохранен
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+            open={textDeletedFlag}
+            autoHideDuration={3000}
+            onClose={toggleTextDeletedFlag}
+        >
+          <Alert severity="success">
+            Текст успешно удален
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+            open={testGenerationStarted}
+            autoHideDuration={3000}
+            onClose={() => {setTestGenerationStarted(!testGenerationStarted)}}
+        >
+          <Alert severity="success">
+            Генерация теста начата
+          </Alert>
+        </Snackbar>
+      </>
+  );
+};
 
 export const Texts = () => {
-    return <LoggedInUserPage mainContent={<ChaptersContent/>}/>;
-}
+  return <LoggedInUserPage mainContent={<ChaptersContent />} />;
+};

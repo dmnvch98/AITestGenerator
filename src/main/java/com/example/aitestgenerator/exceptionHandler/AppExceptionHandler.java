@@ -62,7 +62,7 @@ public class AppExceptionHandler {
     }
 
     private void updateTestGeneratingHistory(TestGeneratingHistory history) {
-        history.setGenerationEnd(LocalDateTime.now(ZoneOffset.UTC));
+        history.setGenerationEnd(LocalDateTime.now());
         history.setGenerationStatus(GenerationStatus.FAILED);
         historyService.save(history);
         historyHolder.clearHistory();

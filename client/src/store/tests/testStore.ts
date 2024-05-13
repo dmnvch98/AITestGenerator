@@ -21,9 +21,7 @@ export interface AnswerOption {
 }
 
 export interface GenerateTestRequestDto {
-    textId: number,
-    minQuestionNumber: number | undefined,
-    maxQuestionNumber: number | undefined
+    textId: number
 }
 
 export interface TestStore {
@@ -44,6 +42,8 @@ export interface TestStore {
     setGenerateTestValidationErrorFlag: (flag: boolean) => void;
     selectedTextId: number | undefined,
     setSelectedTextId: (id: number) => void;
+    testGenerationStarted: boolean;
+    setTestGenerationStarted: (flag: boolean) => void;
 }
 
 export const useTestStore = create<TestStore>((set: any, get: any) => ({
@@ -59,11 +59,12 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     testDeletedFlag: false,
     generateTest: async (textId: number) => {
         let dto: GenerateTestRequestDto = {
-            textId: textId,
-            minQuestionNumber: get().minQuestionsNumber,
-            maxQuestionNumber: get().maxQuestionsNumber
+            textId: textId
         }
-        await TestService.generateTest(dto);
+        const response = await TestService.generateTest(dto);
+        if (response) {
+            set({testGenerationStarted: true})
+        }
     },
     toggleTestDeletedFlag: () => {
         set({testDeletedFlag: !get().testDeletedFlag})
@@ -94,5 +95,9 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     },
     setSelectedTextId: (id: number) => {
         set({selectedTextId: id})
-    }
+    },
+    testGenerationStarted: false,
+    setTestGenerationStarted: (flag: boolean) => {
+        set({testGenerationStarted: flag})
+    },
 }))

@@ -19,7 +19,7 @@ export const AnswerOptionView = ({answerOption}: { answerOption: AnswerOption })
                     primary={answerOption.optionText}
                     secondary={
                         <span style={secondaryTextStyle}>
-                            {answerOption.isCorrect ? 'correct' : 'incorrect'}
+                            {answerOption.isCorrect ? 'верно' : 'неверно'}
                         </span>
                     }
                 />
