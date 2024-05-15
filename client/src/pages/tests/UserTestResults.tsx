@@ -46,7 +46,7 @@ const UserTestResultsContent = () => {
                     <TableCell>
                       <Button
                           onClick={() => {
-                            navigate(`/tests/1/results/${tr.id}`);
+                            navigate(`/tests/${tr.testId}/results/${tr.id}`);
                           }}
                           variant="outlined"
                           color="primary"

@@ -1,6 +1,6 @@
 import customAxios from '../interceptors/custom_axios';
 
-class AuthService {
+export class AuthService {
   signup = async (email: string, password: string) => {
     return await customAxios.post(`/api/v1/users`, { email, password });
   };
@@ -12,6 +12,13 @@ class AuthService {
       role: "USER"
     });
   };
-}
 
-export default new AuthService();
+  logout = async () => {
+    localStorage.removeItem("JWT");
+    await customAxios.post('/api/v1/auth/logout');
+  };
+
+  refresh = async () => {
+    return await customAxios.post('/api/v1/auth/refresh');
+  }
+}

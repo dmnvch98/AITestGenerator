@@ -29,16 +29,13 @@ public class XmlExportService implements ExportService {
 
     @Override
     public ExportedTest export(Test test, ExportTestRequestDto requestDto) throws IOException {
-        // Подготовка корневого элемента
         ObjectNode rootNode = xmlMapper.createObjectNode();
 
-        // Создание элементов вопросов
         ArrayNode questionsNode = xmlMapper.createArrayNode();
         for (Question question : test.getQuestions()) {
             ObjectNode questionNode = xmlMapper.createObjectNode();
             questionNode.put(requestDto.getQuestionTextLabel(), question.getQuestionText());
 
-            // Создание элементов ответов
             ArrayNode answerOptionsNode = xmlMapper.createArrayNode();
             for (AnswerOption answer : question.getAnswerOptions()) {
                 ObjectNode answerOptionNode = xmlMapper.createObjectNode();

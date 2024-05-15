@@ -1,12 +1,8 @@
 package com.example.aitestgenerator.generators;
 
-import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
-import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,10 +18,6 @@ import static com.example.aitestgenerator.utils.Utils.*;
 public class QuestionGenerator extends Generator<List<ChatMessage>> {
 
     private static final String QUESTIONS_PROMPT_FILE = "ai_prompts/generate_questions.txt";
-
-    private final OpenAiService openAiService;
-    private final TestGeneratingHistoryService historyService;
-    private final TestGeneratingHistoryHolder historyHolder;
 
     @Override
     public List<ChatMessage> generateData(TestGeneratingHistory history, List<ChatMessage> messages) throws IOException {

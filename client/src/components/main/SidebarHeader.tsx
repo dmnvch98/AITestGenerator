@@ -22,6 +22,7 @@ import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import { AuthService } from '../../services/AuthService';
 
 const drawerWidth = 300;
 
@@ -135,7 +136,10 @@ export const SidebarHeader = ({ children }: any) => {
         setOpen(false);
     };
 
-    function logout() {}
+    function logout() {
+        const authService: AuthService = new AuthService();
+        authService.logout();
+    }
 
     return (
         <Box sx={{ display: 'flex'}}>

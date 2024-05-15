@@ -1,9 +1,10 @@
 package com.example.aitestgenerator.dto.auth;
 
-import lombok.Value;
+import lombok.Builder;
+import lombok.Getter;
 
-@Value
+@Builder
+@Getter
 public class JwtResponse {
-    String accessToken;
-    String refreshToken;
+    private String accessToken;
 }

@@ -38,12 +38,11 @@ public class QueueClient {
         String messageBody = message.getBody();
         try {
             GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
+            generateTestMessage.setReceipt(message.getReceiptHandle());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
             log.error("An error occurred while parsing message body: {}", e.getMessage());
             return Optional.empty();
-        } finally {
-            deleteMessage(message.getReceiptHandle());
         }
     }
 

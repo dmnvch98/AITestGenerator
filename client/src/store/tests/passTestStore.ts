@@ -6,6 +6,7 @@ export interface TestResult {
     id: number | undefined,
     testPassedTime: Date | undefined
     testTitle: string,
+    testId: number | undefined,
     questionAnswers: QuestionAnswer[]
 }
 
@@ -44,6 +45,7 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
         let testResult: TestResult = {
             id: undefined,
             testPassedTime: undefined,
+            testId: undefined,
             testTitle: title,
             questionAnswers: get().answers
         }

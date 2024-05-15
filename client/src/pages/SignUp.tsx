@@ -8,7 +8,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar } from '@mui/material';
 import { AxiosError } from 'axios';
-import AuthService from '../services/AuthService';
+import { AuthService } from '../services/AuthService';
 
 function RegistrationPage() {
   const [email, setEmail] = useState('');
@@ -17,6 +17,7 @@ function RegistrationPage() {
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(false);
   const [error, setError] = useState(false);
+  const authService: AuthService = new AuthService();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -35,7 +36,7 @@ function RegistrationPage() {
       return;
     }
     try {
-      const response = await AuthService.signup(email, password);
+      const response = await authService.signup(email, password);
       if (response.status === 201) {
         navigate('/sign-in');
       }

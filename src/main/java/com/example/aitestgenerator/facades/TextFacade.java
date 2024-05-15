@@ -18,13 +18,13 @@ public class TextFacade {
     private final TextService textService;
     private final TextConverter textConverter;
 
-    public Text save(Text text, Long userId) {
+    public Text save(final Text text, final Long userId) {
         text.setUserId(userId);
 
         return textService.save(text);
     }
 
-    public List<TextResponseDto> findAllByUser(Long[] textIds, Long userId) {
+    public List<TextResponseDto> findAllByUser(final Long[] textIds, final Long userId) {
         if (textIds!= null && textIds.length > 0) {
             return textService
                 .findAllByIdInAndUserId(List.of(textIds), userId)
@@ -35,7 +35,7 @@ public class TextFacade {
         return findAllByUserId(userId);
     }
 
-    private List<TextResponseDto> findAllByUserId(Long userId) {
+    private List<TextResponseDto> findAllByUserId(final Long userId) {
         return textService.findAllByUserId(userId)
             .stream()
             .map(textConverter::mapTextToResponseDto)
@@ -43,16 +43,16 @@ public class TextFacade {
     }
 
 
-    public void delete(Long id, Long userId) {
+    public void delete(final Long id, final Long userId) {
         textService.delete(id, userId);
     }
 
-    public TextResponseDto update(Text text, Long userId) {
+    public TextResponseDto update(final Text text, final Long userId) {
         return textConverter
             .mapTextToResponseDto(textService.update(text, userId));
     }
 
-    public void deleteInBatch(List<Long> textIds, Long userId) {
+    public void deleteInBatch(final List<Long> textIds, final Long userId) {
         textService.deleteInBatch(textIds, userId);
     }
 

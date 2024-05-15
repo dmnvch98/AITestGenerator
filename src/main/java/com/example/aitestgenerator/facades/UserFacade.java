@@ -6,7 +6,6 @@ import com.example.aitestgenerator.converters.UserConverter;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.dto.users.CreateUserRequestDto;
 import com.example.aitestgenerator.dto.users.CreateUserResponseDto;
-import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import com.example.aitestgenerator.services.UserService;

@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 
@@ -52,11 +50,6 @@ public class JwtFilter extends GenericFilterBean {
         String bearer = request.getHeader(AUTHORIZATION);
         if (bearer != null && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
-        } else {
-            Cookie cookie = WebUtils.getCookie(request, "JWT");
-            if (cookie != null) {
-                return cookie.getValue();
-            }
         }
         return null;
     }

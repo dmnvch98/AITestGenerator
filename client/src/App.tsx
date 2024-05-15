@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import './App.css';
 import LoginPage from "./pages/LoginPage";
 import {Texts} from "./pages/texts/Texts";
@@ -55,6 +55,7 @@ function App() {
                             <Route path="/tests/results" element={<UserTestResults/>}/>
                             <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenHistory/>}/>
+                            <Route path="*" element={<Navigate to="/sign-in" replace />} />
                         </Routes>
                     </div>
                 </Router>

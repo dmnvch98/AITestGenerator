@@ -9,14 +9,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import static com.example.aitestgenerator.utils.Utils.readFileContents;
@@ -26,7 +24,6 @@ import static com.example.aitestgenerator.utils.Utils.readFileContents;
 @RequiredArgsConstructor
 public class AnswerGenerator extends Generator<Test> {
 
-    private final OpenAiService openAiService;
     private final TestGeneratingHistoryService historyService;
     private final TestGeneratingHistoryHolder historyHolder;
     private final ObjectMapper objectMapper;
@@ -41,22 +38,8 @@ public class AnswerGenerator extends Generator<Test> {
         log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
 
         final ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
-        Test testResult;
-        try {
-            testResult = parseTest(result, history);
-        } catch (JsonProcessingException e) {
-            log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
-                    history.getUser().getId(), history.getText().getId(), e.getMessage());
-            throw e;
-        }
-        log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
-
-        history.setGenerationEnd(LocalDateTime.now());
-        history.setGenerationStatus(GenerationStatus.SUCCESS);
-
-        historyService.save(history);
-        historyHolder.clearHistory();
-
+        final Test testResult =  processResult(history, result);
+        handleHistory(history);
         return testResult;
     }
 
@@ -66,5 +49,28 @@ public class AnswerGenerator extends Generator<Test> {
         final String testTitle = test.getTitle();
         test.setTitle(testTitle != null ? testTitle : history.getText().getTitle());
         return test;
+    }
+
+    private void handleHistory(final TestGeneratingHistory history) {
+        history.setGenerationEnd(LocalDateTime.now());
+        history.setGenerationStatus(GenerationStatus.SUCCESS);
+
+        historyService.save(history);
+        historyHolder.clearHistory();
+    }
+
+    private Test processResult(final TestGeneratingHistory history, final ChatCompletionResult result)
+        throws JsonProcessingException {
+        Test testResult;
+        try {
+            testResult = parseTest(result, history);
+        } catch (JsonProcessingException e) {
+            log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
+                history.getUser().getId(), history.getText().getId(), e.getMessage());
+            throw e;
+        }
+        log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+
+        return testResult;
     }
 }

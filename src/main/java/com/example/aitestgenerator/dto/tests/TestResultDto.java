@@ -17,6 +17,7 @@ public class TestResultDto {
     private List<QuestionAnswer> questionAnswers;
     private LocalDateTime testPassedTime;
     private String testTitle;
+    private Long testId;
 
     @Value
     @Builder

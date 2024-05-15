@@ -2,6 +2,7 @@ package com.example.aitestgenerator.models;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
 @Builder
@@ -12,4 +13,6 @@ public class GenerateTestMessage {
     private final long textId;
     private final long userId;
     private final long historyId;
+    @Setter
+    private String receipt;
 }

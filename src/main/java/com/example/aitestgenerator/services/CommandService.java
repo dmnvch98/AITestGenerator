@@ -13,12 +13,16 @@ public class CommandService {
 
     private final QueueClient queueClient;
 
-    public void sendCommand(GenerateTestMessage message) {
+    public void sendCommand(final GenerateTestMessage message) {
         queueClient.sendMessage(message);
     }
 
     public Optional<GenerateTestMessage> getCommand() {
         return queueClient.getMessage();
+    }
+
+    public void deleteMessage(final String receipt) {
+        queueClient.deleteMessage(receipt);
     }
 
 }

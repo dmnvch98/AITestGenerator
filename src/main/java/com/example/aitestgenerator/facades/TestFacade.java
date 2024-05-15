@@ -51,7 +51,7 @@ public class TestFacade {
        commandService.sendCommand(message);
     }
 
-    public void generateTestReceiveMessage(GenerateTestMessage message) {
+    public void generateTestReceiveMessage(final GenerateTestMessage message) {
         TestGeneratingHistory history = historyService.findByIdAndUserId(message.getHistoryId());
         history.setGenerationStatus(GenerationStatus.IN_PROCESS);
         historyService.save(history);
@@ -60,6 +60,7 @@ public class TestFacade {
         final Test test = testGenerationService.generateTest(history);
 
         testService.saveTest(prepareTestToSave(test, message.getUserId(), message.getTextId()));
+        commandService.deleteMessage(message.getReceipt());
         history.setTest(test);
         historyService.save(history);
     }

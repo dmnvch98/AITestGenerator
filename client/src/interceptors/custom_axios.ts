@@ -1,8 +1,12 @@
 import axios from 'axios';
+import { AuthService } from '../services/AuthService';
 
 const customAxios = axios.create({
-    baseURL: 'http://localhost:8080', // Базовый URL вашего сервера
+    baseURL: 'http://localhost:8080',
+    withCredentials: true
 });
+
+let refreshTokenPromise: any
 
 customAxios.interceptors.request.use(
     (config) => {
@@ -18,5 +22,23 @@ customAxios.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+customAxios.interceptors.response.use(r => r, error => {
+  if (error.config && error.response && error.response.status === 401) {
+
+    if (!refreshTokenPromise) {
+      const authService: AuthService = new AuthService();
+      refreshTokenPromise = authService.refresh().then((r) => {
+        refreshTokenPromise = null //
+        localStorage.setItem("JWT", r.data.accessToken);
+      })
+    }
+
+    return refreshTokenPromise.then(() => {
+      return customAxios.request(error.config)
+    })
+  }
+  return Promise.reject(error)
+})
 
 export default customAxios;

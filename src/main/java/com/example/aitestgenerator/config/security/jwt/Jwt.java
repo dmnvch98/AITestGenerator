@@ -27,9 +27,9 @@ public class Jwt {
     private String jwtRefreshSecret;
 
     public String generateAccessToken(User user) {
-        LocalDateTime now = LocalDateTime.now();
-        Instant accessExpirationInstant = now.plusMinutes(15).atZone(ZoneId.systemDefault()).toInstant();
-        Date date = Date.from(accessExpirationInstant);
+        final LocalDateTime now = LocalDateTime.now();
+        final Instant accessExpirationInstant = now.plusMinutes(3).atZone(ZoneId.systemDefault()).toInstant();
+        final Date date = Date.from(accessExpirationInstant);
         return Jwts.builder()
             .setSubject(user.getEmail())
             .setExpiration(date)
@@ -39,9 +39,9 @@ public class Jwt {
     }
 
     public String generateRefreshToken(String login) {
-        LocalDateTime now = LocalDateTime.now();
-        Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
-        Date date = Date.from(refreshExpirationInstant);
+        final LocalDateTime now = LocalDateTime.now();
+        final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
+        final Date date = Date.from(refreshExpirationInstant);
         return Jwts.builder()
             .setSubject(login)
             .setExpiration(date)

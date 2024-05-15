@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import customAxios from '../interceptors/custom_axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -9,7 +8,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar } from '@mui/material';
 import { AxiosError } from 'axios';
-import AuthService from '../services/AuthService';
+import { AuthService } from '../services/AuthService';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,6 +16,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const authService: AuthService = new AuthService();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -31,7 +31,7 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const response = await AuthService.login(email, password);
+      const response = await authService.login(email, password);
       if (response.status === 200) {
         localStorage.setItem("JWT", response.data.accessToken);
         navigate('/texts');

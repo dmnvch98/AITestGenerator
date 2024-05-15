@@ -28,15 +28,13 @@ public class CSVExportService implements ExportService {
 
     @Override
     public ExportedTest export(Test test, ExportTestRequestDto requestDto) throws IOException {
-        // Создаем схему с заголовками
         final CsvSchema schema = CsvSchema.builder()
                 .addColumn(requestDto.getQuestionTextLabel())
                 .addColumn(requestDto.getOptionTextLabel())
                 .addColumn(requestDto.getIsCorrectLabel())
-                .setUseHeader(true)  // Указываем, что нужно использовать заголовок
+                .setUseHeader(true)
                 .build();
 
-        // Используем ByteArrayOutputStream для записи данных в память
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (SequenceWriter writer = csvMapper.writer(schema).writeValues(byteArrayOutputStream)) {
             for (Question question : test.getQuestions()) {
@@ -56,7 +54,6 @@ public class CSVExportService implements ExportService {
                 .build();
     }
 
-    // Вспомогательный класс для форматирования данных в CSV
     @AllArgsConstructor
     public static class CsvQuestionFormat {
         public String questionText;
