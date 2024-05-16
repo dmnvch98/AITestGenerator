@@ -47,14 +47,12 @@ const Actions = ({text}: { text: UserText }) => {
     const handleConfirmDelete = () => {
         deleteText(text.id as number);
         setDeleteTextFlag(false);
-        setConfirmOpen(false);
+        setDeleteTextFlag(false);
     };
 
     const handleViewClick = () => {
         navigate("/texts/" + text.id);
     }
-
-    const textToDelete: string = "Вы уверены что хотите удалить текст? Все связанные с ним сущности будут удалениы"
 
     return (
         <Box>
@@ -77,7 +75,7 @@ const Actions = ({text}: { text: UserText }) => {
                 onClose={() => setDeleteTextFlag(false)}
                 onConfirm={handleConfirmDelete}
                 title="Подтверждение удаления"
-                content={textToDelete}
+                content="Вы уверены что хотите удалить текст? Все связанные с ним сущности будут удалениы"
             />
         </Box>
     );
@@ -85,8 +83,20 @@ const Actions = ({text}: { text: UserText }) => {
 
 export const TextTable = () => {
     const {texts, deleteInBatch,
-        setSelectedIdsToArray, selectedTextIds
+        setSelectedIdsToArray, selectedTextIds,
+        deleteTextFlag, setDeleteTextFlag
     } = useTextStore();
+
+    const handleDeleteInBatch = () => {
+        setDeleteTextFlag(true);
+    };
+
+    const handleConfirmBatchDelete = () => {
+        deleteInBatch();
+        setDeleteTextFlag(false);
+    };
+
+
     const navigate = useNavigate();
 
     const columns: GridColDef[] = [
@@ -150,7 +160,7 @@ export const TextTable = () => {
                     variant="outlined"
                     disabled={selectedTextIds.length === 0}
                     color="error"
-                    onClick={deleteInBatch}
+                    onClick={handleDeleteInBatch}
                 >
                     Удалить выбранное
                 </Button>
@@ -169,6 +179,13 @@ export const TextTable = () => {
                 pageSizeOptions={[5, 10, 15]}
                 checkboxSelection
                 disableRowSelectionOnClick
+            />
+            <ConfirmationDialog
+                open={deleteTextFlag}
+                onClose={() => setDeleteTextFlag(false)}
+                onConfirm={handleConfirmBatchDelete}
+                title="Подтверждение пакетного удаления"
+                content="Вы уверены что хотите удалить выбранные тексты? Все связанные с ними сущности будут удалениы"
             />
         </Box>
     );
