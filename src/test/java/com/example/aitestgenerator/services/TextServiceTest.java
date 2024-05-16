@@ -34,8 +34,8 @@ public class TextServiceTest {
 
     private final Long userId = 1L;
 
-    private final Text defaultText1 = new Text(1L, userId, "Text 1", "Content 1", Set.of());
-    private final Text defaultText2 = new Text(2L, userId, "Text 2", "Content 2", Set.of());
+    private final Text defaultText1 = new Text(1L, userId, "Text 1", "Content 1", List.of());
+    private final Text defaultText2 = new Text(2L, userId, "Text 2", "Content 2", List.of());
 
 
     @Test

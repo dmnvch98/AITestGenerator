@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.models;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,7 +25,7 @@ public class Text {
     @Column(name = "content", columnDefinition = "text")
     private String content;
     @OneToMany(mappedBy = "text", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TestGeneratingHistory> generatingHistories;
+    private List<TestGeneratingHistory> generatingHistories;
     @Override
     public String toString() {
         return "Text{" +

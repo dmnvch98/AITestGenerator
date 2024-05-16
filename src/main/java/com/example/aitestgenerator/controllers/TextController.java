@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
+import com.example.aitestgenerator.dto.texts.TextRequestDto;
 import com.example.aitestgenerator.dto.texts.TextResponseDto;
 import com.example.aitestgenerator.facades.TextFacade;
 import com.example.aitestgenerator.models.Text;
@@ -20,7 +21,7 @@ public class TextController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Text save(@RequestBody Text text, Authentication authentication) {
+    public TextResponseDto save(@RequestBody final TextRequestDto text, final Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return textFacade.save(text, userId);
     }
@@ -32,7 +33,7 @@ public class TextController {
     }
 
     @PutMapping
-    public TextResponseDto update(@RequestBody Text text, Authentication authentication) {
+    public TextResponseDto update(@RequestBody TextRequestDto text, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return textFacade.update(text, userId);
     }

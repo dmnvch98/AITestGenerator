@@ -1,10 +1,10 @@
 package com.example.aitestgenerator.converters;
 
+import com.example.aitestgenerator.dto.texts.TextRequestDto;
 import com.example.aitestgenerator.dto.texts.TextResponseDto;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.Text;
 import com.example.aitestgenerator.repositories.TestRepository;
-import com.example.aitestgenerator.repositories.TestTwoRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -23,6 +23,8 @@ public abstract class TextConverter {
 
     @Mapping(source = "id", target = "testIds", qualifiedByName = "findTestsByTextId")
     public abstract TextResponseDto mapTextToResponseDto(Text text);
+
+    public abstract Text convert(final TextRequestDto requestDto, final long userId);
 
     @Named("findTestsByTextId")
     public List<Long> findTestsByTextId(Long textId) {

@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.converters.TextConverter;
+import com.example.aitestgenerator.dto.texts.TextRequestDto;
 import com.example.aitestgenerator.dto.texts.TextResponseDto;
 import com.example.aitestgenerator.models.Text;
 import com.example.aitestgenerator.services.TextService;
@@ -18,10 +19,12 @@ public class TextFacade {
     private final TextService textService;
     private final TextConverter textConverter;
 
-    public Text save(final Text text, final Long userId) {
-        text.setUserId(userId);
+    public TextResponseDto save(final TextRequestDto requestDto, final Long userId) {
+        final Text text = textConverter.convert(requestDto, userId);
 
-        return textService.save(text);
+        textService.save(text);
+
+        return textConverter.mapTextToResponseDto(text);
     }
 
     public List<TextResponseDto> findAllByUser(final Long[] textIds, final Long userId) {
@@ -47,9 +50,12 @@ public class TextFacade {
         textService.delete(id, userId);
     }
 
-    public TextResponseDto update(final Text text, final Long userId) {
-        return textConverter
-            .mapTextToResponseDto(textService.update(text, userId));
+    public TextResponseDto update(final TextRequestDto requestDto, final Long userId) {
+        Text existingText = textService.findAllByIdAndUserIdOrThrow(requestDto.getId(), userId);
+        existingText.setContent(requestDto.getContent());
+        existingText.setTitle(requestDto.getTitle());
+        textService.update(existingText, userId);
+        return textConverter.mapTextToResponseDto(existingText);
     }
 
     public void deleteInBatch(final List<Long> textIds, final Long userId) {
