@@ -20,6 +20,8 @@ export interface UserTexts {
     setTitle: (title: string) => void;
     setContent: (content: string) => void;
     textSavedFlag: boolean,
+    deleteTextFlag: boolean,
+    setDeleteTextFlag: (flag: boolean) => void;
     textDeletedFlag: boolean,
     textUpdatedFlag: boolean,
     toggleTextSavedFlag: () => void;
@@ -40,6 +42,10 @@ export const useTextStore = create<UserTexts>((set: any, get: any) => ({
     newTextTitle: "",
     newTextContent: "",
     textSavedFlag: false,
+    deleteTextFlag: false,
+    setDeleteTextFlag: (flag: boolean) => {
+        set({deleteTextFlag: flag})
+    },
     textDeletedFlag: false,
     selectedText: null,
     selectedTextIds: [],

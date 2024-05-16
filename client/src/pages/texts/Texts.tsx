@@ -1,10 +1,11 @@
 import { useTextStore } from '../../store/textStore';
 import { Alert, Box, Snackbar } from '@mui/material';
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import { LoggedInUserPage } from '../../components/main/LoggedInUserPage';
 import { TextTable } from '../../components/texts/TextTable';
 import Typography from '@mui/material/Typography';
 import { useTestStore } from '../../store/tests/testStore';
+import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 
 
 const ChaptersContent = () => {
@@ -12,12 +13,12 @@ const ChaptersContent = () => {
   const {
     textSavedFlag, textDeletedFlag,
     toggleTextSavedFlag, toggleTextDeletedFlag,
-    getTexts
+    getTexts, deleteTextFlag, setDeleteTextFlag
   } = useTextStore();
 
   const {testGenerationStarted, setTestGenerationStarted} = useTestStore();
 
-  useEffect(() => {
+    useEffect(() => {
     getTexts();
   }, []);
 
@@ -60,6 +61,7 @@ const ChaptersContent = () => {
             Генерация теста начата
           </Alert>
         </Snackbar>
+
       </>
   );
 };

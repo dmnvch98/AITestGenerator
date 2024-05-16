@@ -8,12 +8,16 @@ import {useTestStore} from "../../store/tests/testStore";
 import {DoneLabel} from "../utils/DoneLabel";
 import {NoLabel} from "../utils/NoLabel";
 import Link from "@mui/material/Link";
+import {ConfirmationDialog} from "../main/ConfirmationDialog";
 
 const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const deleteText = useTextStore(state => state.deleteText);
-    const generateTest = useTestStore(state => state.generateTest);
-    const toggleGenerateTestFlag = useTestStore(state => state.toggleGenerateTestFlag);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const {deleteText, deleteTextFlag, setDeleteTextFlag} = useTextStore();
+
+    const {generateTest, toggleGenerateTestFlag} = useTestStore();
+
     const navigate = useNavigate();
 
 
@@ -36,13 +40,21 @@ const Actions = ({text}: { text: UserText }) => {
     }
 
     const handleDeleteClick = () => {
-        deleteText(text.id as number);
+        setDeleteTextFlag(true);
         handleClose();
+    };
+
+    const handleConfirmDelete = () => {
+        deleteText(text.id as number);
+        setDeleteTextFlag(false);
+        setConfirmOpen(false);
     };
 
     const handleViewClick = () => {
         navigate("/texts/" + text.id);
     }
+
+    const textToDelete: string = "Вы уверены что хотите удалить текст? Все связанные с ним сущности будут удалениы"
 
     return (
         <Box>
@@ -60,15 +72,21 @@ const Actions = ({text}: { text: UserText }) => {
                 <MenuItem onClick={handleDeleteClick}>Удалить</MenuItem>
                 <MenuItem disabled={text.testIds != null} onClick={handleGenerateTestClick}>Сгенерировать тест</MenuItem>
             </Menu>
+            <ConfirmationDialog
+                open={deleteTextFlag}
+                onClose={() => setDeleteTextFlag(false)}
+                onConfirm={handleConfirmDelete}
+                title="Подтверждение удаления"
+                content={textToDelete}
+            />
         </Box>
     );
 };
 
 export const TextTable = () => {
-    const userTexts = useTextStore((state) => state.texts);
-    const deleteInBatch = useTextStore((state) => state.deleteInBatch);
-    const setSelectedIdsToArray = useTextStore((state) => state.setSelectedIdsToArray);
-    const selectedTextIds = useTextStore((state) => state.selectedTextIds);
+    const {texts, deleteInBatch,
+        setSelectedIdsToArray, selectedTextIds
+    } = useTextStore();
     const navigate = useNavigate();
 
     const columns: GridColDef[] = [
@@ -138,7 +156,7 @@ export const TextTable = () => {
                 </Button>
             </Box>
             <DataGrid
-                rows={userTexts}
+                rows={texts}
                 columns={columns}
                 initialState={{
                     pagination: {
