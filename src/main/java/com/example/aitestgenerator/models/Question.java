@@ -20,7 +20,7 @@ public class Question {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "test_id")
+    @JoinColumn(name = "test_id", referencedColumnName = "id")
     @JsonIgnore
     private Test test;
 
@@ -28,7 +28,7 @@ public class Question {
     @JsonProperty("questionText")
     private String questionText;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("answerOptions")
     private Set<AnswerOption> answerOptions;
 

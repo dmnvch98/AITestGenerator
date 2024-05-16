@@ -1,5 +1,7 @@
 package com.example.aitestgenerator.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
@@ -29,7 +31,10 @@ public class Test {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Question> questions;
 
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<TestGeneratingHistory> testGeneratingHistories;
 }

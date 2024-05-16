@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TestService {
+
     private final TestRepository testRepository;
 
     public Test saveTest(Test test) {

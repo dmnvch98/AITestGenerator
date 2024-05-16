@@ -22,7 +22,7 @@ public class AnswerOption {
     @JsonIgnore
     private Question question;
 
-    @Column(name = "option_text")
+    @Column(name = "option_text", columnDefinition = "text")
     @JsonProperty("optionText")
     private String optionText;
 
