@@ -28,6 +28,8 @@ export interface TestStore {
     tests: UserTest[],
     selectedTest: UserTest | undefined,
     selectTest: (userTest: UserTest) => void,
+    deleteTestFlag: boolean,
+    setDeleteTestFlag: (flag: boolean) => void,
     testDeletedFlag: boolean,
     toggleTestDeletedFlag: () => void,
     generateTest: (textId: number) => void,
@@ -100,4 +102,8 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     setTestGenerationStarted: (flag: boolean) => {
         set({testGenerationStarted: flag})
     },
+    deleteTestFlag: false,
+    setDeleteTestFlag: (flag: boolean) => {
+        set({deleteTestFlag: flag});
+    }
 }))

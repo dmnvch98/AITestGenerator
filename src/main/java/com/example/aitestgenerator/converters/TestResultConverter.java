@@ -19,9 +19,12 @@ public interface TestResultConverter {
 
     @Mapping(target = "data", expression = "java(convertQuestionAnswersToJson(dto.getQuestionAnswers()))")
     @Mapping(target = "testPassedTime", source = "testPassedTime")
-    TestResult convert(final TestResultDto dto, final long userId, final long testId, final LocalDateTime testPassedTime);
+    @Mapping(target = "id", source = "dto.id")
+    @Mapping(target = "test", source = "test")
+    TestResult convert(final TestResultDto dto, final long userId, final Test test, final LocalDateTime testPassedTime);
 
     @Mapping(target = "questionAnswers", expression = "java(convertJsonToQuestionAnswers(testResult.getData()))")
+    @Mapping(target = "testId", source = "testResult.test.id")
     TestResultDto convert(final TestResult testResult);
 
     default String convertQuestionAnswersToJson(final List<TestResultDto.QuestionAnswer> questionAnswers) {

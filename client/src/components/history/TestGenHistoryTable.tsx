@@ -5,9 +5,9 @@ import DateTimeUtils from '../../utils/DateTimeUtils';
 import { DoneLabel } from '../utils/DoneLabel';
 import { NoLabel } from '../utils/NoLabel';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import TimerIcon from '@mui/icons-material/Timer';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import {AccessTime} from "@mui/icons-material";
 
 export const TestGenHistoryTable = () => {
     const testGenHistory = useUserStore(state => state.testGenHistory);
@@ -30,7 +30,7 @@ export const TestGenHistoryTable = () => {
     const getStatusComponent = (status: string) => {
         switch (status) {
             case "Waiting":
-                return <TimerIcon/>
+                return <AccessTime/>
             case "Success":
                 return <DoneLabel />;
             case "In process":

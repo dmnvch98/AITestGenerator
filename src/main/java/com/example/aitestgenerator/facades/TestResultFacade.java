@@ -2,6 +2,7 @@ package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.converters.TestResultConverter;
 import com.example.aitestgenerator.dto.tests.TestResultDto;
+import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestResult;
 import com.example.aitestgenerator.services.TestResultService;
 import com.example.aitestgenerator.services.TestService;
@@ -23,8 +24,9 @@ public class TestResultFacade {
 
     @SneakyThrows
     public TestResultDto save(final TestResultDto dto, final long userId, final long testId) {
-        if (testService.findAllByIdAndUserIdOrThrow(testId, userId) != null) {
-            TestResult testResult = converter.convert(dto, userId, testId, LocalDateTime.now());
+        final Test test = testService.findAllByIdAndUserIdOrThrow(testId, userId);
+        if (test != null) {
+            TestResult testResult = converter.convert(dto, userId, test, LocalDateTime.now());
             service.save(testResult);
             return converter.convert(testResult);
         }

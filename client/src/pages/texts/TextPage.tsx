@@ -5,7 +5,6 @@ import {useTextStore} from "../../store/textStore";
 import {TextEditor} from "../../components/texts/TextEditor";
 import {TextViewer} from "../../components/texts/TextViewer";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import { useExportStore } from '../../store/tests/exportStore';
 
 export const TextPageContent = () => {
     const {id} = useParams();

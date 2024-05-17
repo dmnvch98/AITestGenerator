@@ -25,7 +25,7 @@ const TestsContent = () => {
                 onClose={toggleTestDeletedFlag}
             >
                 <Alert severity="success">
-                    Текст(ы) успешно удалены
+                    Тест успешно удален
                 </Alert>
             </Snackbar>
         </>

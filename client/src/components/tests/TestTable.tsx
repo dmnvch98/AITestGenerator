@@ -7,19 +7,22 @@ import {UserTest, useTestStore} from "../../store/tests/testStore";
 import {usePassTestStore} from "../../store/tests/passTestStore";
 import {useExportStore} from "../../store/tests/exportStore";
 import {ExportModal} from "../export/ExportModal";
+import {ConfirmationDialog} from "../main/ConfirmationDialog";
 
 const Actions = ({test}: { test: UserTest }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openExportDialog = useExportStore(state => state.modalOpen);
     const toggleOpenExportDialog = useExportStore(state => state.toggleModelOpen);
-
-    const deleteTest = useTestStore(state => state.deleteTest);
-    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
-    const navigate = useNavigate();
     const {
-        selectedTestId, setSelectedTestId,
+        setSelectedTestId,
         setSelectedTestTitle
     } = useExportStore();
+
+    const {deleteTest, deleteTestFlag, setDeleteTestFlag} = useTestStore();
+
+    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
+    const navigate = useNavigate();
+
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -29,7 +32,7 @@ const Actions = ({test}: { test: UserTest }) => {
     };
 
     const handleDeleteClick = () => {
-        deleteTest(test.id as number);
+        setDeleteTestFlag(true);
         handleClose();
     };
     const handleViewClick = () => {
@@ -45,8 +48,12 @@ const Actions = ({test}: { test: UserTest }) => {
         setSelectedTestId(test.id);
         setSelectedTestTitle(test.title);
         toggleOpenExportDialog();
-        console.log(selectedTestId)
     }
+
+    const handleConfirmDelete = () => {
+        deleteTest(test.id as number);
+        setDeleteTestFlag(false);
+    };
 
     return (
         <div>
@@ -65,17 +72,23 @@ const Actions = ({test}: { test: UserTest }) => {
                 <MenuItem onClick={handleExportClick}>Экспорт</MenuItem>
             </Menu>
 
-            {/* Модальное окно */}
             <Dialog open={openExportDialog} onClose={toggleOpenExportDialog}>
                 <ExportModal/>
             </Dialog>
+            <ConfirmationDialog
+                open={deleteTestFlag}
+                onClose={() => setDeleteTestFlag(false)}
+                onConfirm={handleConfirmDelete}
+                title="Подтверждение удаления теста"
+                content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалениы"
+            />
         </div>
     );
 };
 
 export const TestTable = () => {
     const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
-    const userTests = useTestStore(state => state.tests);
+    const {tests} = useTestStore();
     const navigate = useNavigate();
 
     const columns: GridColDef[] = [
@@ -90,7 +103,7 @@ export const TestTable = () => {
         },
         {
             field: 'actions',
-            headerName: 'Actions',
+            headerName: 'Действия',
             renderCell: (params) => {
                 const test: UserTest = params.row;
 
@@ -120,7 +133,7 @@ export const TestTable = () => {
 
             </Box>
             <DataGrid
-                rows={userTests}
+                rows={tests}
                 columns={columns}
                 initialState={{
                     pagination: {
@@ -134,6 +147,7 @@ export const TestTable = () => {
                 checkboxSelection
                 disableRowSelectionOnClick
             />
+
         </Box>
 
 

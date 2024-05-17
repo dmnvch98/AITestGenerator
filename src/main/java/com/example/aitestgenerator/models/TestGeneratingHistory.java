@@ -2,7 +2,6 @@ package com.example.aitestgenerator.models;
 
 import com.example.aitestgenerator.models.enums.FailReason;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 

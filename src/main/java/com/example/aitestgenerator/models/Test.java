@@ -37,4 +37,8 @@ public class Test {
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<TestGeneratingHistory> testGeneratingHistories;
+
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<TestResult> testResults;
 }

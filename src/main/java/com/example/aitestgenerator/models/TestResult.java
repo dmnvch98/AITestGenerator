@@ -19,8 +19,9 @@ public class TestResult {
     private Long id;
     @Column(name = "user_id")
     private Long userId;
-    @Column(name = "test_id")
-    private Long testId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "testId", referencedColumnName = "id")
+    private Test test;
     @Column(name = "data", columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
     private String data;
