@@ -5,7 +5,7 @@ class ExportService {
     exportTest = async (dto: ExportTestRequestDto, testId: number, testTitle: string) => {
         try {
             const { data } = await customAxios({
-                url: `http://localhost:8080/api/v1/tests/${testId}/export`,
+                url: `/api/v1/tests/${testId}/export`,
                 method: 'POST',
                 data: dto,
                 responseType: 'blob', // Обработка бинарных данных

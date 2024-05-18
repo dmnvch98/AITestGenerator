@@ -5,7 +5,7 @@ import {UserText} from "../store/textStore";
 class TextService {
     getAllUserTexts = async () => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/texts/");
+            const response = await customAxios.get("/api/v1/texts/");
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -15,7 +15,7 @@ class TextService {
 
     getUserTextsByIdsIn = async (ids: number[]) => {
         try {
-            const response = await customAxios.get("http://localhost:8080/api/v1/texts/", {
+            const response = await customAxios.get("/api/v1/texts/", {
                 params: {ids: ids.join(',')}
             });
             return response.data;
@@ -27,7 +27,7 @@ class TextService {
 
     saveText = async (text: UserText) => {
         try {
-            const response = await customAxios.post("http://localhost:8080/api/v1/texts/", text);
+            const response = await customAxios.post("/api/v1/texts/", text);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -37,7 +37,7 @@ class TextService {
 
     deleteText = async (id: number) => {
         try {
-            const response = await customAxios.delete("http://localhost:8080/api/v1/texts/" + id);
+            const response = await customAxios.delete("/api/v1/texts/" + id);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -47,7 +47,7 @@ class TextService {
 
     deleteInBatch = async (ids: number[]) => {
         try {
-            const response = await customAxios.patch("http://localhost:8080/api/v1/texts/", ids);
+            const response = await customAxios.patch("/api/v1/texts/", ids);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -57,7 +57,7 @@ class TextService {
 
     updateText = async (text: UserText) => {
         try {
-            const response = await customAxios.put("http://localhost:8080/api/v1/texts/", text);
+            const response = await customAxios.put("/api/v1/texts/", text);
             return response.data
         } catch (e: unknown) {
             const error = e as AxiosError;

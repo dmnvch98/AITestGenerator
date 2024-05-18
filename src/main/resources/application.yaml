@@ -25,3 +25,19 @@ aws:
   secret-key: bar
   queue-name: test-queue
   url: http://localhost:4566/000000000000/${aws.queue-name}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: demo
+  datasource:
+    url: jdbc:postgresql://postgres:5432/test_generator
+
+aws:
+  region: us-east-1
+  access-key: foo
+  secret-key: bar
+  queue-name: test-queue
+  url: http://localstack:4566/000000000000/${aws.queue-name}

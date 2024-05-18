@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 class TestResultService {
   saveTestResult = async (dto: TestResult, testId: number) => {
     try {
-      const response = await customAxios.post(`http://localhost:8080/api/v1/tests/${testId}/result`, dto);
+      const response = await customAxios.post(`/api/v1/tests/${testId}/result`, dto);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;
@@ -16,7 +16,7 @@ class TestResultService {
   getSingleTestResult = async (testId: number, resultId: number) => {
     try {
       const response =
-          await customAxios.get(`http://localhost:8080/api/v1/tests/${testId}/result/${resultId}`);
+          await customAxios.get(`/api/v1/tests/${testId}/result/${resultId}`);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;
@@ -27,7 +27,7 @@ class TestResultService {
   getAllUserTestResults = async () => {
     try {
       const response =
-          await customAxios.get(`http://localhost:8080/api/v1/tests/results`);
+          await customAxios.get(`/api/v1/tests/results`);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;
