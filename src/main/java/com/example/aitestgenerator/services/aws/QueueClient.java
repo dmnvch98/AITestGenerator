@@ -21,7 +21,7 @@ import java.util.Optional;
 @Slf4j
 public class QueueClient {
 
-    @Value("${aws.url}")
+    @Value("${aws.sqs-url}")
     public String queueUrl;
 
     private final AmazonSQS queue;

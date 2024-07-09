@@ -18,26 +18,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+  private final JwtFilter jwtFilter;
+  private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    @Bean
-    public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configure(http))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
-                        .anyRequest()
-                        .authenticated()
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint));
+  @Bean
+  public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(cors -> cors.configure(http))
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
+//            .requestMatchers(HttpMethod.POST, "/api/v1/files/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/files/**").permitAll()
+            .anyRequest()
+            .authenticated()
+        )
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint));
 
-        return http.build();
-    }
-
+    return http.build();
+  }
 
 }
