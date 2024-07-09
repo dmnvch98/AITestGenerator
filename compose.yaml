@@ -1,7 +1,7 @@
 version: "3"
 services:
   postgres:
-    image: postgres:13.4-alpine
+    image: postgres:14.4-alpine
     container_name: test-generator-postgres
     environment:
       POSTGRES_USER: postgres
@@ -14,6 +14,9 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=kms,sqs
+      - SERVICES=kms,sqs,s3
     volumes:
-      - ./storage:/etc/localstack/init/ready.d
+      - ./localstack/init-kms.sh:/etc/localstack/init/ready.d/init-kms.sh
+      - ./localstack/init-sqs.sh:/etc/localstack/init/ready.d/init-sqs.sh
+      - ./localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+#      - ./storage:/etc/localstack/init/ready.d

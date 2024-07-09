@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      enabled: true
+
   datasource:
     url: jdbc:postgresql://localhost:35432/test_generator
     username: postgres
@@ -15,7 +19,7 @@ spring:
 security:
   secret: SECRET
   refresh-secret: REFRESH_SECRET
-  allowed-origin: http://localhost:3000
+  allowed-origin: http://localhost:3001
 
 csrf:
   cookie_domain: localhost
@@ -24,7 +28,9 @@ aws:
   access-key: foo
   secret-key: bar
   queue-name: test-queue
-  url: http://localhost:4566/000000000000/${aws.queue-name}
+  s3-bucket: files-bucket
+  url: http://localhost:4566/
+  sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
 
 ---
 

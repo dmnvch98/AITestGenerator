@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class AmazonSQSConfig {
     @Value("${aws.region}")
     private String AWS_REGION;
-    @Value("${aws.url}")
+    @Value("${aws.sqs-url}")
     private String QUEUE_ENDPOINT;
     @Value("${aws.access-key}")
     private String login;
