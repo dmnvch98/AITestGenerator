@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {UserText, useTextStore} from "../../store/textStore";
 import {Box, Button, IconButton, Menu, MenuItem} from "@mui/material";
@@ -12,14 +12,11 @@ import {ConfirmationDialog} from "../main/ConfirmationDialog";
 
 const Actions = ({text}: { text: UserText }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [confirmOpen, setConfirmOpen] = useState(false);
-
     const {deleteText, deleteTextFlag, setDeleteTextFlag} = useTextStore();
 
     const {generateTest, toggleGenerateTestFlag} = useTestStore();
 
     const navigate = useNavigate();
-
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -45,8 +42,8 @@ const Actions = ({text}: { text: UserText }) => {
     };
 
     const handleConfirmDelete = () => {
+        console.log("confirm del")
         deleteText(text.id as number);
-        setDeleteTextFlag(false);
         setDeleteTextFlag(false);
     };
 
@@ -95,7 +92,6 @@ export const TextTable = () => {
         deleteInBatch();
         setDeleteTextFlag(false);
     };
-
 
     const navigate = useNavigate();
 

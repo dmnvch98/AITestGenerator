@@ -95,7 +95,7 @@ function LoginPage() {
                   value={email}
                   onChange={handleEmailChange}
                   error={!emailValid && email.length > 0}
-                  helperText={!emailValid && email.length > 0 ? "Enter a valid email" : ""}
+                  helperText={!emailValid && email.length > 0 ? "Неверный формат" : ""}
               />
               <TextField
                   variant="outlined"

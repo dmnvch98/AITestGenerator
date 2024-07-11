@@ -2,7 +2,7 @@ version: "3"
 services:
   postgres:
     image: postgres:14.4-alpine
-    container_name: test-generator-postgres
+    container_name: gen-test
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -19,4 +19,4 @@ services:
       - ./localstack/init-kms.sh:/etc/localstack/init/ready.d/init-kms.sh
       - ./localstack/init-sqs.sh:/etc/localstack/init/ready.d/init-sqs.sh
       - ./localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
-#      - ./storage:/etc/localstack/init/ready.d
+

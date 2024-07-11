@@ -3,9 +3,7 @@ package com.example.aitestgenerator.services;
 import java.util.List;
 
 
-import com.amazonaws.services.sqs.model.ResourceNotFoundException;
 import com.example.aitestgenerator.models.FileHash;
-import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.repositories.FileHashRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +26,12 @@ public class FileHashService {
     return repository.findAllByUserId(userId);
   }
 
-  public boolean isExistsByHashedFilenameAndUser(final String hashedFileName, final Long userId) {
+  public boolean isExistsByHashedFilenameAndUser(final Long userId, final String hashedFileName) {
     return repository.existsByHashedFilenameAndUserId(hashedFileName, userId);
+  }
+
+  public FileHash getByHashedFilenameAndUserId(final Long userId, final String hashedFileName) {
+    return repository.findByHashedFilenameAndUserId(hashedFileName, userId);
   }
 
 }

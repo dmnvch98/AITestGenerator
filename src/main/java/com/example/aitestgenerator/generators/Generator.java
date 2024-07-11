@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.generators;
 
-import com.example.aitestgenerator.models.TestGeneratingHistory;
+import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -16,7 +16,7 @@ import static com.example.aitestgenerator.utils.Utils.countTokens;
 
 public abstract class Generator<T> {
 
-    public abstract T generateData(TestGeneratingHistory history, List<ChatMessage> messages) throws IOException;
+    public abstract T generateData(final GenerateTestRequest request) throws IOException;
 
     @Autowired
     protected OpenAiService openAiService;

@@ -11,6 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 public class GenerateTestMessage {
 
     private final long textId;
+    private final String hashedFileName;
     private final long userId;
     private final long historyId;
     @Setter

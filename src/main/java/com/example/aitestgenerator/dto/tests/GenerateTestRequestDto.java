@@ -1,13 +1,13 @@
 package com.example.aitestgenerator.dto.tests;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 @Jacksonized
 @Builder
-@Value
+@Getter
 public class GenerateTestRequestDto {
-    Long textId;
-    Integer maxQuestionNumber;
+
+    final Long textId;
 }

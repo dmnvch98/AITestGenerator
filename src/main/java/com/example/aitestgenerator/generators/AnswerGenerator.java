@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.generators;
 
+import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
@@ -29,13 +30,15 @@ public class AnswerGenerator extends Generator<Test> {
     private final ObjectMapper objectMapper;
 
     @Override
-    public Test generateData(TestGeneratingHistory history, List<ChatMessage> messages) throws JsonProcessingException {
-        log.info("Generating Test. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+    public Test generateData(final GenerateTestRequest request) throws JsonProcessingException {
+        TestGeneratingHistory history = request.getHistory();
+        List<ChatMessage> messages = request.getMessages();
+        log.info("Generating Test. User id: {}", history.getUser().getId());
         final String testPrompt = readFileContents("ai_prompts/generate_test.txt");
         final ChatMessage testPromptMessage = createChatMessage(testPrompt);
         messages.add(testPromptMessage);
 
-        log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+        log.info("Sending prompt to AI. User id: {}", history.getUser().getId());
 
         final ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
         final Test testResult =  processResult(history, result);
@@ -65,11 +68,11 @@ public class AnswerGenerator extends Generator<Test> {
         try {
             testResult = parseTest(result, history);
         } catch (JsonProcessingException e) {
-            log.error("An error occurred when parsing test. UserId: {}, textId: {}, Error: {}",
-                history.getUser().getId(), history.getText().getId(), e.getMessage());
+            log.error("An error occurred when parsing test. UserId: {}, Error: {}",
+                history.getUser().getId(), e.getMessage());
             throw e;
         }
-        log.info("Test generation completed. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
+        log.info("Test generation completed. User id: {}", history.getUser().getId());
 
         return testResult;
     }
