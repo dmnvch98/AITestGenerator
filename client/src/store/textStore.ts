@@ -75,6 +75,7 @@ export const useTextStore = create<UserTexts>((set: any, get: any) => ({
         return undefined;
     },
     deleteText: async (id: number) => {
+        console.log("del store")
         const response = await TextService.deleteText(id);
         if (response) {
             get().getTexts();

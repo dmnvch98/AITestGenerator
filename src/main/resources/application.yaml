@@ -29,7 +29,7 @@ aws:
   secret-key: bar
   queue-name: test-queue
   s3-bucket: files-bucket
-  url: http://localhost:4566/
+  url: http://localhost:4566
   sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
 
 ---

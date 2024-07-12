@@ -9,9 +9,7 @@ import com.example.aitestgenerator.converters.FileHashConverter;
 import com.example.aitestgenerator.dto.texts.FileHashesResponseDto;
 import com.example.aitestgenerator.exceptions.*;
 import com.example.aitestgenerator.models.FileHash;
-import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.services.FileHashService;
-import com.example.aitestgenerator.services.UserService;
 import com.example.aitestgenerator.services.aws.StorageClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,6 @@ public class FileFacade {
 
   private final FileHashService fileHashService;
   private final StorageClient storageClient;
-  private final UserService userService;
   private final FileHashConverter converter;
 
   @Transactional
@@ -38,7 +35,7 @@ public class FileFacade {
     final String fileNameHash = DigestUtils.md5Hex(originalFileName);
     metadata.setContentLength(file.getSize());
 
-    if (fileHashService.isExistsByHashedFilenameAndUser(fileNameHash, userId)) {
+    if (fileHashService.isExistsByHashedFilenameAndUser(userId, fileNameHash)) {
       throw new ResourceAlreadyExistsException(originalFileName, userId);
     }
 
@@ -48,13 +45,11 @@ public class FileFacade {
       log.error("Cannot get input stream from file", e);
     }
 
-    final User user = userService.findUserById(userId);
-
     final FileHash fileHash = FileHash.builder()
         .hashedFilename(fileNameHash)
         .originalFilename(originalFileName)
         .uploadTime(LocalDateTime.now())
-        .user(user)
+        .userId(userId)
         .build();
 
     fileHashService.save(fileHash);
@@ -84,7 +79,7 @@ public class FileFacade {
   }
 
   private boolean checkFileEligibility(final long userId, final String hashedFileName) {
-    final boolean isExists = fileHashService.isExistsByHashedFilenameAndUser(hashedFileName, userId);
+    final boolean isExists = fileHashService.isExistsByHashedFilenameAndUser(userId, hashedFileName);
     if (!isExists) {
       throw new ResourceNotFoundException(hashedFileName, userId);
     }

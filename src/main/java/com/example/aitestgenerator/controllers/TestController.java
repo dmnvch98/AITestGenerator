@@ -26,7 +26,13 @@ public class TestController {
     @PostMapping("/generate")
     public void generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        testFacade.generateTestSendMessage(userId, dto.getTextId());
+        testFacade.generateTestByTextSendMessage(userId, dto.getTextId());
+    }
+
+    @PostMapping("/generate/files/{fileHash}")
+    public void generateTestByFileAndSave(Authentication authentication, @PathVariable final String fileHash) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        testFacade.generateTestByFileSendMessage(userId, fileHash);
     }
 
     @GetMapping

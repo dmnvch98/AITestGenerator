@@ -1,5 +1,5 @@
 import {useUserStore} from "../../store/userStore";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import DateTimeUtils from '../../utils/DateTimeUtils';
 import { DoneLabel } from '../utils/DoneLabel';
@@ -51,8 +51,8 @@ export const TestGenHistoryTable = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Заголовок текста</TableCell>
                             <TableCell>Заголовок теста</TableCell>
+                            <TableCell>Заголовок текста</TableCell>
                             <TableCell>Начало генерации</TableCell>
                             <TableCell>Конец генерации</TableCell>
                             <TableCell>Статус</TableCell>

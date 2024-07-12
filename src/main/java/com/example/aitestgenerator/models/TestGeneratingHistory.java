@@ -26,6 +26,9 @@ public class TestGeneratingHistory {
     @ManyToOne
     @JoinColumn(name = "textId", referencedColumnName = "id")
     private Text text;
+    @ManyToOne
+    @JoinColumn(name = "fileHashId", referencedColumnName = "id")
+    private FileHash fileHash;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
     private Long inputTokensCount;

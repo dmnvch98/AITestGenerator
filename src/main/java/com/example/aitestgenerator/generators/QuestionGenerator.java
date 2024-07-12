@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.generators;
 
-import com.example.aitestgenerator.models.TestGeneratingHistory;
+import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import lombok.RequiredArgsConstructor;
@@ -20,21 +20,22 @@ public class QuestionGenerator extends Generator<List<ChatMessage>> {
     private static final String QUESTIONS_PROMPT_FILE = "ai_prompts/generate_questions.txt";
 
     @Override
-    public List<ChatMessage> generateData(TestGeneratingHistory history, List<ChatMessage> messages) throws IOException {
-        log.info("Sending prompt to AI. Text id: {}, User id: {}", history.getText().getId(), history.getUser().getId());
-        prepareMessages(history, messages);
+    public List<ChatMessage> generateData(final GenerateTestRequest request) throws IOException {
+        log.info("Sending prompt to AI. User id: {}",
+                request.getHistory().getUser().getId());
+        prepareMessages(request);
 
-        final ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(messages));
-        return processResult(result, messages);
+        final ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(request.getMessages()));
+        return processResult(result, request.getMessages());
     }
 
-    private void prepareMessages(TestGeneratingHistory history, List<ChatMessage> messages) {
-        String textWithoutHTML = removeHTMLTags(history.getText().getContent());
-        ChatMessage textPromptMessage = createChatMessage(textWithoutHTML);
-        ChatMessage questionsPromptMessage = createChatMessage(readFileContents(QUESTIONS_PROMPT_FILE));
+    private void prepareMessages(final GenerateTestRequest request) {
+        final String textWithoutHTML = removeHTMLTags(request.getContent());
+        final ChatMessage textPromptMessage = createChatMessage(textWithoutHTML);
+        final ChatMessage questionsPromptMessage = createChatMessage(readFileContents(QUESTIONS_PROMPT_FILE));
 
-        messages.add(textPromptMessage);
-        messages.add(questionsPromptMessage);
+        request.getMessages().add(textPromptMessage);
+        request.getMessages().add(questionsPromptMessage);
     }
 
     private List<ChatMessage> processResult(ChatCompletionResult result, List<ChatMessage> messages) throws IOException {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.amazonaws.services.s3.model.S3Object;
 
 import java.io.InputStream;
+import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,16 @@ public class StorageClient {
     } catch (final Exception e) {
       log.error("Error when deleting file [{}] from storage", key, e);
     }
+  }
+
+  public URL getFileUrl(final long userId, final String fileHash) {
+    final String key = generateFileKey(userId, fileHash);
+    try {
+      return amazonS3.getUrl(bucketName, key);
+    } catch (final Exception e) {
+      log.error("Error when getting file URL [{}] from storage", key, e);
+    }
+    return null;
   }
 
   private String generateFileKey(final long userId, final String fileName) {

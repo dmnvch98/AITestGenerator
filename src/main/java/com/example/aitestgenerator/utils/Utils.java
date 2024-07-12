@@ -12,12 +12,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,5 +50,18 @@ public class Utils {
     public static String getExportedTestName(String testName, String fileFormat) {
         String truncatedName = testName.length() > 15 ? testName.substring(0, 15) : testName;
         return URLEncoder.encode(truncatedName, StandardCharsets.UTF_8) + '.' + fileFormat.toLowerCase();
+    }
+
+    public static String removeNewLines(final String text) {
+        if (text != null) {
+            return text.replaceAll("\n", "");
+        } else return "";
+    }
+
+    public static String getFileExtension(String filename) {
+        if (filename == null || filename.lastIndexOf('.') == -1) {
+            return "";
+        }
+        return filename.substring(filename.lastIndexOf('.') + 1);
     }
 }
