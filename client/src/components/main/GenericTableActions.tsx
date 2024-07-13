@@ -60,7 +60,7 @@ interface GenericTableProps<T> {
     onSelectionModelChange?: (ids: number[]) => void;
 }
 
-export const GenericTable = <T, >({
+export const GenericTableActions = <T, >({
                                       data,
                                       columns,
                                       actions,
@@ -69,7 +69,7 @@ export const GenericTable = <T, >({
                                   }: GenericTableProps<T>) => {
     const actionColumn: GridColDef = {
         field: 'actions',
-        headerName: 'Actions',
+        headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
             return (

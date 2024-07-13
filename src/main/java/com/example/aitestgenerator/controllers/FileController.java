@@ -26,15 +26,15 @@ public class FileController {
 
   @PostMapping("/")
   @ResponseStatus(HttpStatus.CREATED)
-  public void uploadFile(@RequestParam("file") final MultipartFile file, final Authentication authentication) {
-    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    fileFacade.saveFile(userId, file);
+  public void uploadFile(@RequestParam("file") final MultipartFile file) {
+//    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    fileFacade.saveFile(1, file);
   }
 
   @GetMapping("/{fileHash}")
   public Resource getFileByHash(@PathVariable final String fileHash, final Authentication authentication) {
-    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    return fileFacade.getFileByHash(userId, fileHash);
+//    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    return fileFacade.getFileByHash(1, fileHash);
   }
 
   @DeleteMapping("/{fileHash}")

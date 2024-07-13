@@ -7,7 +7,7 @@ import {useTestStore} from "../../store/tests/testStore";
 import {DoneLabel} from "../utils/DoneLabel";
 import {NoLabel} from "../utils/NoLabel";
 import {ConfirmationDialog} from "../main/ConfirmationDialog";
-import {GenericTable} from "../main/GenericTableActions";
+import {GenericTableActions} from "../main/GenericTableActions";
 
 const getActions = (
     text: UserText,
@@ -100,7 +100,7 @@ export const TextTable = () => {
                     Удалить выбранное
                 </Button>
             </Box>
-            <GenericTable<UserText>
+            <GenericTableActions<UserText>
                 data={texts}
                 columns={columns}
                 actions={(text) => getActions(text, navigate, deleteText, generateTest)}

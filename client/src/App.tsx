@@ -15,6 +15,7 @@ import {TestGenHistory} from "./pages/history/TestGenHistory";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
 import SignUp from './pages/SignUp';
+import {FileUploadModal} from "./components/FileUploadModal";
 
 function App() {
     const theme = createTheme({
@@ -55,6 +56,7 @@ function App() {
                             <Route path="/tests/results" element={<UserTestResults/>}/>
                             <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenHistory/>}/>
+                            <Route path="/sandbox" element={<FileUploadModal open={true} onClose={() => {}}/>}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace />} />
                         </Routes>
                     </div>
