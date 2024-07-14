@@ -12,39 +12,25 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
-    Snackbar,
-    Alert
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FileService from "../services/FileService";
+import useFileStore, { AlertMessage } from "../store/fileStore";
 
 interface FileUploadModalProps {
     open: boolean;
     onClose: () => void;
 }
 
-interface UploadedFile {
-    name: string;
-    type: string;
-    size: number;
-}
-
-interface AlertMessage {
-    id: number;
-    message: string;
-}
-
 export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose }) => {
+    const {filesToUpload, addFiles, removeFile, uploadFiles, setAlert, getFiles, setUploadModalOpen} = useFileStore();
     const [dragOver, setDragOver] = useState(false);
-    const [files, setFiles] = useState<File[]>([]);
-    const [alerts, setAlerts] = useState<AlertMessage[]>([]);
 
     const MAX_FILES = 6;
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     const handleFileUpload = (event: ChangeEvent<HTMLInputElement> | DragEvent) => {
         const newFiles = event.type === 'change'
@@ -56,18 +42,30 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
 
         newFiles.forEach(file => {
             if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
-                invalidFiles.push({ id: Date.now() + Math.random(), message: `<b>${file.name}</b> не PDF/Word документ` });
+                invalidFiles.push({
+                    id: Date.now() + Math.random(),
+                    message: `<b>${file.name}</b> не PDF/Word документ`,
+                    severity: 'error'
+                });
             } else if (file.size > MAX_FILE_SIZE) {
-                invalidFiles.push({ id: Date.now() + Math.random(), message: `<b>${file.name}</b> превышает 5 MБ` });
-            } else if (files.length + validFiles.length >= MAX_FILES) {
-                invalidFiles.push({ id: Date.now() + Math.random(), message: `<b>${file.name}</b> превышает лимит в 6 файлов` });
+                invalidFiles.push({
+                    id: Date.now() + Math.random(),
+                    message: `<b>${file.name}</b> превышает 5 MБ`,
+                    severity: 'error'
+                });
+            } else if (filesToUpload.length + validFiles.length >= MAX_FILES) {
+                invalidFiles.push({
+                    id: Date.now() + Math.random(),
+                    message: `<b>${file.name}</b> превышает лимит в 6 файлов`,
+                    severity: 'error'
+                });
             } else {
                 validFiles.push(file);
             }
         });
 
-        setAlerts([...alerts, ...invalidFiles]);
-        setFiles([...files, ...validFiles]);
+        setAlert(invalidFiles);
+        addFiles(validFiles);
     };
 
     const handleDragOver = (event: DragEvent) => {
@@ -86,7 +84,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
     };
 
     const handleDeleteFile = (index: number) => {
-        setFiles(files.filter((_, i) => i !== index));
+        removeFile(index);
     };
 
     const getIcon = (type: string) => {
@@ -95,22 +93,10 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
         return null;
     };
 
-    const handleAlertClose = (id: number) => {
-        setAlerts(alerts.filter(alert => alert.id !== id));
-    };
-
-    const handleSnackBarClose = () => {
-        setAlerts([]);
-    }
-
     const handleSend = async () => {
-        try {
-            await FileService.uploadFiles(files);
-            setAlerts([{ id: Date.now(), message: 'Файлы успешно загружены' }]);
-            setFiles([]);
-        } catch (error) {
-            setAlerts([{ id: Date.now(), message: 'Ошибка при загрузке файлов' }]);
-        }
+        setUploadModalOpen(false);
+        await uploadFiles();
+        await getFiles();
     };
 
     return (
@@ -165,7 +151,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                     accept=".pdf,.doc,.docx"
                 />
                 <List>
-                    {files.map((file, index) => (
+                    {filesToUpload.map((file, index) => (
                         <ListItem key={index}
                                   secondaryAction={
                                       <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteFile(index)}>
@@ -178,20 +164,6 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         </ListItem>
                     ))}
                 </List>
-                <Snackbar
-                    open={alerts.length > 0}
-                    autoHideDuration={6000}
-                    onClose={handleSnackBarClose}
-                >
-                    <Box sx={{width: '400px'}}>
-                        {alerts.map(alert => (
-                            <Alert key={alert.id} severity="error" sx={{mb: 1}}
-                                   onClose={() => handleAlertClose(alert.id)}>
-                                <span dangerouslySetInnerHTML={{__html: alert.message}}/>
-                            </Alert>
-                        ))}
-                    </Box>
-                </Snackbar>
             </DialogContent>
             <DialogActions sx={{p: 2}}>
                 <Button onClick={handleSend} variant="contained">Отправить</Button>

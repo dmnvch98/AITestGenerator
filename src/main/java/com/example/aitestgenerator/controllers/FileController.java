@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/files")
 @RequiredArgsConstructor
@@ -26,18 +28,19 @@ public class FileController {
 
   @PostMapping("/")
   @ResponseStatus(HttpStatus.CREATED)
-  public void uploadFile(@RequestParam("file") final MultipartFile file) {
-//    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    fileFacade.saveFile(1, file);
+  public void uploadFile(@RequestParam("file") final List<MultipartFile> files, final Authentication authentication) {
+    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    files.forEach(file -> fileFacade.saveFile(userId, file));
   }
 
   @GetMapping("/{fileHash}")
   public Resource getFileByHash(@PathVariable final String fileHash, final Authentication authentication) {
-//    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    return fileFacade.getFileByHash(1, fileHash);
+    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    return fileFacade.getFileByHash(userId, fileHash);
   }
 
   @DeleteMapping("/{fileHash}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFile(@PathVariable final String fileHash, final Authentication authentication) {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
     fileFacade.deleteFileByHash(userId, fileHash);

@@ -40,7 +40,7 @@ const UserTestResultsContent = () => {
               {testResults.map((tr, index) => (
                   <TableRow key={index}>
                     <TableCell>{tr.testTitle}</TableCell>
-                    <TableCell>{DateTimeUtils.formatDate(tr.testPassedTime)}</TableCell>
+                    <TableCell>{DateTimeUtils.formatDateTime(tr.testPassedTime)}</TableCell>
                     <TableCell>{tr.questionAnswers.length}</TableCell>
                     <TableCell>{calcCorrect(tr)}</TableCell>
                     <TableCell>

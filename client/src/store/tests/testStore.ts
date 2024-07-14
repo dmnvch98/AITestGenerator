@@ -33,6 +33,7 @@ export interface TestStore {
     testDeletedFlag: boolean,
     toggleTestDeletedFlag: () => void,
     generateTest: (textId: number) => void,
+    generateTestByFile: (hashedFileName: string) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
     deleteTest: (ids: number) => void,
@@ -68,6 +69,12 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
             set({testGenerationStarted: true})
         }
     },
+
+    generateTestByFile: async (hashedFileName) => {
+        const response = await TestService.generateTestByFile(hashedFileName);
+        return response as boolean;
+    },
+
     toggleTestDeletedFlag: () => {
         set({testDeletedFlag: !get().testDeletedFlag})
     },

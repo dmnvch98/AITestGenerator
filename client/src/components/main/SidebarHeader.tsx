@@ -22,6 +22,7 @@ import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import FolderIcon from '@mui/icons-material/Folder';
 import { AuthService } from '../../services/AuthService';
 
 const drawerWidth = 300;
@@ -117,6 +118,11 @@ export const SidebarHeader = ({ children }: any) => {
             redirect: '/texts',
         },
         {
+            name: 'Файлы',
+            icon: <FolderIcon />,
+            redirect: '/files',
+        },
+        {
             name: 'История прохождений',
             icon: <HistoryIcon />,
             redirect: '/tests/results',
@@ -125,7 +131,7 @@ export const SidebarHeader = ({ children }: any) => {
             name: 'История генераций',
             icon: <HistoryEduIcon />,
             redirect: '/test-gen-history',
-        },
+        }
     ];
 
     const handleDrawerOpen = () => {

@@ -49,7 +49,7 @@ public class QueueClient {
     public void deleteMessage(final String receipt) {
         try {
             queue.deleteMessage(new DeleteMessageRequest(queueUrl, receipt));
-            log.info("Message was deleted the from queue. Receipt : {} ", receipt);
+            log.info("Message was deleted from the queue. Receipt : {} ", receipt);
         } catch (Exception e) {
             log.error("An error occurred during deleting message from the queue. Receipt : {}", receipt);
         }

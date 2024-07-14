@@ -13,11 +13,10 @@ const ChaptersContent = () => {
   const {
     textSavedFlag, textDeletedFlag,
     toggleTextSavedFlag, toggleTextDeletedFlag,
-    getTexts, deleteTextFlag, setDeleteTextFlag
+    getTexts
   } = useTextStore();
 
   const {testGenerationStarted, setTestGenerationStarted} = useTestStore();
-
     useEffect(() => {
     getTexts();
   }, []);

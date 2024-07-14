@@ -2,6 +2,7 @@ package com.example.aitestgenerator.services.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.aitestgenerator.models.FileHash;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ public class StorageClient {
                          final ObjectMetadata metadata) {
     final String key = generateFileKey(userId, fileHash);
     amazonS3.putObject(bucketName, key, inputStream, metadata);
-    log.info("Uploaded file [{}] to storage", fileHash);
+    log.info("Uploaded file [{}] to storage", key);
   }
 
   public Resource downloadFile(final long userId, final String fileHash) {
