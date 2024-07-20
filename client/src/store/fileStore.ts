@@ -16,6 +16,29 @@ export interface FileDto {
     uploadTime: Date;
 }
 
+export const UploadStatus = {
+    SUCCESS: 'SUCCESS',
+    FAILED: 'FAILED',
+    ALREADY_UPLOADED: 'ALREADY_UPLOADED',
+} as const;
+
+export type UploadStatus = (typeof UploadStatus)[keyof typeof UploadStatus];
+
+export const UploadStatusMessages: Record<UploadStatus, string> = {
+    [UploadStatus.SUCCESS]: 'Файл успешно загружен',
+    [UploadStatus.FAILED]: 'Не удалось загрузить файл',
+    [UploadStatus.ALREADY_UPLOADED]: 'Файл с таким именем уже существует',
+};
+
+interface FileResult {
+    fileName: string;
+    status: UploadStatus;
+}
+
+export interface FileUploadResponseDto {
+    fileResults: FileResult[];
+}
+
 interface FileStore {
     filesToUpload: File[];
     fileDtos: FileDto[];
@@ -34,6 +57,7 @@ interface FileStore {
     setFileDtos: (fileDtos: FileDto[]) => void;
     uploadModalOpen: boolean,
     setUploadModalOpen: (flag: boolean) => void;
+    setIsLoading: (flag: boolean) => void;
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
@@ -60,8 +84,16 @@ const useFileStore = create<FileStore>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            await FileService.uploadFiles(filesToUpload);
-            setAlert([{ id: Date.now(), message: 'Файл(ы) успешно загружены', severity: 'success' }]);
+            const response = await FileService.uploadFiles(filesToUpload);
+            if (response && response.fileResults.length > 0) {
+                response.fileResults.map(resp => {
+                    if (resp.status === UploadStatus.ALREADY_UPLOADED ) {
+                        console.log(2)
+                        setAlert([{id: Date.now(), message: UploadStatusMessages[resp.status] + ' - ' + resp.fileName, severity: 'warning'}])
+                    }
+                })
+            }
+            setAlert([{id: Date.now(), message: 'Загрузка файлов завершена', severity: 'success'}]);
             clearFiles();
         } catch (error) {
             const axiosError = error as AxiosError;
@@ -91,7 +123,10 @@ const useFileStore = create<FileStore>((set, get) => ({
     },
     setUploadModalOpen: (flag) => {
         set({uploadModalOpen: flag})
-    }
+    },
+    setIsLoading: (flag) => {
+        set({isLoading: flag})
+    },
 }));
 
 export default useFileStore;

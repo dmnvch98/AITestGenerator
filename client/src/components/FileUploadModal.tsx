@@ -26,7 +26,7 @@ interface FileUploadModalProps {
 }
 
 export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose }) => {
-    const {filesToUpload, addFiles, removeFile, uploadFiles, setAlert, getFiles, setUploadModalOpen} = useFileStore();
+    const {filesToUpload, addFiles, removeFile, uploadFiles, setAlert, getFiles, setUploadModalOpen, setIsLoading} = useFileStore();
     const [dragOver, setDragOver] = useState(false);
 
     const MAX_FILES = 6;
@@ -94,9 +94,11 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
     };
 
     const handleSend = async () => {
+        setIsLoading(true);
         setUploadModalOpen(false);
         await uploadFiles();
         await getFiles();
+        setIsLoading(false);
     };
 
     return (

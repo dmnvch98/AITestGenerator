@@ -1,20 +1,21 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
+import {FileUploadResponseDto} from "../store/fileStore";
 
 class FileService {
 
-    uploadFiles = async (files: File[]) => {
+    uploadFiles = async (files: File[]): Promise<FileUploadResponseDto | void> => {
         const formData = new FormData();
         files.forEach(file => {
             formData.append('file', file);
         });
         try {
-            const response = await customAxios.post('/api/v1/files/', formData, {
+            const response =  await customAxios.post('/api/v1/files/', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data'
                 }
             });
-            response.status === 201 && console.log('Файлы успешно загружены:', response.data);
+            return response.data;
         } catch (error) {
             console.error('Ошибка при загрузке файлов:', error);
         }

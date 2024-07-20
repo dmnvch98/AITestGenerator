@@ -1,7 +1,7 @@
 import useFileStore from "../../store/fileStore";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Alert, Box, Button, Snackbar} from "@mui/material";
+import {Alert, Box, Button, CircularProgress, Snackbar} from "@mui/material";
 import {FileUploadModal} from "../../components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
@@ -14,7 +14,9 @@ const FilesContent = () => {
         deleteAlert,
         clearFiles,
         uploadModalOpen,
-        setUploadModalOpen
+        setUploadModalOpen,
+        isLoading,
+        setIsLoading
     } = useFileStore();
 
     useEffect(() => {
@@ -41,6 +43,7 @@ const FilesContent = () => {
                     sx={{ mr: 2 }}
                     variant="outlined"
                     onClick={handleAdd}
+                    disabled={isLoading}
                 >
                     Добавить файлы
                 </Button>
@@ -63,6 +66,19 @@ const FilesContent = () => {
                         </Alert>
                     ))}
                 </Box>
+            </Snackbar>
+
+            <Snackbar
+                open={isLoading}
+                onClose={() => setIsLoading(false)}
+            >
+
+                <Alert key={Math.random()} severity="info" sx={{ mb: 0.5 }} icon={<CircularProgress size={18} />}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span>Загрузка файлов</span>
+
+                    </Box>
+                </Alert>
             </Snackbar>
         </>
     );

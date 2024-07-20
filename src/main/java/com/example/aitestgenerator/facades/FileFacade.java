@@ -9,6 +9,7 @@ import com.example.aitestgenerator.converters.FileHashConverter;
 import com.example.aitestgenerator.dto.texts.FileHashesResponseDto;
 import com.example.aitestgenerator.exceptions.*;
 import com.example.aitestgenerator.models.FileHash;
+import com.example.aitestgenerator.models.enums.UploadStatus;
 import com.example.aitestgenerator.services.FileHashService;
 import com.example.aitestgenerator.services.aws.StorageClient;
 import jakarta.transaction.Transactional;
@@ -29,30 +30,31 @@ public class FileFacade {
   private final FileHashConverter converter;
 
   @Transactional
-  public void saveFile(final long userId, final MultipartFile file) {
+  public UploadStatus saveFile(final long userId, final MultipartFile file) {
     final String originalFileName = file.getOriginalFilename();
     final ObjectMetadata metadata = new ObjectMetadata();
     final String fileNameHash = DigestUtils.md5Hex(originalFileName);
     metadata.setContentLength(file.getSize());
 
     if (fileHashService.isExistsByHashedFilenameAndUser(userId, fileNameHash)) {
-      throw new ResourceAlreadyExistsException(originalFileName, userId);
+      return UploadStatus.ALREADY_UPLOADED;
     }
 
     try {
       storageClient.uploadFile(userId, fileNameHash, file.getInputStream(), metadata);
+      final FileHash fileHash = FileHash.builder()
+              .hashedFilename(fileNameHash)
+              .originalFilename(originalFileName)
+              .uploadTime(LocalDateTime.now())
+              .userId(userId)
+              .build();
+
+      fileHashService.save(fileHash);
     } catch (IOException e) {
-      log.error("Cannot get input stream from file", e);
+      log.error("Error when saving file: {} for user id: {}", file.getOriginalFilename(), userId, e);
+      return UploadStatus.FAILED;
     }
-
-    final FileHash fileHash = FileHash.builder()
-        .hashedFilename(fileNameHash)
-        .originalFilename(originalFileName)
-        .uploadTime(LocalDateTime.now())
-        .userId(userId)
-        .build();
-
-    fileHashService.save(fileHash);
+    return UploadStatus.SUCCESS;
   }
 
   public Resource getFileByHash(final long userId, final String hash) {
