@@ -33,7 +33,8 @@ public class TestGenerationService {
                 return questionGenerator.generateData(request);
             });
         } catch (final Exception e) {
-            return List.of();
+            throw new RuntimeException("Generation of questions for history id " +  request.getHistory().getId() +
+                    " failed");
         }
     }
 
@@ -44,7 +45,8 @@ public class TestGenerationService {
                 return answerGenerator.generateData(request);
             });
         } catch (final Exception e) {
-            return Test.builder().build();
+            throw new RuntimeException("Generation of answers for history id " +  request.getHistory().getId() +
+                    " failed");
         }
     }
 

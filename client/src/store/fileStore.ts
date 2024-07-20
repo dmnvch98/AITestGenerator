@@ -1,12 +1,7 @@
 import create from 'zustand';
 import FileService from '../services/FileService';
 import { AxiosError } from 'axios';
-
-export interface AlertMessage {
-    id: number;
-    message: string;
-    severity: 'success' | 'info' | 'warning' | 'error' | undefined;
-}
+import {AlertMessage} from "./types";
 
 export interface FileDto {
     id: number;

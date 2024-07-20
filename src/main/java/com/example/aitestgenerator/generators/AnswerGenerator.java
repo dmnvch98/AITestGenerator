@@ -1,7 +1,6 @@
 package com.example.aitestgenerator.generators;
 
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
-import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
@@ -26,7 +25,6 @@ import static com.example.aitestgenerator.utils.Utils.readFileContents;
 public class AnswerGenerator extends Generator<Test> {
 
     private final TestGeneratingHistoryService historyService;
-    private final TestGeneratingHistoryHolder historyHolder;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -59,7 +57,6 @@ public class AnswerGenerator extends Generator<Test> {
         history.setGenerationStatus(GenerationStatus.SUCCESS);
 
         historyService.save(history);
-        historyHolder.clearHistory();
     }
 
     private Test processResult(final TestGeneratingHistory history, final ChatCompletionResult result)

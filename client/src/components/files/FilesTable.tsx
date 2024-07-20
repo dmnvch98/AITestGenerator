@@ -1,12 +1,13 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
 import { GenericTableActions } from "../main/GenericTableActions";
-import useFileStore, {AlertMessage, FileDto} from "../../store/fileStore";
+import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../utils/DateTimeUtils";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Box, Typography } from '@mui/material';
 import {useTestStore} from "../../store/tests/testStore";
+import {AlertMessage} from "../../store/types";
 
 const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase();

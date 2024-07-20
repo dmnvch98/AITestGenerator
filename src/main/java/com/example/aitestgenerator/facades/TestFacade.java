@@ -9,6 +9,7 @@ import com.example.aitestgenerator.services.*;
 import com.example.aitestgenerator.services.aws.StorageClient;
 import com.example.aitestgenerator.utils.Utils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TestFacade {
 
     private final TestService testService;
@@ -100,7 +102,8 @@ public class TestFacade {
         historyService.save(history);
     }
 
-    public void deleteTest(Long testId, Long userId) {
+    public void deleteTest(final Long testId, final Long userId) {
+        log.debug("Deleting test. Test id: {}, User Id: {}", testId, userId);
         testService.findAllByIdAndUserIdOrThrow(testId, userId);
         testService.deleteTest(testId);
     }
