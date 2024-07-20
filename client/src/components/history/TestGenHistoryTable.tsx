@@ -77,8 +77,8 @@ export const TestGenHistoryTable = () => {
                                         {th.textTitle}
                                     </Link>
                                 </TableCell>
-                                <TableCell>{DateTimeUtils.formatDate(th.generationStart)}</TableCell>
-                                <TableCell>{DateTimeUtils.formatDate(th.generationEnd)}</TableCell>
+                                <TableCell>{DateTimeUtils.formatDateTime(th.generationStart)}</TableCell>
+                                <TableCell>{DateTimeUtils.formatDateTime(th.generationEnd)}</TableCell>
                                 <TableCell>{getStatusComponent(th.generationStatus)}</TableCell>
                             </TableRow>
                         ))}

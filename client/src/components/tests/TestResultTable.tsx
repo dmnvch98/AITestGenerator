@@ -17,7 +17,7 @@ export const TestResultTable = ({testResult}: { testResult: TestResult }) => {
                 </Typography>
 
                 <Typography align='left'>
-                    Время теста: {DateTimeUtils.formatDate(testResult.testPassedTime)}
+                    Время теста: {DateTimeUtils.formatDateTime(testResult.testPassedTime)}
                 </Typography>
 
 

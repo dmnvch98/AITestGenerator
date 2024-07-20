@@ -30,8 +30,6 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
-//            .requestMatchers(HttpMethod.POST, "/api/v1/files/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/files/**").permitAll()
             .anyRequest()
             .authenticated()
         )

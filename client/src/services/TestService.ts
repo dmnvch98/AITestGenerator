@@ -12,6 +12,17 @@ class TestService {
             console.log(error.message);
         }
     }
+
+    generateTestByFile = async (hashedFileName: string) => {
+        try {
+            const response = await customAxios.post(`/api/v1/tests/generate/files/${hashedFileName}`);
+            return response.status == 200;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
     getUserTests = async (ids?: number[]) => {
         try {
             const url = "/api/v1/tests";

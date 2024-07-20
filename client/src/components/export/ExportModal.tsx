@@ -9,8 +9,13 @@ import {
     TextField
 } from "@mui/material";
 import {useExportStore} from "../../store/tests/exportStore";
+import {UserTest} from "../../store/tests/testStore";
 
-export const ExportModal = () => {
+interface ExportModalProps {
+    test: UserTest | undefined;
+}
+
+export const ExportModal = ({ test }: ExportModalProps) => {
     const {
         exportFormat, setExportFormat,
         questionsLabel, setQuestionsLabel,
@@ -22,8 +27,10 @@ export const ExportModal = () => {
     } = useExportStore();
 
     const handleExport = () => {
-        exportTest();
-        toggleModelOpen();
+        if (test) {
+            exportTest(test);
+            toggleModelOpen();
+        }
     }
 
     return (

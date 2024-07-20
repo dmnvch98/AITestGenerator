@@ -1,95 +1,74 @@
 import React from 'react';
-import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {Box, Button, IconButton, Menu, MenuItem, Dialog} from "@mui/material";
-import SettingsIcon from '@mui/icons-material/Settings';
-import {useNavigate} from "react-router-dom";
-import {UserTest, useTestStore} from "../../store/tests/testStore";
-import {usePassTestStore} from "../../store/tests/passTestStore";
-import {useExportStore} from "../../store/tests/exportStore";
-import {ExportModal} from "../export/ExportModal";
-import {ConfirmationDialog} from "../main/ConfirmationDialog";
-
-const Actions = ({test}: { test: UserTest }) => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const openExportDialog = useExportStore(state => state.modalOpen);
-    const toggleOpenExportDialog = useExportStore(state => state.toggleModelOpen);
-    const {
-        setSelectedTestId,
-        setSelectedTestTitle
-    } = useExportStore();
-
-    const {deleteTest, deleteTestFlag, setDeleteTestFlag} = useTestStore();
-
-    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
-    const navigate = useNavigate();
+import { GridColDef } from '@mui/x-data-grid';
+import { Box, Button, Dialog } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { UserTest, useTestStore } from "../../store/tests/testStore";
+import { usePassTestStore } from "../../store/tests/passTestStore";
+import { useExportStore } from "../../store/tests/exportStore";
+import { ExportModal } from "../export/ExportModal";
+import { ConfirmationDialog } from "../main/ConfirmationDialog";
+import {GenericTableActions} from "../main/GenericTableActions";
 
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleDeleteClick = () => {
-        setDeleteTestFlag(true);
-        handleClose();
-    };
-    const handleViewClick = () => {
-        navigate("/tests/" + test.id);
-    }
-
-    const handlePassClick = () => {
-        setTestIdsToPass([test.id])
-        navigate("/tests/pass");
-    }
-
-    const handleExportClick = () => {
-        setSelectedTestId(test.id);
-        setSelectedTestTitle(test.title);
-        toggleOpenExportDialog();
-    }
-
-    const handleConfirmDelete = () => {
-        deleteTest(test.id as number);
-        setDeleteTestFlag(false);
-    };
-
-    return (
-        <div>
-            <IconButton onClick={handleClick}>
-                <SettingsIcon/>
-            </IconButton>
-
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                <MenuItem onClick={handleViewClick}>Просмотр</MenuItem>
-                <MenuItem onClick={handleDeleteClick}>Удалить</MenuItem>
-                <MenuItem onClick={handlePassClick}>Пройти</MenuItem>
-                <MenuItem onClick={handleExportClick}>Экспорт</MenuItem>
-            </Menu>
-
-            <Dialog open={openExportDialog} onClose={toggleOpenExportDialog}>
-                <ExportModal/>
-            </Dialog>
-            <ConfirmationDialog
-                open={deleteTestFlag}
-                onClose={() => setDeleteTestFlag(false)}
-                onConfirm={handleConfirmDelete}
-                title="Подтверждение удаления теста"
-                content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалениы"
-            />
-        </div>
-    );
+const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
+    navigate(`/tests/${test.id}`);
 };
 
+const handleDelete = ( selectTest: (test: UserTest) => void, setDeleteTestFlag: (flag: boolean) => void, test: UserTest) => {
+    selectTest(test);
+    setDeleteTestFlag(true);
+};
+
+const handlePass = (setTestIdsToPass: (ids: number[]) => void, navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
+    setTestIdsToPass([test.id]);
+    navigate("/tests/pass");
+};
+
+const handleExport = (
+    selectTest: (test: UserTest) => void,
+    toggleOpenExportDialog: () => void,
+    test: UserTest
+) => {
+    selectTest(test);
+    toggleOpenExportDialog();
+};
+
+const getActions = (
+    test: UserTest,
+    navigate: ReturnType<typeof useNavigate>,
+    setDeleteTestFlag: (flag: boolean) => void,
+    setTestIdsToPass: (ids: number[]) => void,
+    selectTest: (test: UserTest) => void,
+    toggleOpenExportDialog: () => void
+) => [
+    {
+        label: 'Просмотр',
+        onClick: () => handleView(navigate, test),
+    },
+    {
+        label: 'Удалить',
+        onClick: () => handleDelete(selectTest, setDeleteTestFlag, test),
+    },
+    {
+        label: 'Пройти',
+        onClick: () => handlePass(setTestIdsToPass, navigate, test),
+    },
+    {
+        label: 'Экспорт',
+        onClick: () => handleExport(selectTest, toggleOpenExportDialog, test),
+    },
+];
+
 export const TestTable = () => {
-    const setTestIdsToPass = usePassTestStore(state => state.setTestIdsToPass);
-    const {tests} = useTestStore();
+    const { tests, deleteTest, deleteTestFlag, setDeleteTestFlag, selectTest, selectedTest } = useTestStore();
+    const { setTestIdsToPass } = usePassTestStore();
+    const { toggleModelOpen, modalOpen: openExportDialog, selectedTestId } = useExportStore();
     const navigate = useNavigate();
+
+    const handleConfirmDelete = (id: number) => {
+        deleteTest(id);
+        setDeleteTestFlag(false);
+    };
 
     const columns: GridColDef[] = [
         {
@@ -99,57 +78,45 @@ export const TestTable = () => {
         {
             field: 'title',
             headerName: 'Заголовок',
-            minWidth: 800
-        },
-        {
-            field: 'actions',
-            headerName: 'Действия',
-            renderCell: (params) => {
-                const test: UserTest = params.row;
-
-                return (
-                    <Box>
-                        <IconButton>
-                            <Actions test={test}/>
-                        </IconButton>
-                    </Box>
-                );
-            },
-            sortable: false,
-            disableColumnMenu: true,
+            minWidth: 800,
         },
     ];
 
     return (
         <Box>
-            <Box display="flex" sx={{mb: 2}} justifyContent="flex-start">
+            <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
                 <Button
-                    sx={{mr: 2}}
+                    sx={{ mr: 2 }}
                     variant="outlined"
                     onClick={() => navigate("/tests/pass")}
                 >
                     Пройти выбранное
                 </Button>
-
             </Box>
-            <DataGrid
-                rows={tests}
+            <GenericTableActions<UserTest>
+                data={tests}
                 columns={columns}
-                initialState={{
-                    pagination: {
-                        paginationModel: {page: 0, pageSize: 10},
-                    },
-                }}
-                onRowSelectionModelChange={(ids) => {
-                    setTestIdsToPass(ids as number[]);
-                }}
-                pageSizeOptions={[5, 10, 15]}
-                checkboxSelection
-                disableRowSelectionOnClick
+                actions={(test) => getActions(
+                    test,
+                    navigate,
+                    setDeleteTestFlag,
+                    setTestIdsToPass,
+                    selectTest,
+                    toggleModelOpen
+                )}
+                rowIdGetter={(row) => row.id}
+                onSelectionModelChange={setTestIdsToPass}
             />
-
+            <ConfirmationDialog
+                open={deleteTestFlag}
+                onClose={() => setDeleteTestFlag(false)}
+                onConfirm={() => handleConfirmDelete(selectedTestId)}
+                title="Подтверждение удаления теста"
+                content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалены"
+            />
+            <Dialog open={openExportDialog} onClose={toggleModelOpen}>
+                <ExportModal test={selectedTest} />
+            </Dialog>
         </Box>
-
-
     );
 };

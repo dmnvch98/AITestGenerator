@@ -1,5 +1,6 @@
 import {create} from "zustand";
 import ExportService from "../../services/ExportService";
+import {UserTest} from "./testStore";
 
 export interface ExportTestRequestDto {
     exportFormat: string;
@@ -32,7 +33,7 @@ export interface ExportStore {
     setSelectedTestId: (id: number) => void,
     selectedTestTitle: string,
     setSelectedTestTitle: (title: string) => void;
-    exportTest: () => void;
+    exportTest: (test: UserTest) => void;
 }
 
 export const useExportStore = create<ExportStore>((set, get) => ({
@@ -56,7 +57,7 @@ export const useExportStore = create<ExportStore>((set, get) => ({
     setSelectedTestId: (testId: number) => set({selectedTestId: testId}),
     selectedTestTitle: "",
     setSelectedTestTitle: (testTitle: string) => set({selectedTestTitle: testTitle}),
-    exportTest: async () => {
+    exportTest: async (test: UserTest) => {
         const dto: ExportTestRequestDto = {
             exportFormat: get().exportFormat,
             filePath: get().filePath,
@@ -66,6 +67,6 @@ export const useExportStore = create<ExportStore>((set, get) => ({
             optionTextLabel: get().optionTextLabel,
             isCorrectLabel: get().isCorrectLabel,
         }
-        await ExportService.exportTest(dto, get().selectedTestId, get().selectedTestTitle)
+        await ExportService.exportTest(dto, test.id, test.title)
     }
 }));

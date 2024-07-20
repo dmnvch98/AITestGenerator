@@ -11,7 +11,7 @@ import java.net.URL;
 import java.util.List;
 
 @Slf4j
-public class WordExtractor implements FileExtractor {
+public class DocxExtractor implements FileExtractor {
 
     @Override
     public String extract(final URL fileUrl) {
@@ -25,7 +25,7 @@ public class WordExtractor implements FileExtractor {
                 text.append(para.getText()).append("\n");
             }
         } catch (IOException e) {
-            log.error("Error when parsing Word document", e);
+            log.error("Error when parsing .docx document. File url: [{}]", fileUrl.getPath(), e);
         }
 
         return Utils.removeNewLines(text.toString());

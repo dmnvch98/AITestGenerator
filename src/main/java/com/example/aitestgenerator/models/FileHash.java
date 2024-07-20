@@ -1,8 +1,10 @@
 package com.example.aitestgenerator.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +35,8 @@ public class FileHash {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-//    @OneToMany(mappedBy = "text", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<TestGeneratingHistory> generatingHistories;
+    @OneToMany(mappedBy = "fileHash", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<TestGeneratingHistory> generatingHistories;
 
 }
