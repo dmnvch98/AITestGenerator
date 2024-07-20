@@ -3,7 +3,6 @@ package com.example.aitestgenerator.facades;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
 import com.example.aitestgenerator.extractors.FileExtractorFabric;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
-import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.*;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.example.aitestgenerator.services.*;
@@ -27,7 +26,6 @@ public class TestFacade {
     private final TestGenerationService testGenerationService;
     private final TextService textService;
     private final TestGeneratingHistoryService historyService;
-    private final TestGeneratingHistoryHolder historyHolder;
     private final CommandService commandService;
     private final FileHashService fileHashService;
     private final StorageClient storageClient;
@@ -83,10 +81,10 @@ public class TestFacade {
     }
 
     public void generateTestReceiveMessage(final GenerateTestMessage message) {
-        final TestGeneratingHistory history = historyService.findByIdAndUserId(message.getHistoryId());
+        final TestGeneratingHistory history = historyService.findById(message.getHistoryId());
         history.setGenerationStatus(GenerationStatus.IN_PROCESS);
+        history.setMessageReceipt(message.getReceipt());
         historyService.save(history);
-        historyHolder.setHistory(history);
 
         final GenerateTestRequest request = GenerateTestRequest.builder()
                 .content(getContent(history))

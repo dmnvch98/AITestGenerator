@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.models;
 
-import com.example.aitestgenerator.models.enums.FailReason;
+import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,5 +35,15 @@ public class TestGeneratingHistory {
     private Long outputTokensCount;
     @Enumerated(EnumType.STRING)
     private GenerationStatus generationStatus;
-    private FailReason failReason;
+    @Enumerated(EnumType.STRING)
+    private GenerationFailReason failReason;
+    private String messageReceipt;
+
+    @Override
+    public String toString() {
+        return "TestGeneratingHistory{" +
+                "failReason=" + failReason +
+                ", id=" + id +
+                '}';
+    }
 }

@@ -1,11 +1,6 @@
 package com.example.aitestgenerator.exceptionHandler;
 
 import com.example.aitestgenerator.exceptions.*;
-import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
-import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.FailReason;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
-import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,9 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import retrofit2.HttpException;
 
-import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -32,9 +25,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
-
-    private final TestGeneratingHistoryHolder historyHolder;
-    private final TestGeneratingHistoryService historyService;
 
     protected ResponseEntity<Object> handleExceptionInternal(
         final Exception exception,
@@ -54,24 +44,6 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleException(ResponseStatusException e) {
         log.warn(e.getMessage());
         return ResponseEntity.status(e.getStatusCode()).body(createError(e.getStatusCode(), e.getReason()));
-    }
-
-    @ExceptionHandler(SocketTimeoutException.class)
-    public ResponseEntity<ApiErrorResponse> handleSocketTimeoutException(SocketTimeoutException e) {
-        TestGeneratingHistory history = historyHolder.getHistory();
-        log.error("SocketTimeoutException is thrown when generation test for text. User id: {}, Text id: {}, ",
-            history.getUser().getId(), history.getText().getId());
-        return handleException(e, FailReason.TIMEOUT_EXCEPTION, history);
-    }
-
-    @ExceptionHandler(HttpException.class)
-    public ResponseEntity<ApiErrorResponse> handleHttpException(HttpException e) {
-        TestGeneratingHistory history = historyHolder.getHistory();
-
-        log.error("HttpException is thrown when generation test for text. User id: {}, Text id: {}, ",
-            history.getUser().getId(), history.getText().getId());
-
-        return handleException(e, FailReason.HTTP_EXCEPTION, history);
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
@@ -99,22 +71,6 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.NOT_FOUND,
             request
         );
-    }
-
-    private ResponseEntity<ApiErrorResponse> handleException(Exception e, FailReason failReason, TestGeneratingHistory history) {
-        history.setFailReason(failReason);
-        updateTestGeneratingHistory(history);
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(createError(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Some error occurred when generating test. Please contact administrator or try later"));
-    }
-
-    private void updateTestGeneratingHistory(TestGeneratingHistory history) {
-        history.setGenerationEnd(LocalDateTime.now());
-        history.setGenerationStatus(GenerationStatus.FAILED);
-        historyService.save(history);
-        historyHolder.clearHistory();
     }
 
     private ApiErrorResponse createError(HttpStatusCode httpStatus, String message) {
