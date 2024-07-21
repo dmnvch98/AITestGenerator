@@ -1,6 +1,6 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import { Box, Button, Dialog } from "@mui/material";
+import { Box, Dialog } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { UserTest, useTestStore } from "../../store/tests/testStore";
 import { usePassTestStore } from "../../store/tests/passTestStore";
@@ -46,6 +46,10 @@ const getActions = (
         onClick: () => handleView(navigate, test),
     },
     {
+        label: 'Редактировать',
+        onClick: () => navigate(`/tests/${test.id}/edit`)
+    },
+    {
         label: 'Удалить',
         onClick: () => handleDelete(selectTest, setDeleteTestFlag, test),
     },
@@ -62,7 +66,7 @@ const getActions = (
 export const TestTable = () => {
     const { tests, deleteTest, deleteTestFlag, setDeleteTestFlag, selectTest, selectedTest } = useTestStore();
     const { setTestIdsToPass } = usePassTestStore();
-    const { toggleModelOpen, modalOpen: openExportDialog, selectedTestId } = useExportStore();
+    const { toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
     const navigate = useNavigate();
 
     const handleConfirmDelete = (id: number) => {

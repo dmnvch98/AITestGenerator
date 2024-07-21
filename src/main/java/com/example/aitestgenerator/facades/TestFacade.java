@@ -35,8 +35,9 @@ public class TestFacade {
 
     private final UserService userService;
 
-    public Test save(Test test, Long userId) {
+    public Test save(final Test test, final Long userId) {
         return testService.saveTest(prepareTestToSave(test, userId));
+
     }
 
     public void generateTestByTextSendMessage(final Long userId, final Long textId) {
@@ -120,7 +121,7 @@ public class TestFacade {
     }
 
     public Test updateTest(Test updatedTest, Long userId) {
-        return testService.update(updatedTest, userId);
+        return testService.updateTest(updatedTest, userId);
     }
 
     private Test prepareTestToSave(final Test test, final Long userId) {

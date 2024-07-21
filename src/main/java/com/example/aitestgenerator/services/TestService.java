@@ -40,37 +40,24 @@ public class TestService {
         return testRepository.findAllByIdInAndUserId(testIds, userId);
     }
 
-    public Test update(Test updatedTest, Long userId) {
-        log.debug("Updating test by user. Test ID: {}. User ID: {}", updatedTest.getId(), userId);
+    public Test updateTest(final Test updatedTest, final Long userId) {
+        Test existingTest = testRepository.findTestByIdAndUserId(updatedTest.getId(), userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Test not found"));
 
-        Test foundTest = findAllByIdAndUserIdOrThrow(updatedTest.getId(), userId);
-        foundTest.setTitle(updatedTest.getTitle());
+        existingTest.setTitle(updatedTest.getTitle());
 
-        foundTest.getQuestions().forEach(foundQuestion -> {
-            Question updatedQuestion = updatedTest.getQuestions().stream()
-                .filter(q -> q.getId().equals(foundQuestion.getId()))
-                .findFirst()
-                .orElse(null);
+        existingTest.getQuestions().clear();
+        testRepository.save(existingTest);  // Сохранение промежуточного состояния для удаления связанных сущностей
 
-            if (updatedQuestion != null) {
-                foundQuestion.setQuestionText(updatedQuestion.getQuestionText());
-
-                foundQuestion.getAnswerOptions().forEach(foundAnswerOption -> {
-                    AnswerOption updatedAnswerOption = updatedQuestion.getAnswerOptions().stream()
-                        .filter(ao -> ao.getId().equals(foundAnswerOption.getId()))
-                        .findFirst()
-                        .orElse(null);
-
-                    if (updatedAnswerOption != null) {
-                        foundAnswerOption.setOptionText(updatedAnswerOption.getOptionText());
-                        foundAnswerOption.setIsCorrect(updatedAnswerOption.getIsCorrect());
-                    }
-                });
+        for (Question updatedQuestion : updatedTest.getQuestions()) {
+            updatedQuestion.setTest(existingTest);
+            for (AnswerOption updatedOption : updatedQuestion.getAnswerOptions()) {
+                updatedOption.setQuestion(updatedQuestion);
             }
-        });
+            existingTest.getQuestions().add(updatedQuestion);
+        }
 
-        foundTest.setUserId(userId);
-        return testRepository.save(foundTest);
+        return testRepository.save(existingTest);
     }
 
 }

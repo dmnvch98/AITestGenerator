@@ -10,13 +10,13 @@ export interface UserTest {
 }
 
 export interface Question {
-    id: number,
+    id: number | undefined,
     questionText: string,
     answerOptions: AnswerOption[]
 }
 
 export interface AnswerOption {
-    id: number,
+    id: number | undefined,
     optionText: string,
     isCorrect: boolean
 }
@@ -29,6 +29,7 @@ export interface TestStore {
     tests: UserTest[],
     selectedTest: UserTest | undefined,
     selectTest: (userTest: UserTest) => void,
+    clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
     generateTest: (textId: number) => void,
@@ -50,6 +51,7 @@ export interface TestStore {
     setAlert: (alert: AlertMessage[]) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
+    updateTest: (test: UserTest) => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -120,4 +122,17 @@ export const useTestStore = create<TestStore>((set, get) => ({
     deleteAlert: (alertToDelete) => set((state) => ({
         alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
     })),
+    updateTest: async (test) => {
+        const { setAlert, getAllUserTests } = get();
+        const response = await TestService.updateTest(test);
+        if (response) {
+            getAllUserTests();
+            setAlert([{ id: Date.now(), message: 'Тест успешно обновлен', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении теста', severity: 'error' }])
+        }
+    },
+    clearSelectedTest: () => {
+        set({selectedTest: undefined});
+    }
 }))

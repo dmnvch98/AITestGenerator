@@ -40,11 +40,11 @@ export const QuestionAnswersPage = ({
     };
 
     const getOptionColor = (option: AnswerOption) => {
-        if (!answered && isOptionSelected(option.id)) {
+        if (!answered && isOptionSelected(option.id as number)) {
             return appColors.primary.default
         } else if (answered && option.isCorrect) {
             return appColors.primary.main
-        } else if (answered && isOptionSelected(option.id) && !option.isCorrect) {
+        } else if (answered && isOptionSelected(option.id as number) && !option.isCorrect) {
             return appColors.error.main
         }
         return 'transparent';
@@ -81,7 +81,7 @@ export const QuestionAnswersPage = ({
 
         return (
             correctOptionIds.length === selectedOptions.length &&
-            correctOptionIds.every(id => selectedOptions.includes(id))
+            correctOptionIds.every(id => selectedOptions.includes(id as number))
         );
     };
 
@@ -107,7 +107,7 @@ export const QuestionAnswersPage = ({
                         border: `2px solid ${getOptionColor(option)}`
                     }}>
                         <Paper
-                            onClick={() => handleOptionSelect(option.id)}
+                            onClick={() => handleOptionSelect(option.id as number)}
                             sx={{
                                 p: 3,
                                 cursor: 'pointer',

@@ -54,7 +54,7 @@ public class TestController {
         testFacade.deleteTest(testId, userId);
     }
 
-    @PatchMapping
+    @PutMapping
     public Test updateTest(Authentication authentication, @RequestBody Test updatedTest) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.updateTest(updatedTest, userId);
