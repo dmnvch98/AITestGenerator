@@ -40,6 +40,16 @@ class FileService {
             console.log(error.message);
         }
     }
+
+    deleteFilesInBatch = async (hashesFileNames: string[]) => {
+        try {
+            const response = await customAxios.post('/api/v1/files/delete', hashesFileNames);
+            return response.status;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
 }
 
 export default new FileService();

@@ -61,14 +61,14 @@ public class AnswerGenerator extends Generator<Test> {
 
     private Test processResult(final TestGeneratingHistory history, final ChatCompletionResult result)
         throws JsonProcessingException {
-        Test testResult;
-        try {
-            testResult = parseTest(result, history);
-        } catch (JsonProcessingException e) {
-            log.error("An error occurred when parsing test. UserId: {}, Error: {}",
-                history.getUser().getId(), e.getMessage());
-            throw e;
-        }
+//        Test testResult;
+//        try {
+         final Test testResult = parseTest(result, history);
+//        } catch (JsonProcessingException e) {
+//            log.error("An error occurred when parsing test. UserId: {}, Error: {}",
+//                history.getUser().getId(), e.getMessage());
+//            throw e;
+//        }
         log.info("Test generation completed. User id: {}", history.getUser().getId());
 
         return testResult;

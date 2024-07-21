@@ -1,7 +1,6 @@
 import {create} from "zustand";
 import TestService from "../../services/TestService";
 import {AlertMessage} from "../types";
-import {FileDto} from "../fileStore";
 
 export interface UserTest {
     id: number,
@@ -84,10 +83,12 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
+        const { setAlert, getAllUserTests } = get();
         if (response) {
-            const { setAlert, getAllUserTests } = get();
             getAllUserTests();
             setAlert([{ id: Date.now(), message: 'Тест успешно удален', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении теста', severity: 'error' }])
         }
     },
     getUserTestsByIdIn: async (ids: number[]) => {

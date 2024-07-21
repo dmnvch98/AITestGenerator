@@ -1,10 +1,11 @@
 import useFileStore from "../../store/fileStore";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import Typography from "@mui/material/Typography";
 import {Alert, Box, Button, CircularProgress, Snackbar} from "@mui/material";
 import {FileUploadModal} from "../../components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 
 const FilesContent = () => {
     const {
@@ -16,8 +17,12 @@ const FilesContent = () => {
         uploadModalOpen,
         setUploadModalOpen,
         isLoading,
-        setIsLoading
+        setIsLoading,
+        deleteFilesInBatch,
+        selectedFileHashes
     } = useFileStore();
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         getFiles();
@@ -30,6 +35,19 @@ const FilesContent = () => {
     const handleModalClose = () => {
         setUploadModalOpen(false);
         clearFiles();
+    }
+
+    const openDeleteModal = () => {
+        setDeleteModalOpen(true);
+    }
+
+    const handleDelete = async () => {
+        deleteFilesInBatch();
+        setDeleteModalOpen(false);
+    }
+
+    const isDeleteButtonDisabled = () => {
+        return selectedFileHashes.length == 0;
     }
 
     return(
@@ -46,6 +64,16 @@ const FilesContent = () => {
                     disabled={isLoading}
                 >
                     Добавить файлы
+                </Button>
+
+                <Button
+                    sx={{ mr: 2 }}
+                    variant="outlined"
+                    color="error"
+                    onClick={openDeleteModal}
+                    disabled={isDeleteButtonDisabled()}
+                >
+                    Удалить выбранное
                 </Button>
             </Box>
 
@@ -80,6 +108,14 @@ const FilesContent = () => {
                     </Box>
                 </Alert>
             </Snackbar>
+
+            <ConfirmationDialog
+                open={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+                title="Подтверждение пакетного удаления"
+                content="Вы уверены что хотите удалить выбранные файлы? Все связанные с ними сущности будут удалениы"
+            />
         </>
     );
 }

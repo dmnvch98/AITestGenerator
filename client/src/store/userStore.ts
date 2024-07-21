@@ -10,6 +10,7 @@ export interface TestGenHistory {
     generationStart: Date,
     generationEnd: Date,
     generationStatus: string
+    fileName: string
 }
 
 export interface UserStore {
@@ -17,7 +18,7 @@ export interface UserStore {
     getTestGenHistory: () => void;
 }
 
-export const useUserStore = create<UserStore>((set: any, get: any) => ({
+export const useUserStore = create<UserStore>((set: any) => ({
     testGenHistory: [],
     getTestGenHistory: async () => {
         const response = await UserService.getTestGenerationHistory();

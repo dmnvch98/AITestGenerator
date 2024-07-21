@@ -53,6 +53,9 @@ interface FileStore {
     uploadModalOpen: boolean,
     setUploadModalOpen: (flag: boolean) => void;
     setIsLoading: (flag: boolean) => void;
+    selectedFileHashes: string[];
+    setSelectedFileHashes: (fileIds: number[]) => void;
+    deleteFilesInBatch: () => void;
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
@@ -62,6 +65,7 @@ const useFileStore = create<FileStore>((set, get) => ({
     isLoading: false,
     error: null,
     uploadModalOpen: false,
+    selectedFileHashes: [],
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
     removeFile: (index) => set((state) => ({filesToUpload: state.filesToUpload.filter((_, i) => i !== index)})),
@@ -122,6 +126,22 @@ const useFileStore = create<FileStore>((set, get) => ({
     setIsLoading: (flag) => {
         set({isLoading: flag})
     },
+    setSelectedFileHashes: (fileIds) => {
+        const { fileDtos } = get();
+        const hashedFileNames: string[] = fileDtos
+            .filter(dto => fileIds.includes(dto.id))
+            .map(dto => dto.hashedFilename);
+        set({selectedFileHashes: hashedFileNames});
+    },
+    deleteFilesInBatch: async () => {
+        const { selectedFileHashes, setAlert, getFiles} = get();
+        const response = await FileService.deleteFilesInBatch(selectedFileHashes);
+        response === 204
+            ? setAlert([{ id: Date.now(), message: `Файлы успешно удалены`, severity: 'success' }])
+            : setAlert([{ id: Date.now(), message: `Ошибка при удалении файлов`, severity: 'error' }]);
+        set({selectedFileHashes: []});
+        getFiles();
+    }
 }));
 
 export default useFileStore;

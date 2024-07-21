@@ -44,12 +44,12 @@ const getActions = (
 ];
 
 export const FilesTable = () => {
-    const { fileDtos, deleteFile, setAlert } = useFileStore();
+    const { fileDtos, deleteFile, setAlert, setSelectedFileHashes } = useFileStore();
     const { generateTestByFile } = useTestStore();
 
     const columns: GridColDef[] = [
         {
-            field: 'title',
+            field: 'originalFilename',
             minWidth: 600,
             headerName: 'Заголовок',
             renderCell: (params) => {
@@ -60,10 +60,10 @@ export const FilesTable = () => {
                         <Typography sx={{ ml: 1 }}>{file.originalFilename}</Typography>
                     </Box>
                 );
-            },
+            }
         },
         {
-            field: 'test',
+            field: 'uploadTime',
             minWidth: 300,
             headerName: 'Дата загрузки',
             renderCell: (params) => {
@@ -79,7 +79,7 @@ export const FilesTable = () => {
             columns={columns}
             actions={(file) => getActions(file, setAlert, deleteFile, generateTestByFile)}
             rowIdGetter={(row) => row.id as number}
-            onSelectionModelChange={() => { }}
+            onSelectionModelChange={setSelectedFileHashes}
         />
     );
 };

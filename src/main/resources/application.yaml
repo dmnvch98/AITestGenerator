@@ -34,7 +34,7 @@ aws:
   url: http://localhost:4566
   sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
 retry:
-  attempt: 3
+  attempt: 2
 
 ---
 
