@@ -18,7 +18,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useFileStore, { AlertMessage } from "../store/fileStore";
+import useFileStore from "../store/fileStore";
+import {AlertMessage} from "../store/types";
 
 interface FileUploadModalProps {
     open: boolean;

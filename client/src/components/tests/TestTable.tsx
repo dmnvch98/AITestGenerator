@@ -84,15 +84,6 @@ export const TestTable = () => {
 
     return (
         <Box>
-            <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
-                <Button
-                    sx={{ mr: 2 }}
-                    variant="outlined"
-                    onClick={() => navigate("/tests/pass")}
-                >
-                    Пройти выбранное
-                </Button>
-            </Box>
             <GenericTableActions<UserTest>
                 data={tests}
                 columns={columns}
@@ -110,7 +101,7 @@ export const TestTable = () => {
             <ConfirmationDialog
                 open={deleteTestFlag}
                 onClose={() => setDeleteTestFlag(false)}
-                onConfirm={() => handleConfirmDelete(selectedTestId)}
+                onConfirm={() => handleConfirmDelete(selectedTest?.id as number)}
                 title="Подтверждение удаления теста"
                 content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалены"
             />

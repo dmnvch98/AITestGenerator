@@ -13,5 +13,6 @@ public interface TextGenerationHistoryConverter {
     @Mapping(source = "text.title", target = "textTitle")
     @Mapping(source = "text.id", target = "textId")
     @Mapping(source = "generationStatus.text", target = "generationStatus")
-    TextGenerationHistoryDto historyToDto(TestGeneratingHistory history);
+    @Mapping(source = "fileHash.originalFilename", target = "fileName")
+    TextGenerationHistoryDto historyToDto(final TestGeneratingHistory history);
 }

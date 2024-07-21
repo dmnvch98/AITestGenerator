@@ -1,12 +1,13 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
 import { GenericTableActions } from "../main/GenericTableActions";
-import useFileStore, {AlertMessage, FileDto} from "../../store/fileStore";
+import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../utils/DateTimeUtils";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Box, Typography } from '@mui/material';
 import {useTestStore} from "../../store/tests/testStore";
+import {AlertMessage} from "../../store/types";
 
 const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase();
@@ -43,12 +44,12 @@ const getActions = (
 ];
 
 export const FilesTable = () => {
-    const { fileDtos, deleteFile, setAlert } = useFileStore();
+    const { fileDtos, deleteFile, setAlert, setSelectedFileHashes } = useFileStore();
     const { generateTestByFile } = useTestStore();
 
     const columns: GridColDef[] = [
         {
-            field: 'title',
+            field: 'originalFilename',
             minWidth: 600,
             headerName: 'Заголовок',
             renderCell: (params) => {
@@ -59,10 +60,10 @@ export const FilesTable = () => {
                         <Typography sx={{ ml: 1 }}>{file.originalFilename}</Typography>
                     </Box>
                 );
-            },
+            }
         },
         {
-            field: 'test',
+            field: 'uploadTime',
             minWidth: 300,
             headerName: 'Дата загрузки',
             renderCell: (params) => {
@@ -78,7 +79,7 @@ export const FilesTable = () => {
             columns={columns}
             actions={(file) => getActions(file, setAlert, deleteFile, generateTestByFile)}
             rowIdGetter={(row) => row.id as number}
-            onSelectionModelChange={() => { }}
+            onSelectionModelChange={setSelectedFileHashes}
         />
     );
 };

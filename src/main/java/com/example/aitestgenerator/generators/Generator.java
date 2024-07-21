@@ -34,14 +34,10 @@ public abstract class Generator<T> {
                 .map(ChatMessage::getContent)
                 .collect(Collectors.joining()));
 
-        int maxTokens = 16000 - tokensCount;
-
         return ChatCompletionRequest.builder()
-                .model("gpt-3.5-turbo-16k-0613")
+                .model("gpt-4o")
                 .messages(chatMessages)
-                .maxTokens(maxTokens)
-                .temperature(1.0)
-                .topP(1.0)
+                .temperature(0.2)
                 .build();
     }
 

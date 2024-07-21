@@ -2,7 +2,6 @@ package com.example.aitestgenerator.dto.tests;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Value;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +14,9 @@ public class TextGenerationHistoryDto {
     private long testId;
     private String testTitle;
     private String textTitle;
-    private long textId;
+    private Long textId;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
     private String generationStatus;
+    private String fileName;
 }

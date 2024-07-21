@@ -3,13 +3,13 @@ package com.example.aitestgenerator.facades;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
 import com.example.aitestgenerator.extractors.FileExtractorFabric;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
-import com.example.aitestgenerator.holder.TestGeneratingHistoryHolder;
 import com.example.aitestgenerator.models.*;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.example.aitestgenerator.services.*;
 import com.example.aitestgenerator.services.aws.StorageClient;
 import com.example.aitestgenerator.utils.Utils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -21,13 +21,13 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TestFacade {
 
     private final TestService testService;
     private final TestGenerationService testGenerationService;
     private final TextService textService;
     private final TestGeneratingHistoryService historyService;
-    private final TestGeneratingHistoryHolder historyHolder;
     private final CommandService commandService;
     private final FileHashService fileHashService;
     private final StorageClient storageClient;
@@ -83,10 +83,10 @@ public class TestFacade {
     }
 
     public void generateTestReceiveMessage(final GenerateTestMessage message) {
-        final TestGeneratingHistory history = historyService.findByIdAndUserId(message.getHistoryId());
+        final TestGeneratingHistory history = historyService.findById(message.getHistoryId());
         history.setGenerationStatus(GenerationStatus.IN_PROCESS);
+        history.setMessageReceipt(message.getReceipt());
         historyService.save(history);
-        historyHolder.setHistory(history);
 
         final GenerateTestRequest request = GenerateTestRequest.builder()
                 .content(getContent(history))
@@ -102,7 +102,8 @@ public class TestFacade {
         historyService.save(history);
     }
 
-    public void deleteTest(Long testId, Long userId) {
+    public void deleteTest(final Long testId, final Long userId) {
+        log.debug("Deleting test. Test id: {}, User Id: {}", testId, userId);
         testService.findAllByIdAndUserIdOrThrow(testId, userId);
         testService.deleteTest(testId);
     }

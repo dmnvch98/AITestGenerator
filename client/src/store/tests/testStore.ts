@@ -1,5 +1,6 @@
 import {create} from "zustand";
 import TestService from "../../services/TestService";
+import {AlertMessage} from "../types";
 
 export interface UserTest {
     id: number,
@@ -30,8 +31,6 @@ export interface TestStore {
     selectTest: (userTest: UserTest) => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    testDeletedFlag: boolean,
-    toggleTestDeletedFlag: () => void,
     generateTest: (textId: number) => void,
     generateTestByFile: (hashedFileName: string) => Promise<boolean>,
     getAllUserTests: () => void,
@@ -47,19 +46,23 @@ export interface TestStore {
     setSelectedTextId: (id: number) => void;
     testGenerationStarted: boolean;
     setTestGenerationStarted: (flag: boolean) => void;
+    alerts: AlertMessage[],
+    setAlert: (alert: AlertMessage[]) => void;
+    clearAlerts: () => void;
+    deleteAlert: (alert: AlertMessage) => void;
 }
 
-export const useTestStore = create<TestStore>((set: any, get: any) => ({
+export const useTestStore = create<TestStore>((set, get) => ({
     tests: [],
     selectedTest: undefined,
     generateTestFlag: false,
     maxQuestionsNumber: "",
     generateTestValidationErrorFlag: false,
     selectedTextId: undefined,
+    alerts: [],
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest})
     },
-    testDeletedFlag: false,
     generateTest: async (textId: number) => {
         let dto: GenerateTestRequestDto = {
             textId: textId
@@ -74,19 +77,18 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
         const response = await TestService.generateTestByFile(hashedFileName);
         return response as boolean;
     },
-
-    toggleTestDeletedFlag: () => {
-        set({testDeletedFlag: !get().testDeletedFlag})
-    },
     getAllUserTests: async () => {
         const response = await TestService.getUserTests()
         set({tests: response})
     },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
+        const { setAlert, getAllUserTests } = get();
         if (response) {
-            get().getAllUserTests();
-            set({testDeletedFlag: true})
+            getAllUserTests();
+            setAlert([{ id: Date.now(), message: 'Тест успешно удален', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении теста', severity: 'error' }])
         }
     },
     getUserTestsByIdIn: async (ids: number[]) => {
@@ -112,5 +114,10 @@ export const useTestStore = create<TestStore>((set: any, get: any) => ({
     deleteTestFlag: false,
     setDeleteTestFlag: (flag: boolean) => {
         set({deleteTestFlag: flag});
-    }
+    },
+    setAlert: (alerts) => set((state) => ({alerts: [...state.alerts, ...alerts]})),
+    clearAlerts: () => set({alerts: []}),
+    deleteAlert: (alertToDelete) => set((state) => ({
+        alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
+    })),
 }))

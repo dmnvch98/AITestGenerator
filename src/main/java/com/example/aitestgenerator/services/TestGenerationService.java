@@ -6,7 +6,7 @@ import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.models.Test;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class TestGenerationService {
 
     private final QuestionGenerator questionGenerator;
@@ -25,14 +26,28 @@ public class TestGenerationService {
         return generateAnswers(request);
     }
 
-    @SneakyThrows
     public List<ChatMessage> generateQuestions(final GenerateTestRequest request) {
-        return retryTemplate.execute(arg0 -> questionGenerator.generateData(request));
+        try {
+            return retryTemplate.execute(context -> {
+                context.setAttribute("historyId", request.getHistory().getId());
+                return questionGenerator.generateData(request);
+            });
+        } catch (final Exception e) {
+            throw new RuntimeException("Generation of questions for history id " +  request.getHistory().getId() +
+                    " failed");
+        }
     }
 
-    @SneakyThrows
     public Test generateAnswers(final GenerateTestRequest request) {
-        return retryTemplate.execute(arg0 -> answerGenerator.generateData(request));
+        try {
+            return retryTemplate.execute(context -> {
+                context.setAttribute("historyId", request.getHistory().getId());
+                return answerGenerator.generateData(request);
+            });
+        } catch (final Exception e) {
+            throw new RuntimeException("Generation of answers for history id " +  request.getHistory().getId() +
+                    " failed");
+        }
     }
 
 }

@@ -18,22 +18,19 @@ public class TestService {
     private final TestRepository testRepository;
 
     public Test saveTest(Test test) {
-        log.info("Saving test. Test title: {}. Text id: {}, User id: {} ", test.getTitle(), test.getTextId(), test.getUserId());
+        log.debug("Saving test. Test title: {}. Text id: {}, User id: {} ", test.getTitle(), test.getTextId(), test.getUserId());
         return testRepository.save(test);
     }
 
     public List<Test> findAllByUserId(Long userId) {
-        log.info("Finding all tests for user. User ID: {}", userId);
         return testRepository.findAllByUserId(userId);
     }
 
     public void deleteTest(Long testId) {
-        log.info("Deleting test. Test ID: {}", testId);
         testRepository.deleteTestById(testId);
     }
 
     public Test findAllByIdAndUserIdOrThrow(Long testId, Long userId) {
-        log.info("Finding test by ID {} for user. User Id: {}", testId, userId);
         return testRepository.findTestByIdAndUserId(testId, userId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, String.format("Test with Id %d not found for user with id: %d", testId, userId)));
@@ -44,7 +41,7 @@ public class TestService {
     }
 
     public Test update(Test updatedTest, Long userId) {
-        log.info("Updating test by user. Test ID: {}. User ID: {}", updatedTest.getId(), userId);
+        log.debug("Updating test by user. Test ID: {}. User ID: {}", updatedTest.getId(), userId);
 
         Test foundTest = findAllByIdAndUserIdOrThrow(updatedTest.getId(), userId);
         foundTest.setTitle(updatedTest.getTitle());

@@ -20,31 +20,29 @@ public class TextService {
     private final TextRepository textRepository;
 
     public Text save(Text text) {
-        log.info("Saving text. Text title: {}. Text length : {}", text.getTitle(),
+        log.debug("Saving text. Text title: {}. Text length : {}", text.getTitle(),
             text.getContent().length());
 
         return textRepository.save(text);
     }
 
     public List<Text> findAllByUserId(Long userId) {
-        log.info("Finding all texts for user. User ID: {}", userId);
-            return textRepository.findAllByUserId(userId);
+        return textRepository.findAllByUserId(userId);
     }
 
     public List<Text> findAllByIdInAndUserId(List<Long> ids, Long userId) {
-        log.info("Finding all texts by text Ids and user id. User ID: {} . Chapter IDs: {}", userId, ids);
         return getUserTextsOrThrow(ids, userId);
     }
 
     public void delete(Long id, Long userId) {
-        log.info("deleting text. Text id: {}. User id: {}", id, userId);
+        log.debug("Deleting text. Text id: {}. User id: {}", id, userId);
         Text existingText = findAllByIdAndUserIdOrThrow(id, userId);
 
         textRepository.delete(existingText);
     }
 
     public Text update(final Text text, final Long userId) {
-        log.info("Updating text.Text ID: {}", text.getId());
+        log.debug("Updating text.Text ID: {}", text.getId());
 
         findAllByIdAndUserIdOrThrow(text.getId(), userId);
 

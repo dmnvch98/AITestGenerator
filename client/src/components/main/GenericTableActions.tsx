@@ -95,6 +95,11 @@ export const GenericTableActions = <T, >({
                 onRowSelectionModelChange={(ids) => {
                     onSelectionModelChange && onSelectionModelChange(ids as number[]);
                 }}
+                initialState={{
+                    pagination: {
+                        paginationModel: { page: 0, pageSize: 5 },
+                    },
+                }}
             />
         </Box>
     );

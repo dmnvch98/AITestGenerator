@@ -24,7 +24,7 @@ public class UserFacade {
     private final TestGeneratingHistoryService testGeneratingHistoryService;
     private final TextGenerationHistoryConverter textGenerationHistoryConverter;
 
-    public CreateUserResponseDto save(CreateUserRequestDto userDto) {
+    public CreateUserResponseDto save(final CreateUserRequestDto userDto) {
         User user = userConverter.createUserDtoToUser(userDto);
         String hashedPassword = passwordConfig.passwordEncoder().encode(userDto.getPassword());
         user.setPassword(hashedPassword);
@@ -32,7 +32,7 @@ public class UserFacade {
         return userConverter.userToCreateUserResponseDto(user);
     }
 
-    public List<TextGenerationHistoryDto> getTestGenerationHistory(Long userId) {
+    public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId) {
         return testGeneratingHistoryService.getAllByUserId(userId)
             .stream()
             .map(textGenerationHistoryConverter::historyToDto)

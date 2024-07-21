@@ -45,7 +45,7 @@ public class UserService {
     }
 
     public User findUserById(Long id) {
-        log.info("Searching user by id: {}", id);
+        log.debug("Searching user by id: {}", id);
         return userRepository.findUserById(id);
     }
 }
