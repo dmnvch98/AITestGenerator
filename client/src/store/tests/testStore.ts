@@ -4,7 +4,7 @@ import {AlertMessage} from "../types";
 
 export interface UserTest {
     id: number,
-    textId: number,
+    textId: number | undefined,
     title: string,
     questions: Question[]
 }

@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Question, AnswerOption } from "../../../store/tests/testStore";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, IconButton, TextField } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
 import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
 import ClearIcon from "@mui/icons-material/Clear";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { question: Question, onQuestionChange: (question: Question) => void, onDelete: () => void }) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
     const [expanded, setExpanded] = useState(false);
+
+    useEffect(() => {
+        setQuestionText(question.questionText);
+        setAnswerOptions(question.answerOptions);
+    }, [question]);
 
     const handleQuestionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuestionText(e.target.value);
@@ -18,7 +24,7 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { questio
 
     const handleAddAnswerOption = () => {
         const newOption: AnswerOption = {
-            id: answerOptions.length + 1,
+            id: answerOptions.length > 0 ? Math.max(...answerOptions.map(o => o.id || 0)) + 1 : 1,
             optionText: '',
             isCorrect: false
         };
@@ -60,6 +66,7 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { questio
                         <ExpandMoreIcon />
                     </IconButton>
                     <TextField
+                        multiline
                         fullWidth
                         variant="standard"
                         value={questionText}
@@ -81,9 +88,9 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { questio
                             onDelete={() => handleDeleteAnswerOption(answerOption.id as number)}
                         />
                     ))}
-                    <Button variant="outlined" onClick={handleAddAnswerOption}>
-                        Добавить вариант
-                    </Button>
+                    <IconButton onClick={handleAddAnswerOption} color="primary" >
+                        <AddCircleIcon sx={{ fontSize: 36 }} />
+                    </IconButton>
                 </Box>
             </AccordionDetails>
         </Accordion>

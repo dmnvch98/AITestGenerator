@@ -14,9 +14,8 @@ public interface TestRepository extends CrudRepository<Test, Long> {
 
     List<Test> findAllByTextId(Long textId);
 
-    List<Test> findAllByIdInAndUserId(List<Long> ids, Long userId);
+    List<Test> findAllByIdInAndUserIdOrderByIdDesc(List<Long> ids, Long userId);
 
-    List<Test> findAllByTextIdAndUserId(Long textId, Long userId);
     @Transactional
     void deleteTestById(Long id);
 }

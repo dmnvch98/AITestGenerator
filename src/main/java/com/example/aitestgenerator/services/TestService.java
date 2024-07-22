@@ -37,7 +37,7 @@ public class TestService {
     }
 
     public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
-        return testRepository.findAllByIdInAndUserId(testIds, userId);
+        return testRepository.findAllByIdInAndUserIdOrderByIdDesc(testIds, userId);
     }
 
     public Test updateTest(final Test updatedTest, final Long userId) {

@@ -1,11 +1,11 @@
-import {ListItem} from "@mui/material";
+import { ListItem } from "@mui/material";
 import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import {AnswerOption} from "../../../store/tests/testStore";
+import { AnswerOption } from "../../../store/tests/testStore";
 import Divider from "@mui/material/Divider";
 
-export const AnswerOptionView = ({answerOption}: { answerOption: AnswerOption }) => {
+export const AnswerOptionView = ({ answerOption, isLast }: { answerOption: AnswerOption, isLast: boolean }) => {
     const secondaryTextColor = answerOption.isCorrect ? '#006400' : '#f50057';
 
     const secondaryTextStyle = {
@@ -14,7 +14,7 @@ export const AnswerOptionView = ({answerOption}: { answerOption: AnswerOption })
 
     return (
         <List>
-            <ListItem>
+            <ListItem sx={{ pl: 4, pr: 4 }}>
                 <ListItemText
                     primary={answerOption.optionText}
                     secondary={
@@ -24,7 +24,7 @@ export const AnswerOptionView = ({answerOption}: { answerOption: AnswerOption })
                     }
                 />
             </ListItem>
-            <Divider/>
+            {!isLast && <Divider />}
         </List>
-    )
-}
+    );
+};
