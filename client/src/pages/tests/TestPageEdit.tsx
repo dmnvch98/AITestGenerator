@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import QuestionEdit from "../../components/tests/questions/QuestionEdit";
-import { Paper } from "@mui/material";
+import {Alert, Paper, Snackbar} from "@mui/material";
 
 const TestPageEditContent = () => {
     const { id } = useParams();
@@ -15,12 +15,13 @@ const TestPageEditContent = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [previousPath, setPreviousPath] = useState<string | null>(null);
+    const [invalidQuestions, setInvalidQuestions] = useState<{index: number, message: string}[]>([]);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     useEffect(() => {
         if (location.state?.from) {
             setPreviousPath(location.state.from);
         }
-        console.log(location)
     }, []);
 
     useEffect(() => {
@@ -90,16 +91,17 @@ const TestPageEditContent = () => {
     }
 
     const handleSave = () => {
-        if (localTest) {
+        if (localTest && validateTest()) {
             removeLocalIds();
             updateTest(localTest);
             clearSelectedTest();
+            navigate("/tests");
         }
-        navigate("/tests");
     };
 
     const handleReset = () => {
         if (selectedTest) {
+            setInvalidQuestions([])
             setLocalTest(cloneDeep(selectedTest));
         }
     };
@@ -116,6 +118,35 @@ const TestPageEditContent = () => {
         return JSON.parse(JSON.stringify(obj));
     };
 
+    const validateTest = () => {
+        const invalidQuestions = localTest?.questions
+            .map((q, index) => {
+                if (!q.questionText) {
+                    return { index, message: 'Вопрос не должен быть пустым' };
+                }
+                if (q.answerOptions.length < 2) {
+                    return { index, message: 'Вопрос должен иметь минимум 2 ответа' };
+                }
+                if (!q.answerOptions.some(a => a.isCorrect)) {
+                    return { index, message: 'Вопрос должен иметь минимум один правильный ответ' };
+                }
+                if (q.answerOptions.some(a => a.optionText === '')) {
+                    return { index, message: 'Ответ не должен быть пустым' };
+                }
+                return null;
+            })
+            .filter(item => item !== null) as {index: number, message: string}[];
+
+        setInvalidQuestions(invalidQuestions);
+
+        if (invalidQuestions.length > 0) {
+            setSnackbarOpen(true);
+            return false;
+        }
+
+        return true;
+    };
+
     return (
         <Box display="flex" flexDirection="row" position="relative">
             <Box flexGrow={1} mr="250px">
@@ -127,14 +158,14 @@ const TestPageEditContent = () => {
                     onChange={handleTitleChange}
                     sx={{ '& .MuiInputBase-input': { fontWeight: 500, fontSize: '24px' } }}
                 />
-                {localTest && localTest.questions.map((question: Question) => (
+                {localTest && localTest.questions.map((question: Question, index) => (
                     <Box key={question.id} display="flex" alignItems="center" my={2}>
                         <Box flexGrow={1}>
                             <QuestionEdit
                                 question={question}
                                 onQuestionChange={handleQuestionChange}
                                 onDelete={() => handleDeleteQuestion(question.id as number)}
-                            />
+                                errorMessage={invalidQuestions.find(item => item.index === index)?.message || ''}                            />
                         </Box>
                     </Box>
                 ))}
@@ -177,6 +208,15 @@ const TestPageEditContent = () => {
                     </Button>
                 </Paper>
             </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+                    Пожалуйста, исправьте ошибки в тесте
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

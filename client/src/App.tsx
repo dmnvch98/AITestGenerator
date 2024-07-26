@@ -16,7 +16,6 @@ import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
 import SignUp from './pages/SignUp';
 import {Files} from "./pages/files/Files";
-import QuestionEdit from "./components/tests/questions/QuestionEdit";
 import {TestPageEdit} from "./pages/tests/TestPageEdit";
 
 function App() {
@@ -41,15 +40,6 @@ function App() {
         },
     });
 
-    const questions = {
-        id: 1,
-        questionText: 'Что такое поток (thread) в Java, и какие преимущества многопоточности в сравнении с однопоточными приложениями?',
-        answerOptions: [
-            { id: 1, optionText: 'Поток - это процесс внутри операционной системы.', isCorrect: false },
-            { id: 2, optionText: 'Поток - это класс в Java, предназначенный для синхронизации операций.', isCorrect: true }
-        ]
-    }
-
     return (
             <ThemeProvider theme={theme}>
                 <Router>
@@ -69,12 +59,6 @@ function App() {
                             <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenHistory/>}/>
                             <Route path="/files" element={<Files/>}/>
-                            <Route path="/sandbox" element={<QuestionEdit
-                                question={questions}
-                                onDelete={() => {} }
-                                onQuestionChange={() => {}}
-
-                            />}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace />} />
                         </Routes>
                     </div>

@@ -6,8 +6,9 @@ import React from "react";
 import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Typography from "@mui/material/Typography";
 
-export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { question: Question, onQuestionChange: (question: Question) => void, onDelete: () => void }) => {
+export const QuestionEdit = ({ question, onQuestionChange, onDelete, errorMessage }: { question: Question, onQuestionChange: (question: Question) => void, onDelete: () => void, errorMessage: string }) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
     const [expanded, setExpanded] = useState(false);
@@ -53,12 +54,12 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { questio
     };
 
     return (
-        <Accordion expanded={expanded}>
+        <Accordion expanded={expanded} sx={{border: errorMessage ? '2px solid red' : 'none' }}>
             <AccordionSummary
                 aria-controls="panel1a-content"
                 id="panel1a-header"
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%'}}>
                     <IconButton
                         onClick={handleExpandClick}
                         edge="start"
@@ -91,6 +92,11 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete }: { questio
                     <IconButton onClick={handleAddAnswerOption} color="primary" >
                         <AddCircleIcon sx={{ fontSize: 36 }} />
                     </IconButton>
+                    {errorMessage && (
+                        <Typography color="error" variant="body2" align="left">
+                            {errorMessage}
+                        </Typography>
+                    )}
                 </Box>
             </AccordionDetails>
         </Accordion>

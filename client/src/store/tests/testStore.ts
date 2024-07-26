@@ -63,7 +63,8 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTextId: undefined,
     alerts: [],
     selectTest: (userTest: UserTest) => {
-        set({selectedTest: userTest})
+        userTest.questions.sort((a, b) => Number(a.id) > Number(b.id) ? 1 : -1);
+        set({selectedTest: userTest});
     },
     generateTest: async (textId: number) => {
         let dto: GenerateTestRequestDto = {
