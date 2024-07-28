@@ -54,7 +54,7 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete, errorMessag
     };
 
     return (
-        <Accordion expanded={expanded} sx={{border: errorMessage ? '2px solid red' : 'none' }}>
+        <Accordion expanded={expanded} sx={{border: errorMessage ? '2px solid #ff604f' : 'none' }}>
             <AccordionSummary
                 aria-controls="panel1a-content"
                 id="panel1a-header"
