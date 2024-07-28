@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect, useRef} from "react";
 import { Question, AnswerOption } from "../../../store/tests/testStore";
 import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -8,10 +8,27 @@ import ClearIcon from "@mui/icons-material/Clear";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from "@mui/material/Typography";
 
-export const QuestionEdit = ({ question, onQuestionChange, onDelete, errorMessage }: { question: Question, onQuestionChange: (question: Question) => void, onDelete: () => void, errorMessage: string }) => {
+export interface QuestionEditProps {
+    question: Question;
+    onQuestionChange: (question: Question) => void;
+    onDelete: () => void;
+    errorMessage: string;
+}
+
+export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage}) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
     const [expanded, setExpanded] = useState(false);
+    const errorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (errorMessage !== '') {
+            setExpanded(true);
+            if (errorRef.current) {
+                errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }, [errorMessage]);
 
     useEffect(() => {
         setQuestionText(question.questionText);
@@ -93,7 +110,7 @@ export const QuestionEdit = ({ question, onQuestionChange, onDelete, errorMessag
                         <AddCircleIcon sx={{ fontSize: 36 }} />
                     </IconButton>
                     {errorMessage && (
-                        <Typography color="error" variant="body2" align="left">
+                        <Typography ref={errorRef} color="error" variant="body2" align="left">
                             {errorMessage}
                         </Typography>
                     )}

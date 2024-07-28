@@ -1,15 +1,13 @@
-import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import React, {useEffect} from "react";
 import {useTestStore} from "../../store/tests/testStore";
 import {TestTable} from "../../components/tests/TestTable";
 import {Alert, Box, Button, Dialog, Snackbar} from "@mui/material";
-import Typography from "@mui/material/Typography";
 import {useNavigate} from "react-router-dom";
 import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 import {ExportModal} from "../../components/export/ExportModal";
 import {useExportStore} from "../../store/tests/exportStore";
 
-const TestsContent = () => {
+export const Tests = () => {
     const {
         getAllUserTests,
         deleteTest,
@@ -35,9 +33,6 @@ const TestsContent = () => {
     }, [])
     return (
         <>
-            <Typography variant="h5" align="left" sx={{mb: 2}}>
-                Сгенерированные тесты
-            </Typography>
             <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
                 <Button
                     sx={{ mr: 2 }}
@@ -74,8 +69,4 @@ const TestsContent = () => {
             </Dialog>
         </>
     )
-}
-
-export const Tests = () => {
-    return <LoggedInUserPage mainContent={<TestsContent/>}/>;
 }

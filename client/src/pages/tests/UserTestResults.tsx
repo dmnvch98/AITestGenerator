@@ -1,12 +1,10 @@
-import { LoggedInUserPage } from '../../components/main/LoggedInUserPage';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import React, { useEffect } from 'react';
 import { TestResult, usePassTestStore } from '../../store/tests/passTestStore';
 import DateTimeUtils from '../../utils/DateTimeUtils';
 import { useNavigate } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
 
-const UserTestResultsContent = () => {
+export const UserTestResults = () => {
 
   const { testResults, getAllUserTestResults } = usePassTestStore();
   const navigate = useNavigate();
@@ -22,9 +20,6 @@ const UserTestResultsContent = () => {
 
   return (
       <>
-        <Typography variant="h5" align="left" sx={{ mb: 2 }}>
-          История прохождения тестов
-        </Typography>
         <TableContainer>
           <Table>
             <TableHead>
@@ -63,6 +58,3 @@ const UserTestResultsContent = () => {
   );
 };
 
-export const UserTestResults = () => {
-  return <LoggedInUserPage mainContent={<UserTestResultsContent />} />;
-};

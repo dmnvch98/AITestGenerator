@@ -1,5 +1,5 @@
 import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { Question, UserTest, useTestStore } from "../../store/tests/testStore";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -17,6 +17,7 @@ const TestPageEditContent = () => {
     const [previousPath, setPreviousPath] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{index: number, message: string}[]>([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
         if (location.state?.from) {
@@ -118,6 +119,16 @@ const TestPageEditContent = () => {
         return JSON.parse(JSON.stringify(obj));
     };
 
+    const scrollToInvalidQuestion = () => {
+        if (invalidQuestions.length > 0) {
+            const firstInvalidQuestion = invalidQuestions[0];
+            const invalidQuestionElement = questionRefs.current[firstInvalidQuestion.index];
+            if (invalidQuestionElement) {
+                invalidQuestionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    };
+
     const validateTest = () => {
         const invalidQuestions = localTest?.questions
             .map((q, index) => {
@@ -141,6 +152,7 @@ const TestPageEditContent = () => {
 
         if (invalidQuestions.length > 0) {
             setSnackbarOpen(true);
+            scrollToInvalidQuestion();
             return false;
         }
 
@@ -159,15 +171,23 @@ const TestPageEditContent = () => {
                     sx={{ '& .MuiInputBase-input': { fontWeight: 500, fontSize: '24px' } }}
                 />
                 {localTest && localTest.questions.map((question: Question, index) => (
-                    <Box key={question.id} display="flex" alignItems="center" my={2}>
+                    <Box
+                        key={question.id}
+                        display="flex"
+                        alignItems="center"
+                        my={2}
+                        ref={(el) => (questionRefs.current[index] = el as HTMLDivElement | null)}
+                    >
                         <Box flexGrow={1}>
                             <QuestionEdit
                                 question={question}
                                 onQuestionChange={handleQuestionChange}
                                 onDelete={() => handleDeleteQuestion(question.id as number)}
-                                errorMessage={invalidQuestions.find(item => item.index === index)?.message || ''}                            />
+                                errorMessage={invalidQuestions.find((item) => item.index === index)?.message || ''}
+                            />
                         </Box>
                     </Box>
+
                 ))}
             </Box>
             <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">

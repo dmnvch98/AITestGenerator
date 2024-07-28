@@ -6,17 +6,17 @@ import {Texts} from "./pages/texts/Texts";
 import {AddText} from "./pages/texts/AddText";
 import {createTheme, ThemeProvider} from "@mui/material";
 import {TextPage} from "./pages/texts/TextPage";
-import {Tests} from "./pages/tests/Tests";
 import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./colors/appColors";
-import {TestGenHistory} from "./pages/history/TestGenHistory";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
 import SignUp from './pages/SignUp';
 import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/TestPageEdit";
+import {TestsPage} from "./pages/tests/TestPage";
+import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
 
 function App() {
     const theme = createTheme({
@@ -50,14 +50,14 @@ function App() {
                             <Route path="/sign-up" element={<SignUp/>}/>
                             <Route path="/add-text" element={<AddText/>}/>
                             <Route path="/texts/:id" element={<TextPage/>}/>
-                            <Route path="/tests" element={<Tests/>}/>
+                            <Route path="/tests" element={<TestsPage/>}/>
                             <Route path="/tests/:id" element={<TestPageView/>}/>
                             <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
                             <Route path="/tests/pass" element={<TestPass/>}/>
                             <Route path="/tests/result" element={<TestResults/>}/>
                             <Route path="/tests/results" element={<UserTestResults/>}/>
                             <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
-                            <Route path="/test-gen-history" element={<TestGenHistory/>}/>
+                            <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                             <Route path="/files" element={<Files/>}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace />} />
                         </Routes>

@@ -17,11 +17,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
-import HistoryIcon from '@mui/icons-material/History';
 import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AuthService } from '../../services/AuthService';
 
@@ -121,16 +119,6 @@ export const SidebarHeader = ({ children }: any) => {
             name: 'Файлы',
             icon: <FolderIcon />,
             redirect: '/files',
-        },
-        {
-            name: 'История прохождений',
-            icon: <HistoryIcon />,
-            redirect: '/tests/results',
-        },
-        {
-            name: 'История генераций',
-            icon: <HistoryEduIcon />,
-            redirect: '/test-gen-history',
         }
     ];
 

@@ -1,12 +1,10 @@
-import React, {useEffect} from "react";
-import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import React from "react";
 import {usePassTestStore} from "../../store/tests/passTestStore";
 import {TestResultTable} from "../../components/tests/TestResultTable";
 import {Box, Typography} from "@mui/material";
 
-const TestResultContent = () => {
+export const TestResults = () => {
     const testResults = usePassTestStore((state) => state.testResults);
-    useEffect(() => {console.log(testResults)}, [])
     return (
         <>
             <Box>
@@ -17,6 +15,3 @@ const TestResultContent = () => {
     );
 };
 
-export const TestResults = () => {
-    return <LoggedInUserPage mainContent={<TestResultContent/>}/>;
-};

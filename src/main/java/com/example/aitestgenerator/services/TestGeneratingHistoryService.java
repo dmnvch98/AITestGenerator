@@ -1,9 +1,12 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.converters.TextGenerationHistoryConverter;
+import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.example.aitestgenerator.repositories.TestGeneratingHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +16,13 @@ import java.util.List;
 public class TestGeneratingHistoryService {
 
     private final TestGeneratingHistoryRepository repository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final TextGenerationHistoryConverter testGenerationHistoryConverter;
 
     public void save(final TestGeneratingHistory history) {
         repository.save(history);
+        final TextGenerationHistoryDto dto = testGenerationHistoryConverter.historyToDto(history);
+        messagingTemplate.convertAndSendToUser("1", "/queue/TestGeneratingHistory", dto);
     }
 
     public void save(final List<TestGeneratingHistory> histories) {

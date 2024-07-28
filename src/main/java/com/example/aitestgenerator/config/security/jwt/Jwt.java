@@ -28,7 +28,7 @@ public class Jwt {
 
     public String generateAccessToken(User user) {
         final LocalDateTime now = LocalDateTime.now();
-        final Instant accessExpirationInstant = now.plusMinutes(3).atZone(ZoneId.systemDefault()).toInstant();
+        final Instant accessExpirationInstant = now.plusMinutes(40).atZone(ZoneId.systemDefault()).toInstant();
         final Date date = Date.from(accessExpirationInstant);
         return Jwts.builder()
             .setSubject(user.getEmail())

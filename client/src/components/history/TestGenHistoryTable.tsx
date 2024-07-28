@@ -1,4 +1,4 @@
-import {useUserStore} from "../../store/userStore";
+import {TestGenHistory} from "../../store/userStore";
 import React from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import DateTimeUtils from '../../utils/DateTimeUtils';
@@ -8,8 +8,11 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import Link from '@mui/material/Link';
 import {AccessTime} from "@mui/icons-material";
 
-export const TestGenHistoryTable = () => {
-    const testGenHistory = useUserStore(state => state.testGenHistory);
+interface TestGenHistoryTableProps {
+    testGenHistory: TestGenHistory[];
+}
+
+export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGenHistory }) => {
 
     const getStatusComponent = (status: string) => {
         switch (status) {
