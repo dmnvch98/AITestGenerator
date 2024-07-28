@@ -40,4 +40,8 @@ public class TestGeneratingHistoryService {
     public List<TestGeneratingHistory> findAllByStatus(final GenerationStatus status) {
         return repository.findAllByGenerationStatus(status);
     }
+
+    public List<TestGeneratingHistory> findAllByGenerationStatus(final long userId, final GenerationStatus status) {
+        return repository.findAllByUserIdAndGenerationStatus(userId, status);
+    }
 }

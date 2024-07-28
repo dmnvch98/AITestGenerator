@@ -1,10 +1,12 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
+import {GenerationStatus} from "../store/types";
 
 class UserService {
-    getTestGenerationHistory = async () => {
+    getTestGenerationHistory = async (status: GenerationStatus | undefined) => {
         try {
-            const response = await customAxios.get("/api/v1/users/test-gen-history");
+            const queryParam = status ? `status=${status}` : '';
+            const response = await customAxios.get(`/api/v1/tests/history?${queryParam}`);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

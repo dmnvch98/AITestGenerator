@@ -26,22 +26,34 @@ customAxios.interceptors.request.use(
     }
 );
 
-customAxios.interceptors.response.use(r => r, error => {
-  if (error.config && error.response && error.response.status === 401) {
+customAxios.interceptors.response.use(
+    response => response,
+    error => {
+        const originalRequest = error.config;
 
-    if (!refreshTokenPromise) {
-      const authService: AuthService = new AuthService();
-      refreshTokenPromise = authService.refresh().then((r) => {
-        refreshTokenPromise = null //
-        localStorage.setItem("JWT", r.data.accessToken);
-      })
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            if (!refreshTokenPromise) {
+                const authService = new AuthService();
+                refreshTokenPromise = authService.refresh()
+                    .then((r) => {
+                        refreshTokenPromise = null;
+                        localStorage.setItem("JWT", r.data.accessToken);
+                        originalRequest._retry = true;
+                        return customAxios(originalRequest);
+                    })
+                    .catch((err) => {
+                        refreshTokenPromise = null;
+                        localStorage.removeItem("JWT");
+                        window.location.href = '/sign-in';
+                        return Promise.reject(err);
+                    });
+            }
+
+            return refreshTokenPromise;
+        }
+
+        return Promise.reject(error);
     }
-
-    return refreshTokenPromise.then(() => {
-      return customAxios.request(error.config)
-    })
-  }
-  return Promise.reject(error)
-})
+);
 
 export default customAxios;

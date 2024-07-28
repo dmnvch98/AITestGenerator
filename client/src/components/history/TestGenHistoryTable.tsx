@@ -1,12 +1,13 @@
 import {TestGenHistory} from "../../store/userStore";
 import React from 'react';
-import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import {CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 import DateTimeUtils from '../../utils/DateTimeUtils';
-import { DoneLabel } from '../utils/DoneLabel';
-import { NoLabel } from '../utils/NoLabel';
+import {DoneLabel} from '../utils/DoneLabel';
+import {NoLabel} from '../utils/NoLabel';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import Link from '@mui/material/Link';
 import {AccessTime} from "@mui/icons-material";
+import {GenerationStatus} from "../../store/types";
 
 interface TestGenHistoryTableProps {
     testGenHistory: TestGenHistory[];
@@ -14,15 +15,15 @@ interface TestGenHistoryTableProps {
 
 export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGenHistory }) => {
 
-    const getStatusComponent = (status: string) => {
+    const getStatusComponent = (status: GenerationStatus) => {
         switch (status) {
-            case "Waiting":
+            case GenerationStatus.WAITING:
                 return <AccessTime/>
-            case "Success":
+            case GenerationStatus.SUCCESS:
                 return <DoneLabel />;
-            case "In process":
+            case GenerationStatus.IN_PROCESS:
                 return <CircularProgress size={24}/>;
-            case "Failed":
+            case GenerationStatus.FAILED:
                 return <NoLabel />;
             default:
                 return <QuestionMarkIcon />;

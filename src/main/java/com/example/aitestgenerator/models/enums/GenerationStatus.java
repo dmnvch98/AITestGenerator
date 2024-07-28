@@ -1,25 +1,13 @@
 package com.example.aitestgenerator.models.enums;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 public enum GenerationStatus {
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    WAITING("Waiting"),
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    IN_PROCESS("In process"),
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    FAILED("Failed"),
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    SUCCESS("Success");
 
-    private final String text;
+    WAITING,
 
-    GenerationStatus(String text) {
-        this.text = text;
-    }
+    IN_PROCESS,
 
-    public String getText() {
-        return text;
-    }
+    FAILED,
+
+    SUCCESS
 }
 

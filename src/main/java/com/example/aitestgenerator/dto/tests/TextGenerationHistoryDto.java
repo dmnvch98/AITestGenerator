@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.dto.tests;
 
+import com.example.aitestgenerator.models.enums.GenerationStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,6 +18,6 @@ public class TextGenerationHistoryDto {
     private Long textId;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
-    private String generationStatus;
+    private GenerationStatus generationStatus;
     private String fileName;
 }

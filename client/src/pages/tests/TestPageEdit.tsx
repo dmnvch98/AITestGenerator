@@ -1,39 +1,37 @@
 import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
 import React, {useEffect, useRef, useState} from "react";
 import { Question, UserTest, useTestStore } from "../../store/tests/testStore";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import QuestionEdit from "../../components/tests/questions/QuestionEdit";
 import {Alert, Paper, Snackbar} from "@mui/material";
+import {LoadingPage} from "../../components/main/LoadingPage";
+import {useUserStore} from "../../store/userStore";
 
 const TestPageEditContent = () => {
     const { id } = useParams();
     const { selectedTest, getUserTestsByIdIn, selectTest, tests, updateTest, clearSelectedTest } = useTestStore();
+    const { setLoading } = useUserStore();
     const [localTest, setLocalTest] = useState<UserTest | null>(null);
     const navigate = useNavigate();
-    const location = useLocation();
-    const [previousPath, setPreviousPath] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{index: number, message: string}[]>([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
-        if (location.state?.from) {
-            setPreviousPath(location.state.from);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (tests.length === 0) {
-            getUserTestsByIdIn([Number(id)]).then(() => {
-                loadTestData(Number(id));
-            });
-        } else {
+        const loadData = async () => {
+            setLoading(true);
+            if (tests.length === 0) {
+                await getUserTestsByIdIn([Number(id)]);
+            }
             loadTestData(Number(id));
-        }
-    }, [id, tests]);
+            setLoading(false);
+        };
+
+        loadData();
+    }, [id, tests, setLoading, getUserTestsByIdIn]);
 
     useEffect(() => {
         if (selectedTest) {
@@ -108,11 +106,7 @@ const TestPageEditContent = () => {
     };
 
     const handleExit = () => {
-        if (previousPath) {
-            navigate(previousPath);
-        } else {
-            navigate("/tests");
-        }
+        navigate("/tests");
     };
 
     const cloneDeep = (obj: any) => {
@@ -242,5 +236,6 @@ const TestPageEditContent = () => {
 }
 
 export const TestPageEdit = () => {
-    return <LoggedInUserPage mainContent={<TestPageEditContent />} />;
+    const { loading } = useUserStore();
+    return <LoggedInUserPage mainContent={loading ? <LoadingPage/> : <TestPageEditContent/>}/>;
 }

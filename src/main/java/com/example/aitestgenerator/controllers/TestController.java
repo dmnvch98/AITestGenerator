@@ -2,6 +2,7 @@ package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
+import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,13 @@ public class TestController {
     public Test updateTest(Authentication authentication, @RequestBody Test updatedTest) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.updateTest(updatedTest, userId);
+    }
+
+    @GetMapping("/history")
+    public List<TextGenerationHistoryDto> getTestGenerationHistory(
+            final Authentication authentication,
+            @RequestParam(value = "status", required = false) final String status) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.getTestGenerationHistory(userId, status);
     }
 }

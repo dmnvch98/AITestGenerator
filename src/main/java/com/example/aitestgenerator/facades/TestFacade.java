@@ -1,5 +1,7 @@
 package com.example.aitestgenerator.facades;
 
+import com.example.aitestgenerator.converters.TextGenerationHistoryConverter;
+import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
 import com.example.aitestgenerator.extractors.FileExtractorFabric;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class TestFacade {
     private final FileHashService fileHashService;
     private final StorageClient storageClient;
     private final FileExtractorFabric fileExtractorFabric;
+    private final TextGenerationHistoryConverter textGenerationHistoryConverter;
 
     private final UserService userService;
 
@@ -159,4 +163,17 @@ public class TestFacade {
         return fileExtractorFabric.getFileExtractor(originalFileName)
                 .extract(fileUrl);
     }
+
+    public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {
+        final List<TestGeneratingHistory> historyDtos = Optional.ofNullable(status)
+                .map(GenerationStatus::valueOf)
+                .map(s -> historyService.findAllByGenerationStatus(userId, s))
+                .orElse(historyService.getAllByUserId(userId));
+
+        return historyDtos
+                .stream()
+                .map(textGenerationHistoryConverter::historyToDto)
+                .collect(Collectors.toList());
+    }
+
 }
