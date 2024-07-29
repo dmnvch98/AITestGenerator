@@ -9,9 +9,11 @@ import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar } from '@mui/material';
 import { AxiosError } from 'axios';
 import { AuthService } from '../services/AuthService';
+import {useUserStore} from "../store/userStore";
 
 function LoginPage() {
   const [email, setEmail] = useState('');
+  const { getMe } = useUserStore();
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(false);
@@ -34,6 +36,7 @@ function LoginPage() {
       const response = await authService.login(email, password);
       if (response.status === 200) {
         localStorage.setItem("JWT", response.data.accessToken);
+        getMe();
         navigate('/texts');
       }
     } catch (error) {

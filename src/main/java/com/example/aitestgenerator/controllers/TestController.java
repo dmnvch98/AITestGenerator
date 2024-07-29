@@ -68,4 +68,11 @@ public class TestController {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.getTestGenerationHistory(userId, status);
     }
+
+    @GetMapping("/history/current")
+    public List<TextGenerationHistoryDto> getCurrentTestGenerationHistory(
+            final Authentication authentication) {
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.getCurrentHistories(userId);
+    }
 }

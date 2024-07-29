@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface TextGenerationHistoryConverter {
+public interface TestGenerationHistoryConverter {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "test.title", target = "testTitle")
     @Mapping(source = "test.id", target = "testId")

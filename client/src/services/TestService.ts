@@ -1,6 +1,7 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
 import {GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
+import {GenerationStatus} from "../store/types";
 
 class TestService {
     generateTest = async (dto: GenerateTestRequestDto) => {
@@ -49,6 +50,16 @@ class TestService {
         try {
             const response = await customAxios.put("/api/v1/tests", test);
             return response.status == 200;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+    getCurrentTestGenerationHistory = async () => {
+        try {
+            const response = await customAxios.get(`/api/v1/tests/history/current`);
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

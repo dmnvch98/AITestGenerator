@@ -1,6 +1,7 @@
 import {create} from "zustand";
 import UserService from "../services/UserService";
-import {GenerationStatus} from "./types";
+import {GenerationStatus, User} from "./types";
+import TestService from "../services/TestService";
 
 export interface TestGenHistory {
     id: number,
@@ -22,12 +23,16 @@ export interface UserStore {
     getTestGenHistory: () => void;
     loading: boolean;
     setLoading: (flag: boolean) => void;
+    user: User | undefined,
+    getMe: () => void,
+    getCurrentUser: () => void;
 }
 
 export const useUserStore = create<UserStore>((set: any, get: any) => ({
     testGenHistoryPast: [],
     testGenHistoryCurrent: [],
     loading: false,
+    user: undefined,
     setLoading: (flag) => {
         set({loading: flag})
     },
@@ -37,7 +42,7 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
     },
 
     getTestGenHistoryCurrent: async () => {
-        const response = await UserService.getTestGenerationHistory(GenerationStatus.IN_PROCESS);
+        const response = await TestService.getCurrentTestGenerationHistory();
         set({testGenHistoryCurrent: response})
     },
     setCurrentTestGenHistories: (testGen) => {
@@ -50,5 +55,31 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             updatedHistory = [...testGenHistoryCurrent, testGen];
         }
         set({ testGenHistoryCurrent: updatedHistory });
+    },
+
+    getMe: async () => {
+        const response: User = await UserService.getMe();
+        if (response) {
+            set({user: response});
+            localStorage.setItem("user", JSON.stringify(response));
+        }
+    },
+
+    getCurrentUser: () => {
+        const userString = localStorage.getItem("user");
+        let user: User;
+
+        if (userString) {
+            try {
+                user = JSON.parse(userString) as User;
+                set({user: user});
+            } catch (error) {
+                console.error('Ошибка при парсинге JSON строки:', error);
+                throw new Error('Invalid user data in localStorage');
+            }
+        } else {
+            throw new Error('No user data found in localStorage');
+        }
     }
+
 }))

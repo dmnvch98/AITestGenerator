@@ -15,4 +15,5 @@ public interface TestGeneratingHistoryRepository extends CrudRepository<TestGene
 
     List<TestGeneratingHistory> findAllByUserIdAndGenerationStatus(final Long userId, final GenerationStatus generationStatus);
 
+    List<TestGeneratingHistory> findAllByUserIdAndGenerationStatusIn(final Long userId, final List<GenerationStatus> generationStatuses);
 }

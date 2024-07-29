@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.facades;
 
-import com.example.aitestgenerator.converters.TextGenerationHistoryConverter;
+import com.example.aitestgenerator.converters.TestGenerationHistoryConverter;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
 import com.example.aitestgenerator.extractors.FileExtractorFabric;
@@ -35,7 +35,7 @@ public class TestFacade {
     private final FileHashService fileHashService;
     private final StorageClient storageClient;
     private final FileExtractorFabric fileExtractorFabric;
-    private final TextGenerationHistoryConverter textGenerationHistoryConverter;
+    private final TestGenerationHistoryConverter textGenerationHistoryConverter;
 
     private final UserService userService;
 
@@ -68,7 +68,7 @@ public class TestFacade {
         final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(userId, hashedFileName);
 
         if (fileHash == null) {
-            throw new ResourceNotFoundException(hashedFileName, userId);
+            throw new ResourceNotFoundException(hashedFileName);
         }
         final TestGeneratingHistory history = TestGeneratingHistory.builder()
                 .generationStart(LocalDateTime.now())
@@ -171,6 +171,13 @@ public class TestFacade {
                 .orElse(historyService.getAllByUserId(userId));
 
         return historyDtos
+                .stream()
+                .map(textGenerationHistoryConverter::historyToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TextGenerationHistoryDto> getCurrentHistories(final Long userId) {
+        return historyService.findAllByUserIdAndGenerationStatusIn(userId, List.of(GenerationStatus.WAITING, GenerationStatus.IN_PROCESS))
                 .stream()
                 .map(textGenerationHistoryConverter::historyToDto)
                 .collect(Collectors.toList());

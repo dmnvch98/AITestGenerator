@@ -13,6 +13,16 @@ class UserService {
             console.log(error.message);
         }
     }
+
+    getMe = async () => {
+        try {
+            const response = await customAxios.get(`/api/v1/users/me`);
+            return response.data;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
 }
 
 export default new UserService();

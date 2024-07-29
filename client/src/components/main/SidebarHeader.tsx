@@ -23,7 +23,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AuthService } from '../../services/AuthService';
 
-const drawerWidth = 300;
+const drawerWidth = 200;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,

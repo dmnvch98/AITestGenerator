@@ -2,7 +2,6 @@ package com.example.aitestgenerator.facades;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -84,7 +83,7 @@ public class FileFacade {
   private boolean checkFileEligibility(final long userId, final String hashedFileName) {
     final boolean isExists = fileHashService.isExistsByHashedFilenameAndUser(userId, hashedFileName);
     if (!isExists) {
-      throw new ResourceNotFoundException(hashedFileName, userId);
+      throw new ResourceNotFoundException(hashedFileName);
     }
     return true;
   }

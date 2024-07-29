@@ -23,12 +23,12 @@ const TestGenHistoryPast = () => {
 }
 
 const TestGenHistoryCurrent = () => {
-    const userId = 1;
+    const { getCurrentUser, user } = useUserStore();
 
     const {getTestGenHistoryCurrent, testGenHistoryCurrent, setCurrentTestGenHistories} = useUserStore();
-
     useEffect(() => {
         getTestGenHistoryCurrent();
+        getCurrentUser();
     }, [])
 
     useEffect(() => {
@@ -36,10 +36,11 @@ const TestGenHistoryCurrent = () => {
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
-                client.subscribe(`/user/${userId}/queue/TestGeneratingHistory`, message => {
+                client.subscribe(`/user/${user?.id}/queue/TestGeneratingHistory`, message => {
                     const updatedHistory = JSON.parse(message.body) as TestGenHistory;
                     setCurrentTestGenHistories(updatedHistory);
                 });
+                console.log('Subscribed: ' + `/user/${user?.id}/queue/TestGeneratingHistory`);
             },
             onStompError: (frame) => {
                 console.error('Broker reported error: ' + frame.headers['message']);
@@ -52,7 +53,7 @@ const TestGenHistoryCurrent = () => {
         return () => {
             client.deactivate();
         };
-    }, [userId]);
+    }, [user]);
 
 
     return(
