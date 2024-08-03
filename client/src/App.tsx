@@ -9,7 +9,7 @@ import {TextPage} from "./pages/texts/TextPage";
 import {TestPageView} from "./pages/tests/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResultMultiple";
-import {appColors} from "./colors/appColors";
+import {appColors} from "./styles/appColors";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
 import SignUp from './pages/SignUp';
@@ -17,6 +17,8 @@ import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/TestPageEdit";
 import {TestsPage} from "./pages/tests/TestPage";
 import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
+import {TestPrint} from "./pages/tests/TestPrint";
+import {PrintTest} from "./pages/tests/PrintTest";
 
 function App() {
     const theme = createTheme({
@@ -39,7 +41,6 @@ function App() {
             }
         },
     });
-
     return (
             <ThemeProvider theme={theme}>
                 <Router>
@@ -59,6 +60,7 @@ function App() {
                             <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                             <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                             <Route path="/files" element={<Files/>}/>
+                            <Route path="/sandbox2" element={<PrintTest/>}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace />} />
                         </Routes>
                     </div>

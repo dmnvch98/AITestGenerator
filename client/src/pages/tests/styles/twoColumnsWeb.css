@@ -1,0 +1,31 @@
+/* TwoColumnsWeb.css */
+.two-columns-mode {
+    display: flex;
+    justify-content: space-between;
+}
+
+.two-columns-mode .question {
+    margin-bottom: 16px;
+}
+
+.test-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.question-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+}
+
+.no-print {
+    display: block;
+}

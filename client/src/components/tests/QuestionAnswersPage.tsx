@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Box, Button, Paper, Typography} from "@mui/material";
 import {AnswerOption, Question} from "../../store/tests/testStore";
 import {QuestionAnswer, usePassTestStore} from "../../store/tests/passTestStore";
-import {appColors} from "../../colors/appColors";
+import {appColors} from "../../styles/appColors";
 
 export const QuestionAnswersPage = ({
                         question,
