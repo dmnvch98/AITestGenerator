@@ -19,6 +19,11 @@ const handleDelete = ( selectTest: (test: UserTest) => void, setDeleteTestFlag: 
     setDeleteTestFlag(true);
 };
 
+const handlePrint = ( selectTest: (test: UserTest) => void, navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
+    selectTest(test);
+    navigate(`/tests/${test.id}/print`);
+};
+
 const handlePass = (setTestIdsToPass: (ids: number[]) => void, navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     setTestIdsToPass([test.id]);
     navigate("/tests/pass");
@@ -60,6 +65,10 @@ const getActions = (
     {
         label: 'Экспорт',
         onClick: () => handleExport(selectTest, toggleOpenExportDialog, test),
+    },
+    {
+        label: 'Печать',
+        onClick: () => handlePrint(selectTest, navigate, test),
     },
 ];
 

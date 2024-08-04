@@ -4,17 +4,23 @@ import com.theokanning.openai.service.OpenAiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
-    private final String allowedOrigin;
 
-    public MvcConfiguration(@Value("${security.allowed-origin}") final String allowedOrigin) {
-        this.allowedOrigin = allowedOrigin;
+    private final List<String> allowedOrigins;
+
+    public MvcConfiguration(@Value("${security.allowed-origin}") final String allowedOrigins) {
+        this.allowedOrigins = Arrays.stream(allowedOrigins.split(",")).toList();
     }
 
     @Bean
@@ -22,11 +28,16 @@ public class MvcConfiguration implements WebMvcConfigurer {
         return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(300));
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowCredentials(true)
-            .allowedOrigins(allowedOrigin)
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE");
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(allowedOrigins);
+        config.setAllowCredentials(true);
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 }

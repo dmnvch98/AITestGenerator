@@ -21,7 +21,7 @@ spring:
 security:
   secret: SECRET
   refresh-secret: REFRESH_SECRET
-  allowed-origin: http://localhost:3001
+  allowed-origin: http://localhost:3001,http://192.168.0.142:3001
 
 csrf:
   cookie_domain: localhost

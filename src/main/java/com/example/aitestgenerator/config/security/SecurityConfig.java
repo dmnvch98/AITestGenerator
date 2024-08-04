@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,16 +23,16 @@ public class SecurityConfig {
   private final AuthenticationEntryPoint authenticationEntryPoint;
 
   @Bean
-  public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain formLoginFilterChain(final HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors.configure(http))
+//        .cors(cors -> cors.configure(http))
+            .cors(Customizer.withDefaults())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
             .requestMatchers( "/ws/**").permitAll()
-            .requestMatchers( "/api/v1/**").permitAll()
             .anyRequest()
             .authenticated()
         )

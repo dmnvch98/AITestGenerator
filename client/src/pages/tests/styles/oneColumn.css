@@ -1,0 +1,28 @@
+.center-mode {
+    width: 21cm;
+    max-width: 21cm;
+    padding: 0.5cm 1cm 2cm;
+    border: 1px solid #999;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.question-text {
+    text-align: justify;
+}
+
+.answer-text {
+    text-align: justify;
+}
+
+@page {
+    margin: 0; /* Убирает стандартные колонтитулы браузера */
+}
+
+@media print {
+    .center-mode {
+        border: none;
+        text-align: center;
+    }
+}

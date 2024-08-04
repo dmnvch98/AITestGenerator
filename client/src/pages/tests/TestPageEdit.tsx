@@ -7,7 +7,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import QuestionEdit from "../../components/tests/questions/QuestionEdit";
 import {Alert, Paper, Snackbar} from "@mui/material";
-import {LoadingPage} from "../../components/main/LoadingPage";
 import {useUserStore} from "../../store/userStore";
 
 const TestPageEditContent = () => {
@@ -236,6 +235,5 @@ const TestPageEditContent = () => {
 }
 
 export const TestPageEdit = () => {
-    const { loading } = useUserStore();
-    return <LoggedInUserPage mainContent={loading ? <LoadingPage/> : <TestPageEditContent/>}/>;
+    return <LoggedInUserPage mainContent={<TestPageEditContent/>}/>;
 }

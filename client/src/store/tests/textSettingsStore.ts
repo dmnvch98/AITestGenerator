@@ -12,10 +12,16 @@ interface TextSettingsState {
     setTitleFontWeight: (value: number) => void;
     questionFontWeight: number;
     setQuestionFontWeight: (value: number) => void;
+    lineHeight: number,
+    setLineHeight: (value: number) => void;
+    showAnswers: boolean;
+    setShowAnswers: (value: boolean) => void;
+    showHeader: boolean,
+    setShowHeader: (value: boolean) => void;
 }
 
 const useTextSettingsStore = create<TextSettingsState>((set) => ({
-    titleFontSize: 20,
+    titleFontSize: 16,
     setTitleFontSize: (value) => set({ titleFontSize: value }),
     questionFontSize: 14,
     questionFontWeight: 600,
@@ -25,6 +31,17 @@ const useTextSettingsStore = create<TextSettingsState>((set) => ({
     titleFontWeight: 600,
     setTitleFontWeight: (value) => set({ titleFontWeight: value }),
     setQuestionFontWeight: (value) => set({ questionFontWeight: value }),
+    lineHeight: 7,
+    setLineHeight: (value) => set({lineHeight: value}),
+    showAnswers: false,
+    setShowAnswers: (value) => {
+        set({showAnswers: value})
+    },
+    showHeader: true,
+    setShowHeader: (value) => {
+        set({showHeader: value})
+    },
+
 }));
 
 export default useTextSettingsStore;

@@ -17,8 +17,9 @@ import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/TestPageEdit";
 import {TestsPage} from "./pages/tests/TestPage";
 import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
-import {TestPrint} from "./pages/tests/TestPrint";
-import {PrintTest} from "./pages/tests/PrintTest";
+import {PrintTestPage} from "./pages/tests/PrintTestPage";
+import {useUserStore} from "./store/userStore";
+import {LoadingPage} from "./components/main/LoadingPage";
 
 function App() {
     const theme = createTheme({
@@ -41,30 +42,36 @@ function App() {
             }
         },
     });
+
+    const {loading} = useUserStore();
     return (
             <ThemeProvider theme={theme}>
-                <Router>
-                    <div className="App">
-                        <Routes>
-                            <Route path="/texts" element={<Texts/>}/>
-                            <Route path="/sign-in" element={<LoginPage/>}/>
-                            <Route path="/sign-up" element={<SignUp/>}/>
-                            <Route path="/add-text" element={<AddText/>}/>
-                            <Route path="/texts/:id" element={<TextPage/>}/>
-                            <Route path="/tests" element={<TestsPage/>}/>
-                            <Route path="/tests/:id" element={<TestPageView/>}/>
-                            <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
-                            <Route path="/tests/pass" element={<TestPass/>}/>
-                            <Route path="/tests/result" element={<TestResults/>}/>
-                            <Route path="/tests/results" element={<UserTestResults/>}/>
-                            <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
-                            <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
-                            <Route path="/files" element={<Files/>}/>
-                            <Route path="/sandbox2" element={<PrintTest/>}/>
-                            <Route path="*" element={<Navigate to="/sign-in" replace />} />
-                        </Routes>
-                    </div>
-                </Router>
+                {loading ? <LoadingPage/> :
+                    <Router>
+                        <div className="App">
+                            <Routes>
+                                <Route path="/texts" element={<Texts/>}/>
+                                <Route path="/sign-in" element={<LoginPage/>}/>
+                                <Route path="/sign-up" element={<SignUp/>}/>
+                                <Route path="/add-text" element={<AddText/>}/>
+                                <Route path="/texts/:id" element={<TextPage/>}/>
+                                <Route path="/tests" element={<TestsPage/>}/>
+                                <Route path="/tests/:id" element={<TestPageView/>}/>
+                                <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
+                                <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
+                                <Route path="/tests/pass" element={<TestPass/>}/>
+                                <Route path="/tests/result" element={<TestResults/>}/>
+                                <Route path="/tests/results" element={<UserTestResults/>}/>
+                                <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
+                                <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
+                                <Route path="/files" element={<Files/>}/>
+                                <Route path="/sandbox2" element={<PrintTestPage/>}/>
+                                <Route path="*" element={<Navigate to="/sign-in" replace />} />
+                            </Routes>
+                        </div>
+                    </Router>
+                }
+
             </ThemeProvider>
     );
 }
