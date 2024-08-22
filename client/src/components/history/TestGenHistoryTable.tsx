@@ -37,7 +37,6 @@ export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGe
                     <TableHead>
                         <TableRow>
                             <TableCell>Тест</TableCell>
-                            <TableCell>Текст</TableCell>
                             <TableCell>Файл</TableCell>
                             <TableCell>Начало генерации</TableCell>
                             <TableCell>Конец генерации</TableCell>
@@ -53,14 +52,6 @@ export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGe
                                         underline='none'
                                         href={`/tests/${th.testId}`}>
                                         {th.testTitle}
-                                    </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <Link
-                                        color='inherit'
-                                        underline='none'
-                                        href={`/texts/${th.textId}`}>
-                                        {th.textTitle}
                                     </Link>
                                 </TableCell>
                                 <TableCell>{th.fileName}</TableCell>

@@ -9,5 +9,11 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 public class GenerateTestRequestDto {
 
-    final Long textId;
+    final String hashedFileName;
+    @Builder.Default
+    private final int maxQuestionsCount = 5;
+    @Builder.Default
+    private final int minAnswersCount = 4;
+    @Builder.Default
+    private final int maxAnswersCount = 5;
 }

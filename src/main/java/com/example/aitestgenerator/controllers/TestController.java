@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api/v1/tests")
 @RequiredArgsConstructor
 public class TestController {
+
     private final TestFacade testFacade;
 
     @PostMapping
@@ -24,16 +25,16 @@ public class TestController {
         return testFacade.save(test, userId);
     }
 
-    @PostMapping("/generate")
-    public void generateTestAndSave(Authentication authentication, @RequestBody GenerateTestRequestDto dto) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        testFacade.generateTestByTextSendMessage(userId, dto.getTextId());
-    }
+//    @PostMapping("/generate")
+//    public void generateTestAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
+//        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+//        testFacade.generateTestByTextSendMessage(userId, dto.getTextId());
+//    }
 
-    @PostMapping("/generate/files/{fileHash}")
-    public void generateTestByFileAndSave(Authentication authentication, @PathVariable final String fileHash) {
+    @PostMapping("/generate")
+    public void generateTestByFileAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        testFacade.generateTestByFileSendMessage(userId, fileHash);
+        testFacade.prepareTestGeneration(userId, dto);
     }
 
     @GetMapping

@@ -1,3 +1,5 @@
+server:
+  port: 8080
 spring:
   servlet:
     multipart:
@@ -33,6 +35,10 @@ aws:
   s3-bucket: files-bucket
   url: http://localhost:4566
   sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
+generation:
+  models:
+    question: ft:gpt-4o-mini-2024-07-18:personal:questions-1108-4:9v5P1xMY
+    answers: ft:gpt-4o-mini-2024-07-18:personal:answers:9uae8che
 retry:
   attempt: 2
 

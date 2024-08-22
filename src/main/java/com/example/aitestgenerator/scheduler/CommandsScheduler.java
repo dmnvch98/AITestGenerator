@@ -20,7 +20,7 @@ public class CommandsScheduler {
         commandService.getCommand()
             .ifPresent(
                 c -> {
-                    log.info("Received command to generate test: UserId: {}, TextId: {} ", c.getUserId(), c.getTextId());
+                    log.info("Received command to generate test: UserId: {}, File: {} ", c.getUserId(), c.getHashedFileName());
                     testFacade.generateTestReceiveMessage(c);
                 });
     }

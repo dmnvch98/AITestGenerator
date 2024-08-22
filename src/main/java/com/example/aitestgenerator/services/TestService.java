@@ -17,9 +17,19 @@ public class TestService {
 
     private final TestRepository testRepository;
 
-    public Test saveTest(Test test) {
-        log.debug("Saving test. Test title: {}. Text id: {}, User id: {} ", test.getTitle(), test.getTextId(), test.getUserId());
+    public Test prepareTestAndSave(final Test test) {
+        test.getQuestions().forEach(question -> {
+            question.setTest(test);
+            question
+                    .getAnswerOptions()
+                    .forEach(answerOption -> answerOption.setQuestion(question));
+        });
         return testRepository.save(test);
+    }
+
+    public Test prepareTestAndSave(final Test test, final long userId) {
+        test.setUserId(userId);
+        return prepareTestAndSave(test);
     }
 
     public List<Test> findAllByUserId(Long userId) {

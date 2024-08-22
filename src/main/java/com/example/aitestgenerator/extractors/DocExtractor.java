@@ -22,7 +22,7 @@ public class DocExtractor implements FileExtractor {
                 text.append(extractor.getText());
             }
         } catch (IOException e) {
-            log.error("Error when parsing .doc document. File url: [{}]", fileUrl.getPath(), e);
+            throw new IllegalArgumentException("Error when parsing .doc document. File url: " + fileUrl.getPath(), e);
         }
 
         return Utils.removeNewLines(text.toString());

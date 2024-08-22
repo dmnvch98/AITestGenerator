@@ -1,4 +1,4 @@
-// store/textSettingsStore.ts
+// store/testPrintStore.ts
 import create from "zustand";
 
 interface TextSettingsState {

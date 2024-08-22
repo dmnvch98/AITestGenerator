@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, FormControl, FormControlLabel, FormGroup, Paper, Slider, Switch, Typography } from "@mui/material";
-import useTextSettingsStore from "../../../store/tests/textSettingsStore";
+import useTextSettingsStore from "../../../store/tests/testPrintStore";
 import ReactToPrint from "react-to-print";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";

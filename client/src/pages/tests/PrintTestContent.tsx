@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Box, Typography, List, ListItem, Checkbox, Grid, Divider} from '@mui/material';
 import './styles/oneColumn.css';
-import useTextSettingsStore from "../../store/tests/textSettingsStore";
+import useTextSettingsStore from "../../store/tests/testPrintStore";
 import {useTestStore} from "../../store/tests/testStore";
 import {useParams} from "react-router-dom";
 import {useUserStore} from "../../store/userStore";

@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -23,16 +23,8 @@ public class TestGeneratingHistory {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "testId", referencedColumnName = "id")
     private Test test;
-    @ManyToOne
-    @JoinColumn(name = "textId", referencedColumnName = "id")
-    private Text text;
-    @ManyToOne
-    @JoinColumn(name = "fileHashId", referencedColumnName = "id")
-    private FileHash fileHash;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
-    private Long inputTokensCount;
-    private Long outputTokensCount;
     @Enumerated(EnumType.STRING)
     private GenerationStatus generationStatus;
     @Enumerated(EnumType.STRING)

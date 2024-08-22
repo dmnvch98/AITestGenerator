@@ -1,12 +1,10 @@
 package com.example.aitestgenerator.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,8 +23,11 @@ public class Test {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "text_id")
-    private Long textId;
+    @ManyToOne
+    @JoinColumn(name = "file_hash_id")
+    private FileHash fileHash;
+
+    private String problems;
 
     @Column(name = "title")
     private String title;

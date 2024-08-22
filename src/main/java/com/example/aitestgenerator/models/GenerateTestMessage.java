@@ -10,10 +10,12 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 public class GenerateTestMessage {
 
-    private final long textId;
     private final String hashedFileName;
     private final long userId;
     private final long historyId;
     @Setter
     private String receipt;
+    private final int maxQuestionsCount;
+    private final int minAnswersCount;
+    private final int maxAnswersCount;
 }

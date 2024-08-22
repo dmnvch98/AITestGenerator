@@ -20,6 +20,7 @@ import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
 import {PrintTestPage} from "./pages/tests/PrintTestPage";
 import {useUserStore} from "./store/userStore";
 import {LoadingPage} from "./components/main/LoadingPage";
+import GenTestModal from "./components/tests/GenTestModal";
 
 function App() {
     const theme = createTheme({
@@ -65,7 +66,7 @@ function App() {
                                 <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
                                 <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                                 <Route path="/files" element={<Files/>}/>
-                                <Route path="/sandbox2" element={<PrintTestPage/>}/>
+                                <Route path="/sandbox" element={<GenTestModal open={true} handleClose ={() => {}}/>}/>
                                 <Route path="*" element={<Navigate to="/sign-in" replace />} />
                             </Routes>
                         </div>

@@ -3,7 +3,7 @@ package com.example.aitestgenerator.config.retriers;
 import com.example.aitestgenerator.config.shutdown.ShutdownFlag;
 import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
+import com.example.aitestgenerator.services.ActivityService;
 import com.example.aitestgenerator.services.CommandService;
 import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,6 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryListener;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +21,7 @@ public class GenerationRetryListener implements RetryListener {
     private final TestGeneratingHistoryService testGeneratingHistoryService;
     private final CommandService commandService;
     private final ShutdownFlag shutdownFlag;
+    private final ActivityService activityService;
 
     @Override
     public <T, E extends Throwable> boolean open(final RetryContext context, final RetryCallback<T, E> callback) {
@@ -45,11 +44,7 @@ public class GenerationRetryListener implements RetryListener {
 
                 final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(throwable);
 
-                history.setGenerationStatus(GenerationStatus.FAILED);
-                history.setMessageReceipt(null);
-                history.setFailReason(failReason);
-                history.setGenerationEnd(LocalDateTime.now());
-                testGeneratingHistoryService.save(history);
+                activityService.failGeneration(history, failReason);
             }
         }
     }
@@ -57,5 +52,18 @@ public class GenerationRetryListener implements RetryListener {
     @Override
     public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
         log.error("Retry attempt {} failed.", context.getRetryCount(), throwable);
+        if (!shutdownFlag.isShuttingDown() && throwable != null) {
+            final Long historyId = (Long) context.getAttribute("historyId");
+            if (historyId != null) {
+                TestGeneratingHistory history = testGeneratingHistoryService.findById(historyId);
+                final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(throwable);
+
+                if (failReason.isFatal()) {
+                    activityService.failGeneration(history, throwable);
+                }
+            } else {
+                activityService.failGeneration(throwable);
+            }
+        }
     }
 }

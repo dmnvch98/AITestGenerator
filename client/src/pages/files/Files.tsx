@@ -113,7 +113,7 @@ const FilesContent = () => {
                 open={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
                 onConfirm={handleDelete}
-                title="Подтверждение пакетного удаления"
+                title="Подтверждение удаления"
                 content="Вы уверены что хотите удалить выбранные файлы? Все связанные с ними сущности будут удалениы"
             />
         </>

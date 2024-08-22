@@ -19,8 +19,8 @@ public class PDFExtractor implements FileExtractor {
             PDFTextStripper pdfStripper = new PDFTextStripper();
             return Utils.removeNewLines(pdfStripper.getText(document));
         } catch (IOException e) {
-            log.error("Error when parsing PDF document", e);
-            return null;
+            throw new IllegalArgumentException("Error when parsing PDF document. File url: " + fileUrl.getPath(), e);
+
         }
     }
 }
