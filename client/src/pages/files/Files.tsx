@@ -1,11 +1,15 @@
-import useFileStore from "../../store/fileStore";
-import React, {useEffect, useState} from "react";
+import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
-import {Alert, Box, Button, CircularProgress, Snackbar} from "@mui/material";
-import {FileUploadModal} from "../../components/FileUploadModal";
-import {FilesTable} from "../../components/files/FilesTable";
-import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
+import { Box, Button, Snackbar, CircularProgress, Alert } from "@mui/material";
+import { FileUploadModal } from "../../components/FileUploadModal";
+import { FilesTable } from "../../components/files/FilesTable";
+import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
+import { ConfirmationDialog } from "../../components/main/ConfirmationDialog";
+import useFileStore from "../../store/fileStore";
+import { FileDto } from "../../store/fileStore";
+import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
+import {GenTestModal} from "../../components/tests/GenTestModal";
+import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 
 const FilesContent = () => {
     const {
@@ -22,7 +26,13 @@ const FilesContent = () => {
         selectedFileHashes
     } = useFileStore();
 
+    const { generateTestByFile } = useTestStore();
+    const { maxQuestionsCount, minAnswersCount, temperature, topP } = useGenerateTestStore();
+    const { setAlert } = useFileStore();
+
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<FileDto | null>(null); // Добавляем состояние для хранения выбранного файла
 
     useEffect(() => {
         getFiles();
@@ -30,29 +40,68 @@ const FilesContent = () => {
 
     const handleAdd = () => {
         setUploadModalOpen(true);
-    }
+    };
 
     const handleModalClose = () => {
         setUploadModalOpen(false);
         clearFiles();
-    }
+    };
 
     const openDeleteModal = () => {
         setDeleteModalOpen(true);
-    }
+    };
 
     const handleDelete = async () => {
         deleteFilesInBatch();
         setDeleteModalOpen(false);
-    }
+    };
 
     const isDeleteButtonDisabled = () => {
-        return selectedFileHashes.length == 0;
-    }
+        return selectedFileHashes.length === 0;
+    };
 
-    return(
+    const openGenTestModal = (file: FileDto) => {
+        setSelectedFile(file);
+        setGenTestModalOpen(true);
+    };
+
+    const closeGenTestModal = () => {
+        setGenTestModalOpen(false);
+    };
+
+    const handleGenTestSubmit = () => {
+        if (selectedFile) {
+            const request: GenerateTestRequest = {
+                maxQuestionsCount,
+                minAnswersCount,
+                temperature,
+                topP,
+                hashedFileName: selectedFile.hashedFilename
+            }
+            generateTestByFile(request).then((r) => {
+                r
+                    ? setAlert([{id: Date.now(), message: 'Генерация теста начата', severity: 'success'}])
+                    : setAlert([{id: Date.now(), message: 'Ошибка при генерации теста', severity: 'error'}])
+            });
+        }
+        closeGenTestModal();
+    };
+
+    const actions = (file: FileDto) => [
+        {
+            label: 'Удалить',
+            // onClick: () => deleteFilesInBatch([file.hashedFilename]),
+            onClick: () => {}
+        },
+        {
+            label: 'Сгенерировать тест',
+            onClick: () => openGenTestModal(file)
+        }
+    ];
+
+    return (
         <>
-            <Typography variant="h5" align="left" sx={{mb: 2}}>
+            <Typography variant="h5" align="left" sx={{ mb: 2 }}>
                 Файлы
             </Typography>
 
@@ -77,20 +126,22 @@ const FilesContent = () => {
                 </Button>
             </Box>
 
-            <FilesTable/>
+            <FilesTable actions={actions} />
 
-            <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
+            <FileUploadModal open={uploadModalOpen} onClose={handleModalClose} />
+
+            <GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>
 
             <Snackbar
                 open={alerts.length > 0}
                 autoHideDuration={6000}
                 onClose={clearAlerts}
             >
-                <Box sx={{maxWidth: '400px'}}>
+                <Box sx={{ maxWidth: '400px' }}>
                     {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
+                        <Alert key={alert.id} severity={alert.severity} sx={{ mb: 0.5, textAlign: 'left' }}
                                onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
+                            <span dangerouslySetInnerHTML={{ __html: alert.message }} />
                         </Alert>
                     ))}
                 </Box>
@@ -100,11 +151,9 @@ const FilesContent = () => {
                 open={isLoading}
                 onClose={() => setIsLoading(false)}
             >
-
                 <Alert key={Math.random()} severity="info" sx={{ mb: 0.5 }} icon={<CircularProgress size={18} />}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                         <span>Загрузка файлов</span>
-
                     </Box>
                 </Alert>
             </Snackbar>
@@ -114,12 +163,13 @@ const FilesContent = () => {
                 onClose={() => setDeleteModalOpen(false)}
                 onConfirm={handleDelete}
                 title="Подтверждение удаления"
-                content="Вы уверены что хотите удалить выбранные файлы? Все связанные с ними сущности будут удалениы"
+                content="Вы уверены что хотите удалить выбранные файлы? Все связанные с ними сущности будут удалены"
             />
+
         </>
     );
 }
 
 export const Files = () => {
-    return <LoggedInUserPage mainContent={<FilesContent/>}/>
-}
+    return <LoggedInUserPage mainContent={<FilesContent />} />;
+};

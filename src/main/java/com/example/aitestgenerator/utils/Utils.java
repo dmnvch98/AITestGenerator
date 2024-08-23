@@ -12,8 +12,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @UtilityClass
 @Slf4j
@@ -33,18 +31,6 @@ public class Utils {
             log.error("An error occurred while reading the file: {}", e.getMessage());
         }
         return null;
-    }
-    public static String removeHTMLTags(String htmlText) {
-        if (htmlText == null) {
-            return null;
-        }
-
-        Pattern pattern = Pattern.compile("<[^>]*>");
-        Matcher matcher = pattern.matcher(htmlText);
-
-        return matcher
-            .replaceAll("")
-            .replaceAll("&nbsp;", " ");
     }
 
     public static String getExportedTestName(String testName, String fileFormat) {

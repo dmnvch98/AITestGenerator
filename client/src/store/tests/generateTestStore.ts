@@ -1,8 +1,8 @@
 import create from 'zustand';
 
 interface SettingsState {
-    questions: number;
-    answers: number;
+    maxQuestionsCount: number;
+    minAnswersCount: number;
     temperature: number;
     topP: number;
     setQuestions: (value: number) => void;
@@ -12,12 +12,12 @@ interface SettingsState {
 }
 
 export const useGenerateTestStore = create<SettingsState>((set) => ({
-    questions: 10,
-    answers: 4,
+    maxQuestionsCount: 10,
+    minAnswersCount: 4,
     temperature: 0.5,
     topP: 0.8,
-    setQuestions: (value: number) => set({ questions: value }),
-    setAnswers: (value: number) => set({ answers: value }),
+    setQuestions: (value: number) => set({ maxQuestionsCount: value }),
+    setAnswers: (value: number) => set({ minAnswersCount: value }),
     setTemperature: (value: number) => set({ temperature: value }),
     setTopP: (value: number) => set({ topP: value }),
 }));

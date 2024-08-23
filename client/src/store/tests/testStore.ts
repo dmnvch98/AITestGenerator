@@ -25,6 +25,14 @@ export interface GenerateTestRequestDto {
     textId: number
 }
 
+export interface GenerateTestRequest {
+    maxQuestionsCount: number,
+    minAnswersCount: number,
+    temperature: number,
+    topP: number,
+    hashedFileName: string
+}
+
 export interface TestStore {
     tests: UserTest[],
     selectedTest: UserTest | undefined,
@@ -33,7 +41,7 @@ export interface TestStore {
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
     generateTest: (textId: number) => void,
-    generateTestByFile: (hashedFileName: string) => Promise<boolean>,
+    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
     deleteTest: (ids: number) => void,
@@ -76,8 +84,8 @@ export const useTestStore = create<TestStore>((set, get) => ({
         }
     },
 
-    generateTestByFile: async (hashedFileName) => {
-        const response = await TestService.generateTestByFile(hashedFileName);
+    generateTestByFile: async (request) => {
+        const response = await TestService.generateTestByFile(request);
         return response as boolean;
     },
     getAllUserTests: async () => {

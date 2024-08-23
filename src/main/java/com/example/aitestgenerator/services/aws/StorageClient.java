@@ -2,7 +2,6 @@ package com.example.aitestgenerator.services.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.aitestgenerator.models.FileHash;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +60,16 @@ public class StorageClient {
       log.error("Error when getting file URL [{}] from storage", key, e);
     }
     return null;
+  }
+
+  public boolean doesFileExist(final long userId, final String fileHash) {
+    final String key = generateFileKey(userId, fileHash);
+    try {
+      return amazonS3.doesObjectExist(bucketName, key);
+    } catch (final Exception e) {
+      log.error("Error when checking existence of file [{}] in storage", key, e);
+      return false;
+    }
   }
 
   private String generateFileKey(final long userId, final String fileName) {

@@ -63,7 +63,7 @@ public class TestFacade {
 
     TestGeneratingHistory history = testGenerationConverter.getWaiting(userService.findUserById(userId));
 
-    if (fileHash == null || storageClient.getFileUrl(userId, hashedFileName) == null) {
+    if (fileHash == null || !storageClient.doesFileExist(userId, hashedFileName)) {
       log.error("File=[{}] not found for userId=[{}]", hashedFileName, userId);
       activityService.failGeneration(history, GenerationFailReason.FILE_NOT_FOUND);
       throw new ResourceNotFoundException(hashedFileName);
@@ -76,6 +76,7 @@ public class TestFacade {
   }
 
   public void generateTestReceiveMessage(final GenerateTestMessage message) {
+    log.info("Received message to generate test. Message=[{}]", message);
     TestGeneratingHistory history = historyService.findById(message.getHistoryId());
     final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
 

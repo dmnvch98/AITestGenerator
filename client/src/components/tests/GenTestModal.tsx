@@ -5,13 +5,14 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 interface ModalFormProps {
     open: boolean;
-    handleClose: () => void;
+    onClose: () => void;
+    onSubmit: () => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ open, handleClose }) => {
+export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit }) => {
     const {
-        questions,
-        answers,
+        maxQuestionsCount,
+        minAnswersCount,
         temperature,
         topP,
         setQuestions,
@@ -39,7 +40,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, handleClose }) => {
     };
 
     return (
-        <Modal open={open} onClose={handleClose}>
+        <Modal open={open} onClose={onClose}>
             <Box
                 sx={{
                     position: 'absolute',
@@ -60,7 +61,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, handleClose }) => {
                 <TextField
                     label="Максимальное число вопросов (50 макс.)"
                     type="number"
-                    value={questions}
+                    value={maxQuestionsCount}
                     onChange={handleQuestionsChange}
                     fullWidth
                     margin="normal"
@@ -70,7 +71,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, handleClose }) => {
                 <TextField
                     label="Максимальное число вариантов ответов (8 макс.)"
                     type="number"
-                    value={answers}
+                    value={minAnswersCount}
                     onChange={handleAnswersChange}
                     fullWidth
                     margin="normal"
@@ -109,12 +110,10 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, handleClose }) => {
                     valueLabelDisplay="auto"
                 />
 
-                <Button onClick={handleClose} variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                <Button onClick={onSubmit} variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                     Сгенерировать
                 </Button>
             </Box>
         </Modal>
     );
 };
-
-export default ModalForm;

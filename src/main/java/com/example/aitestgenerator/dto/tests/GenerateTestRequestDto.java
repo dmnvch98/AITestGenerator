@@ -16,4 +16,8 @@ public class GenerateTestRequestDto {
     private final int minAnswersCount = 4;
     @Builder.Default
     private final int maxAnswersCount = 5;
+    @Builder.Default
+    private final double topP = 0.6;
+    @Builder.Default
+    private final double temperature = 0.5;
 }

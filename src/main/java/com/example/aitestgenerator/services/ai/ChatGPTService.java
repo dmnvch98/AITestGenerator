@@ -16,13 +16,13 @@ public class ChatGPTService implements AIService {
     private final OpenAiService openAiService;
 
     @Override
-    public String send(final String model, final List<ChatMessage> messages, final JsonNode schema) {
+    public String send(final String model, final List<ChatMessage> messages, final JsonNode schema, final double temperature, final double topP) {
 
         final ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
                 .messages(messages)
-                .temperature(0.3)
-                .topP(0.8)
+                .temperature(temperature)
+                .topP(topP)
                 .responseFormat(ChatCompletionRequest.JsonSchemaResponseFormat.builder().jsonSchema(schema).build())
                 .build();
 

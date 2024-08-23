@@ -1,7 +1,6 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
-import {GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
-import {GenerationStatus} from "../store/types";
+import {GenerateTestRequest, GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
 
 class TestService {
     generateTest = async (dto: GenerateTestRequestDto) => {
@@ -14,9 +13,9 @@ class TestService {
         }
     }
 
-    generateTestByFile = async (hashedFileName: string) => {
+    generateTestByFile = async (request: GenerateTestRequest) => {
         try {
-            const response = await customAxios.post(`/api/v1/tests/generate/files/${hashedFileName}`);
+            const response = await customAxios.post(`/api/v1/tests/generate`, request);
             return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;

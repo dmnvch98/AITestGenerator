@@ -52,7 +52,7 @@ public class AnswerGenerator {
         final List<ChatMessage> messages = prepareMessages(request, questionsResponseDto);
         final JsonNode responseSchema = objectMapper.readTree(readFileContents(ANSWERS_SCHEMA_FILE));
 
-        final String result = aiService.send(model, messages, responseSchema);
+        final String result = aiService.send(model, messages, responseSchema, request.getTemperature(), request.getTopP());
 //        handleTokensCount(request.getUserId(), request.getText(), getContextPrompt(), result, startTime);
 
         final GenerateAnswersResponseDto answersResponseDto = converter.convertToAnswersResponseDto(result);

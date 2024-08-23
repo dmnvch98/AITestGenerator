@@ -13,10 +13,9 @@ public class GenerateTestRequest {
     private final FileHash fileHash;
     private final String text;
     private final Long userId;
-    @Builder.Default
-    private final int maxQuestionsCount = 5;
-    @Builder.Default
-    private final int minAnswersCount = 3;
-    @Builder.Default
-    private final int maxAnswersCount = 5;
+    private final int maxQuestionsCount;
+    private final int minAnswersCount;
+    private final int maxAnswersCount;
+    private final double topP;
+    private final double temperature;
 }
