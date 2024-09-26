@@ -49,7 +49,6 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
             testTitle: title,
             questionAnswers: get().answers
         }
-        console.log(testResult);
         TestResultService.saveTestResult(testResult, testId).then(
             r => {
                 set({
@@ -64,7 +63,6 @@ export const usePassTestStore = create<PassTest>((set: any, get: any) => ({
     },
     setTestIdsToPass: (selectedTestsToPass: number[]) => {
         set({testIdsToPass: selectedTestsToPass})
-        console.log(get().testIdsToPass);
     },
     answers: [],
     addAnswer: (questionAnswer: QuestionAnswer) => {

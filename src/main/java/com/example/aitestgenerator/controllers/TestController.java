@@ -2,6 +2,7 @@ package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
+import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
@@ -38,7 +39,7 @@ public class TestController {
     }
 
     @GetMapping
-    public List<Test> findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
+    public TestsResponseDto findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findAllByUser(ids, userId);
     }

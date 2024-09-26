@@ -14,7 +14,6 @@ const TestResultContent = () => {
             const testIdNumber = Number(testId);
             const resultIdNumber = Number(id);
             getSingleTestResult(testIdNumber, resultIdNumber);
-            console.log(singleTestResult)
         }
     }, [])
     return (

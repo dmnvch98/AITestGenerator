@@ -11,7 +11,7 @@ import {useUserStore} from "../../store/userStore";
 
 const TestPageEditContent = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestsByIdIn, selectTest, tests, updateTest, clearSelectedTest } = useTestStore();
+    const { selectedTest, getUserTestById, updateTest, clearSelectedTest } = useTestStore();
     const { setLoading } = useUserStore();
     const [localTest, setLocalTest] = useState<UserTest | null>(null);
     const navigate = useNavigate();
@@ -20,30 +20,16 @@ const TestPageEditContent = () => {
     const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            if (tests.length === 0) {
-                await getUserTestsByIdIn([Number(id)]);
-            }
-            loadTestData(Number(id));
-            setLoading(false);
-        };
-
-        loadData();
-    }, [id, tests, setLoading, getUserTestsByIdIn]);
-
-    useEffect(() => {
         if (selectedTest) {
             setLocalTest({ ...selectedTest });
         }
     }, [selectedTest]);
 
-    const loadTestData = (id: number) => {
-        const test = tests.find(test => test.id === id);
-        if (test) {
-            selectTest(test);
-        }
-    };
+    useEffect(() => {
+        setLoading(true);
+        getUserTestById(Number(id));
+        setLoading(false);
+    }, []);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (localTest) {

@@ -11,13 +11,14 @@ import com.example.aitestgenerator.models.enums.GenerationStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface TestGenerationConverter {
 
   @Mapping(source = "user.id", target = "userId")
   @Mapping(source = "test.title", target = "testTitle")
   @Mapping(source = "test.id", target = "testId")
-  @Mapping(source = "test.fileHash.originalFilename", target = "fileName")
   TextGenerationHistoryDto historyToDto(final TestGeneratingHistory history);
 
   default TestGeneratingHistory getWaiting(final User user) {
@@ -31,6 +32,7 @@ public interface TestGenerationConverter {
     return history
           .toBuilder()
           .generationStatus(GenerationStatus.IN_PROCESS)
+          .generationStart(LocalDateTime.now())
           .messageReceipt(receipt)
           .build();
   }

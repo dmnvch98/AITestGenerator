@@ -1,7 +1,9 @@
 package com.example.aitestgenerator.facades;
 
+import com.example.aitestgenerator.converters.TestConverter;
 import com.example.aitestgenerator.converters.TestGenerationConverter;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
+import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class TestFacade {
 
   private final TestService testService;
+  private final TestConverter testConverter;
   private final TestGenerationService testGenerationService;
   private final TestGeneratingHistoryService historyService;
   private final CommandService commandService;
@@ -69,6 +72,7 @@ public class TestFacade {
       throw new ResourceNotFoundException(hashedFileName);
     }
 
+    history.setFileName(fileHash.getOriginalFilename());
     historyService.save(history);
 
     final GenerateTestMessage message = testGenerationConverter.convert(dto, hashedFileName, userId, history.getId());
@@ -107,10 +111,15 @@ public class TestFacade {
   }
 
 
-  public List<Test> findAllByUser(Long[] testIds, Long userId) {
-    return (testIds != null && testIds.length > 0) ?
-        testService.findAllByIdInAndUserId(Arrays.asList(testIds), userId) :
-        testService.findAllByUserId(userId);
+  public TestsResponseDto findAllByUser(final Long[] testIds, final Long userId) {
+    List<Test> tests;
+    if (testIds != null && testIds.length > 0) {
+      tests = testService.findAllByIdInAndUserId(Arrays.asList(testIds), userId);
+    } else {
+      tests = testService.findAllByUserId(userId);
+    }
+
+    return testConverter.convert(tests);
   }
 
   public Test findTestById(Long testId, Long userId) {

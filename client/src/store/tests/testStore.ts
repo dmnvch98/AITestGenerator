@@ -44,6 +44,7 @@ export interface TestStore {
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
+    getUserTestById: (id: number) => Promise<void>,
     deleteTest: (ids: number) => void,
     generateTestFlag: boolean,
     toggleGenerateTestFlag: () => void,
@@ -71,7 +72,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTextId: undefined,
     alerts: [],
     selectTest: (userTest: UserTest) => {
-        userTest.questions.sort((a, b) => Number(a.id) > Number(b.id) ? 1 : -1);
         set({selectedTest: userTest});
     },
     generateTest: async (textId: number) => {
@@ -89,8 +89,8 @@ export const useTestStore = create<TestStore>((set, get) => ({
         return response as boolean;
     },
     getAllUserTests: async () => {
-        const response = await TestService.getUserTests()
-        set({tests: response})
+        const {tests} = await TestService.getUserTests()
+        set({tests: tests})
     },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
@@ -143,5 +143,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     clearSelectedTest: () => {
         set({selectedTest: undefined});
+    },
+    getUserTestById: async (id) => {
+        const response = await TestService.getUserTestById(id);
+        set({selectedTest: response});
     }
 }))

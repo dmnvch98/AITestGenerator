@@ -8,6 +8,7 @@ import {ExportModal} from "../../components/export/ExportModal";
 import {useExportStore} from "../../store/tests/exportStore";
 
 export const Tests = () => {
+
     const {
         getAllUserTests,
         deleteTest,
@@ -31,6 +32,7 @@ export const Tests = () => {
     useEffect(() => {
         getAllUserTests();
     }, [])
+
     return (
         <>
             <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
@@ -62,7 +64,7 @@ export const Tests = () => {
                 onClose={() => setDeleteTestFlag(false)}
                 onConfirm={() => handleConfirmDelete(selectedTest?.id as number)}
                 title="Подтверждение удаления теста"
-                content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалены"
+                content="Вы уверены что хотите удалить выбранный тест?"
             />
             <Dialog open={openExportDialog} onClose={toggleModelOpen}>
                 <ExportModal test={selectedTest} />

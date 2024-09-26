@@ -3,6 +3,7 @@ import {AxiosError} from "axios";
 import {GenerateTestRequest, GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
 
 class TestService {
+
     generateTest = async (dto: GenerateTestRequestDto) => {
         try {
             const response = await customAxios.post("/api/v1/tests/generate", dto);
@@ -58,6 +59,18 @@ class TestService {
     getCurrentTestGenerationHistory = async () => {
         try {
             const response = await customAxios.get(`/api/v1/tests/history/current`);
+            return response.data;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+
+    getUserTestById = async (id: number) => {
+        try {
+            const url = `/api/v1/tests/${id}`;
+            const response = await customAxios.get(url);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

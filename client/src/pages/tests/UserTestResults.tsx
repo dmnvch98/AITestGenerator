@@ -11,7 +11,6 @@ export const UserTestResults = () => {
 
   useEffect(() => {
     getAllUserTestResults();
-    console.log(testResults);
   }, []);
 
   const calcCorrect = (testResult: TestResult): number => {

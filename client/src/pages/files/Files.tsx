@@ -23,7 +23,8 @@ const FilesContent = () => {
         isLoading,
         setIsLoading,
         deleteFilesInBatch,
-        selectedFileHashes
+        selectedFileHashes,
+        deleteFile
     } = useFileStore();
 
     const { generateTestByFile } = useTestStore();
@@ -89,9 +90,13 @@ const FilesContent = () => {
 
     const actions = (file: FileDto) => [
         {
-            label: 'Удалить',
-            // onClick: () => deleteFilesInBatch([file.hashedFilename]),
-            onClick: () => {}
+            onClick: () => deleteFile(file),
+            confirmProps: {
+                buttonTitle: 'Удалить',
+                dialogTitle: 'Подтверждение удаления',
+                dialogContent: `Вы уверены что хотите удалить <b>${file.originalFilename}</b> ?`,
+                variant: 'menuItem'
+            }
         },
         {
             label: 'Сгенерировать тест',

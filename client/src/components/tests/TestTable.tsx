@@ -6,22 +6,12 @@ import { UserTest, useTestStore } from "../../store/tests/testStore";
 import { usePassTestStore } from "../../store/tests/passTestStore";
 import { useExportStore } from "../../store/tests/exportStore";
 import { ExportModal } from "../export/ExportModal";
-import { ConfirmationDialog } from "../main/ConfirmationDialog";
 import {GenericTableActions} from "../main/GenericTableActions";
+import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 
 
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
-};
-
-const handleDelete = ( selectTest: (test: UserTest) => void, setDeleteTestFlag: (flag: boolean) => void, test: UserTest) => {
-    selectTest(test);
-    setDeleteTestFlag(true);
-};
-
-const handlePrint = ( selectTest: (test: UserTest) => void, navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
-    selectTest(test);
-    navigate(`/tests/${test.id}/print`);
 };
 
 const handlePass = (setTestIdsToPass: (ids: number[]) => void, navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
@@ -41,7 +31,7 @@ const handleExport = (
 const getActions = (
     test: UserTest,
     navigate: ReturnType<typeof useNavigate>,
-    setDeleteTestFlag: (flag: boolean) => void,
+    deleteTest: (id: number) => void,
     setTestIdsToPass: (ids: number[]) => void,
     selectTest: (test: UserTest) => void,
     toggleOpenExportDialog: () => void
@@ -55,8 +45,13 @@ const getActions = (
         onClick: () => navigate(`/tests/${test.id}/edit`)
     },
     {
-        label: 'Удалить',
-        onClick: () => handleDelete(selectTest, setDeleteTestFlag, test),
+        onClick: () => deleteTest(test.id),
+        confirmProps: {
+            buttonTitle: 'Удалить',
+            dialogTitle: 'Подтверждение удаления',
+            dialogContent: `Вы уверены что хотите удалить тест <b>${test.title}</b> ?`,
+            variant: 'menuItem'
+        } as ConfirmationButtonProps
     },
     {
         label: 'Пройти',
@@ -68,30 +63,30 @@ const getActions = (
     },
     {
         label: 'Печать',
-        onClick: () => handlePrint(selectTest, navigate, test),
+        onClick: () => navigate(`/tests/${test.id}/print`),
     },
 ];
 
 export const TestTable = () => {
-    const { tests, deleteTest, deleteTestFlag, setDeleteTestFlag, selectTest, selectedTest } = useTestStore();
+    const { tests, deleteTest, selectTest, selectedTest } = useTestStore();
     const { setTestIdsToPass } = usePassTestStore();
     const { toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
     const navigate = useNavigate();
 
-    const handleConfirmDelete = (id: number) => {
-        deleteTest(id);
-        setDeleteTestFlag(false);
-    };
-
     const columns: GridColDef[] = [
         {
-            field: 'id',
-            headerName: 'ID',
+            field: 'order',
+            headerName: '#',
+        },
+        {
+            field: 'fileName',
+            headerName: 'Файл',
+            minWidth: 250,
         },
         {
             field: 'title',
             headerName: 'Заголовок',
-            minWidth: 800,
+            minWidth: 550,
         },
     ];
 
@@ -103,7 +98,7 @@ export const TestTable = () => {
                 actions={(test) => getActions(
                     test,
                     navigate,
-                    setDeleteTestFlag,
+                    deleteTest,
                     setTestIdsToPass,
                     selectTest,
                     toggleModelOpen
@@ -111,13 +106,7 @@ export const TestTable = () => {
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={setTestIdsToPass}
             />
-            <ConfirmationDialog
-                open={deleteTestFlag}
-                onClose={() => setDeleteTestFlag(false)}
-                onConfirm={() => handleConfirmDelete(selectedTest?.id as number)}
-                title="Подтверждение удаления теста"
-                content="Вы уверены что хотите удалить выбранный тест? Все связанные с ним сущности будут удалены"
-            />
+
             <Dialog open={openExportDialog} onClose={toggleModelOpen}>
                 <ExportModal test={selectedTest} />
             </Dialog>

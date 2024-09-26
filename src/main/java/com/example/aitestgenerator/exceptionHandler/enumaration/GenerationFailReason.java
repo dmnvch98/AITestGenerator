@@ -22,6 +22,7 @@ public enum GenerationFailReason {
     HTTP_EXCEPTION_LIMIT_EXCEEDED(OpenAiHttpException.class,
             "You exceeded your current quota, please check your plan and billing details. .*", true),
     FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true),
+    REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true),
     UNKNOWN(null, null, false);
 
     private final Class<? extends Throwable> cause;

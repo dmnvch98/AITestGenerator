@@ -36,7 +36,7 @@ public class ActivityService {
         history = history.toBuilder()
            .generationStatus(GenerationStatus.FAILED)
            .messageReceipt(null)
-           .failReason(failReason)
+           .failReason(failReason.name())
            .build();
 
         testGeneratingHistoryService.save(history);

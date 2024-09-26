@@ -16,6 +16,7 @@ import java.util.Set;
 @Setter
 @Jacksonized
 public class Test {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +24,11 @@ public class Test {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "file_hash_id")
-    private FileHash fileHash;
+//    @ManyToOne
+//    @JoinColumn(name = "file_hash_id")
+//    private FileHash fileHash;
+
+    private String fileName;
 
     private String problems;
 

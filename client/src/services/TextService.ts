@@ -37,9 +37,7 @@ class TextService {
 
     deleteText = async (id: number) => {
         try {
-            console.log("delete")
             const response = await customAxios.delete("/api/v1/texts/" + id);
-            console.log("resp: " + JSON.stringify(response, null, 2));
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
