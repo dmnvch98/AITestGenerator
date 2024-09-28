@@ -1,29 +1,40 @@
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import {useTestStore} from "../../store/tests/testStore";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useTestStore } from "../../store/tests/testStore";
 import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
-import {TestForm} from "../../components/tests/TestForm";
-import {useUserStore} from "../../store/userStore";
+import { TestForm } from "../../components/tests/TestForm";
+import { CircularProgress, Box } from "@mui/material";
 
 export const TestPageEdit = () => {
     const { id } = useParams();
-    const { setLoading } = useUserStore();
-    const { selectedTest, getUserTestById, upsert, clearSelectedTest } = useTestStore();
-    useNavigate();
+    const { selectedTest, getUserTestById, clearSelectedTest } = useTestStore();
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
-        setLoading(true);
-        getUserTestById(Number(id));
-        setLoading(false);
+        const loadData = async () => {
+            setIsLoading(true);
+            await getUserTestById(Number(id));
+            setIsLoading(false);
+        };
+
+        loadData();
+
         return () => clearSelectedTest();
     }, [id, getUserTestById, clearSelectedTest]);
 
     return (
         <LoggedInUserPage
             mainContent={
-                <TestForm
-                    initialTest={selectedTest}
-                    isEditMode={true}
-                />
+                isLoading ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <TestForm
+                        initialTest={selectedTest}
+                        isEditMode={true}
+                    />
+                )
             }
         />
     );

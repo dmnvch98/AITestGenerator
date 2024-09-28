@@ -13,9 +13,9 @@ interface TestFormProps{
 }
 
 export const TestForm = ({
-                                                                        initialTest,
-                                                                        isEditMode
-                                                                    }: TestFormProps) => {
+                             initialTest,
+                             isEditMode
+                         }: TestFormProps) => {
     const navigate = useNavigate();
 
     const defaultInitialTest: CreateTestRequestDto = {
@@ -44,6 +44,7 @@ export const TestForm = ({
     const [testTitleError, setTestTitleError] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string }[]>([]);
     const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const scrollRef = useRef<HTMLDivElement | null>(null); // Add this ref for scrolling
     const { alerts, clearAlerts, deleteAlert, setAlert, upsert } = useTestStore();
     const [hasSaved, setHasSaved] = useState(false);
 
@@ -83,6 +84,11 @@ export const TestForm = ({
             };
             const updatedQuestions = [...localTest.questions, newQuestion];
             setLocalTest({ ...localTest, questions: updatedQuestions });
+
+            // Scroll to the bottom after adding a question
+            setTimeout(() => {
+                scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
         }
     };
 
@@ -161,17 +167,28 @@ export const TestForm = ({
     return (
         <Box display="flex" flexDirection="row" position="relative">
             <Box flexGrow={1} mr="250px">
-                <TextField
-                    placeholder="Введите название теста"
-                    fullWidth
-                    multiline
-                    value={localTest?.title || ""}
-                    variant="outlined"
-                    onChange={handleTitleChange}
-                    sx={{ "& .MuiInputBase-input": { fontWeight: 500, fontSize: "24px" } }}
-                    error={!!testTitleError}
-                    helperText={testTitleError}
-                />
+                <Paper>
+                    <TextField
+                        placeholder="Введите название теста"
+                        fullWidth
+                        multiline
+                        value={localTest?.title || ""}
+                        variant="outlined"
+                        onChange={handleTitleChange}
+                        sx={{
+                            "& .MuiInputBase-input": {
+                                fontWeight: 500,
+                                fontSize: "24px",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                border: "none",
+                            },
+                        }}
+                        error={!!testTitleError}
+                        helperText={testTitleError}
+                    />
+                </Paper>
+
                 {localTest &&
                     localTest.questions.map((question: Question, index) => (
                         <Box
@@ -191,6 +208,8 @@ export const TestForm = ({
                             </Box>
                         </Box>
                     ))}
+                {/* Add a div for scroll reference */}
+                <div ref={scrollRef} />
             </Box>
             <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
                 <Paper sx={{ maxWidth: 230, p: 2, position: "fixed" }}>
