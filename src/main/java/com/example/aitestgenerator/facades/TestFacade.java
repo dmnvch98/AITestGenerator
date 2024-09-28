@@ -128,8 +128,8 @@ public class TestFacade {
     return testService.findAllByIdAndUserIdOrThrow(testId, userId);
   }
 
-  public Test updateTest(Test updatedTest, Long userId) {
-    return testService.updateTest(updatedTest, userId);
+  public Test upsert(final Test updatedTest, final Long userId) {
+    return testService.upsert(updatedTest, userId);
   }
 
   public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {

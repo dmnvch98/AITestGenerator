@@ -50,14 +50,19 @@ public class TestService {
         return testRepository.findAllByIdInAndUserIdOrderByIdDesc(testIds, userId);
     }
 
-    public Test updateTest(final Test updatedTest, final Long userId) {
+    public Test upsert(final Test updatedTest, final Long userId) {
+
+        if (updatedTest.getId() == null) {
+            return prepareTestAndSave(updatedTest, userId);
+        }
+
         Test existingTest = testRepository.findTestByIdAndUserId(updatedTest.getId(), userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Test not found"));
 
         existingTest.setTitle(updatedTest.getTitle());
 
         existingTest.getQuestions().clear();
-        testRepository.save(existingTest);  // Сохранение промежуточного состояния для удаления связанных сущностей
+        testRepository.save(existingTest);
 
         for (Question updatedQuestion : updatedTest.getQuestions()) {
             updatedQuestion.setTest(existingTest);

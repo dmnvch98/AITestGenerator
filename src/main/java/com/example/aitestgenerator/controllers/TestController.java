@@ -1,10 +1,7 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
-import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
-import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
-import com.example.aitestgenerator.dto.tests.TestsResponseDto;
-import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
+import com.example.aitestgenerator.dto.tests.*;
 import com.example.aitestgenerator.facades.TestFacade;
 import com.example.aitestgenerator.models.Test;
 import lombok.RequiredArgsConstructor;
@@ -54,15 +51,23 @@ public class TestController {
 
     @DeleteMapping("/{testId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTest(Authentication authentication, @PathVariable Long testId) {
+    public void deleteTest(final Authentication authentication, @PathVariable Long testId) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         testFacade.deleteTest(testId, userId);
     }
 
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void bulkTestDelete(final Authentication authentication,
+                               final @RequestBody BulkDeleteTestsRequestDto requestDto) {
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        requestDto.getIds().forEach(testId -> testFacade.deleteTest(testId, userId));
+    }
+
     @PutMapping
-    public Test updateTest(Authentication authentication, @RequestBody Test updatedTest) {
+    public Test upsert(final Authentication authentication, @RequestBody final Test updatedTest) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.updateTest(updatedTest, userId);
+        return testFacade.upsert(updatedTest, userId);
     }
 
     @GetMapping("/history")

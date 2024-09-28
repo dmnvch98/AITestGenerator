@@ -1,11 +1,12 @@
-import React, {useEffect} from "react";
-import {useTestStore} from "../../store/tests/testStore";
+import React, {useCallback, useEffect, useState} from "react";
+import {BulkDeleteTestsRequestDto, UserTest, useTestStore} from "../../store/tests/testStore";
 import {TestTable} from "../../components/tests/TestTable";
 import {Alert, Box, Button, Dialog, Snackbar} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 import {ExportModal} from "../../components/export/ExportModal";
 import {useExportStore} from "../../store/tests/exportStore";
+import {ConfirmationButton} from "../../components/main/ConfirmationButton";
 
 export const Tests = () => {
 
@@ -17,10 +18,12 @@ export const Tests = () => {
         selectedTest,
         alerts,
         clearAlerts,
-        deleteAlert
+        deleteAlert,
+        bulkDeleteTest
     } = useTestStore();
 
     const {toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
+    const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
 
     const navigate = useNavigate();
 
@@ -32,6 +35,20 @@ export const Tests = () => {
     useEffect(() => {
         getAllUserTests();
     }, [])
+
+    const handleBulkDelete = useCallback(() => {
+        if (selectedTestIds.length > 0) {
+            const request: BulkDeleteTestsRequestDto = {
+                ids: selectedTestIds
+            }
+            bulkDeleteTest(request);
+        }
+    }, [selectedTestIds]);
+
+    const onMultiTestSelection = useCallback((ids: number[]) => {
+        setSelectedTestIds(ids);
+    }, []);
+
 
     return (
         <>
@@ -50,8 +67,20 @@ export const Tests = () => {
                 >
                     Создать тест
                 </Button>
+                <ConfirmationButton
+                    config={
+                        {
+                            buttonTitle: 'Удалить выбранное',
+                            dialogContent: 'Вы уверены что хотите удалить выбранные тесты?',
+                            dialogTitle: 'Удаление тестов',
+                            variant: 'button',
+                            disabled: selectedTestIds.length < 1
+                        }
+                    }
+                    onSubmit={handleBulkDelete}
+                />
             </Box>
-            <TestTable/>
+            <TestTable onSelectionModelChange={onMultiTestSelection}/>
             <Snackbar
                 open={alerts.length > 0}
                 autoHideDuration={6000}

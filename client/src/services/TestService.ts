@@ -1,6 +1,12 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
-import {CreateTestRequestDto, GenerateTestRequest, GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
+import {
+    BulkDeleteTestsRequestDto,
+    CreateTestRequestDto,
+    GenerateTestRequest,
+    GenerateTestRequestDto,
+    UserTest
+} from "../store/tests/testStore";
 
 class TestService {
 
@@ -56,10 +62,20 @@ class TestService {
         }
     }
 
-    updateTest = async (test: UserTest) => {
+    bulkTestDelete = async (requestDto: BulkDeleteTestsRequestDto) => {
+        try {
+            const response = await customAxios.delete("/api/v1/tests", {data: requestDto});
+            return response.status == 204;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+    upsert = async (test: UserTest | CreateTestRequestDto) => {
         try {
             const response = await customAxios.put("/api/v1/tests", test);
-            return response.status == 200;
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

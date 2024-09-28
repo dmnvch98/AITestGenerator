@@ -31,7 +31,7 @@ public class Test {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.MERGE, orphanRemoval = true)
     private Set<Question> questions;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)

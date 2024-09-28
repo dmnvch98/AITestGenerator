@@ -14,13 +14,13 @@ export interface CreateTestRequestDto {
 }
 
 export interface Question {
-    id: number | undefined,
+    id?: number,
     questionText: string,
     answerOptions: AnswerOption[]
 }
 
 export interface AnswerOption {
-    id: number | undefined,
+    id?: number,
     optionText: string,
     isCorrect: boolean
 }
@@ -35,6 +35,10 @@ export interface GenerateTestRequest {
     temperature: number,
     topP: number,
     hashedFileName: string
+}
+
+export interface BulkDeleteTestsRequestDto {
+    ids: number[];
 }
 
 export interface TestStore {
@@ -64,8 +68,9 @@ export interface TestStore {
     setAlert: (alert: AlertMessage[]) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
-    updateTest: (test: UserTest) => void;
+    upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
     saveTest: (test: CreateTestRequestDto) => void;
+    bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -136,14 +141,16 @@ export const useTestStore = create<TestStore>((set, get) => ({
     deleteAlert: (alertToDelete) => set((state) => ({
         alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
     })),
-    updateTest: async (test) => {
-        const { setAlert, getAllUserTests } = get();
-        const response = await TestService.updateTest(test);
+    upsert: async (test): Promise<UserTest | null> => {
+        const { setAlert, getAllUserTests} = get();
+        const response = await TestService.upsert(test);
         if (response) {
             getAllUserTests();
             setAlert([{ id: Date.now(), message: 'Тест успешно обновлен', severity: 'success' }])
+            return response as UserTest;
         } else {
             setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении теста', severity: 'error' }])
+            return null;
         }
     },
     clearSelectedTest: () => {
@@ -160,6 +167,16 @@ export const useTestStore = create<TestStore>((set, get) => ({
             setAlert([{ id: Date.now(), message: 'Тест успешно сохранен', severity: 'success' }])
         } else {
             setAlert([{ id: Date.now(), message: 'Произошла ошибка при сохранении теста', severity: 'error' }])
+        }
+    },
+    bulkDeleteTest: async (request) => {
+        const response = await TestService.bulkTestDelete(request);
+        const { setAlert, getAllUserTests } = get();
+        if (response) {
+            getAllUserTests();
+            setAlert([{ id: Date.now(), message: 'Тесты успешно удалены', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении тестов', severity: 'error' }])
         }
     },
 }))

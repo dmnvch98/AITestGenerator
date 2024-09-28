@@ -6,19 +6,20 @@ export interface ConfirmationButtonProps {
     dialogTitle: string;
     dialogContent: string;
     variant: 'button' | 'menuItem';
+    disabled?: boolean
 }
 
 interface Props {
     config: ConfirmationButtonProps;
     onSubmit: () => void;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose }) => {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
-
+        setOpen(true);
     };
 
     const handleMenuItemClick = () => {
@@ -27,13 +28,13 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose 
 
     const handleClose = () => {
         setOpen(false);
-        onClose();
+        onClose && onClose();
     };
 
     const handleConfirm = () => {
         onSubmit();
         setOpen(false);
-        onClose();
+        onClose && onClose();
     };
 
     return (
@@ -45,8 +46,9 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose 
                 </MenuItem>
                 :
                 <Button
-                    variant="contained"
-                    color="primary"
+                    disabled={config?.disabled}
+                    variant="outlined"
+                    color="secondary"
                     onClick={handleClickOpen}>
                     {config.buttonTitle}
                 </Button>

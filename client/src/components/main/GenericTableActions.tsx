@@ -111,7 +111,7 @@ export const GenericTableActions = <T,>({
                 }}
                 initialState={{
                     pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
+                        paginationModel: { page: 0, pageSize: 15 },
                     },
                 }}
                 localeText={tableLables}

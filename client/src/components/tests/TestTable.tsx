@@ -67,7 +67,11 @@ const getActions = (
     },
 ];
 
-export const TestTable = () => {
+interface Props {
+    onSelectionModelChange: (testIds: number[]) => void;
+}
+
+export const TestTable: React.FC<Props> = ({ onSelectionModelChange }) => {
     const { tests, deleteTest, selectTest, selectedTest } = useTestStore();
     const { setTestIdsToPass } = usePassTestStore();
     const { toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
@@ -104,7 +108,7 @@ export const TestTable = () => {
                     toggleModelOpen
                 )}
                 rowIdGetter={(row) => row.id}
-                onSelectionModelChange={setTestIdsToPass}
+                onSelectionModelChange={onSelectionModelChange}
             />
 
             <Dialog open={openExportDialog} onClose={toggleModelOpen}>

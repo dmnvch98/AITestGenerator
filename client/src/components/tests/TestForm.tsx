@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../store/tests/testStore";
+import { CreateTestRequestDto, Question, UserTest, useTestStore } from "../../store/tests/testStore";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -7,35 +7,54 @@ import Button from "@mui/material/Button";
 import QuestionEdit from "../../components/tests/questions/QuestionEdit";
 import { Alert, Paper, Snackbar } from "@mui/material";
 
-interface TestFormProps<T> {
-    initialTest?: T;
-    onSave: (test: T) => void;
+interface TestFormProps{
+    initialTest?: UserTest;
     isEditMode: boolean;
 }
 
-export const TestForm = <T extends UserTest | CreateTestRequestDto>({
+export const TestForm = ({
                                                                         initialTest,
-                                                                        onSave,
                                                                         isEditMode
-                                                                    }: TestFormProps<T>) => {
+                                                                    }: TestFormProps) => {
     const navigate = useNavigate();
 
-    const [localTest, setLocalTest] = useState<T | null>(initialTest || null);
+    const defaultInitialTest: CreateTestRequestDto = {
+        title: '',
+        questions: [
+            {
+                questionText: '',
+                answerOptions: [
+                    {
+                        optionText: '',
+                        isCorrect: false
+                    }
+                ]
+            }
+        ]
+    }
+
+    const [localTest, setLocalTest] = useState<UserTest | CreateTestRequestDto>(() => {
+        if (isEditMode && initialTest) {
+            return { ...initialTest };
+        } else {
+            return defaultInitialTest;
+        }
+    });
+
     const [testTitleError, setTestTitleError] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string }[]>([]);
     const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const { alerts, clearAlerts, deleteAlert, setAlert} = useTestStore();
+    const { alerts, clearAlerts, deleteAlert, setAlert, upsert } = useTestStore();
     const [hasSaved, setHasSaved] = useState(false);
 
-
     useEffect(() => {
-        if (initialTest && !hasSaved) {
+        if (isEditMode && initialTest && !hasSaved) {
             setLocalTest({ ...initialTest });
         }
-    }, [initialTest, hasSaved]);
+    }, [initialTest, hasSaved, isEditMode]);
 
     useEffect(() => {
-        return () => {removeLocalIds()};
+        return () => { removeLocalIds() };
     }, []);
 
     const handleReset = () => {
@@ -85,9 +104,13 @@ export const TestForm = <T extends UserTest | CreateTestRequestDto>({
 
     const handleSave = () => {
         if (localTest && validateTest()) {
-            // removeLocalIds();
-            onSave(localTest);
-            setHasSaved(true);
+            upsert(localTest).then(resp => {
+                    if (resp != null) {
+                        setHasSaved(true);
+                        setLocalTest(resp);
+                    }
+                }
+            )
         }
     };
 
@@ -101,7 +124,7 @@ export const TestForm = <T extends UserTest | CreateTestRequestDto>({
     };
 
     const validateTest = () => {
-        if (!localTest?.title.trim()) {
+        if (localTest?.title && !localTest?.title.trim()) {
             setTestTitleError("Заголовок теста не должен быть пустым");
             return false;
         } else {
@@ -192,11 +215,11 @@ export const TestForm = <T extends UserTest | CreateTestRequestDto>({
                 autoHideDuration={6000}
                 onClose={clearAlerts}
             >
-                <Box sx={{maxWidth: '400px'}}>
+                <Box sx={{ maxWidth: '400px' }}>
                     {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
+                        <Alert key={alert.id} severity={alert.severity} sx={{ mb: 0.5, textAlign: 'left' }}
                                onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
+                            <span dangerouslySetInnerHTML={{ __html: alert.message }} />
                         </Alert>
                     ))}
                 </Box>
