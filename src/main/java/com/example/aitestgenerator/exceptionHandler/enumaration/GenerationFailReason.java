@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.FileNotFoundException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,6 +24,7 @@ public enum GenerationFailReason {
             "You exceeded your current quota, please check your plan and billing details. .*", true),
     FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true),
     REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true),
+    SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", true),
     UNKNOWN(null, null, false);
 
     private final Class<? extends Throwable> cause;

@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef} from "react";
 import { Question, AnswerOption } from "../../../store/tests/testStore";
-import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField } from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
 import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
@@ -13,9 +13,12 @@ export interface QuestionEditProps {
     onQuestionChange: (question: Question) => void;
     onDelete: () => void;
     errorMessage: string;
+    questionNumber?: number;
+    expandable?: boolean
 }
 
-export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage}) => {
+export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage,
+                                                              expandable}) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
     const [expanded, setExpanded] = useState(true);
@@ -71,18 +74,20 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
     };
 
     return (
+
         <Accordion expanded={expanded} sx={{border: errorMessage ? '2px solid #ff604f' : 'none' }}>
             <AccordionSummary
                 aria-controls="panel1a-content"
                 id="panel1a-header"
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%'}}>
-                    <IconButton
+                    {expandable && (<IconButton
                         onClick={handleExpandClick}
                         edge="start"
                     >
-                        <ExpandMoreIcon />
-                    </IconButton>
+                        <ExpandMoreIcon/>
+                    </IconButton>)}
+
                     <TextField
                         placeholder="Текст вопроса"
                         multiline
@@ -90,7 +95,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                         variant="standard"
                         value={questionText}
                         onChange={handleQuestionTextChange}
-                        sx={{ '& .MuiInputBase-input': { fontWeight: 500 } }}
+                        sx={{ '& .MuiInputBase-input': { fontWeight: 500 }, ml: !expandable ? 3 : 0 }}
                     />
                     <IconButton onClick={onDelete}>
                         <ClearIcon />
