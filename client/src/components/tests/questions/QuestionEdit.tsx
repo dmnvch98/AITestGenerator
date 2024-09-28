@@ -18,7 +18,7 @@ export interface QuestionEditProps {
 export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage}) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(true);
     const errorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -84,6 +84,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                         <ExpandMoreIcon />
                     </IconButton>
                     <TextField
+                        placeholder="Текст вопроса"
                         multiline
                         fullWidth
                         variant="standard"

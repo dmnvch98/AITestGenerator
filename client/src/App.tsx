@@ -20,6 +20,7 @@ import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
 import {PrintTestPage} from "./pages/tests/PrintTestPage";
 import {useUserStore} from "./store/userStore";
 import {LoadingPage} from "./components/main/LoadingPage";
+import {TestPageCreate} from "./pages/tests/TestPageCreate";
 
 function App() {
     const theme = createTheme({
@@ -56,6 +57,7 @@ function App() {
                                 <Route path="/add-text" element={<AddText/>}/>
                                 <Route path="/texts/:id" element={<TextPage/>}/>
                                 <Route path="/tests" element={<TestsPage/>}/>
+                                <Route path="/tests/create" element={<TestPageCreate/>}/>
                                 <Route path="/tests/:id" element={<TestPageView/>}/>
                                 <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
                                 <Route path="/tests/:id/print" element={<PrintTestPage/>}/>

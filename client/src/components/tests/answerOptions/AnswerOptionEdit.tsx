@@ -22,6 +22,7 @@ const AnswerOptionEdit = ({ answerOption, onOptionChange, onDelete }: { answerOp
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center'}}>
                         <TextField
+                            placeholder="Текст варианта ответа"
                             multiline
                             id="standard-basic"
                             variant="standard"

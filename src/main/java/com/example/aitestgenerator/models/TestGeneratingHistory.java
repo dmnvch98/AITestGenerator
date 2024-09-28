@@ -28,9 +28,6 @@ public class TestGeneratingHistory {
     private GenerationStatus generationStatus;
     private String failReason;
     private String messageReceipt;
-//    @ManyToOne
-//    @JoinColumn(name = "fileHashId", referencedColumnName = "id")
-//    private FileHash fileHash;
     private String fileName;
 
     @Override

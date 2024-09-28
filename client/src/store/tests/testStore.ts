@@ -4,7 +4,11 @@ import {AlertMessage} from "../types";
 
 export interface UserTest {
     id: number,
-    textId: number | undefined,
+    title: string,
+    questions: Question[]
+}
+
+export interface CreateTestRequestDto {
     title: string,
     questions: Question[]
 }
@@ -61,6 +65,7 @@ export interface TestStore {
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
     updateTest: (test: UserTest) => void;
+    saveTest: (test: CreateTestRequestDto) => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -147,5 +152,14 @@ export const useTestStore = create<TestStore>((set, get) => ({
     getUserTestById: async (id) => {
         const response = await TestService.getUserTestById(id);
         set({selectedTest: response});
-    }
+    },
+    saveTest: async (test) => {
+        const { setAlert} = get();
+        const response = await TestService.saveUserTest(test);
+        if (response) {
+            setAlert([{ id: Date.now(), message: 'Тест успешно сохранен', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при сохранении теста', severity: 'error' }])
+        }
+    },
 }))

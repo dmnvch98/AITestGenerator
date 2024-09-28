@@ -2,6 +2,7 @@ package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.converters.TestConverter;
 import com.example.aitestgenerator.converters.TestGenerationConverter;
+import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
@@ -39,7 +40,8 @@ public class TestFacade {
 
   private final UserService userService;
 
-  public Test save(final Test test, final Long userId) {
+  public Test save(final CreateTestRequestDto request, final Long userId) {
+    final Test test = testConverter.convert(request);
     return testService.prepareTestAndSave(test, userId);
   }
 

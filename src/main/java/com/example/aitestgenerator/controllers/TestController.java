@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
+import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
@@ -21,7 +22,8 @@ public class TestController {
     private final TestFacade testFacade;
 
     @PostMapping
-    public Test save(@RequestBody Test test, Authentication authentication) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Test save(@RequestBody CreateTestRequestDto test, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.save(test, userId);
     }

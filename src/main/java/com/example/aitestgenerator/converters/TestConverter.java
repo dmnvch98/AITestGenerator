@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.converters;
 
 import com.example.aitestgenerator.dto.generation.GenerateAnswersResponseDto;
+import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.Test;
@@ -34,4 +35,6 @@ public interface TestConverter {
     default String getFileHashId(final FileHash fileHash) {
         return fileHash.getOriginalFilename();
     }
+
+    Test convert(final CreateTestRequestDto dto);
 }

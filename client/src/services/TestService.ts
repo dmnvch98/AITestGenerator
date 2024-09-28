@@ -1,8 +1,18 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
-import {GenerateTestRequest, GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
+import {CreateTestRequestDto, GenerateTestRequest, GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
 
 class TestService {
+
+    saveUserTest = async (dto: CreateTestRequestDto) => {
+        try {
+            const response = await customAxios.post("/api/v1/tests", dto);
+            return response.status === 201;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
 
     generateTest = async (dto: GenerateTestRequestDto) => {
         try {
