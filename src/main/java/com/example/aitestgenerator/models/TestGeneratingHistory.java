@@ -28,6 +28,7 @@ public class TestGeneratingHistory {
     private GenerationStatus generationStatus;
     private String failReason;
     private String messageReceipt;
+    private String cid;
     private String fileName;
 
     @Override

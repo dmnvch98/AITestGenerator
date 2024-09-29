@@ -41,6 +41,9 @@ generation:
     answers: ft:gpt-4o-mini-2024-07-18:personal:answers:9uae8che
 retry:
   attempt: 2
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level cid:%X{cid:-} - %msg%n"
 
 ---
 

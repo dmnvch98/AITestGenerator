@@ -28,12 +28,13 @@ public interface TestGenerationConverter {
           .build();
   }
 
-  default TestGeneratingHistory getInProcess(final TestGeneratingHistory history, final String receipt) {
+  default TestGeneratingHistory getInProcess(final TestGeneratingHistory history, final String receipt, final String cid) {
     return history
           .toBuilder()
           .generationStatus(GenerationStatus.IN_PROCESS)
           .generationStart(LocalDateTime.now())
           .messageReceipt(receipt)
+          .cid(cid)
           .build();
   }
 

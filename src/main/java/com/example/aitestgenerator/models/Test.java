@@ -34,9 +34,9 @@ public class Test {
     @OneToMany(mappedBy = "test", cascade = CascadeType.MERGE, orphanRemoval = true)
     private Set<Question> questions;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private Set<TestGeneratingHistory> testGeneratingHistories;
+//    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnore
+//    private Set<TestGeneratingHistory> testGeneratingHistories;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

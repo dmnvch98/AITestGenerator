@@ -12,17 +12,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CommandsScheduler {
 
-    private final CommandService commandService;
-    private final TestFacade testFacade;
+  private final CommandService commandService;
+  private final TestFacade testFacade;
 
-    @Scheduled(fixedDelay = 10000)
-    public void processMessage() {
-        commandService.getCommand()
-            .ifPresent(
-                c -> {
-                    log.info("Received command to generate test: UserId: {}, File: {} ", c.getUserId(), c.getHashedFileName());
-                    testFacade.generateTestReceiveMessage(c);
-                });
-    }
+  @Scheduled(fixedDelay = 1000)
+  public void processMessage() {
+    commandService.getCommand().ifPresent(testFacade::generateTestReceiveMessage);
+  }
 
 }

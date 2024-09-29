@@ -1,10 +1,7 @@
 package com.example.aitestgenerator.services.aws;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.*;
 import com.example.aitestgenerator.models.GenerateTestMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,31 +10,47 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class QueueClient {
 
+    private final static int timeoutInSeconds = 300;
+
     @Value("${aws.sqs-url}")
     public String queueUrl;
 
     private final AmazonSQS queue;
     private final ObjectMapper objectMapper;
-    private final static int delay = 1;
+    private final Map<String, String> receiptMessageIdMap = new ConcurrentHashMap<>();
 
     public Optional<GenerateTestMessage> getMessage() {
-        ReceiveMessageResult receiveMessageResult = queue.receiveMessage(queueUrl);
-        List<Message> messages = receiveMessageResult.getMessages();
+        final ReceiveMessageResult receiveMessageResult = queue.receiveMessage(new ReceiveMessageRequest(queueUrl)
+              .withMaxNumberOfMessages(1)
+              .withVisibilityTimeout(timeoutInSeconds));
+        final List<Message> messages = receiveMessageResult.getMessages();
         if (messages.isEmpty()) {
             return Optional.empty();
         }
-        Message message = messages.get(0);
-        String messageBody = message.getBody();
+        final Message message = messages.get(0);
+        final Optional<String> receiptToUpdate = receiptMessageIdMap.entrySet()
+              .stream()
+              .filter(entry -> entry.getValue().equals(message.getMessageId()))
+              .map(Map.Entry::getKey)
+              .findFirst();
+
+        if (receiptToUpdate.isPresent()) {
+            log.info("Skipping message with id {} as it's already processing. Updating visibility timeout", message.getMessageId());
+            updateVisibilityTimeout(receiptToUpdate.get());
+            return Optional.empty();
+        }
+        final String messageBody = message.getBody();
         try {
-            GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
+            receiptMessageIdMap.put(message.getReceiptHandle(), message.getMessageId());
+            final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
             generateTestMessage.setReceipt(message.getReceiptHandle());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
@@ -48,6 +61,7 @@ public class QueueClient {
 
     public void deleteMessage(final String receipt) {
         try {
+            receiptMessageIdMap.remove(receipt);
             queue.deleteMessage(new DeleteMessageRequest(queueUrl, receipt));
             log.info("Message was deleted from the queue. Receipt : {} ", receipt);
         } catch (Exception e) {
@@ -57,16 +71,25 @@ public class QueueClient {
 
     public void sendMessage(GenerateTestMessage message) {
         try {
-            log.info("Adding message to the queue to generate test. User id: {}. File: {}" +
-                    " Delay : {} sec", message.getUserId(), message.getHashedFileName(), delay);
+            log.info("Adding message to the queue to generate test. User id: {}. File: {}",
+                  message.getUserId(), message.getHashedFileName());
             SendMessageRequest messageRequest =
                     new SendMessageRequest(queueUrl, String.valueOf(objectMapper.writeValueAsString(message)));
-            messageRequest.setDelaySeconds(delay);
             queue.sendMessage(messageRequest);
         } catch (Exception e) {
             log.error("An error occurred during saving message to the queue. User id: {}, File: {}",
                     message.getUserId(), message.getHashedFileName(), e);
         }
     }
+
+    private void updateVisibilityTimeout(final String receiptHandle) {
+        final ChangeMessageVisibilityRequest request = new ChangeMessageVisibilityRequest()
+              .withQueueUrl(queueUrl)
+              .withReceiptHandle(receiptHandle)
+              .withVisibilityTimeout(timeoutInSeconds);
+
+        queue.changeMessageVisibility(request);
+    }
+
 
 }

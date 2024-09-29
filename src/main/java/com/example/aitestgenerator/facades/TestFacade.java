@@ -15,11 +15,14 @@ import com.example.aitestgenerator.services.*;
 import com.example.aitestgenerator.services.aws.StorageClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,7 +66,7 @@ public class TestFacade {
 
   public void prepareTestGeneration(final Long userId, final GenerateTestRequestDto dto) {
     final String hashedFileName = dto.getHashedFileName();
-    log.info("Retrieved command to generation test by file=[{}], userId=[{}]", hashedFileName, userId);
+    log.info("Received command to generation test by file=[{}], userId=[{}]", hashedFileName, userId);
     final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(userId, hashedFileName);
 
     TestGeneratingHistory history = testGenerationConverter.getWaiting(userService.findUserById(userId));
@@ -75,19 +78,23 @@ public class TestFacade {
     }
 
     history.setFileName(fileHash.getOriginalFilename());
-    historyService.save(history);
 
+    historyService.save(history);
     final GenerateTestMessage message = testGenerationConverter.convert(dto, hashedFileName, userId, history.getId());
     commandService.sendCommand(message);
   }
 
+  @Async("taskExecutor")
   public void generateTestReceiveMessage(final GenerateTestMessage message) {
+    final String cid = UUID.randomUUID().toString();
+    MDC.put("cid", cid);
+
     log.info("Received message to generate test. Message=[{}]", message);
     TestGeneratingHistory history = historyService.findById(message.getHistoryId());
     final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
 
     if (history != null) {
-      history = testGenerationConverter.getInProcess(history, message.getReceipt());
+      history = testGenerationConverter.getInProcess(history, message.getReceipt(), cid);
       historyService.save(history);
     } else {
       activityService.failGeneration(message.getReceipt(),
