@@ -41,8 +41,8 @@ public class TestFacade {
   private final UserService userService;
 
   public Test save(final CreateTestRequestDto request, final Long userId) {
-    final Test test = testConverter.convert(request);
-    return testService.prepareTestAndSave(test, userId);
+    final Test test = testConverter.convert(request, userId);
+    return testService.save(test);
   }
 
 //  public void generateTestByTextSendMessage(final Long userId, final Long textId) {
@@ -99,8 +99,7 @@ public class TestFacade {
     final GenerateTestRequest request = testGenerationConverter.convert(message, history, userContent, message.getUserId(), fileHash);
 
     final Test test = testGenerationService.generateTest(request);
-
-    testService.prepareTestAndSave(test);
+    testService.save(test);
 
     history = history.toBuilder()
           .testId(test.getId())
@@ -131,8 +130,8 @@ public class TestFacade {
     return testService.findAllByIdAndUserIdOrThrow(testId, userId);
   }
 
-  public Test upsert(final Test updatedTest, final Long userId) {
-    return testService.upsert(updatedTest, userId);
+  public Test upsert(final Test test, final Long userId) {
+    return null;
   }
 
   public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {

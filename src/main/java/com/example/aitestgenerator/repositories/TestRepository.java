@@ -12,8 +12,6 @@ public interface TestRepository extends CrudRepository<Test, Long> {
 
     Optional<Test> findTestByIdAndUserId(Long id, Long userId);
 
-//    List<Test> findAllByTextId(Long textId);
-
     List<Test> findAllByIdInAndUserIdOrderByIdDesc(List<Long> ids, Long userId);
 
     @Transactional

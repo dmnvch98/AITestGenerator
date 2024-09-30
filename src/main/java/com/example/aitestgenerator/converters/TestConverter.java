@@ -36,5 +36,7 @@ public interface TestConverter {
         return fileHash.getOriginalFilename();
     }
 
-    Test convert(final CreateTestRequestDto dto);
+    @Mapping(source = "userId", target = "userId")
+    Test convert(final CreateTestRequestDto dto, final Long userId);
+
 }

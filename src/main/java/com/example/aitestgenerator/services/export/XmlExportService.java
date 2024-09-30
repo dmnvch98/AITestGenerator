@@ -1,8 +1,6 @@
 package com.example.aitestgenerator.services.export;
 
 import com.example.aitestgenerator.dto.tests.export.ExportTestRequestDto;
-import com.example.aitestgenerator.models.AnswerOption;
-import com.example.aitestgenerator.models.Question;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.services.export.model.ExportedTest;
 import com.example.aitestgenerator.utils.Utils;
@@ -32,21 +30,21 @@ public class XmlExportService implements ExportService {
         ObjectNode rootNode = xmlMapper.createObjectNode();
 
         ArrayNode questionsNode = xmlMapper.createArrayNode();
-        for (Question question : test.getQuestions()) {
-            ObjectNode questionNode = xmlMapper.createObjectNode();
-            questionNode.put(requestDto.getQuestionTextLabel(), question.getQuestionText());
-
-            ArrayNode answerOptionsNode = xmlMapper.createArrayNode();
-            for (AnswerOption answer : question.getAnswerOptions()) {
-                ObjectNode answerOptionNode = xmlMapper.createObjectNode();
-                answerOptionNode.put(requestDto.getOptionTextLabel(), answer.getOptionText());
-                answerOptionNode.put(requestDto.getIsCorrectLabel(), answer.getIsCorrect());
-                answerOptionsNode.add(answerOptionNode);
-            }
-
-            questionNode.set(requestDto.getAnswerOptionsLabel(), answerOptionsNode);
-            questionsNode.add(questionNode);
-        }
+//        for (Question question : test.getQuestions()) {
+//            ObjectNode questionNode = xmlMapper.createObjectNode();
+//            questionNode.put(requestDto.getQuestionTextLabel(), question.getQuestionText());
+//
+//            ArrayNode answerOptionsNode = xmlMapper.createArrayNode();
+//            for (AnswerOption answer : question.getAnswerOptions()) {
+//                ObjectNode answerOptionNode = xmlMapper.createObjectNode();
+//                answerOptionNode.put(requestDto.getOptionTextLabel(), answer.getOptionText());
+//                answerOptionNode.put(requestDto.getIsCorrectLabel(), answer.getIsCorrect());
+//                answerOptionsNode.add(answerOptionNode);
+//            }
+//
+//            questionNode.set(requestDto.getAnswerOptionsLabel(), answerOptionsNode);
+//            questionsNode.add(questionNode);
+//        }
 
         rootNode.set(requestDto.getQuestionsLabel(), questionsNode);
 
