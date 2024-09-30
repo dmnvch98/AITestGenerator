@@ -1,12 +1,11 @@
 import {useState, useEffect, useRef} from "react";
 import { Question, AnswerOption } from "../../../store/tests/testStore";
-import {Accordion, AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
 import React from "react";
 import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
-import ClearIcon from "@mui/icons-material/Clear";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from "@mui/material/Typography";
+import {DeleteOutlineOutlined} from "@mui/icons-material";
 
 export interface QuestionEditProps {
     question: Question;
@@ -14,11 +13,10 @@ export interface QuestionEditProps {
     onDelete: () => void;
     errorMessage: string;
     questionNumber?: number;
-    expandable?: boolean
 }
 
 export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage,
-                                                              expandable}) => {
+                                                              questionNumber}) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
     const [expanded, setExpanded] = useState(true);
@@ -68,37 +66,25 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
         onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
     };
 
-    const handleExpandClick = (event: React.MouseEvent) => {
-        event.stopPropagation();
-        setExpanded(!expanded);
-    };
-
     return (
-
-        <Accordion expanded={expanded} sx={{border: errorMessage ? '2px solid #ff604f' : 'none' }}>
+        <Box sx={{border: errorMessage ? '2px solid #ff604f' : 'none' }}>
             <AccordionSummary
                 aria-controls="panel1a-content"
                 id="panel1a-header"
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%'}}>
-                    {expandable && (<IconButton
-                        onClick={handleExpandClick}
-                        edge="start"
-                    >
-                        <ExpandMoreIcon/>
-                    </IconButton>)}
-
                     <TextField
-                        placeholder="Текст вопроса"
+                        label={"Вопрос " + questionNumber}
+                        placeholder="Введите вопрос"
                         multiline
                         fullWidth
                         variant="standard"
                         value={questionText}
                         onChange={handleQuestionTextChange}
-                        sx={{ '& .MuiInputBase-input': { fontWeight: 500 }, ml: !expandable ? 3 : 0 }}
+                        sx={{ '& .MuiInputBase-input': { fontWeight: 600 }, ml: 2 }}
                     />
                     <IconButton onClick={onDelete}>
-                        <ClearIcon />
+                        <DeleteOutlineOutlined />
                     </IconButton>
                 </Box>
             </AccordionSummary>
@@ -122,7 +108,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                     )}
                 </Box>
             </AccordionDetails>
-        </Accordion>
+        </Box>
     );
 };
 

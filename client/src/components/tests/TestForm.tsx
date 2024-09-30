@@ -40,7 +40,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
     const {alerts, clearAlerts, deleteAlert, setAlert, upsert} = useTestStore();
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('list'); // View mode state
+    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated'); // View mode state
 
     useEffect(() => {
         if (isEditMode && initialTest && !hasSaved) {
@@ -130,50 +130,49 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
         <Box display="flex" flexDirection="row" position="relative">
             <Box flexGrow={1} mr="250px">
                 <Paper>
-                    <TextField
-                        placeholder="Введите название теста"
-                        fullWidth
-                        multiline
-                        value={localTest?.title || ""}
-                        variant="outlined"
-                        onChange={handleTitleChange}
-                        sx={{
-                            "& .MuiInputBase-input": {
-                                fontWeight: 500,
-                                fontSize: "20px",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                border: "none",
-                            },
-                        }}
-                        error={!!testTitleError}
-                        helperText={testTitleError}
-                    />
-                </Paper>
+                    <Box sx={{ml: 4, mr: 4, pt: 2}}>
+                            <TextField
+                                label="Заголовок теста"
+                                placeholder="Введите заголовок теста"
+                                fullWidth
+                                multiline
+                                value={localTest?.title || ""}
+                                variant="standard"
+                                onChange={handleTitleChange}
+                                sx={{
+                                    "& .MuiInputBase-input": {
+                                        fontWeight: 600,
+                                        fontSize: "22px",
+                                    }
+                                }}
+                                error={!!testTitleError}
+                                helperText={testTitleError}
+                            />
 
-                {/* Render questions based on view mode */}
-                {viewMode === 'list' ? (
-                    <QuestionListView
-                        questions={localTest.questions}
-                        onQuestionChange={handleQuestionChange}
-                        onDelete={handleDeleteQuestion}
-                        invalidQuestions={invalidQuestions}
-                    />
-                ) : (
-                    <QuestionPaginatedView
-                        questions={localTest.questions}
-                        currentQuestionIndex={currentQuestionIndex}
-                        onQuestionChange={handleQuestionChange}
-                        onDelete={handleDeleteQuestion}
-                        onSelectQuestion={setCurrentQuestionIndex}
-                        invalidQuestions={invalidQuestions}
-                    />
-                )}
+                    </Box>
+
+                    {viewMode === 'list' ? (
+                        <QuestionListView
+                            questions={localTest.questions}
+                            onQuestionChange={handleQuestionChange}
+                            onDelete={handleDeleteQuestion}
+                            invalidQuestions={invalidQuestions}
+                        />
+                    ) : (
+                        <QuestionPaginatedView
+                            questions={localTest.questions}
+                            currentQuestionIndex={currentQuestionIndex}
+                            onQuestionChange={handleQuestionChange}
+                            onDelete={handleDeleteQuestion}
+                            onSelectQuestion={setCurrentQuestionIndex}
+                            invalidQuestions={invalidQuestions}
+                        />
+                    )}
+                </Paper>
             </Box>
 
             <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
                 <Paper sx={{maxWidth: 230, p: 2, position: "fixed"}}>
-                    {/* Dropdown for view mode selection */}
                     <FormControl fullWidth sx={{mb: 3}}>
                         <InputLabel id="view-mode-select-label">Режим отображения</InputLabel>
                         <Select
@@ -210,20 +209,20 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                     {viewMode === 'paginated' && (
                         <>
                             <Box sx={{mt: 3}}>
-                            <Divider sx={{mb: 3}}/>
+                                <Divider sx={{mb: 3}}/>
                                 <Typography align="left" variant="subtitle2" sx={{mb: 1}}>Номер вопроса:</Typography>
-                            <Pagination
-                                count={localTest.questions.length}
-                                page={currentQuestionIndex + 1}
-                                onChange={(_, page) => setCurrentQuestionIndex(page - 1)}
-                                variant="outlined"
-                                shape="rounded"
-                                sx={{display: 'flex', justifyContent: 'center'}}
-                                hidePrevButton
-                                hideNextButton
-                                boundaryCount={localTest.questions.length}
-                                siblingCount={localTest.questions.length}
-                            />
+                                <Pagination
+                                    count={localTest.questions.length}
+                                    page={currentQuestionIndex + 1}
+                                    onChange={(_, page) => setCurrentQuestionIndex(page - 1)}
+                                    variant="outlined"
+                                    shape="rounded"
+                                    sx={{display: 'flex', justifyContent: 'center'}}
+                                    hidePrevButton
+                                    hideNextButton
+                                    boundaryCount={localTest.questions.length}
+                                    siblingCount={localTest.questions.length}
+                                />
                             </Box>
                         </>
                     )}

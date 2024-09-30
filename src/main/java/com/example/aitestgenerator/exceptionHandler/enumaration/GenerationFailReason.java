@@ -42,14 +42,19 @@ public enum GenerationFailReason {
     }
 
     public static GenerationFailReason extractFailureCode(final Throwable throwable) {
-        for (final GenerationFailReason code : failReasons) {
-            if (code.getCause().isInstance(throwable)) {
-                final String message = throwable.getMessage();
-                if (message != null && Pattern.matches(code.getMessageRegex(), message)) {
-                    return code;
+        Throwable current = throwable;
+        while (current != null) {
+            for (final GenerationFailReason code : failReasons) {
+                if (code.getCause().isInstance(current)) {
+                    final String message = current.getMessage();
+                    if (message != null && Pattern.matches(code.getMessageRegex(), message)) {
+                        return code;
+                    }
                 }
             }
+            current = current.getCause();
         }
         return UNKNOWN;
     }
+
 }

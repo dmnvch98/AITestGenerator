@@ -26,7 +26,6 @@ export const QuestionListView: React.FC<QuestionListViewProps> = ({
             <Box key={index} display="flex" alignItems="center" my={2}>
                 <Box flexGrow={1}>
                     <QuestionEdit
-                        expandable={true}
                         question={question}
                         questionNumber={index + 1}
                         onQuestionChange={onQuestionChange}
@@ -51,7 +50,6 @@ export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = ({
             <Box display="flex" alignItems="center" my={2}>
                 <Box flexGrow={1}>
                     <QuestionEdit
-                        expandable={false}
                         questionNumber={currentQuestionIndex + 1}
                         question={questions[currentQuestionIndex]}
                         onQuestionChange={onQuestionChange}

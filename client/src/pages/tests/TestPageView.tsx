@@ -29,7 +29,7 @@ const TestPageViewContent = () => {
         <Box display="flex" flexDirection="row" position="relative">
             <Box flexGrow={1} mr={3}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                    <Paper sx={{ p: 2 }}>
+                    <Paper sx={{ p: 2, width: '100%' }}>
                         <Typography
                             align="left"
                             sx={{

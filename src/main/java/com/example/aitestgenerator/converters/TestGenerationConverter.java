@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 public interface TestGenerationConverter {
 
   @Mapping(source = "user.id", target = "userId")
-  @Mapping(source = "test.title", target = "testTitle")
-  @Mapping(source = "test.id", target = "testId")
   TextGenerationHistoryDto historyToDto(final TestGeneratingHistory history);
 
   default TestGeneratingHistory getWaiting(final User user) {
@@ -28,13 +26,12 @@ public interface TestGenerationConverter {
           .build();
   }
 
-  default TestGeneratingHistory getInProcess(final TestGeneratingHistory history, final String receipt, final String cid) {
+  default TestGeneratingHistory getInProcess(final TestGeneratingHistory history, final String receipt) {
     return history
           .toBuilder()
           .generationStatus(GenerationStatus.IN_PROCESS)
           .generationStart(LocalDateTime.now())
           .messageReceipt(receipt)
-          .cid(cid)
           .build();
   }
 

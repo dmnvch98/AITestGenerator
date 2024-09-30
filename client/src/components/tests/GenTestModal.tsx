@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Modal, Box, Typography, TextField, Slider, Button, Tooltip} from '@mui/material';
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -21,6 +21,12 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
         setTopP,
     } = useGenerateTestStore();
 
+    useEffect(() => {
+        if (!open) {
+            clearFields();
+        }
+    }, [open]);
+
     const handleQuestionsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Math.min(50, Math.max(0, parseInt(event.target.value, 10) || 0));
         setQuestions(value);
@@ -38,6 +44,13 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
     const handleTopPChange = (_event: Event, newValue: number | number[]) => {
         setTopP(newValue as number);
     };
+
+    const clearFields = () => {
+        setQuestions(10);
+        setAnswers(4);
+        setTemperature(0.5);
+        setTopP(0.8);
+    }
 
     return (
         <Modal open={open} onClose={onClose}>

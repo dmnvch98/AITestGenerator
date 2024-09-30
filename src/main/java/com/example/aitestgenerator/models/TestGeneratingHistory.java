@@ -19,9 +19,8 @@ public class TestGeneratingHistory {
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "testId", referencedColumnName = "id")
-    private Test test;
+    private Long testId;
+    private String testTitle;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
     @Enumerated(EnumType.STRING)
