@@ -1,0 +1,32 @@
+{
+  "name": "questions",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "questionText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "questionText"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "title",
+      "questions"
+    ],
+    "additionalProperties": false
+  }
+}

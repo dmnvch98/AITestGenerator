@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.services;
 
-import com.example.aitestgenerator.converters.TestGenerationHistoryConverter;
+import com.example.aitestgenerator.converters.TestGenerationConverter;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
@@ -17,7 +17,7 @@ public class TestGeneratingHistoryService {
 
     private final TestGeneratingHistoryRepository repository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final TestGenerationHistoryConverter testGenerationHistoryConverter;
+    private final TestGenerationConverter testGenerationHistoryConverter;
 
     public void save(final TestGeneratingHistory history) {
         repository.save(history);

@@ -1,16 +1,25 @@
 import { Question } from "../../../store/tests/testStore";
 import {Accordion, AccordionDetails, AccordionSummary, IconButton, Typography} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { AnswerOptionView } from "../answerOptions/AnswerOptionView";
 import Box from "@mui/material/Box";
 
-export const QuestionView = ({ question }: { question: Question }) => {
-    const [expanded, setExpanded] = useState(false);
+interface QuestionViewProps {
+    question: Question,
+    isExpanded: boolean
+}
+
+export const QuestionView = ({ question, isExpanded }: QuestionViewProps) => {
+    const [expanded, setExpanded] = useState(isExpanded);
 
     const handleAccordionChange = () => {
         setExpanded(!expanded);
     };
+
+    useEffect(() => {
+        setExpanded(isExpanded);
+    }, [isExpanded]);
 
     return (
         <Accordion expanded={expanded} onChange={handleAccordionChange}>

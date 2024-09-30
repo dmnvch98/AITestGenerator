@@ -6,6 +6,8 @@ import com.theokanning.openai.OpenAiHttpException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.FileNotFoundException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -15,16 +17,20 @@ import java.util.stream.Collectors;
 @Getter
 public enum GenerationFailReason {
 
-    HTTP_EXCEPTION_UNAUTHORIZED(OpenAiHttpException.class, "Incorrect API key provided: .*"),
-    SHUTDOWN_REQUESTED(null, null),
-    PARSE_EXCEPTION(JsonParseException.class, "Unexpected character: .*"),
+    HTTP_EXCEPTION_UNAUTHORIZED(OpenAiHttpException.class, "Incorrect API key provided: .*", true),
+    SHUTDOWN_REQUESTED(null, null, true),
+    PARSE_EXCEPTION(JsonParseException.class, "Unexpected character: .*", true),
     HTTP_EXCEPTION_LIMIT_EXCEEDED(OpenAiHttpException.class,
-            "You exceeded your current quota, please check your plan and billing details. .*"),
-    UNKNOWN(null, null);
+            "You exceeded your current quota, please check your plan and billing details. .*", true),
+    FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true),
+    REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true),
+    SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", true),
+    UNKNOWN(null, null, false);
 
     private final Class<? extends Throwable> cause;
     private final String messageRegex;
     private final static Set<GenerationFailReason> failReasons = initializeFailsReasons();
+    private final boolean fatal;
 
     private static Set<GenerationFailReason> initializeFailsReasons() {
       if (CollectionUtils.isNullOrEmpty(failReasons)) {
@@ -36,14 +42,19 @@ public enum GenerationFailReason {
     }
 
     public static GenerationFailReason extractFailureCode(final Throwable throwable) {
-        for (final GenerationFailReason code : failReasons) {
-            if (code.getCause().isInstance(throwable)) {
-                final String message = throwable.getMessage();
-                if (message != null && Pattern.matches(code.getMessageRegex(), message)) {
-                    return code;
+        Throwable current = throwable;
+        while (current != null) {
+            for (final GenerationFailReason code : failReasons) {
+                if (code.getCause().isInstance(current)) {
+                    final String message = current.getMessage();
+                    if (message != null && Pattern.matches(code.getMessageRegex(), message)) {
+                        return code;
+                    }
                 }
             }
+            current = current.getCause();
         }
         return UNKNOWN;
     }
+
 }

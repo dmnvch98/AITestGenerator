@@ -25,7 +25,7 @@ public class DocxExtractor implements FileExtractor {
                 text.append(para.getText()).append("\n");
             }
         } catch (IOException e) {
-            log.error("Error when parsing .docx document. File url: [{}]", fileUrl.getPath(), e);
+            throw new IllegalArgumentException("Error when parsing .docx document. File url: " + fileUrl.getPath(), e);
         }
 
         return Utils.removeNewLines(text.toString());

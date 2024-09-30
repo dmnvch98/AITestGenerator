@@ -1,10 +1,17 @@
 package com.example.aitestgenerator.generators;
 
+import com.example.aitestgenerator.converters.GenerationConverter;
+import com.example.aitestgenerator.dto.generation.GenerateQuestionsResponseDto;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
+import com.example.aitestgenerator.services.ai.AIService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,36 +22,37 @@ import static com.example.aitestgenerator.utils.Utils.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class QuestionGenerator extends Generator<List<ChatMessage>> {
+public class QuestionGenerator extends Generator<GenerateQuestionsResponseDto> {
 
-    private static final String QUESTIONS_PROMPT_FILE = "ai_prompts/generate_questions.txt";
+    private static final String QUESTIONS_CONTEXT_PROMPT_FILE = "ai/question_context_prompt.txt";
+    private static final String QUESTIONS_SCHEMA_FILE = "ai/schemas/questions.json";
+
+    @Value("${generation.models.question}")
+    private String model;
+
+    private final GenerationConverter converter;
+    private final AIService aiService;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public List<ChatMessage> generateData(final GenerateTestRequest request) throws IOException {
-        log.info("Sending prompt to AI. User id: {}",
-                request.getHistory().getUser().getId());
-        prepareMessages(request);
+    public GenerateQuestionsResponseDto generateData(final GenerateTestRequest request) throws IOException {
+        log.info("Sending prompt to generation questions. User id: {}", request.getUserId());
 
-        final ChatCompletionResult result = openAiService.createChatCompletion(buildChatCompletionRequest(request.getMessages()));
-        return processResult(result, request.getMessages());
+        final JsonNode responseSchema = objectMapper.readTree(readFileContents(QUESTIONS_SCHEMA_FILE));
+        final List<ChatMessage> chatMessages = prepareMessages(request);
+        final String result = aiService.send(model, chatMessages, responseSchema, request.getTemperature(), request.getTopP());
+
+        return converter.convert(result);
     }
 
-    private void prepareMessages(final GenerateTestRequest request) {
-        final String textWithoutHTML = removeHTMLTags(request.getContent());
-        final ChatMessage textPromptMessage = createChatMessage(textWithoutHTML);
-        final ChatMessage questionsPromptMessage = createChatMessage(readFileContents(QUESTIONS_PROMPT_FILE));
+    private List<ChatMessage> prepareMessages(final GenerateTestRequest request) throws JsonProcessingException {
+        final String contextPrompt = readFileContents(QUESTIONS_CONTEXT_PROMPT_FILE);
+        final String userPrompt = converter.convert(request);
 
-        request.getMessages().add(textPromptMessage);
-        request.getMessages().add(questionsPromptMessage);
+        final ChatMessage context = new ChatMessage(ChatMessageRole.SYSTEM.value(), contextPrompt);
+        final ChatMessage userText = new ChatMessage(ChatMessageRole.USER.value(), userPrompt);
+
+        return List.of(context, userText);
     }
 
-    private List<ChatMessage> processResult(ChatCompletionResult result, List<ChatMessage> messages) throws IOException {
-        String resultContent = result.getChoices().get(0).getMessage().getContent();
-        if (resultContent.isEmpty()) {
-            log.error("No content received from AI service.");
-            throw new IOException("No content received from AI service.");
-        }
-        extractAnswer(result, messages);
-        return messages;
-    }
 }

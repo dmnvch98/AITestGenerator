@@ -40,7 +40,6 @@ const TestGenHistoryCurrent = () => {
                     const updatedHistory = JSON.parse(message.body) as TestGenHistory;
                     setCurrentTestGenHistories(updatedHistory);
                 });
-                console.log('Subscribed: ' + `/user/${user?.id}/queue/TestGeneratingHistory`);
             },
             onStompError: (frame) => {
                 console.error('Broker reported error: ' + frame.headers['message']);

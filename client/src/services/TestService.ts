@@ -1,9 +1,25 @@
 import customAxios from "../interceptors/custom_axios";
 import {AxiosError} from "axios";
-import {GenerateTestRequestDto, UserTest} from "../store/tests/testStore";
-import {GenerationStatus} from "../store/types";
+import {
+    BulkDeleteTestsRequestDto,
+    CreateTestRequestDto,
+    GenerateTestRequest,
+    GenerateTestRequestDto,
+    UserTest
+} from "../store/tests/testStore";
 
 class TestService {
+
+    saveUserTest = async (dto: CreateTestRequestDto) => {
+        try {
+            const response = await customAxios.post("/api/v1/tests", dto);
+            return response.status === 201;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
     generateTest = async (dto: GenerateTestRequestDto) => {
         try {
             const response = await customAxios.post("/api/v1/tests/generate", dto);
@@ -14,9 +30,9 @@ class TestService {
         }
     }
 
-    generateTestByFile = async (hashedFileName: string) => {
+    generateTestByFile = async (request: GenerateTestRequest) => {
         try {
-            const response = await customAxios.post(`/api/v1/tests/generate/files/${hashedFileName}`);
+            const response = await customAxios.post(`/api/v1/tests/generate`, request);
             return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -46,10 +62,20 @@ class TestService {
         }
     }
 
-    updateTest = async (test: UserTest) => {
+    bulkTestDelete = async (requestDto: BulkDeleteTestsRequestDto) => {
+        try {
+            const response = await customAxios.delete("/api/v1/tests", {data: requestDto});
+            return response.status == 204;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+    upsert = async (test: UserTest | CreateTestRequestDto) => {
         try {
             const response = await customAxios.put("/api/v1/tests", test);
-            return response.status == 200;
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);
@@ -59,6 +85,18 @@ class TestService {
     getCurrentTestGenerationHistory = async () => {
         try {
             const response = await customAxios.get(`/api/v1/tests/history/current`);
+            return response.data;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+
+    getUserTestById = async (id: number) => {
+        try {
+            const url = `/api/v1/tests/${id}`;
+            const response = await customAxios.get(url);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

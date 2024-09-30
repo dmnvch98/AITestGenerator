@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Box, Typography, List, ListItem, Checkbox, Grid, Divider} from '@mui/material';
 import './styles/oneColumn.css';
-import useTextSettingsStore from "../../store/tests/textSettingsStore";
+import useTextSettingsStore from "../../store/tests/testPrintStore";
 import {useTestStore} from "../../store/tests/testStore";
 import {useParams} from "react-router-dom";
 import {useUserStore} from "../../store/userStore";
@@ -60,24 +60,13 @@ export const PrintTestContent = () => {
         showAnswers,
         showHeader
     } = useTextSettingsStore();
-    const {selectedTest, tests, getUserTestsByIdIn, selectTest} = useTestStore();
+    const {selectedTest, getUserTestById} = useTestStore();
 
     useEffect(() => {
-        const loadTestData = async (id: number) => {
-            setLoading(true);
-            if (tests.length === 0) {
-                await getUserTestsByIdIn([Number(id)]);
-            }
-            const test = tests.find(test => test.id === Number(id));
-            if (test) {
-                selectTest(test);
-            }
-            setLoading(false);
-        };
-
-        loadTestData(Number(id));
-    }, [id, tests, getUserTestsByIdIn, selectTest, setLoading]);
-
+        setLoading(true);
+        getUserTestById(Number(id));
+        setLoading(false);
+    }, []);
 
     return (
         <>

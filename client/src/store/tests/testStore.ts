@@ -4,25 +4,41 @@ import {AlertMessage} from "../types";
 
 export interface UserTest {
     id: number,
-    textId: number | undefined,
+    title: string,
+    questions: Question[]
+}
+
+export interface CreateTestRequestDto {
     title: string,
     questions: Question[]
 }
 
 export interface Question {
-    id: number | undefined,
+    id?: number,
     questionText: string,
     answerOptions: AnswerOption[]
 }
 
 export interface AnswerOption {
-    id: number | undefined,
+    id?: number,
     optionText: string,
     isCorrect: boolean
 }
 
 export interface GenerateTestRequestDto {
     textId: number
+}
+
+export interface GenerateTestRequest {
+    maxQuestionsCount: number,
+    minAnswersCount: number,
+    temperature: number,
+    topP: number,
+    hashedFileName: string
+}
+
+export interface BulkDeleteTestsRequestDto {
+    ids: number[];
 }
 
 export interface TestStore {
@@ -33,9 +49,10 @@ export interface TestStore {
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
     generateTest: (textId: number) => void,
-    generateTestByFile: (hashedFileName: string) => Promise<boolean>,
+    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
+    getUserTestById: (id: number) => Promise<void>,
     deleteTest: (ids: number) => void,
     generateTestFlag: boolean,
     toggleGenerateTestFlag: () => void,
@@ -51,7 +68,9 @@ export interface TestStore {
     setAlert: (alert: AlertMessage[]) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
-    updateTest: (test: UserTest) => void;
+    upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
+    saveTest: (test: CreateTestRequestDto) => void;
+    bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -63,7 +82,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTextId: undefined,
     alerts: [],
     selectTest: (userTest: UserTest) => {
-        userTest.questions.sort((a, b) => Number(a.id) > Number(b.id) ? 1 : -1);
         set({selectedTest: userTest});
     },
     generateTest: async (textId: number) => {
@@ -76,13 +94,13 @@ export const useTestStore = create<TestStore>((set, get) => ({
         }
     },
 
-    generateTestByFile: async (hashedFileName) => {
-        const response = await TestService.generateTestByFile(hashedFileName);
+    generateTestByFile: async (request) => {
+        const response = await TestService.generateTestByFile(request);
         return response as boolean;
     },
     getAllUserTests: async () => {
-        const response = await TestService.getUserTests()
-        set({tests: response})
+        const {tests} = await TestService.getUserTests()
+        set({tests: tests})
     },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
@@ -123,17 +141,42 @@ export const useTestStore = create<TestStore>((set, get) => ({
     deleteAlert: (alertToDelete) => set((state) => ({
         alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
     })),
-    updateTest: async (test) => {
-        const { setAlert, getAllUserTests } = get();
-        const response = await TestService.updateTest(test);
+    upsert: async (test): Promise<UserTest | null> => {
+        const { setAlert, getAllUserTests} = get();
+        const response = await TestService.upsert(test);
         if (response) {
             getAllUserTests();
             setAlert([{ id: Date.now(), message: 'Тест успешно обновлен', severity: 'success' }])
+            return response as UserTest;
         } else {
             setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении теста', severity: 'error' }])
+            return null;
         }
     },
     clearSelectedTest: () => {
         set({selectedTest: undefined});
-    }
+    },
+    getUserTestById: async (id) => {
+        const response = await TestService.getUserTestById(id);
+        set({selectedTest: response});
+    },
+    saveTest: async (test) => {
+        const { setAlert} = get();
+        const response = await TestService.saveUserTest(test);
+        if (response) {
+            setAlert([{ id: Date.now(), message: 'Тест успешно сохранен', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при сохранении теста', severity: 'error' }])
+        }
+    },
+    bulkDeleteTest: async (request) => {
+        const response = await TestService.bulkTestDelete(request);
+        const { setAlert, getAllUserTests } = get();
+        if (response) {
+            getAllUserTests();
+            setAlert([{ id: Date.now(), message: 'Тесты успешно удалены', severity: 'success' }])
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении тестов', severity: 'error' }])
+        }
+    },
 }))

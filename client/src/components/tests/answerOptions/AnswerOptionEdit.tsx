@@ -4,7 +4,7 @@ import React from "react";
 import { AnswerOption } from "../../../store/tests/testStore";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import ClearIcon from "@mui/icons-material/Clear";
+import {DeleteOutlineOutlined} from "@mui/icons-material";
 
 const AnswerOptionEdit = ({ answerOption, onOptionChange, onDelete }: { answerOption: AnswerOption, onOptionChange: (option: AnswerOption) => void, onDelete: () => void }) => {
     const handleOptionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,10 +18,12 @@ const AnswerOptionEdit = ({ answerOption, onOptionChange, onDelete }: { answerOp
 
     return (
         <List>
-            <ListItem sx={{pl:4, pr: 4}}>
+            <ListItem>
                 <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center'}}>
                         <TextField
+                            label="Вариант ответа"
+                            placeholder="Введите вариант ответа"
                             multiline
                             id="standard-basic"
                             variant="standard"
@@ -30,7 +32,7 @@ const AnswerOptionEdit = ({ answerOption, onOptionChange, onDelete }: { answerOp
                             fullWidth
                         />
                         <IconButton onClick={onDelete} edge="end">
-                            <ClearIcon />
+                            <DeleteOutlineOutlined />
                         </IconButton>
                     </Box>
                     <FormGroup>

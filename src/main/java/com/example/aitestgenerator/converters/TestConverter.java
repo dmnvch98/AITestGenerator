@@ -1,32 +1,42 @@
 package com.example.aitestgenerator.converters;
 
-import com.example.aitestgenerator.dto.tests.AnswerOptionDto;
-import com.example.aitestgenerator.dto.tests.QuestionDto;
-import com.example.aitestgenerator.dto.tests.GenerateAdditionalTestDto;
-import com.example.aitestgenerator.models.AnswerOption;
+import com.example.aitestgenerator.dto.generation.GenerateAnswersResponseDto;
+import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
+import com.example.aitestgenerator.dto.tests.TestsResponseDto;
+import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.Test;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
 
 @Mapper
-public abstract class TestConverter {
-    public abstract AnswerOptionDto answerOptionToDto(AnswerOption answerOption);
+public interface TestConverter {
 
-    public GenerateAdditionalTestDto testToDto(List<Test> tests, String title) {
-        List<QuestionDto> questionDtos = tests
-            .stream()
-            .flatMap(test -> test.getQuestions().stream())
-            .map(question -> {
-                List<AnswerOptionDto> answerOptionDtos = question.getAnswerOptions()
-                    .stream()
-                    .map(this::answerOptionToDto)
-                    .toList();
-                return new QuestionDto(question.getQuestionText(), answerOptionDtos);
-            })
-            .toList();
-        return new GenerateAdditionalTestDto(title, questionDtos);
+    @Mapping(source = "answersDto.questions", target = "questions")
+    @Mapping(source = "answersDto.title", target = "title")
+    @Mapping(source = "problems", target = "problems")
+    @Mapping(source = "userId", target = "userId")
+    @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
+    Test convert(final GenerateAnswersResponseDto answersDto,
+                 final String problems, final long userId,
+                 final FileHash fileHash);
+
+    TestsResponseDto.TestResponseDto convert(final Test test);
+
+    default TestsResponseDto convert(final List<Test> tests) {
+        return TestsResponseDto.builder()
+              .tests(tests.stream().map(this::convert).toList())
+              .build();
     }
 
+    @Named("getOriginalFilename")
+    default String getFileHashId(final FileHash fileHash) {
+        return fileHash.getOriginalFilename();
+    }
+
+    @Mapping(source = "userId", target = "userId")
+    Test convert(final CreateTestRequestDto dto, final Long userId);
 
 }

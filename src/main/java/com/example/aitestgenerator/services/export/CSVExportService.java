@@ -1,8 +1,6 @@
 package com.example.aitestgenerator.services.export;
 
 import com.example.aitestgenerator.dto.tests.export.ExportTestRequestDto;
-import com.example.aitestgenerator.models.AnswerOption;
-import com.example.aitestgenerator.models.Question;
 import com.example.aitestgenerator.models.Test;
 import com.example.aitestgenerator.services.export.model.ExportedTest;
 import com.example.aitestgenerator.utils.Utils;
@@ -37,15 +35,15 @@ public class CSVExportService implements ExportService {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (SequenceWriter writer = csvMapper.writer(schema).writeValues(byteArrayOutputStream)) {
-            for (Question question : test.getQuestions()) {
-                for (AnswerOption option : question.getAnswerOptions()) {
-                    writer.write(new CsvQuestionFormat(
-                            question.getQuestionText(),
-                            option.getOptionText(),
-                            option.getIsCorrect() ? "True" : "False"
-                    ));
-                }
-            }
+//            for (Question question : test.getQuestions()) {
+//                for (AnswerOption option : question.getAnswerOptions()) {
+//                    writer.write(new CsvQuestionFormat(
+//                            question.getQuestionText(),
+//                            option.getOptionText(),
+//                            option.getIsCorrect() ? "True" : "False"
+//                    ));
+//                }
+//            }
         }
 
         return ExportedTest.builder()

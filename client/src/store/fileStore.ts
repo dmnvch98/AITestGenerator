@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import FileService from '../services/FileService';
 import { AxiosError } from 'axios';
 import {AlertMessage} from "./types";
@@ -87,7 +87,6 @@ const useFileStore = create<FileStore>((set, get) => ({
             if (response && response.fileResults.length > 0) {
                 response.fileResults.map(resp => {
                     if (resp.status === UploadStatus.ALREADY_UPLOADED ) {
-                        console.log(2)
                         setAlert([{id: Date.now(), message: UploadStatusMessages[resp.status] + ' - ' + resp.fileName, severity: 'warning'}])
                     }
                 })

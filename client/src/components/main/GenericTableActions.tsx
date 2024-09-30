@@ -1,12 +1,15 @@
 import React from 'react';
-import {DataGrid, GridColDef, GridRowIdGetter} from '@mui/x-data-grid';
-import {Box, IconButton, Menu, MenuItem} from "@mui/material";
+import { DataGrid, GridColDef, GridRowIdGetter } from '@mui/x-data-grid';
+import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { tableLables } from './helper';
+import { ConfirmationButton, ConfirmationButtonProps } from './ConfirmationButton';
 
 interface Action<T> {
-    label: string;
-    onClick: (item: T) => void;
+    label?: string;
+    onClick?: (item: T) => void;
     disabled?: boolean;
+    confirmProps?: ConfirmationButtonProps;
 }
 
 interface ActionsProps<T> {
@@ -14,12 +17,13 @@ interface ActionsProps<T> {
     actions: Action<T>[];
 }
 
-export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
+export const Actions = <T,>({ item, actions }: ActionsProps<T>) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -27,26 +31,38 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
     return (
         <Box>
             <IconButton onClick={handleClick}>
-                <SettingsIcon/>
+                <SettingsIcon />
             </IconButton>
 
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                {actions.map((action, index) => (
-                    <MenuItem
-                        key={index}
-                        onClick={() => {
-                            action.onClick(item);
-                            handleClose();
-                        }}
-                        disabled={action.disabled}
-                    >
-                        {action.label}
-                    </MenuItem>
-                ))}
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                {actions.map((action, index) =>
+                    action.confirmProps ? (
+                        <ConfirmationButton
+                            key={index}
+                            config={{
+                                buttonTitle: action.confirmProps.buttonTitle,
+                                dialogTitle: action.confirmProps.dialogTitle,
+                                dialogContent: action.confirmProps.dialogContent,
+                                variant: 'menuItem',
+                            }}
+                            onSubmit={() => {
+                                action.onClick && action.onClick(item);
+                            }}
+                            onClose={handleClose}
+                        />
+                    ) : (
+                        <MenuItem
+                            key={index}
+                            onClick={() => {
+                                action.onClick && action.onClick(item);
+                                handleClose();
+                            }}
+                            disabled={action.disabled}
+                        >
+                            {action.label}
+                        </MenuItem>
+                    )
+                )}
             </Menu>
         </Box>
     );
@@ -60,24 +76,19 @@ interface GenericTableProps<T> {
     onSelectionModelChange?: (ids: number[]) => void;
 }
 
-export const GenericTableActions = <T, >({
-                                      data,
-                                      columns,
-                                      actions,
-                                      rowIdGetter,
-                                      onSelectionModelChange
-                                  }: GenericTableProps<T>) => {
+export const GenericTableActions = <T,>({
+                                            data,
+                                            columns,
+                                            actions,
+                                            rowIdGetter,
+                                            onSelectionModelChange,
+                                        }: GenericTableProps<T>) => {
     const actionColumn: GridColDef = {
         field: 'actions',
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
-            return (
-                <Actions
-                    item={item}
-                    actions={actions(item)}
-                />
-            );
+            return <Actions item={item} actions={actions(item)} />;
         },
         sortable: false,
         disableColumnMenu: true,
@@ -86,7 +97,10 @@ export const GenericTableActions = <T, >({
     return (
         <Box>
             <DataGrid
-                rows={data}
+                rows={data.map((item, idx) => ({
+                    order: idx + 1,
+                    ...item,
+                }))}
                 columns={[...columns, actionColumn]}
                 pageSizeOptions={[5, 10, 15]}
                 checkboxSelection
@@ -97,9 +111,10 @@ export const GenericTableActions = <T, >({
                 }}
                 initialState={{
                     pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
+                        paginationModel: { page: 0, pageSize: 15 },
                     },
                 }}
+                localeText={tableLables}
             />
         </Box>
     );

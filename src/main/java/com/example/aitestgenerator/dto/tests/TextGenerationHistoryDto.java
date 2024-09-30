@@ -14,8 +14,6 @@ public class TextGenerationHistoryDto {
     private Long userId;
     private long testId;
     private String testTitle;
-    private String textTitle;
-    private Long textId;
     private LocalDateTime generationStart;
     private LocalDateTime generationEnd;
     private GenerationStatus generationStatus;
