@@ -131,7 +131,7 @@ public class TestFacade {
   }
 
   public Test upsert(final Test test, final Long userId) {
-    return null;
+    return testService.upsert(test, userId);
   }
 
   public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {

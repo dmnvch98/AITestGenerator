@@ -39,7 +39,7 @@ public class Test {
     @ColumnTransformer(write = "?::jsonb")
     private JsonNode questions;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private Set<TestResult> testResults;
+//    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnore
+//    private Set<TestResult> testResults;
 }

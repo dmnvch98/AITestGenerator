@@ -39,4 +39,7 @@ public interface TestConverter {
     @Mapping(source = "userId", target = "userId")
     Test convert(final CreateTestRequestDto dto, final Long userId);
 
+    @Mapping(source = "userId", target = "userId")
+    Test convert(final Test test, final Long userId);
+
 }

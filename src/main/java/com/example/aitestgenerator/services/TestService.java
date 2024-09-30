@@ -1,5 +1,6 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.converters.TestConverter;
 import com.example.aitestgenerator.models.*;
 import com.example.aitestgenerator.repositories.TestRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class TestService {
 
     private final TestRepository testRepository;
+    private final TestConverter testConverter;
 
     public Test save(final Test test) {
         return testRepository.save(test);
@@ -55,29 +57,20 @@ public class TestService {
         return testRepository.findAllByIdInAndUserIdOrderByIdDesc(testIds, userId);
     }
 
-    public Optional<Test> findTestByIdAndUserId(final Long id, final Long userId) {
-      return testRepository.findTestByIdAndUserId(id, userId);
+    public Test upsert(final Test test, final Long userId) {
+        final Test testToSave = Optional.ofNullable(test.getId())
+              .flatMap(id -> testRepository.findTestByIdAndUserId(id, userId))
+              .map(existingTest -> updateTestFields(existingTest, test))
+              .orElseGet(() -> testConverter.convert(test, userId));
+        return testRepository.save(testToSave);
     }
 
-//    public Test update(final Test updatedTest, final Long userId) {
-//
-//        Test existingTest = testRepository.findTestByIdAndUserId(updatedTest.getId(), userId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Test not found"));
-//
-//        existingTest.setTitle(updatedTest.getTitle());
-//
-//        existingTest.getQuestions().clear();
-//        testRepository.save(existingTest);
-//
-//        for (Question updatedQuestion : updatedTest.getQuestions()) {
-//            updatedQuestion.setTest(existingTest);
-//            for (AnswerOption updatedOption : updatedQuestion.getAnswerOptions()) {
-//                updatedOption.setQuestion(updatedQuestion);
-//            }
-//            existingTest.getQuestions().add(updatedQuestion);
-//        }
-//
-//        return testRepository.save(existingTest);
-//    }
+    private Test updateTestFields(final Test existingTest, final Test updateTest) {
+        existingTest.setQuestions(updateTest.getQuestions());
+        if (!existingTest.getTitle().equals(updateTest.getTitle())) {
+            existingTest.setTitle(updateTest.getTitle());
+        }
+        return existingTest;
+    }
 
 }
