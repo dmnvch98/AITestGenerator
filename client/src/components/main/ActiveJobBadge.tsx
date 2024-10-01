@@ -1,26 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {
-    Badge,
-    Box,
-    IconButton,
-    Popover,
-    CircularProgress, Grid, Paper
-} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Badge, Box, CircularProgress, IconButton, Popover, Typography, Divider, ListItemButton, ListItemText, ListItemIcon, List, ListItem } from '@mui/material';
 import TimerIcon from '@mui/icons-material/Timer';
-import {GenerationStatus} from "../../store/types";
-import {AccessTime} from "@mui/icons-material";
-import {DoneLabel} from "../utils/DoneLabel";
-import {NoLabel} from "../utils/NoLabel";
+import { GenerationStatus } from "../../store/types";
+import { AccessTime } from "@mui/icons-material";
+import { DoneLabel } from "../utils/DoneLabel";
+import { NoLabel } from "../utils/NoLabel";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import {TestGenHistory, useUserStore} from "../../store/userStore";
-import {useTestGenHistoryWebSocket} from "../../store/useTestGenHistoryWebSocket";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
+import { TestGenHistory, useUserStore } from "../../store/userStore";
+import { useTestGenHistoryWebSocket } from "../../store/useTestGenHistoryWebSocket";
 
 export const ActiveJobBadge = () => {
     const MAX_FILENAME_LENGTH = 30;
-    const {getCurrentUser, user} = useUserStore();
-    const {getTestGenHistoryCurrent} = useUserStore();
+    const { getCurrentUser, getTestGenHistoryCurrent, user } = useUserStore();
     const [testGenHistoryCurrent, setTestGenHistoryCurrent] = useState<TestGenHistory[]>([]);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -30,9 +21,7 @@ export const ActiveJobBadge = () => {
     };
 
     const handleClose = () => {
-        setTestGenHistoryCurrent(prev =>
-            prev.filter(h => ![GenerationStatus.SUCCESS, GenerationStatus.FAILED].includes(h.generationStatus))
-        );
+        setTestGenHistoryCurrent(prev => prev.filter(h => ![GenerationStatus.SUCCESS, GenerationStatus.FAILED].includes(h.generationStatus)));
         setAnchorEl(null);
     };
 
@@ -48,98 +37,75 @@ export const ActiveJobBadge = () => {
         fetchInitialData();
     }, [getCurrentUser, getTestGenHistoryCurrent]);
 
-    // Обновляем данные через веб-сокет
     const newTestGenHistory = useTestGenHistoryWebSocket(user?.id);
 
-    // Когда приходят новые данные через веб-сокет, добавляем их к существующим
     useEffect(() => {
-        if (newTestGenHistory) { // Убедитесь, что новое значение существует
-            const index = testGenHistoryCurrent.findIndex((obj: { id: number; }) => obj.id === newTestGenHistory.id);
-            let updatedHistory;
-            if (index !== -1) {
-                // Если элемент уже существует, обновляем его
-                updatedHistory = [
-                    ...testGenHistoryCurrent.slice(0, index),
-                    newTestGenHistory,
-                    ...testGenHistoryCurrent.slice(index + 1)
-                ];
-            } else {
-                // Если элемента нет, добавляем новый
-                updatedHistory = [...testGenHistoryCurrent, newTestGenHistory];
+        if (newTestGenHistory) {
+            const updatedHistory = testGenHistoryCurrent.map(h => (h.id === newTestGenHistory.id ? newTestGenHistory : h));
+            if (!testGenHistoryCurrent.some(h => h.id === newTestGenHistory.id)) {
+                updatedHistory.push(newTestGenHistory);
             }
             setTestGenHistoryCurrent(updatedHistory);
         }
     }, [newTestGenHistory]);
 
-
-    const getStatusComponent = (status: GenerationStatus) => {
-        switch (status) {
-            case GenerationStatus.WAITING:
-                return <AccessTime/>;
-            case GenerationStatus.SUCCESS:
-                return <DoneLabel/>;
-            case GenerationStatus.IN_PROCESS:
-                return <CircularProgress size={24}/>;
-            case GenerationStatus.FAILED:
-                return <NoLabel/>;
-            default:
-                return <QuestionMarkIcon/>;
-        }
+    const statusComponents = {
+        [GenerationStatus.WAITING]: <AccessTime />,
+        [GenerationStatus.SUCCESS]: <DoneLabel />,
+        [GenerationStatus.IN_PROCESS]: <CircularProgress size={24} />,
+        [GenerationStatus.FAILED]: <NoLabel />,
     };
 
-    const truncateString = (str: string) => {
-        return str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str;
+    const getStatusComponent = (status: GenerationStatus) => statusComponents[status] || <QuestionMarkIcon />;
+
+    const truncateString = (str: string) => (str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str);
+
+    const getCurrentJobComponent = (item: TestGenHistory) => {
+        const link = item.testId ? `/tests/${item.testId}` : (item.generationStatus === GenerationStatus.FAILED ? '/tests?activeTab=history' : '/tests?activeTab=history&currentHistory=true');
+
+        return (
+            <ListItem disablePadding key={item.id}>
+                <ListItemButton component="a" href={link}>
+                    <ListItemText primary={truncateString(item.fileName)} secondary={item.testId ? "Нажмите чтобы открыть тест" : ""} />
+                    <ListItemIcon sx={{ml: 2}}>
+                        {getStatusComponent(item.generationStatus)}
+                    </ListItemIcon>
+                </ListItemButton>
+            </ListItem>
+        );
+    };
+
+    const getNoJobsComponent = () => {
+        return (
+            <ListItem disablePadding sx={{p: 2}}>
+                <ListItemText primary='Нет активных работ'/>
+            </ListItem>
+        );
     };
 
     return (
         <Box>
             <IconButton onClick={handleClick}>
-                <Badge badgeContent={testGenHistoryCurrent.length} color="secondary" anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                }}>
-                    <TimerIcon/>
+                <Badge badgeContent={testGenHistoryCurrent.length} color="secondary" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                    <TimerIcon />
                 </Badge>
             </IconButton>
             <Popover
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-                <Paper sx={{ padding: 2, minWidth: '300px', maxWidth: '350px' }}>
-                    <b>Текущие работы</b>
-                    <Divider sx={{ mt: 1, mb: 1 }} />
-                    {testGenHistoryCurrent.length > 0 ? (
-                        <Grid container spacing={2}>
-                            <Grid item xs={9}>
-                                <Typography variant="subtitle1" fontSize={14}><strong>Название файла</strong></Typography>
-                            </Grid>
-                            <Grid item xs={3} display="flex" justifyContent="center" alignItems="center">
-                                <Typography variant="subtitle1" fontSize={14}><strong>Статус</strong></Typography>
-                            </Grid>
-                            {testGenHistoryCurrent.map((item, index) => (
-                                <React.Fragment key={index}>
-                                    <Grid item xs={9}>
-                                        <Typography fontSize={14}>{truncateString(item.fileName)}</Typography>
-                                    </Grid>
-                                    <Grid item xs={3} display="flex" justifyContent="center" alignItems="center" style={{ width: '100%' }}>
-                                        {getStatusComponent(item.generationStatus)}
-                                    </Grid>
-                                </React.Fragment>
-                            ))}
-                        </Grid>
-                    ) : (
-                        <Typography variant="subtitle1" align="center" fontSize={14}>Нет активных работ</Typography>
-                    )}
-                </Paper>
+                <Box sx={{ width: '100%', maxWidth: 400, minWidth: 300, bgcolor: 'background.paper' }}>
+                    <Box sx={{ p: 1, ml: 1 }}>
+                        <Typography variant="subtitle1"><strong>Активные работы</strong></Typography>
+                    </Box>
+                    <Divider />
+                    <List>
+                        {testGenHistoryCurrent.length > 0 ? testGenHistoryCurrent.map(getCurrentJobComponent) : getNoJobsComponent()}
+                    </List>
+                </Box>
             </Popover>
         </Box>
     );

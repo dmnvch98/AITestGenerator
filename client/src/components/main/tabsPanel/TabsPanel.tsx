@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Tab, Tabs } from "@mui/material";
-import {CustomTabPanel} from "./CustomTabPanel";
+import { CustomTabPanel } from "./CustomTabPanel";
 
 export interface TabItem {
     children?: React.ReactNode;
@@ -11,10 +11,11 @@ export interface TabItem {
 
 export interface TabsPanelProps {
     tabs: TabItem[];
+    activeTab: number;
+    onTabChange: (newValue: number) => void;
 }
 
-export const TabsPanel: React.FC<TabsPanelProps> = ({ tabs }) => {
-    const [value, setValue] = React.useState(0);
+export const TabsPanel: React.FC<TabsPanelProps> = ({ tabs, activeTab, onTabChange }) => {
 
     const a11yProps = (index: number) => {
         return {
@@ -24,20 +25,20 @@ export const TabsPanel: React.FC<TabsPanelProps> = ({ tabs }) => {
     };
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
+        onTabChange(newValue); // Обновляем активную вкладку через коллбэк
     };
 
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%'}}>
-                <Tabs value={value} onChange={handleChange} aria-label="dynamic tabs example">
+                <Tabs value={activeTab} onChange={handleChange} aria-label="dynamic tabs example">
                     {tabs.map((tab, index) => (
                         <Tab label={tab.title} {...a11yProps(index)} key={index} />
                     ))}
                 </Tabs>
             </Box>
             {tabs.map((tab, index) => (
-                <CustomTabPanel value={value} index={index} key={index}>
+                <CustomTabPanel value={activeTab} index={index} key={index}>
                     {tab.children}
                 </CustomTabPanel>
             ))}

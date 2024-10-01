@@ -137,7 +137,7 @@ export const SidebarHeader = ({ children }: any) => {
     }
 
     return (
-        <Box sx={{ display: 'flex'}}>
+        <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar>
@@ -156,21 +156,23 @@ export const SidebarHeader = ({ children }: any) => {
 
                     <Grid container>
                         <Grid item sm={12}>
-                            <Box display="flex" justifyContent="space-between">
+                            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
                                 <Typography variant="h6" noWrap component="div">
                                     ГенТест
                                 </Typography>
-                                <ActiveJobBadge />
-                                <Link href="/sign-in">
-                                    <Button
-                                        sx={{ color: 'black' }}
-                                        onClick={() => {
-                                            logout();
-                                        }}
-                                    >
-                                        Выход
-                                    </Button>
-                                </Link>
+                                <Box display="flex" alignItems="center">
+                                    <ActiveJobBadge />
+                                    <Link href="/sign-in" underline="none">
+                                        <Button
+                                            sx={{ color: 'black', ml: 4 }}
+                                            onClick={() => {
+                                                logout();
+                                            }}
+                                        >
+                                            Выход
+                                        </Button>
+                                    </Link>
+                                </Box>
                             </Box>
                         </Grid>
                     </Grid>
@@ -185,8 +187,8 @@ export const SidebarHeader = ({ children }: any) => {
                 <Divider />
                 <List>
                     {tabs.map((t) => (
-                        <Link href={t.redirect} underline="none" color="inherit">
-                            <ListItem key={t.name} disablePadding sx={{ display: 'block' }}>
+                        <Link href={t.redirect} underline="none" color="inherit" key={t.name}>
+                            <ListItem disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
                                         minHeight: 48,
@@ -212,7 +214,7 @@ export const SidebarHeader = ({ children }: any) => {
                 </List>
             </Drawer>
 
-            <Grid container sx={{mt: 10}}>
+            <Grid container sx={{ mt: 10 }}>
                 <Grid item xs={12}>
                     {children}
                 </Grid>
