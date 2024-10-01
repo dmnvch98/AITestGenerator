@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Duration;
@@ -25,7 +24,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public OpenAiService openAiService () {
-        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(300));
+        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(5));
     }
 
     @Bean

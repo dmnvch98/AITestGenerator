@@ -10,6 +10,7 @@ import { FileDto } from "../../store/fileStore";
 import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
 import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
+import {useUserStore} from "../../store/userStore";
 
 const FilesContent = () => {
     const {
@@ -30,6 +31,7 @@ const FilesContent = () => {
     const { generateTestByFile } = useTestStore();
     const { maxQuestionsCount, minAnswersCount, temperature, topP } = useGenerateTestStore();
     const { setAlert } = useFileStore();
+    const { getTestGenHistoryCurrent } = useUserStore();
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
@@ -70,6 +72,11 @@ const FilesContent = () => {
         setGenTestModalOpen(false);
     };
 
+    const generationStartSuccessful = () => {
+        setAlert([{id: Date.now(), message: 'Генерация теста начата', severity: 'success'}]);
+        getTestGenHistoryCurrent();
+    }
+
     const handleGenTestSubmit = () => {
         if (selectedFile) {
             const request: GenerateTestRequest = {
@@ -81,7 +88,7 @@ const FilesContent = () => {
             }
             generateTestByFile(request).then((r) => {
                 r
-                    ? setAlert([{id: Date.now(), message: 'Генерация теста начата', severity: 'success'}])
+                    ? generationStartSuccessful()
                     : setAlert([{id: Date.now(), message: 'Ошибка при генерации теста', severity: 'error'}])
             });
         }

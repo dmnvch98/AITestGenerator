@@ -3,9 +3,10 @@ import { Question, AnswerOption } from "../../../store/tests/testStore";
 import {AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
 import React from "react";
 import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from "@mui/material/Typography";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 
 export interface QuestionEditProps {
     question: Question;
@@ -13,18 +14,18 @@ export interface QuestionEditProps {
     onDelete: () => void;
     errorMessage: string;
     questionNumber?: number;
+    viewMode?: 'list' | 'paginated';
+    last?: boolean;
 }
 
 export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage,
-                                                              questionNumber}) => {
+                                                              questionNumber, last, viewMode}) => {
     const [questionText, setQuestionText] = useState(question.questionText);
     const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
-    const [expanded, setExpanded] = useState(true);
     const errorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (errorMessage !== '') {
-            setExpanded(true);
             if (errorRef.current) {
                 errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -98,9 +99,9 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                             onDelete={() => handleDeleteAnswerOption(answerOption.id as number)}
                         />
                     ))}
-                    <IconButton onClick={handleAddAnswerOption} color="primary" >
-                        <AddCircleIcon sx={{ fontSize: 36 }} />
-                    </IconButton>
+                    <Button onClick={handleAddAnswerOption} variant="outlined">
+                        Добавить ответ
+                    </Button>
                     {errorMessage && (
                         <Typography ref={errorRef} color="error" variant="body2" align="left">
                             {errorMessage}
@@ -108,6 +109,8 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                     )}
                 </Box>
             </AccordionDetails>
+
+            {(!last && viewMode === 'list') && <Divider sx={{mt: 2, mb: 2}}/>}
         </Box>
     );
 };

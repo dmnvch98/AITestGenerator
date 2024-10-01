@@ -22,6 +22,7 @@ import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AuthService } from '../../services/AuthService';
+import {ActiveJobBadge} from "./ActiveJobBadge";
 
 const drawerWidth = 200;
 
@@ -159,6 +160,7 @@ export const SidebarHeader = ({ children }: any) => {
                                 <Typography variant="h6" noWrap component="div">
                                     ГенТест
                                 </Typography>
+                                <ActiveJobBadge />
                                 <Link href="/sign-in">
                                     <Button
                                         sx={{ color: 'black' }}

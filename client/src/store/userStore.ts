@@ -18,7 +18,7 @@ export interface TestGenHistory {
 export interface UserStore {
     testGenHistoryPast: TestGenHistory[],
     testGenHistoryCurrent: TestGenHistory[],
-    getTestGenHistoryCurrent: () => void,
+    getTestGenHistoryCurrent: () => Promise<TestGenHistory[]>,
     setCurrentTestGenHistories: (testGen: TestGenHistory) => void,
     getTestGenHistory: () => void;
     loading: boolean;
@@ -41,9 +41,10 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         set({testGenHistoryPast: response})
     },
 
-    getTestGenHistoryCurrent: async () => {
+    getTestGenHistoryCurrent: async (): Promise<TestGenHistory[]> => {
         const response = await TestService.getCurrentTestGenerationHistory();
         set({testGenHistoryCurrent: response})
+        return response as TestGenHistory[];
     },
     setCurrentTestGenHistories: (testGen) => {
         const { testGenHistoryCurrent } = get();

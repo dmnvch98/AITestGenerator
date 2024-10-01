@@ -26,6 +26,8 @@ export const QuestionListView: React.FC<QuestionListViewProps> = ({
             <Box key={index} display="flex" alignItems="center" my={2}>
                 <Box flexGrow={1}>
                     <QuestionEdit
+                        last={index + 1 === questions.length}
+                        viewMode="list"
                         question={question}
                         questionNumber={index + 1}
                         onQuestionChange={onQuestionChange}
