@@ -14,7 +14,6 @@ import java.util.List;
 @Mapper
 public interface TestConverter {
 
-    @Mapping(source = "answersDto.questions", target = "questions")
     @Mapping(source = "answersDto.title", target = "title")
     @Mapping(source = "problems", target = "problems")
     @Mapping(source = "userId", target = "userId")

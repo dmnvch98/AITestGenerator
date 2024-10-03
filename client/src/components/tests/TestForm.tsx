@@ -4,43 +4,58 @@ import {useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import {Alert, Paper, Snackbar, MenuItem, Select, FormControl, InputLabel, Pagination} from "@mui/material";
+import {
+    Alert,
+    Paper,
+    Snackbar,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+    Pagination,
+    Tooltip,
+    PaginationItem
+} from "@mui/material";
 import {QuestionListView, QuestionPaginatedView} from "./TestDisplayMode";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
+import { v4 as uuidv4 } from 'uuid';
 
 interface TestFormProps {
     initialTest?: UserTest;
     isEditMode: boolean;
 }
 
+const newTest = {
+    title: '',
+    questions: [
+        {
+            id: uuidv4(),
+            questionText: '',
+            answerOptions: [
+                {
+                    id: uuidv4(),
+                    optionText: '',
+                    isCorrect: false
+                }
+            ]
+        }
+    ]
+};
+
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => {
     const navigate = useNavigate();
 
-    const defaultInitialTest: CreateTestRequestDto = {
-        title: '',
-        questions: [
-            {
-                questionText: '',
-                answerOptions: [
-                    {
-                        optionText: '',
-                        isCorrect: false
-                    }
-                ]
-            }
-        ]
-    };
-
+    const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
     const [localTest, setLocalTest] = useState<UserTest | CreateTestRequestDto>(() => {
-        return isEditMode && initialTest ? {...initialTest} : defaultInitialTest;
+        return isEditMode && initialTest ? {...initialTest} : newTest;
     });
     const [testTitleError, setTestTitleError] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string }[]>([]);
     const {alerts, clearAlerts, deleteAlert, setAlert, upsert} = useTestStore();
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated'); // View mode state
+    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
 
     useEffect(() => {
         if (isEditMode && initialTest && !hasSaved) {
@@ -55,7 +70,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
     const handleAddQuestion = () => {
         if (localTest) {
             const newQuestion: Question = {
-                id: localTest.questions.length + 1,
+                id: uuidv4(),
                 questionText: "",
                 answerOptions: [],
             };
@@ -72,11 +87,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
         setLocalTest({...localTest, questions: updatedQuestions});
     };
 
-    const handleDeleteQuestion = (id: number) => {
+    const handleDeleteQuestion = (id: string) => {
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setLocalTest({...localTest, questions: updatedQuestions});
+
         if (currentQuestionIndex >= updatedQuestions.length) {
-            setCurrentQuestionIndex(updatedQuestions.length - 1);
+            setCurrentQuestionIndex(updatedQuestions.length > 0 ? updatedQuestions.length - 1 : 0);
         }
     };
 
@@ -86,6 +102,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                 if (resp != null) {
                     setHasSaved(true);
                     setLocalTest(resp);
+                    setLastSavedTest(resp);
                 }
             });
         }
@@ -98,6 +115,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
         } else {
             setTestTitleError(null);
         }
+
+        if (localTest.questions.length < 1) {
+            setAlert([{id: Date.now(), message: 'Тест должен содержить минимум один вопрос', severity: 'error'}]);
+            return false;
+        }
+
         const invalidQuestions = localTest?.questions
             .map((q, index) => {
                 if (!q.questionText) {
@@ -120,16 +143,24 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
 
         if (invalidQuestions.length > 0) {
             setAlert([{id: Date.now(), message: 'Пожалуйста, исправьте ошибки в тесте', severity: 'error'}]);
+            setCurrentQuestionIndex((invalidQuestions[0].index));
             return false;
         }
 
         return true;
     };
 
+    const handleReset = () => {
+        const resetTest = lastSavedTest ?? initialTest ?? newTest;
+        setLocalTest(resetTest);
+        setCurrentQuestionIndex(0);
+        setInvalidQuestions([]);
+    };
+
     return (
         <Box display="flex" flexDirection="row" position="relative">
             <Box flexGrow={1} mr="250px">
-                <Paper>
+                <Paper sx={{minHeight: '100px'}}>
                     <Box sx={{ml: 4, mr: 4, pt: 2}}>
                             <TextField
                                 label="Заголовок теста"
@@ -196,12 +227,14 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                     <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="primary" onClick={handleAddQuestion}>
                         Добавить вопрос
                     </Button>
-                    {isEditMode && (
-                        <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="primary"
-                                onClick={() => setLocalTest(initialTest as UserTest)}>
+                    <Tooltip title="Сбрасывает состояние до последнего сохраненного" enterDelay={500} leaveDelay={200}>
+                        <span>
+                        <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="secondary"
+                                onClick={handleReset}>
                             Сбросить
                         </Button>
-                    )}
+                            </span>
+                    </Tooltip>
                     <Button sx={{width: "100%"}} variant="outlined" color="secondary"
                             onClick={() => navigate("/tests")}>
                         Выйти
@@ -222,6 +255,17 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                                     hideNextButton
                                     boundaryCount={localTest.questions.length}
                                     siblingCount={localTest.questions.length}
+                                    renderItem={(item) => (
+                                        <PaginationItem
+                                            {...item}
+                                            sx={{
+                                                ...(invalidQuestions.map(q => q.index + 1).includes(item.page as number) && {
+                                                    backgroundColor: 'red',
+                                                    color: 'black',
+                                                })
+                                            }}
+                                        />
+                                    )}
                                 />
                             </Box>
                         </>

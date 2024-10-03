@@ -1,14 +1,13 @@
 package com.example.aitestgenerator.models;
 
-import com.example.aitestgenerator.converters.JsonConverter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.example.aitestgenerator.converters.QuestionsConverter;
+import com.example.aitestgenerator.dto.tests.QuestionDto;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import org.hibernate.annotations.ColumnTransformer;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "tests")
@@ -34,10 +33,10 @@ public class Test {
     @Column(name = "title")
     private String title;
 
-    @Convert(converter = JsonConverter.class)
+    @Convert(converter = QuestionsConverter.class)
     @Column(name = "questions", columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
-    private JsonNode questions;
+    private List<QuestionDto> questions;
 
 //    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @JsonIgnore

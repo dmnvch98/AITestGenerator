@@ -14,13 +14,13 @@ export interface CreateTestRequestDto {
 }
 
 export interface Question {
-    id?: number,
+    id?: string,
     questionText: string,
     answerOptions: AnswerOption[]
 }
 
 export interface AnswerOption {
-    id?: number,
+    id?: string,
     optionText: string,
     isCorrect: boolean
 }

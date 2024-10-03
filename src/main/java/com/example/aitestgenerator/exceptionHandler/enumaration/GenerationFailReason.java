@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.io.FileNotFoundException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ public enum GenerationFailReason {
     FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true),
     REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true),
     SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", true),
+    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true),
     UNKNOWN(null, null, false);
 
     private final Class<? extends Throwable> cause;

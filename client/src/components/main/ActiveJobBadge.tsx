@@ -61,7 +61,7 @@ export const ActiveJobBadge = () => {
     const truncateString = (str: string) => (str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str);
 
     const getCurrentJobComponent = (item: TestGenHistory) => {
-        const link = item.testId ? `/tests/${item.testId}` : (item.generationStatus === GenerationStatus.FAILED ? '/tests?activeTab=history' : '/tests?activeTab=history&currentHistory=true');
+        const link = item.testId ? `/tests/${item.testId}` : (item.generationStatus === GenerationStatus.FAILED ? '/tests?activeTab=history&currentHistory=false' : '/tests?activeTab=history');
 
         return (
             <ListItem disablePadding key={item.id}>
@@ -97,7 +97,7 @@ export const ActiveJobBadge = () => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-                <Box sx={{ width: '100%', maxWidth: 400, minWidth: 300, bgcolor: 'background.paper' }}>
+                <Box sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper' }}>
                     <Box sx={{ p: 1, ml: 1 }}>
                         <Typography variant="subtitle1"><strong>Активные работы</strong></Typography>
                     </Box>

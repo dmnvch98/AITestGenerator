@@ -6,7 +6,7 @@ import { Question } from "../../store/tests/testStore";
 interface QuestionListViewProps {
     questions: Question[];
     onQuestionChange: (question: Question) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
     invalidQuestions: { index: number; message: string }[];
 }
 
@@ -31,7 +31,7 @@ export const QuestionListView: React.FC<QuestionListViewProps> = ({
                         question={question}
                         questionNumber={index + 1}
                         onQuestionChange={onQuestionChange}
-                        onDelete={() => onDelete(question.id as number)}
+                        onDelete={() => onDelete(question.id as string)}
                         errorMessage={invalidQuestions.find((item) => item.index === index)?.message || ""}
                     />
                 </Box>
@@ -55,7 +55,7 @@ export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = ({
                         questionNumber={currentQuestionIndex + 1}
                         question={questions[currentQuestionIndex]}
                         onQuestionChange={onQuestionChange}
-                        onDelete={() => onDelete(questions[currentQuestionIndex].id as number)}
+                        onDelete={() => onDelete(questions[currentQuestionIndex].id as string)}
                         errorMessage={invalidQuestions.find((item) => item.index === currentQuestionIndex)?.message || ""}
                     />
                 </Box>

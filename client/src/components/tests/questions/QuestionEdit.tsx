@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import {v4 as uuidv4} from "uuid";
 
 export interface QuestionEditProps {
     question: Question;
@@ -44,7 +45,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
 
     const handleAddAnswerOption = () => {
         const newOption: AnswerOption = {
-            id: answerOptions.length > 0 ? Math.max(...answerOptions.map(o => o.id || 0)) + 1 : 1,
+            id: uuidv4(),
             optionText: '',
             isCorrect: false
         };
@@ -61,7 +62,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
         onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
     };
 
-    const handleDeleteAnswerOption = (id: number) => {
+    const handleDeleteAnswerOption = (id: string) => {
         const updatedOptions = answerOptions.filter(option => option.id !== id);
         setAnswerOptions(updatedOptions);
         onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
@@ -96,7 +97,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                             key={index}
                             answerOption={answerOption}
                             onOptionChange={handleAnswerOptionChange}
-                            onDelete={() => handleDeleteAnswerOption(answerOption.id as number)}
+                            onDelete={() => handleDeleteAnswerOption(answerOption.id as string)}
                         />
                     ))}
                     <Button onClick={handleAddAnswerOption} variant="outlined">

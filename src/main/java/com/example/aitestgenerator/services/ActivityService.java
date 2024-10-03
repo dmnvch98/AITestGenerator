@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,6 +37,7 @@ public class ActivityService {
 
         history = history.toBuilder()
            .generationStatus(GenerationStatus.FAILED)
+           .generationEnd(LocalDateTime.now())
            .messageReceipt(null)
            .failReason(failReason.name())
            .build();
