@@ -52,7 +52,7 @@ export interface TestStore {
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
-    getUserTestById: (id: number) => Promise<void>,
+    getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
     generateTestFlag: boolean,
     toggleGenerateTestFlag: () => void,
@@ -158,7 +158,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     getUserTestById: async (id) => {
         const response = await TestService.getUserTestById(id);
+        console.log("resp: " + JSON.stringify(response, null))
         set({selectedTest: response});
+        return response;
     },
     saveTest: async (test) => {
         const { setAlert} = get();

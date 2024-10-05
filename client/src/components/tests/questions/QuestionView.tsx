@@ -1,52 +1,34 @@
-import { Question } from "../../../store/tests/testStore";
-import {Accordion, AccordionDetails, AccordionSummary, IconButton, Typography} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import React, {useEffect, useState} from "react";
-import { AnswerOptionView } from "../answerOptions/AnswerOptionView";
+import {Question} from "../../../store/tests/testStore";
+import {Divider, Typography} from "@mui/material";
+import {AnswerOptionView} from "../answerOptions/AnswerOptionView";
 import Box from "@mui/material/Box";
+import React from "react";
 
 interface QuestionViewProps {
-    question: Question,
-    isExpanded: boolean
+    question: Question;
+    last?: boolean;
+    viewMode?: "list" | "paginated";
+    questionNumber: number;
 }
 
-export const QuestionView = ({ question, isExpanded }: QuestionViewProps) => {
-    const [expanded, setExpanded] = useState(isExpanded);
-
-    const handleAccordionChange = () => {
-        setExpanded(!expanded);
-    };
-
-    useEffect(() => {
-        setExpanded(isExpanded);
-    }, [isExpanded]);
+export const QuestionView = ({question, last, viewMode, questionNumber}: QuestionViewProps) => {
 
     return (
-        <Accordion expanded={expanded} onChange={handleAccordionChange}>
-            <AccordionSummary
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-            >
-            <Box sx={{display: 'flex', alignItems: 'center', width: '100%'}}>
-                <IconButton
-                    edge="start"
-                >
-                    <ExpandMoreIcon/>
-                </IconButton>
-                <Typography align='left' sx={{fontWeight: expanded ? 'bold' : 'normal'}}>
-                    {question.questionText}
+        <Box>
+            <Box sx={{display: 'flex', alignItems: 'center', width: '100%', pl: 4, pr: 4}}>
+                <Typography variant="subtitle1" sx={{fontWeight: 600}} align="left">
+                    {`Вопрос ${questionNumber}: ${question.questionText}`}
                 </Typography>
             </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-                {question.answerOptions.map((answerOption, index) => (
+            <Box>
+                {question.answerOptions.map((answerOption) => (
                     <AnswerOptionView
                         key={answerOption.id}
                         answerOption={answerOption}
-                        isLast={index === question.answerOptions.length - 1}
                     />
                 ))}
-            </AccordionDetails>
-        </Accordion>
+            </Box>
+            {(!last && viewMode === 'list') && <Divider sx={{mt: 2, mb: 2}}/>}
+        </Box>
     );
 };

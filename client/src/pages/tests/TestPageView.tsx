@@ -1,68 +1,96 @@
 import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
 import React, { useEffect, useState } from "react";
 import { useTestStore } from "../../store/tests/testStore";
-import { QuestionView } from "../../components/tests/questions/QuestionView";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import { Box, Button, Paper } from "@mui/material";
+import {Box, Button, Divider, Paper} from "@mui/material";
+import {TestViewModeSelector} from "./edit/components/TestViewModeSelector";
+import {QuestionPagination} from "./edit/components/QuestionPagination";
+import {QuestionListView, QuestionPaginatedView} from "./edit/components/TestDisplayMode";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
     const selectedTest = useTestStore(state => state.selectedTest);
     const getUserTestById = useTestStore(state => state.getUserTestById);
     const navigate = useNavigate();
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     useEffect(() => {
         getUserTestById(Number(id));
     }, [id, getUserTestById]);
 
     const handleEdit = () => {
-        navigate(`/tests/${id}/edit`)
+        navigate(`/tests/${id}/edit`);
     }
 
-    const handleToggleExpand = () => {
-        setIsExpanded(prev => !prev);
+    const handleExit = () => {
+        navigate('/tests');
     }
 
     return (
-        <Box display="flex" flexDirection="row" position="relative">
-            <Box flexGrow={1} mr={3}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                    <Paper sx={{ p: 2, width: '100%' }}>
+        <Box display="flex" flexDirection="row" position="relative" sx={{mb: 2}}>
+            <Box flexGrow={1} mr="250px">
+                <Paper sx={{minHeight: '100px', pb: 0.25}}>
+                    <Box sx={{ml: 4, mr: 4, pt: 2}}>
                         <Typography
                             align="left"
                             sx={{
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 fontSize: "24px",
                             }}
                         >
                             {selectedTest?.title}
                         </Typography>
-                    </Paper>
-                </Box>
-
-                {selectedTest && selectedTest.questions.map((question, index) =>
-                    (
-                        <QuestionView key={index} question={question} isExpanded={isExpanded} />
-                    ))
-                }
+                    </Box>
+                    <Divider sx={{mt: 2, mb: 2}}/>
+                    {viewMode === 'list' ? (
+                        <QuestionListView
+                            questions={selectedTest?.questions || []}
+                            editMode={false}
+                            invalidQuestions={[]} onDelete={() => {}}
+                            onQuestionChange={() => {}}/>
+                    ) : (
+                        <QuestionPaginatedView
+                            questions={selectedTest?.questions || []}
+                            currentQuestionIndex={currentQuestionIndex}
+                            onSelectQuestion={setCurrentQuestionIndex}
+                            editMode={false} // Просмотр, а не редактирование
+                            invalidQuestions={[]}
+                            onDelete={() => {}}
+                            onQuestionChange={() => {}}/>
+                    )}
+                </Paper>
             </Box>
 
-            <Box>
-                <Paper sx={{ p: 2, minWidth: 230 }}>
-                    <Button variant="contained" color="primary" onClick={handleEdit} fullWidth sx={{ mb: 2 }}>
+            <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
+                <Paper sx={{width: '230px', p: 2, position: "fixed"}}>
+                    <TestViewModeSelector viewMode={viewMode} onChange={setViewMode}/>
+                    <Divider sx={{mb: 3}}/>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        onClick={handleEdit}
+                        sx={{mb: 2}}
+                    >
                         Редактировать
                     </Button>
-
                     <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={handleToggleExpand}
                         fullWidth
+                        variant="outlined"
+                        color="secondary"
+                        onClick={handleExit}
                     >
-                        {isExpanded ? 'Свернуть все' : 'Раскрыть все'}
+                        Выйти
                     </Button>
+                    {viewMode === 'paginated' && (
+                        <QuestionPagination
+                            currentIndex={currentQuestionIndex}
+                            totalQuestions={selectedTest?.questions?.length as number}
+                            onChange={setCurrentQuestionIndex}
+                            invalidQuestionNumbers={[]}
+                        />
+                    )}
                 </Paper>
             </Box>
         </Box>
