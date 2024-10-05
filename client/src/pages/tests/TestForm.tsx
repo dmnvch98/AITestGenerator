@@ -55,6 +55,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
 
     const handleDeleteQuestion = (id: string) => {
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
+        setCurrentQuestionIndex(updatedQuestions.length - 1);
         setLocalTest({...localTest, questions: updatedQuestions});
         if (invalidQuestions.map(q => q.id).includes(id)) {
             const newInvalidQuestions = invalidQuestions.filter(q => q.id !== id);

@@ -1,11 +1,13 @@
 import {create} from "zustand";
 import TestService from "../../services/TestService";
 import {AlertMessage} from "../types";
+import TestRatingService from "../../services/TestRatingService";
 
 export interface UserTest {
     id: number,
     title: string,
-    questions: Question[]
+    questions: Question[],
+    rating?: number
 }
 
 export interface CreateTestRequestDto {
@@ -41,9 +43,15 @@ export interface BulkDeleteTestsRequestDto {
     ids: number[];
 }
 
+export interface TestRatingDto {
+    rating: number;
+    feedback?: string;
+}
+
 export interface TestStore {
     tests: UserTest[],
     selectedTest: UserTest | undefined,
+    selectedTestRating: TestRatingDto | undefined;
     selectTest: (userTest: UserTest) => void,
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
@@ -71,11 +79,14 @@ export interface TestStore {
     upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
     saveTest: (test: CreateTestRequestDto) => void;
     bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
+    updateRating: (id: number, request: TestRatingDto) => void;
+    getRating: (id: number) => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
     tests: [],
     selectedTest: undefined,
+    selectedTestRating: undefined,
     generateTestFlag: false,
     maxQuestionsNumber: "",
     generateTestValidationErrorFlag: false,
@@ -158,7 +169,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     getUserTestById: async (id) => {
         const response = await TestService.getUserTestById(id);
-        console.log("resp: " + JSON.stringify(response, null))
         set({selectedTest: response});
         return response;
     },
@@ -181,4 +191,26 @@ export const useTestStore = create<TestStore>((set, get) => ({
             setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении тестов', severity: 'error' }])
         }
     },
+    updateRating: async (id, request) => {
+        const response = await TestRatingService.upsert(id, request);
+        const { setAlert, selectedTest, selectTest } = get();
+        if (response) {
+            setAlert([{ id: Date.now(), message: 'Рейтинг успешно обновлен', severity: 'success' }]);
+            if (selectedTest) {
+                const updatedTest: UserTest = {
+                    rating: request.rating,
+                    ...selectedTest
+                }
+                selectTest(updatedTest);
+            }
+        } else {
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении рейтинга', severity: 'error' }])
+        }
+    },
+    getRating: async (id) => {
+        const rating = await TestRatingService.get(id);
+        if (rating) {
+            set({selectedTestRating: rating})
+        }
+    }
 }))

@@ -65,23 +65,23 @@ public class TestController {
     }
 
     @PutMapping
-    public Test upsert(final Authentication authentication, @RequestBody final Test updatedTest) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.upsert(updatedTest, userId);
+    public Test upsert(final Authentication authentication, @RequestBody final Test test) {
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.upsert(test, userId);
     }
 
     @GetMapping("/history")
     public List<TextGenerationHistoryDto> getTestGenerationHistory(
             final Authentication authentication,
             @RequestParam(value = "status", required = false) final String status) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.getTestGenerationHistory(userId, status);
     }
 
     @GetMapping("/history/current")
     public List<TextGenerationHistoryDto> getCurrentTestGenerationHistory(
             final Authentication authentication) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.getCurrentHistories(userId);
     }
 }

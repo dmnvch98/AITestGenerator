@@ -3,21 +3,22 @@ import React, { useEffect, useState } from "react";
 import { useTestStore } from "../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import {Box, Button, Divider, Paper} from "@mui/material";
+import {Alert, Box, Button, Divider, Paper, Snackbar} from "@mui/material";
 import {TestViewModeSelector} from "./edit/components/TestViewModeSelector";
 import {QuestionPagination} from "./edit/components/QuestionPagination";
 import {QuestionListView, QuestionPaginatedView} from "./edit/components/TestDisplayMode";
+import TestRatingForm from "./view/components/TestRatingForm";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
-    const selectedTest = useTestStore(state => state.selectedTest);
-    const getUserTestById = useTestStore(state => state.getUserTestById);
+    const {selectedTest, getUserTestById, alerts, clearAlerts, deleteAlert, getRating} = useTestStore();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     useEffect(() => {
         getUserTestById(Number(id));
+        getRating(Number(id));
     }, [id, getUserTestById]);
 
     const handleEdit = () => {
@@ -64,7 +65,8 @@ const TestPageViewContent = () => {
             </Box>
 
             <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
-                <Paper sx={{width: '230px', p: 2, position: "fixed"}}>
+                <Box sx={{width: '230px', position: "fixed"}}>
+                <Paper sx={{p: 2}}>
                     <TestViewModeSelector viewMode={viewMode} onChange={setViewMode}/>
                     <Divider sx={{mb: 3}}/>
                     <Button
@@ -92,7 +94,22 @@ const TestPageViewContent = () => {
                         />
                     )}
                 </Paper>
+                    <Box sx={{ mt: 2}}>
+                        {selectedTest && <TestRatingForm id={selectedTest.id}/>}
+                    </Box>
+
+                </Box>
+
             </Box>
+            <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
+                <Box sx={{maxWidth: '400px'}}>
+                    {alerts.map(alert => (
+                        <Alert key={alert.id} severity={alert.severity} onClose={() => deleteAlert(alert)}>
+                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
+                        </Alert>
+                    ))}
+                </Box>
+            </Snackbar>
         </Box>
     );
 }
