@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../store/tests/testStore";
+import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
 import {Box, Paper, Snackbar, Alert, Divider} from "@mui/material";
-import {QuestionListView, QuestionPaginatedView} from "./edit/components/TestDisplayMode";
-import {validateTest, createNewTest, createNewQuestion} from "./edit/utils";
-import {TestTitleInput} from "./edit/components/TestTitleInput";
-import {TestViewModeSelector} from "./edit/components/TestViewModeSelector";
-import {TestFormActionButtons} from "./edit/components/ActionButtonProps";
-import {QuestionPagination} from "./edit/components/QuestionPagination";
+import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDisplayMode";
+import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
+import {TestTitleInput} from "../edit/components/TestTitleInput";
+import {TestViewModeSelector} from "../edit/components/TestViewModeSelector";
+import {TestFormActionButtons} from "../edit/components/ActionButtonProps";
+import {QuestionPagination} from "../edit/components/QuestionPagination";
 
 interface TestFormProps {
     initialTest?: UserTest;

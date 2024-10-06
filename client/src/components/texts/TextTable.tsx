@@ -112,7 +112,7 @@ export const TextTable = () => {
                 onClose={() => setDeleteTextFlag(false)}
                 onConfirm={handleConfirmBatchDelete}
                 title="Подтверждение пакетного удаления"
-                content="Вы уверены что хотите удалить выбранные тексты? Все связанные с ними сущности будут удалениы"
+                children="Вы уверены что хотите удалить выбранные тексты? Все связанные с ними сущности будут удалениы"
             />
         </Box>
     );

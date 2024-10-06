@@ -9,7 +9,6 @@ import { ExportModal } from "../export/ExportModal";
 import {GenericTableActions} from "../main/GenericTableActions";
 import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 
-
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
 };
@@ -91,6 +90,20 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange }) => {
             field: 'title',
             headerName: 'Заголовок',
             minWidth: 550,
+            renderCell: (params) => (
+                <Box
+                    onClick={() => navigate(`/tests/${params.row.id}`)}
+                    sx={{
+                        cursor: 'pointer',
+                        height: '100%',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    {params.value}
+                </Box>
+            )
         },
     ];
 

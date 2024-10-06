@@ -2,6 +2,7 @@ package com.example.aitestgenerator.converters;
 
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
+import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.GenerateTestMessage;
@@ -10,13 +11,16 @@ import com.example.aitestgenerator.models.User;
 import com.example.aitestgenerator.models.enums.GenerationStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Mapper
 public interface TestGenerationConverter {
 
   @Mapping(source = "user.id", target = "userId")
+  @Mapping(source = "failReason", target = "failCode", qualifiedByName = "convertFailReason")
   TextGenerationHistoryDto historyToDto(final TestGeneratingHistory history);
 
   default TestGeneratingHistory getWaiting(final User user) {
@@ -48,4 +52,10 @@ public interface TestGenerationConverter {
   GenerateTestRequest convert(final GenerateTestMessage message, final TestGeneratingHistory history, final String text,
                               final long userId, final FileHash fileHash);
 
+  @Named("convertFailReason")
+  default Integer convertFailReason(final String failReason) {
+    return Optional.ofNullable(failReason)
+          .map(GenerationFailReason::getFailCode)
+          .orElse(null);
+  }
 }

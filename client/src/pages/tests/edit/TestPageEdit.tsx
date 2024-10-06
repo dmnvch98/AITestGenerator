@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useTestStore } from "../../store/tests/testStore";
-import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
-import { TestForm } from "./TestForm";
+import { useTestStore } from "../../../store/tests/testStore";
+import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
+import { TestForm } from "../components/TestForm";
 import { CircularProgress, Box } from "@mui/material";
 
 export const TestPageEdit = () => {

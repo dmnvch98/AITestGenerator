@@ -10,12 +10,13 @@ import java.time.LocalDateTime;
 @Data
 public class TextGenerationHistoryDto {
 
-    private Long id;
-    private Long userId;
-    private long testId;
-    private String testTitle;
-    private LocalDateTime generationStart;
-    private LocalDateTime generationEnd;
-    private GenerationStatus generationStatus;
-    private String fileName;
+    private final Long id;
+    private final Long userId;
+    private final long testId;
+    private final String testTitle;
+    private final LocalDateTime generationStart;
+    private final LocalDateTime generationEnd;
+    private final GenerationStatus generationStatus;
+    private final String fileName;
+    private final Integer failCode;
 }

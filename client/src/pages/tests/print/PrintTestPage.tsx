@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import {Box} from '@mui/material';
-import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {PrintTestSettings} from "./print/PrintTestSettings";
+import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
+import {PrintTestSettings} from "./PrintTestSettings";
 import {PrintTestContent} from "./PrintTestContent";
 
 const PrintTestPageContent: React.FC = () => {

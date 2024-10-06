@@ -12,7 +12,8 @@ export interface TestGenHistory {
     generationStart: Date,
     generationEnd: Date,
     generationStatus: GenerationStatus
-    fileName: string
+    fileName: string;
+    failCode: number;
 }
 
 export interface UserStore {

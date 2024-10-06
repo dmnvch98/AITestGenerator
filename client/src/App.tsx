@@ -6,7 +6,7 @@ import {Texts} from "./pages/texts/Texts";
 import {AddText} from "./pages/texts/AddText";
 import {createTheme, ThemeProvider} from "@mui/material";
 import {TextPage} from "./pages/texts/TextPage";
-import {TestPageView} from "./pages/tests/TestPageView";
+import {TestPageView} from "./pages/tests/view/TestPageView";
 import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./styles/appColors";
@@ -14,13 +14,13 @@ import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
 import SignUp from './pages/SignUp';
 import {Files} from "./pages/files/Files";
-import {TestPageEdit} from "./pages/tests/TestPageEdit";
+import {TestPageEdit} from "./pages/tests/edit/TestPageEdit";
 import {TestsPage} from "./pages/tests/TestPage";
 import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
-import {PrintTestPage} from "./pages/tests/PrintTestPage";
+import {PrintTestPage} from "./pages/tests/print/PrintTestPage";
 import {useUserStore} from "./store/userStore";
 import {LoadingPage} from "./components/main/LoadingPage";
-import {TestPageCreate} from "./pages/tests/TestPageCreate";
+import {TestPageCreate} from "./pages/tests/create/TestPageCreate";
 
 function App() {
     const theme = createTheme({

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {BulkDeleteTestsRequestDto, UserTest, useTestStore} from "../../store/tests/testStore";
+import {BulkDeleteTestsRequestDto, useTestStore} from "../../store/tests/testStore";
 import {TestTable} from "../../components/tests/TestTable";
 import {Alert, Box, Button, Dialog, Snackbar} from "@mui/material";
 import {useNavigate} from "react-router-dom";
@@ -100,7 +100,7 @@ export const Tests = () => {
                 onClose={() => setDeleteTestFlag(false)}
                 onConfirm={() => handleConfirmDelete(selectedTest?.id as number)}
                 title="Подтверждение удаления теста"
-                content="Вы уверены что хотите удалить выбранный тест?"
+                children="Вы уверены что хотите удалить выбранный тест?"
             />
             <Dialog open={openExportDialog} onClose={toggleModelOpen}>
                 <ExportModal test={selectedTest} />

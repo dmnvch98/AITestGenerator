@@ -9,8 +9,7 @@ import lombok.Getter;
 import java.io.FileNotFoundException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -18,21 +17,42 @@ import java.util.stream.Collectors;
 @Getter
 public enum GenerationFailReason {
 
-    HTTP_EXCEPTION_UNAUTHORIZED(OpenAiHttpException.class, "Incorrect API key provided: .*", true),
-    SHUTDOWN_REQUESTED(null, null, true),
-    PARSE_EXCEPTION(JsonParseException.class, "Unexpected character: .*", true),
+    //10000
+    HTTP_EXCEPTION_UNAUTHORIZED(OpenAiHttpException.class, "Incorrect API key provided: .*", true, 1),
     HTTP_EXCEPTION_LIMIT_EXCEEDED(OpenAiHttpException.class,
-            "You exceeded your current quota, please check your plan and billing details. .*", true),
-    FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true),
-    REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true),
-    SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", true),
-    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true),
-    UNKNOWN(null, null, false);
+          "You exceeded your current quota, please check your plan and billing details. .*", true, 2),
+    REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true, 3),
+    //11000
+    PARSE_EXCEPTION(JsonParseException.class, "Unexpected character: .*", true, 1),
+    //12000
+    FILE_NOT_FOUND(FileNotFoundException.class, "(http|https)://.*", true, 1),
+    //13000
+    SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", false, 1),
+    //14000
+    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true, 1),
+    //00000
+    UNKNOWN(null, null, false, 1),
+    SHUTDOWN_REQUESTED(null, null, true,2);
 
     private final Class<? extends Throwable> cause;
     private final String messageRegex;
     private final static Set<GenerationFailReason> failReasons = initializeFailsReasons();
     private final boolean fatal;
+    private final int number;
+    private static final Map<Class<?>, Integer> groupCodes = initializeGroupCodes();
+
+    private static Map<Class<?>, Integer> initializeGroupCodes() {
+        if (groupCodes!= null) {
+            return groupCodes;
+        }
+        final Map<Class<?>, Integer> groupCodes = new HashMap<>();
+        groupCodes.put(OpenAiHttpException.class, 10000);
+        groupCodes.put(JsonParseException.class, 11000);
+        groupCodes.put(FileNotFoundException.class, 12000);
+        groupCodes.put(SocketTimeoutException.class, 13000);
+        groupCodes.put(UnknownHostException.class, 14000);
+        return groupCodes;
+    }
 
     private static Set<GenerationFailReason> initializeFailsReasons() {
       if (CollectionUtils.isNullOrEmpty(failReasons)) {
@@ -58,5 +78,21 @@ public enum GenerationFailReason {
         }
         return UNKNOWN;
     }
+
+    public static int getFailCode(final GenerationFailReason failReason) {
+        return Optional.of(failReason)
+           .map(GenerationFailReason::getCause)
+           .map(cause -> groupCodes.getOrDefault(cause, 1))
+           .map(groupCode -> groupCode + failReason.getNumber())
+           .orElse(1);
+    }
+
+    public static int getFailCode(final String failReason) {
+        return Optional.ofNullable(failReason)
+              .map(GenerationFailReason::valueOf)
+              .map(GenerationFailReason::getFailCode)
+              .orElse(1);
+    }
+
 
 }

@@ -1,13 +1,13 @@
-import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
+import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
 import React, { useEffect, useState } from "react";
-import { useTestStore } from "../../store/tests/testStore";
+import { useTestStore } from "../../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import {Alert, Box, Button, Divider, Paper, Snackbar} from "@mui/material";
-import {TestViewModeSelector} from "./edit/components/TestViewModeSelector";
-import {QuestionPagination} from "./edit/components/QuestionPagination";
-import {QuestionListView, QuestionPaginatedView} from "./edit/components/TestDisplayMode";
-import TestRatingForm from "./view/components/TestRatingForm";
+import {TestViewModeSelector} from "../edit/components/TestViewModeSelector";
+import {QuestionPagination} from "../edit/components/QuestionPagination";
+import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDisplayMode";
+import {TestRatingForm} from "./components/TestRatingForm";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
