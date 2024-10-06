@@ -24,7 +24,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public OpenAiService openAiService () {
-        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(300));
+        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(40));
     }
 
     @Bean

@@ -70,6 +70,11 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 <Typography variant="h6" gutterBottom>
                     Параметры генерации
                 </Typography>
+                <Typography fontSize={14} gutterBottom color="#777">
+                    Расшифровка параметров 'Температура' и 'Top P' находится в иконках ⓘ. <br/>
+                    Менять эти параметры необязательно.
+                </Typography>
+
 
                 <TextField
                     label="Максимальное число вопросов (50 макс.)"

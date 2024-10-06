@@ -71,14 +71,13 @@ public class QueueClient {
 
     public void sendMessage(GenerateTestMessage message) {
         try {
-            log.info("Adding message to the queue to generate test. User id: {}. File: {}",
-                  message.getUserId(), message.getHashedFileName());
+            log.info("Adding message to the queue to generate test. Message: {}", message);
             SendMessageRequest messageRequest =
                     new SendMessageRequest(queueUrl, String.valueOf(objectMapper.writeValueAsString(message)));
             queue.sendMessage(messageRequest);
         } catch (Exception e) {
-            log.error("An error occurred during saving message to the queue. User id: {}, File: {}",
-                    message.getUserId(), message.getHashedFileName(), e);
+            log.error("An error occurred during saving message to the queue. Message: {}",
+                  message, e);
         }
     }
 

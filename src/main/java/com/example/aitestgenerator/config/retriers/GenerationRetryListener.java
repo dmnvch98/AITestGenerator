@@ -59,6 +59,7 @@ public class GenerationRetryListener implements RetryListener {
                 final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(throwable);
 
                 if (failReason.isFatal()) {
+                    log.info("Fatal exception. Stop executing. FailReason=[{}]", failReason);
                     activityService.failGeneration(history, throwable);
                 }
             } else {

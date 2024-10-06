@@ -6,6 +6,7 @@ import {TabItem, TabsPanel} from "../../components/main/tabsPanel/TabsPanel";
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {useLocation} from "react-router-dom";
+import Typography from "@mui/material/Typography";
 
 const TestGenHistoryPast = () => {
     const {getTestGenHistory, testGenHistoryPast} = useUserStore();
@@ -58,8 +59,11 @@ const TestGenHistoryCurrent = () => {
 
     return(
         <>
-            <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-end" id="#test-gen-current">
-            </Box>
+            <Typography fontSize={14} align="left">
+                Здесь отображаются ваши активные задачи по генерации тестов. Процесс может занять от 10 секунд до 10 минут, в зависимости от размера текста и состояния стороннего ИИ.
+                <br/>
+                Обратите внимание: генерация происходит в фоновом режиме, и вы можете закрыть эту страницу.
+            </Typography>
             <TestGenHistoryTable testGenHistory={testGenHistoryCurrent}/>
         </>
     )

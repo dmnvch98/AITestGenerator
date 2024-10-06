@@ -116,6 +116,9 @@ const FilesContent = () => {
             <Typography variant="h5" align="left" sx={{ mb: 2 }}>
                 Файлы
             </Typography>
+            <Typography variant="subtitle1" align="left" sx={{mt: 2}} gutterBottom>
+                Загрузите файл для генерации теста. После загрузки, выберете: Действия → Сгенерировать тест.
+            </Typography>
 
             <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
                 <Button

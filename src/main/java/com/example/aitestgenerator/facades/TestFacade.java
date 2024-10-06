@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -100,13 +99,17 @@ public class TestFacade {
     final GenerateTestRequest request = testGenerationConverter.convert(message, history, userContent, message.getUserId(), fileHash);
 
     final Test test = testGenerationService.generateTest(request);
+    log.info("Saving test");
     testService.save(test);
+    log.info("Test is saved");
 
     history = history.toBuilder()
           .testId(test.getId())
           .testTitle(test.getTitle())
           .build();
+    log.info("Saving history. History id: {}", history.getId());
     activityService.finishGeneration(history, message.getReceipt());
+    log.info("History is saved. History id: {}", history.getId());
   }
 
   public void deleteTest(final Long testId, final Long userId) {

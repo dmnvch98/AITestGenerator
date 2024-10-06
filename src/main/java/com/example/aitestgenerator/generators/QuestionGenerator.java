@@ -41,7 +41,7 @@ public class QuestionGenerator extends Generator<GenerateQuestionsResponseDto> {
         final JsonNode responseSchema = objectMapper.readTree(readFileContents(QUESTIONS_SCHEMA_FILE));
         final List<ChatMessage> chatMessages = prepareMessages(request);
         final String result = aiService.send(model, chatMessages, responseSchema, request.getTemperature(), request.getTopP());
-
+        log.info("Question generation is done. User id: {}", request.getUserId());
         return converter.convert(result);
     }
 

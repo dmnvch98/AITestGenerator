@@ -23,12 +23,10 @@ public class TestGenerationService {
     private final TestConverter testConverter;
 
     public Test generateTest(final GenerateTestRequest request) {
-        final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request);
-        final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto);
+      final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request);
+      final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto);
 
-        final Test test = testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
-        log.info("Test generation is done. File hash=[{}], userId=[{}]", request.getFileHash().getHashedFilename(), request.getUserId());
-        return test;
+      return testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
     }
 
     public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request) {

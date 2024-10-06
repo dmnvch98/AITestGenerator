@@ -24,6 +24,7 @@ public class ChatGPTService implements AIService {
                 .temperature(temperature)
                 .topP(topP)
                 .responseFormat(ChatCompletionRequest.JsonSchemaResponseFormat.builder().jsonSchema(schema).build())
+                .stream(false)
                 .build();
 
         return openAiService.createChatCompletion(request).getChoices().get(0).getMessage().getContent();
