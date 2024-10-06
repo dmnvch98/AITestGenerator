@@ -26,7 +26,11 @@ public class FileController {
 
   @PostMapping("/")
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<FileUploadResponseDto> uploadFile(@RequestParam("file") final List<MultipartFile> files, final Authentication authentication) {
+  public ResponseEntity<FileUploadResponseDto> uploadFile(
+        @RequestParam("file")
+        final List<MultipartFile> files,
+        final Authentication authentication)
+  {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
     final List<FileUploadResponseDto.FileResult> fileResults = new ArrayList<>();
     for (final MultipartFile file : files) {

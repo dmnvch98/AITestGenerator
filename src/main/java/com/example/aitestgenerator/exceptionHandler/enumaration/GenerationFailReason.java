@@ -1,6 +1,7 @@
 package com.example.aitestgenerator.exceptionHandler.enumaration;
 
 import com.amazonaws.util.CollectionUtils;
+import com.example.aitestgenerator.exceptions.TestGenException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.theokanning.openai.OpenAiHttpException;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,10 @@ import java.util.stream.Collectors;
 @Getter
 public enum GenerationFailReason {
 
+    //1
+    UNKNOWN(TestGenException.class, null, false, 1),
+    //2
+    SHUTDOWN_REQUESTED(TestGenException.class, null, true,2),
     //10000
     HTTP_EXCEPTION_UNAUTHORIZED(OpenAiHttpException.class, "Incorrect API key provided: .*", true, 1),
     HTTP_EXCEPTION_LIMIT_EXCEEDED(OpenAiHttpException.class,
@@ -29,10 +34,7 @@ public enum GenerationFailReason {
     //13000
     SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", false, 1),
     //14000
-    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true, 1),
-    //00000
-    UNKNOWN(null, null, false, 1),
-    SHUTDOWN_REQUESTED(null, null, true,2);
+    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true, 1);
 
     private final Class<? extends Throwable> cause;
     private final String messageRegex;
@@ -46,6 +48,7 @@ public enum GenerationFailReason {
             return groupCodes;
         }
         final Map<Class<?>, Integer> groupCodes = new HashMap<>();
+        groupCodes.put(TestGenException.class, 0);
         groupCodes.put(OpenAiHttpException.class, 10000);
         groupCodes.put(JsonParseException.class, 11000);
         groupCodes.put(FileNotFoundException.class, 12000);

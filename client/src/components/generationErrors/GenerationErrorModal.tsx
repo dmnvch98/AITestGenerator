@@ -40,7 +40,7 @@ export const GenerationErrorModal: React.FC<ErrorModalProps> = ({ failCode, open
         <Dialog open={open} onClose={onClose}>
                 {errorInfo ? (
                     <>
-                        <DialogTitle>Ошибка: {errorInfo.code}</DialogTitle>
+                        <DialogTitle>Код ошибки: {errorInfo.code}</DialogTitle>
                         <IconButton
                             aria-label="close"
                             onClick={onClose}

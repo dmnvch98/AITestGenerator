@@ -15,6 +15,7 @@ export const UploadStatus = {
     SUCCESS: 'SUCCESS',
     FAILED: 'FAILED',
     ALREADY_UPLOADED: 'ALREADY_UPLOADED',
+    INVALID_EXTENSION: 'INVALID_EXTENSION'
 } as const;
 
 export type UploadStatus = (typeof UploadStatus)[keyof typeof UploadStatus];
@@ -23,6 +24,7 @@ export const UploadStatusMessages: Record<UploadStatus, string> = {
     [UploadStatus.SUCCESS]: 'Файл успешно загружен',
     [UploadStatus.FAILED]: 'Не удалось загрузить файл',
     [UploadStatus.ALREADY_UPLOADED]: 'Файл с таким именем уже существует',
+    [UploadStatus.INVALID_EXTENSION]: 'Неверное разрешение файла'
 };
 
 interface FileResult {
@@ -86,7 +88,7 @@ const useFileStore = create<FileStore>((set, get) => ({
             const response = await FileService.uploadFiles(filesToUpload);
             if (response && response.fileResults.length > 0) {
                 response.fileResults.map(resp => {
-                    if (resp.status === UploadStatus.ALREADY_UPLOADED ) {
+                    if (resp.status !== UploadStatus.SUCCESS ) {
                         setAlert([{id: Date.now(), message: UploadStatusMessages[resp.status] + ' - ' + resp.fileName, severity: 'warning'}])
                     }
                 })

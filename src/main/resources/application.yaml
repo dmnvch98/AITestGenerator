@@ -1,5 +1,6 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT}
+
 spring:
   servlet:
     multipart:
@@ -8,55 +9,46 @@ spring:
       max-request-size: 30MB
 
   datasource:
-    url: jdbc:postgresql://localhost:35432/test_generator
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
 
   jpa:
-    show-sql: false
+    show-sql: ${JPA_SHOW_SQL}
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO}
     properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.dialect: ${JPA_HIBERNATE_DIALECT}
+
+file-upload:
+  allowed-extensions: ${FILE_UPLOAD_ALLOWED_EXTENSIONS}
 
 security:
-  secret: SECRET
-  refresh-secret: REFRESH_SECRET
-  allowed-origin: http://localhost:3001,http://192.168.0.142:3001
+  secret: ${SECURITY_SECRET}
+  refresh-secret: ${SECURITY_REFRESH_SECRET}
+  allowed-origin: ${SECURITY_ALLOWED_ORIGIN}
 
 csrf:
-  cookie_domain: localhost
+  cookie_domain: ${CSRF_COOKIE_DOMAIN}
+
 aws:
-  region: us-east-1
-  access-key: foo
-  secret-key: bar
-  queue-name: test-queue
-  s3-bucket: files-bucket
-  url: http://localhost:4566
-  sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
+  region: ${AWS_REGION}
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  queue-name: ${AWS_QUEUE_NAME}
+  s3-bucket: ${AWS_S3_BUCKET}
+  url: ${AWS_URL}
+  sqs-url: ${AWS_SQS_URL}
+
 generation:
   models:
-    question: ft:gpt-4o-mini-2024-07-18:personal:questions-1108-4:9v5P1xMY
-    answers: ft:gpt-4o-mini-2024-07-18:personal:answers:9uae8che
+    question: ${GENERATION_MODELS_QUESTION}
+    answers: ${GENERATION_MODELS_ANSWERS}
+
 retry:
-  attempt: 2
+  attempt: ${RETRY_ATTEMPT}
+
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level cid:%X{cid:-} - %msg%n"
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: demo
-  datasource:
-    url: jdbc:postgresql://postgres:5432/test_generator
-
-aws:
-  region: us-east-1
-  access-key: foo
-  secret-key: bar
-  queue-name: test-queue
-  url: http://localstack:4566/000000000000/${aws.queue-name}
+    console: ${LOGGING_PATTERN_CONSOLE}

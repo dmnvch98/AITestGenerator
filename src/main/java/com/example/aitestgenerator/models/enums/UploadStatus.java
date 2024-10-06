@@ -4,4 +4,5 @@ public enum UploadStatus {
     SUCCESS,
     FAILED,
     ALREADY_UPLOADED,
+    INVALID_EXTENSION
 }

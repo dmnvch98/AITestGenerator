@@ -2,6 +2,8 @@ package com.example.aitestgenerator.facades;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -16,6 +18,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.poi.util.StringUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +32,8 @@ public class FileFacade {
   private final FileHashService fileHashService;
   private final StorageClient storageClient;
   private final FileHashConverter converter;
+  @Value("${file-upload.allowed-extensions}")
+  private final List<String> allowedFileExtensions;
 
   @Transactional
   public UploadStatus saveFile(final long userId, final MultipartFile file) {
@@ -35,6 +41,10 @@ public class FileFacade {
     final ObjectMetadata metadata = new ObjectMetadata();
     final String fileNameHash = DigestUtils.md5Hex(originalFileName);
     metadata.setContentLength(file.getSize());
+
+    if (!checkFileExtension(originalFileName)) {
+      return UploadStatus.INVALID_EXTENSION;
+    }
 
     if (fileHashService.isExistsByHashedFilenameAndUser(userId, fileNameHash)) {
       return UploadStatus.ALREADY_UPLOADED;
@@ -86,5 +96,13 @@ public class FileFacade {
       throw new ResourceNotFoundException(hashedFileName);
     }
     return true;
+  }
+
+  private boolean checkFileExtension(final String fileName) {
+    return Optional.ofNullable(fileName)
+          .filter(StringUtil::isNotBlank)
+          .map(f -> fileName.substring(f.lastIndexOf('.') + 1).toLowerCase())
+          .map(allowedFileExtensions::contains)
+          .orElse(false);
   }
 }
