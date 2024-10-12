@@ -2,12 +2,16 @@ package com.example.aitestgenerator.dto.tests;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
+
+import java.io.Serializable;
 
 @Jacksonized
 @Builder
 @Getter
-public class GenerateTestRequestDto {
+@ToString
+public class GenerateTestRequestDto implements Serializable {
 
     final String hashedFileName;
     @Builder.Default

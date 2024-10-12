@@ -9,8 +9,11 @@ import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.models.Test;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.AttributeAccessor;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @AllArgsConstructor
 @Service
@@ -22,35 +25,43 @@ public class TestGenerationService {
     private final RetryTemplate retryTemplate;
     private final TestConverter testConverter;
 
-    public Test generateTest(final GenerateTestRequest request) {
-      final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request);
-      final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto);
+    public Test generateTest(final GenerateTestRequest request, Map<String, String> retryContextParamsMap) {
+      final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
+      final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
 
       return testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
     }
 
-    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request) {
+    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, Map<String, String> retryContextParamsMap) {
         try {
             return retryTemplate.execute(context -> {
-                context.setAttribute("historyId", request.getHistory().getId());
+                setRetryContextParams(context, retryContextParamsMap);
                 return questionGenerator.generateData(request);
             });
         } catch (final Exception e) {
-            throw new RuntimeException("Questions generation failed for userId = " + request.getHistory().getUser().getId() +
-                    " historyId = " + request.getHistory().getId());
+            throw new RuntimeException("Questions generation failed for userId = " + request.getUserId() +
+                    " fileHash = " + request.getFileHash());
         }
     }
 
     public GenerateAnswersResponseDto generateAnswers(final GenerateTestRequest request,
-                                                      final GenerateQuestionsResponseDto questionsResponseDto) {
+                                                      final GenerateQuestionsResponseDto questionsResponseDto,
+                                                      final Map<String, String> retryContextParamsMap
+                                                      ) {
         try {
             return retryTemplate.execute(context -> {
-                context.setAttribute("historyId", request.getHistory().getId());
+                setRetryContextParams(context, retryContextParamsMap);
                 return answerGenerator.generateData(request, questionsResponseDto);
             });
         } catch (final Exception e) {
-            throw new RuntimeException("Generation of answers for history id " + request.getHistory().getId() +
-                    " failed");
+            throw new RuntimeException("Generation of answers failed for userId = " + request.getUserId() +
+                  " fileHash = " + request.getFileHash());
+        }
+    }
+
+    private void setRetryContextParams(final AttributeAccessor context, final Map<String, String> retryContextParamsMap) {
+        for (Map.Entry<String, String> entry : retryContextParamsMap.entrySet()) {
+            context.setAttribute(entry.getKey(), entry.getValue());
         }
     }
 

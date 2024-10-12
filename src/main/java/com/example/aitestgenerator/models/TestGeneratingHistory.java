@@ -1,8 +1,11 @@
 package com.example.aitestgenerator.models;
 
-import com.example.aitestgenerator.models.enums.GenerationStatus;
+import com.example.aitestgenerator.converters.ormConverter.GenerateTestRequestConverter;
+import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
+import com.example.aitestgenerator.models.enums.ActivityStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
 
@@ -16,25 +19,20 @@ public class TestGeneratingHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "userId", referencedColumnName = "id")
-    private User user;
+    private Long userId;
     private Long testId;
     private String testTitle;
-    private LocalDateTime generationStart;
-    private LocalDateTime generationEnd;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     @Enumerated(EnumType.STRING)
-    private GenerationStatus generationStatus;
+    private ActivityStatus status;
     private String failReason;
-    private String messageReceipt;
     private String cid;
     private String fileName;
 
-    @Override
-    public String toString() {
-        return "TestGeneratingHistory{" +
-                "failReason=" + failReason +
-                ", id=" + id +
-                '}';
-    }
+    @Convert(converter = GenerateTestRequestConverter.class)
+    @Column(name = "requestDto", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
+    private GenerateTestRequestDto requestDto;
+
 }

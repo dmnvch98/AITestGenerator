@@ -1,92 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import { Badge, Box, CircularProgress, IconButton, Popover, Typography, Divider, ListItemButton, ListItemText, ListItemIcon, List, ListItem } from '@mui/material';
+import React, { useState, useCallback} from 'react';
+import { Badge, Box, IconButton, Popover, Typography, Divider, ListItemText, ListItemIcon, List, ListItem } from '@mui/material';
 import TimerIcon from '@mui/icons-material/Timer';
 import { GenerationStatus } from "../../store/types";
-import { AccessTime } from "@mui/icons-material";
-import { DoneLabel } from "../utils/DoneLabel";
-import { NoLabel } from "../utils/NoLabel";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { TestGenHistory, useUserStore } from "../../store/userStore";
-import { useTestGenHistoryWebSocket } from "../../store/useTestGenHistoryWebSocket";
+import { ActivityDto, useUserStore } from "../../store/userStore";
+import DeleteIcon from "@mui/icons-material/Delete";
+import StatusIndicator from "../status/StatusIndicator";
+
+// Константы для статусов
+const DeletableStatuses = new Set([
+    GenerationStatus.FAILED,
+    GenerationStatus.SUCCESS,
+]);
 
 export const ActiveJobBadge = () => {
     const MAX_FILENAME_LENGTH = 30;
-    const { getCurrentUser, getTestGenHistoryCurrent, user } = useUserStore();
-    const [testGenHistoryCurrent, setTestGenHistoryCurrent] = useState<TestGenHistory[]>([]);
+    const { currentActivities, deleteCurrentActivity } = useUserStore();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
-    };
+    }, []);
 
-    const handleClose = () => {
-        setTestGenHistoryCurrent(prev => prev.filter(h => ![GenerationStatus.SUCCESS, GenerationStatus.FAILED].includes(h.generationStatus)));
+    const handleClose = useCallback(() => {
         setAnchorEl(null);
-    };
+    }, []);
 
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            const result = await getTestGenHistoryCurrent();
-            if (result) {
-                setTestGenHistoryCurrent(result);
-            }
+    const handleDelete = useCallback((item: ActivityDto) => {
+        deleteCurrentActivity(item);
+    }, [deleteCurrentActivity]);
+
+    const truncateString = useCallback((str: string) => (
+        str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str
+    ), []);
+
+    const getCurrentJobComponent = useCallback((item: ActivityDto) => {
+        if (!item) return null;
+
+        const showDeleteButton = () => {
+            return DeletableStatuses.has(item.status);
         };
 
-        getCurrentUser();
-        fetchInitialData();
-    }, [getCurrentUser, getTestGenHistoryCurrent]);
-
-    const newTestGenHistory = useTestGenHistoryWebSocket(user?.id);
-
-    useEffect(() => {
-        if (newTestGenHistory) {
-            const updatedHistory = testGenHistoryCurrent.map(h => (h.id === newTestGenHistory.id ? newTestGenHistory : h));
-            if (!testGenHistoryCurrent.some(h => h.id === newTestGenHistory.id)) {
-                updatedHistory.push(newTestGenHistory);
-            }
-            setTestGenHistoryCurrent(updatedHistory);
-        }
-    }, [newTestGenHistory]);
-
-    const statusComponents = {
-        [GenerationStatus.WAITING]: <AccessTime />,
-        [GenerationStatus.SUCCESS]: <DoneLabel />,
-        [GenerationStatus.IN_PROCESS]: <CircularProgress size={24} />,
-        [GenerationStatus.FAILED]: <NoLabel />,
-    };
-
-    const getStatusComponent = (status: GenerationStatus) => statusComponents[status] || <QuestionMarkIcon />;
-
-    const truncateString = (str: string) => (str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str);
-
-    const getCurrentJobComponent = (item: TestGenHistory) => {
-        const link = item.testId ? `/tests/${item.testId}` : (item.generationStatus === GenerationStatus.FAILED ? '/tests?activeTab=history&currentHistory=false' : '/tests?activeTab=history');
-
         return (
-            <ListItem disablePadding key={item.id}>
-                <ListItemButton component="a" href={link}>
-                    <ListItemText primary={truncateString(item.fileName)} secondary={item.testId ? "Нажмите чтобы открыть тест" : ""} />
-                    <ListItemIcon sx={{ml: 2}}>
-                        {getStatusComponent(item.generationStatus)}
-                    </ListItemIcon>
-                </ListItemButton>
+            <ListItem
+                secondaryAction={ showDeleteButton() && (
+                    <Box onClick={() => handleDelete(item)} aria-label="Delete activity">
+                        <IconButton edge="end" aria-label="delete">
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
+                )}
+            >
+                <ListItemIcon sx={{ml: 2}}>
+                    <StatusIndicator status={item.status}/>
+                </ListItemIcon>
+                <ListItemText
+                    primary={truncateString(item.fileName)}
+                />
             </ListItem>
         );
-    };
+    }, [truncateString, handleDelete]);
 
-    const getNoJobsComponent = () => {
-        return (
-            <ListItem disablePadding sx={{p: 2}}>
-                <ListItemText primary='Нет активных работ'/>
-            </ListItem>
-        );
-    };
+    const getNoJobsComponent = useCallback(() => (
+        <ListItem disablePadding sx={{ p: 2 }}>
+            <ListItemText primary='Нет активных работ' />
+        </ListItem>
+    ), []);
 
     return (
         <Box>
             <IconButton onClick={handleClick}>
-                <Badge badgeContent={testGenHistoryCurrent.length} color="secondary" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                <Badge badgeContent={currentActivities.length} color="secondary" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
                     <TimerIcon />
                 </Badge>
             </IconButton>
@@ -103,7 +87,7 @@ export const ActiveJobBadge = () => {
                     </Box>
                     <Divider />
                     <List>
-                        {testGenHistoryCurrent.length > 0 ? testGenHistoryCurrent.map(getCurrentJobComponent) : getNoJobsComponent()}
+                        {currentActivities.length > 0 ? currentActivities.map(getCurrentJobComponent) : getNoJobsComponent()}
                     </List>
                 </Box>
             </Popover>

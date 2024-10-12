@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import './App.css';
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/auth/LoginPage";
 import {Texts} from "./pages/texts/Texts";
 import {AddText} from "./pages/texts/AddText";
 import {createTheme, ThemeProvider} from "@mui/material";
@@ -12,15 +12,15 @@ import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./styles/appColors";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
 import { UserTestResults } from './pages/tests/UserTestResults';
-import SignUp from './pages/SignUp';
+import SignUp from './pages/auth/SignUp';
 import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/edit/TestPageEdit";
 import {TestsPage} from "./pages/tests/TestPage";
 import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
 import {PrintTestPage} from "./pages/tests/print/PrintTestPage";
-import {useUserStore} from "./store/userStore";
-import {LoadingPage} from "./components/main/LoadingPage";
 import {TestPageCreate} from "./pages/tests/create/TestPageCreate";
+import {useUserStore} from "./store/userStore";
+import {useAuthStore} from "./pages/auth/authStore";
 
 function App() {
     const theme = createTheme({
@@ -44,10 +44,18 @@ function App() {
         },
     });
 
-    const {loading} = useUserStore();
+    const { getTestGenCurrentActivitiesLongPoll, getTestGenCurrentActivities } = useUserStore();
+    const { isAuthenticated} = useAuthStore();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            getTestGenCurrentActivities();
+            getTestGenCurrentActivitiesLongPoll();
+        }
+    }, [isAuthenticated, getTestGenCurrentActivities, getTestGenCurrentActivitiesLongPoll]);
+
     return (
             <ThemeProvider theme={theme}>
-                {loading ? <LoadingPage/> :
                     <Router>
                         <div className="App">
                             <Routes>
@@ -71,8 +79,6 @@ function App() {
                             </Routes>
                         </div>
                     </Router>
-                }
-
             </ThemeProvider>
     );
 }

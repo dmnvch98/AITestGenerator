@@ -31,7 +31,7 @@ const FilesContent = () => {
     const { generateTestByFile } = useTestStore();
     const { maxQuestionsCount, minAnswersCount, temperature, topP } = useGenerateTestStore();
     const { setAlert } = useFileStore();
-    const { getTestGenHistoryCurrent } = useUserStore();
+    const { getTestGenCurrentActivities } = useUserStore();
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
@@ -74,7 +74,7 @@ const FilesContent = () => {
 
     const generationStartSuccessful = () => {
         setAlert([{id: Date.now(), message: 'Генерация теста начата', severity: 'success'}]);
-        getTestGenHistoryCurrent();
+        getTestGenCurrentActivities();
     }
 
     const handleGenTestSubmit = () => {

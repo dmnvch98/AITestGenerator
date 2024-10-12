@@ -25,4 +25,8 @@ public class CommandService {
         queueClient.deleteMessage(receipt);
     }
 
+    public void purgeQueue() {
+        queueClient.purgeQueue();
+    }
+
 }

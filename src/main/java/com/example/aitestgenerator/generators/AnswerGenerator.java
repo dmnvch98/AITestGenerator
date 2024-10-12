@@ -5,8 +5,6 @@ import com.example.aitestgenerator.dto.generation.GenerateQuestionsResponseDto;
 import com.example.aitestgenerator.dto.generation.GenerateAnswersResponseDto;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.models.GenerationInfo;
-import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
 import com.example.aitestgenerator.repositories.GenerationInfoRepository;
 import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import com.example.aitestgenerator.services.ai.AIService;
@@ -37,7 +35,6 @@ public class AnswerGenerator {
     @Value("${generation.models.answers}")
     private String model;
 
-    private final TestGeneratingHistoryService historyService;
     private final GenerationConverter converter;
     private final AIService aiService;
     private final GenerationInfoRepository generationInfoRepository;
@@ -56,9 +53,7 @@ public class AnswerGenerator {
         log.info("Test generation is done. User id: {}", request.getUserId());
 //        handleTokensCount(request.getUserId(), request.getText(), getContextPrompt(), result, startTime);
 
-        final GenerateAnswersResponseDto answersResponseDto = converter.convertToAnswersResponseDto(result);
-        handleHistory(request.getHistory());
-        return answersResponseDto;
+      return converter.convertToAnswersResponseDto(result);
     }
 
     private List<ChatMessage> prepareMessages(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto) throws JsonProcessingException {
@@ -69,14 +64,6 @@ public class AnswerGenerator {
         final ChatMessage userText = new ChatMessage(ChatMessageRole.USER.value(), testGenerationRequest);
 
         return List.of(context, userText);
-    }
-
-
-    private void handleHistory(final TestGeneratingHistory history) {
-        history.setGenerationEnd(LocalDateTime.now());
-        history.setGenerationStatus(GenerationStatus.SUCCESS);
-
-        historyService.save(history);
     }
 
     private void handleTokensCount(final long userId, final String text, final String contextPrompt,

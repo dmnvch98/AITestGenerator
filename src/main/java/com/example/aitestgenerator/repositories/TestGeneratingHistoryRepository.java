@@ -1,7 +1,7 @@
 package com.example.aitestgenerator.repositories;
 
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
+import com.example.aitestgenerator.models.enums.ActivityStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +11,7 @@ import java.util.List;
 public interface TestGeneratingHistoryRepository extends CrudRepository<TestGeneratingHistory, Long> {
     List<TestGeneratingHistory> findAllByUserIdOrderByIdDesc(final Long userId);
 
-    List<TestGeneratingHistory> findAllByGenerationStatus(final GenerationStatus generationStatus);
+    List<TestGeneratingHistory> findAllByUserIdAndStatus(final Long userId, final ActivityStatus status);
 
-    List<TestGeneratingHistory> findAllByUserIdAndGenerationStatus(final Long userId, final GenerationStatus generationStatus);
-
-    List<TestGeneratingHistory> findAllByUserIdAndGenerationStatusIn(final Long userId, final List<GenerationStatus> generationStatuses);
+    List<TestGeneratingHistory> findAllByUserIdAndStatusIn(final Long userId, final List<ActivityStatus> statuses);
 }

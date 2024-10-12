@@ -1,7 +1,6 @@
 package com.example.aitestgenerator.generators.models;
 
 import com.example.aitestgenerator.models.FileHash;
-import com.example.aitestgenerator.models.TestGeneratingHistory;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +8,6 @@ import lombok.Getter;
 @Getter
 public class GenerateTestRequest {
 
-    private TestGeneratingHistory history;
     private final FileHash fileHash;
     private final String text;
     private final Long userId;
@@ -18,4 +16,5 @@ public class GenerateTestRequest {
     private final int maxAnswersCount;
     private final double topP;
     private final double temperature;
+    private final String testGenKey;
 }

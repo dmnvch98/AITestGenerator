@@ -3,7 +3,6 @@ package com.example.aitestgenerator.annotations;
 import com.example.aitestgenerator.models.GenerateTestMessage;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
 import com.example.aitestgenerator.services.ActivityService;
-import com.example.aitestgenerator.services.TestGeneratingHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 public class ExceptionHandlingAspect {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandlingAspect.class);
-    private final ActivityService activityService;
 
   @Pointcut("@annotation(StopGenerationIfException)")
     public void catchExceptionAndHandle() {}
@@ -40,13 +38,13 @@ public class ExceptionHandlingAspect {
             }
         }
 
-        if (history != null) {
-            activityService.failGeneration(history, ex);
-        } else if (message != null) {
-            activityService.failGeneration(message.getReceipt(), ex);
-        } else {
-            activityService.failGeneration(ex);
-        }
+//        if (history != null) {
+////            activityService.failGeneration(history, ex);
+//        } else if (message != null) {
+//            activityService.failActivityIfFatal(message.getReceipt(), ex);
+//        } else {
+//            activityService.failActivityIfFatal(ex);
+//        }
 
     }
 }

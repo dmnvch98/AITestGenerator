@@ -1,10 +1,8 @@
 import {TestGenHistoryTable} from "../../components/history/TestGenHistoryTable";
 import React, {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
-import {TestGenHistory, useUserStore} from "../../store/userStore";
+import {useUserStore} from "../../store/userStore";
 import {TabItem, TabsPanel} from "../../components/main/tabsPanel/TabsPanel";
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import {useLocation} from "react-router-dom";
 import Typography from "@mui/material/Typography";
 
@@ -25,37 +23,11 @@ const TestGenHistoryPast = () => {
 }
 
 const TestGenHistoryCurrent = () => {
-    const { getCurrentUser, user } = useUserStore();
 
-    const {getTestGenHistoryCurrent, testGenHistoryCurrent, setCurrentTestGenHistories} = useUserStore();
+    const {getTestGenCurrentActivities, currentActivities} = useUserStore();
     useEffect(() => {
-        getTestGenHistoryCurrent();
-        getCurrentUser();
+        getTestGenCurrentActivities();
     }, [])
-
-    useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws');
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                client.subscribe(`/user/${user?.id}/queue/TestGeneratingHistory`, message => {
-                    const updatedHistory = JSON.parse(message.body) as TestGenHistory;
-                    setCurrentTestGenHistories(updatedHistory);
-                });
-            },
-            onStompError: (frame) => {
-                console.error('Broker reported error: ' + frame.headers['message']);
-                console.error('Additional details: ' + frame.body);
-            },
-        });
-
-        client.activate();
-
-        return () => {
-            client.deactivate();
-        };
-    }, [user]);
-
 
     return(
         <>
@@ -64,7 +36,7 @@ const TestGenHistoryCurrent = () => {
                 <br/>
                 Обратите внимание: генерация происходит в фоновом режиме, и вы можете закрыть эту страницу.
             </Typography>
-            <TestGenHistoryTable testGenHistory={testGenHistoryCurrent}/>
+            <TestGenHistoryTable testGenHistory={currentActivities}/>
         </>
     )
 }

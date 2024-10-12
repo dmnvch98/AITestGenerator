@@ -1,59 +1,121 @@
 package com.example.aitestgenerator.services;
 
+import com.example.aitestgenerator.config.redis.RedisService;
+import com.example.aitestgenerator.converters.ActivityConverter;
+import com.example.aitestgenerator.converters.TestGenerationConverter;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityDto;
+import com.example.aitestgenerator.models.TestGenerationActivity;
+import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
+import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
+import com.example.aitestgenerator.notifiets.ActivityNotifier;
+import com.example.aitestgenerator.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ActivityService {
 
-    private final TestGeneratingHistoryService testGeneratingHistoryService;
     private final CommandService commandService;
+    private final ActivityConverter activityConverter;
+    private final TestGenerationConverter historyConverter;
+    private final RedisService<TestGenerationActivity> redisService;
+    private final TestGeneratingHistoryService historyService;
+    private final ActivityNotifier activityNotifier;
 
-    public void finishGeneration(final TestGeneratingHistory history, final String receipt) {
-        commandService.deleteMessage(receipt);
-        testGeneratingHistoryService.save(history);
+    public TestGenerationActivity getActivity(final String hashKey, final String cid) {
+        return redisService.getUserActivity(hashKey, cid, TestGenerationActivity.class);
     }
 
-    public void failGeneration(final TestGeneratingHistory history, final Throwable cause) {
+    public Set<TestGenerationActivity> getUserActivities(final String hashKey) {
+        return redisService.getUserActivities(hashKey, TestGenerationActivity.class);
+    }
+
+    public void createWaitingActivity(final FileHash fileHash, final String cid,
+                                      final GenerateTestRequestDto requestDto, final Long userId) {
+        final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId);
+        redisService.saveUserActivity(userId, cid, waitingActivity);
+        final TestGenerationActivityDto dto = activityConverter.convert(waitingActivity);
+        activityNotifier.publishActivity(userId, dto);
+    }
+
+    public void createInProgressActivity(final Long userId, final String cid, final String messageReceipt) {
+        final String hashKey = Utils.getHashKey(userId);
+        final TestGenerationActivity currentActivity = redisService
+              .getUserActivity(hashKey, cid, TestGenerationActivity.class);
+        final TestGenerationActivity inProcessActivity = activityConverter
+              .getInProgressActivity(currentActivity, messageReceipt);
+        redisService.saveUserActivity(userId, inProcessActivity.getCid(), inProcessActivity);
+        final TestGenerationActivityDto dto = activityConverter.convert(inProcessActivity);
+        activityNotifier.publishActivity(userId, dto);
+    }
+
+    public void finishActivity(final String messageReceipt, final Long userId, final String cid) {
+        final String hashKey = Utils.getHashKey(userId);
+        final TestGenerationActivity currentActivity = redisService
+              .getUserActivity(hashKey, cid, TestGenerationActivity.class);
+        final TestGenerationActivity finishedActivity = activityConverter
+              .getFinishedActivity(currentActivity);
+        final TestGenerationActivityDto dto = activityConverter.convert(finishedActivity);
+        activityNotifier.publishActivity(userId, dto);
+
+        commandService.deleteMessage(messageReceipt);
+        redisService.deleteUserActivity(userId, cid);
+    }
+
+    public void failActivity(final String hashKey, final String cid, final GenerationFailReason failReason) {
+        final TestGenerationActivity activity = redisService.getUserActivity(hashKey, cid, TestGenerationActivity.class);
+        final Long userId = Utils.getUserIdFromHashKey(hashKey);
+
+        if (activity != null) {
+            final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
+            historyService.save(failedHistory);
+            final String receipt = activity.getMessageReceipt();
+
+            if (receipt != null) {
+                commandService.deleteMessage(receipt);
+            }
+
+            final TestGenerationActivityDto dto = activityConverter.getFailedActivity(activity);
+            activityNotifier.publishActivity(userId, dto);
+        }
+
+        redisService.deleteUserActivity(userId, cid);
+
+
+    }
+
+    public void failActivity(final String hashKey, final String cid, final Throwable cause) {
         final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(cause);
-
-        failGeneration(history, failReason);
-        throw new ResponseStatusException(500, "Test generation failed. History id: " + history.getId(), cause);
+        failActivity(hashKey, cid, failReason);
     }
 
-    public void failGeneration(TestGeneratingHistory history, final GenerationFailReason failReason) {
-        if (history.getMessageReceipt() != null) {
-            commandService.deleteMessage(history.getMessageReceipt());
+    public void failActivityIfFatal(final String hashKey, final String cid, final Throwable cause) {
+        final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(cause);
+        if (failReason.isFatal()) {
+            failActivity(hashKey, cid, failReason);
         }
-
-        history = history.toBuilder()
-           .generationStatus(GenerationStatus.FAILED)
-           .generationEnd(LocalDateTime.now())
-           .messageReceipt(null)
-           .failReason(failReason.name())
-           .build();
-
-        testGeneratingHistoryService.save(history);
     }
 
-    public void failGeneration(final String messageReceipt, final Throwable cause) {
-        if (messageReceipt != null) {
-            commandService.deleteMessage(messageReceipt);
-        }
-        throw new ResponseStatusException(500, "Test generation failed", cause);
-    }
+    public void failAllActivities(final GenerationFailReason failReason) {
+        final List<TestGenerationActivity> activities = redisService.getAllObjectsFromHashes(TestGenerationActivity.class);
+        log.warn("Force closing activities, activities size:=[{}]", activities.size());
 
-    public void failGeneration(final Throwable cause) {
-        throw new ResponseStatusException(500, "Test generation failed", cause);
+        commandService.purgeQueue();
+        redisService.deleteAllKeys();
+
+        final List<TestGeneratingHistory> testGeneratingHistories = activities.stream()
+           .map(activity -> historyConverter.getFailedHistory(activity, failReason))
+           .toList();
+
+        historyService.save(testGeneratingHistories);
     }
 
 }

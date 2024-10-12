@@ -26,13 +26,13 @@ public class SecurityConfig {
   public SecurityFilterChain formLoginFilterChain(final HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
-//        .cors(cors -> cors.configure(http))
             .cors(Customizer.withDefaults())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
             .requestMatchers( "/ws/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/sse/**").permitAll()
             .anyRequest()
             .authenticated()
         )

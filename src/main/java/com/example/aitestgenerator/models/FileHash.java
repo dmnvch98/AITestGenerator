@@ -33,8 +33,4 @@ public class FileHash {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-//    @OneToMany(mappedBy = "fileHash")
-//    @JsonIgnore
-//    private Set<Test> tests;
-
 }

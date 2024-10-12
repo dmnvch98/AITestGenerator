@@ -8,17 +8,16 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar } from '@mui/material';
 import { AxiosError } from 'axios';
-import { AuthService } from '../services/AuthService';
-import {useUserStore} from "../store/userStore";
+import {useAuthStore} from "./authStore";
 
-function LoginPage() {
+function RegistrationPage() {
   const [email, setEmail] = useState('');
-  const { getMe } = useUserStore();
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const authService: AuthService = new AuthService();
+  const [error, setError] = useState(false);
+  const { signup } = useAuthStore();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -31,26 +30,25 @@ function LoginPage() {
     setEmailValid(validateEmail(emailInput));
   };
 
-  const handleLogin = async () => {
+  const handleRegistration = async () => {
+    if (password !== confirmPassword) {
+      setError(true);
+      return;
+    }
     try {
-      const response = await authService.login(email, password);
-      if (response.status === 200) {
-        localStorage.setItem("JWT", response.data.accessToken);
-        getMe();
-        navigate('/texts');
+      const response = await signup(email, password);
+      if (response && response.status === 201) {
+        navigate('/sign-in');
       }
     } catch (error) {
       const axiosError = error as AxiosError;
-      if (axiosError.isAxiosError && axiosError.response && axiosError.response.status === 404) {
-        setNotFound(true);
-      } else {
-        console.error('Login error:', axiosError);
-      }
+      console.error('Registration error:', axiosError);
+      setError(true);
     }
   };
 
   const isFormValid = () => {
-    return emailValid && password.length > 0;
+    return emailValid && password.length > 0 && password === confirmPassword;
   };
 
   return (
@@ -60,7 +58,7 @@ function LoginPage() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
               ГенТест
             </Typography>
-            <Button color="inherit" onClick={() => navigate('/sign-up')}>Регистрация</Button>
+            <Button color="inherit" onClick={() => navigate('/sign-in')}>Вход</Button>
           </Toolbar>
         </AppBar>
 
@@ -74,13 +72,13 @@ function LoginPage() {
               }}
           >
             <Typography component="h1" variant="h5">
-              Вход
+              Регистрация
             </Typography>
             <Box
                 component="form"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleLogin();
+                  handleRegistration();
                 }}
                 noValidate
                 sx={{ mt: 1 }}
@@ -98,7 +96,7 @@ function LoginPage() {
                   value={email}
                   onChange={handleEmailChange}
                   error={!emailValid && email.length > 0}
-                  helperText={!emailValid && email.length > 0 ? "Неверный формат" : ""}
+                  helperText={!emailValid && email.length > 0 ? "Введите действительный email" : ""}
               />
               <TextField
                   variant="outlined"
@@ -109,9 +107,24 @@ function LoginPage() {
                   label="Пароль"
                   type="password"
                   id="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Подтверждение пароля"
+                  type="password"
+                  id="confirmPassword"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  error={password !== confirmPassword && confirmPassword.length > 0}
+                  helperText={password !== confirmPassword && confirmPassword.length > 0 ? "Пароли не совпадают" : ""}
               />
               <Button
                   type="submit"
@@ -120,17 +133,17 @@ function LoginPage() {
                   sx={{ mt: 3, mb: 2 }}
                   disabled={!isFormValid()}
               >
-                Войти
+                Зарегистрироваться
               </Button>
             </Box>
           </Box>
           <Snackbar
-              open={notFound}
+              open={error}
               autoHideDuration={3000}
-              onClose={() => setNotFound(!notFound)}
+              onClose={() => setError(false)}
           >
             <Alert severity="error">
-              Пользователь не найден
+              Ошибка при регистрации
             </Alert>
           </Snackbar>
         </Container>
@@ -138,4 +151,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegistrationPage;

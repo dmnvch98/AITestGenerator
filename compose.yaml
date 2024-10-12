@@ -15,8 +15,27 @@ services:
       - "4566:4566"
     environment:
       - SERVICES=kms,sqs,s3
+      - DEFAULT_REGION=ap-southeast-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
     volumes:
       - ./localstack/init-kms.sh:/etc/localstack/init/ready.d/init-kms.sh
       - ./localstack/init-sqs.sh:/etc/localstack/init/ready.d/init-sqs.sh
       - ./localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+  sqs-admin-ui:
+    image: akilamaxi/sqs-admin-ui:v1
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=ap-southeast-1
+      - SQS_ENDPOINT_URL=http://localstack:4566  # Pointing to the SQS service in localstack
+    ports:
+      - "8081:8081"
+    depends_on:
+      - localstack
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
 

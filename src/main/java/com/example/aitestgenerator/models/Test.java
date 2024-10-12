@@ -1,6 +1,6 @@
 package com.example.aitestgenerator.models;
 
-import com.example.aitestgenerator.converters.QuestionsConverter;
+import com.example.aitestgenerator.converters.ormConverter.QuestionsConverter;
 import com.example.aitestgenerator.dto.tests.QuestionDto;
 import jakarta.persistence.*;
 import lombok.*;

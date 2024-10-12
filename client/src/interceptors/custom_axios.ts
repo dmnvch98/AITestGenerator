@@ -1,59 +1,62 @@
+// customAxios.ts
 import axios from 'axios';
-import { AuthService } from '../services/AuthService';
 
-const profile = process.env.REACT_APP_PROFILE;
-const host = profile === 'demo' ? 'server' : 'localhost';
+const createCustomAxios = (logout: () => Promise<void>, refresh: () => Promise<void>) => {
+    const customAxios = axios.create({
+        baseURL: `http://localhost:8080`,
+        withCredentials: true,
+    });
 
-const customAxios = axios.create({
-    baseURL: `http://${host}:8080`,
-    withCredentials: true
-});
+    let refreshTokenPromise: Promise<any> | null = null;
 
-let refreshTokenPromise: any
-
-customAxios.interceptors.request.use(
-    (config) => {
-        if (config.url && !config.url.includes('/api/v1/auth/login')) {
-            const token = localStorage.getItem("JWT");
-            if (token) {
-                config.headers['Authorization'] = `Bearer ${token}`;
+    // Интерсептор запросов
+    customAxios.interceptors.request.use(
+        (config) => {
+            if (config.url && !config.url.includes('/api/v1/auth/login')) {
+                const token = localStorage.getItem("JWT");
+                if (token) {
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
             }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
         }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+    );
 
-customAxios.interceptors.response.use(
-    response => response,
-    error => {
-        const originalRequest = error.config;
+    customAxios.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
 
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            if (!refreshTokenPromise) {
-                const authService = new AuthService();
-                refreshTokenPromise = authService.refresh()
-                    .then((r) => {
-                        refreshTokenPromise = null;
-                        localStorage.setItem("JWT", r.data.accessToken);
-                        originalRequest._retry = true;
-                        return customAxios(originalRequest);
-                    })
-                    .catch((err) => {
-                        refreshTokenPromise = null;
-                        localStorage.removeItem("JWT");
-                        window.location.href = '/sign-in';
-                        return Promise.reject(err);
-                    });
+            if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                console.log('Token expired, trying to refresh...');
+
+                if (!refreshTokenPromise) {
+                    refreshTokenPromise = refresh()
+                        .then(() => {
+                            refreshTokenPromise = null;
+                            originalRequest._retry = true;
+                            console.log('Token refreshed successfully');
+                            return customAxios(originalRequest);
+                        })
+                        .catch(async (err: any) => {
+                            console.error('Refresh token failed, logging out:', err);
+                            refreshTokenPromise = null;
+                            await logout();
+                            return Promise.reject(err);
+                        });
+                }
+
+                return refreshTokenPromise;
             }
 
-            return refreshTokenPromise;
+            return Promise.reject(error);
         }
+    );
 
-        return Promise.reject(error);
-    }
-);
+    return customAxios;
+};
 
-export default customAxios;
+export default createCustomAxios;

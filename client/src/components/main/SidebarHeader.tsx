@@ -21,8 +21,8 @@ import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import FolderIcon from '@mui/icons-material/Folder';
-import { AuthService } from '../../services/AuthService';
 import {ActiveJobBadge} from "./ActiveJobBadge";
+import {useAuthStore} from "../../pages/auth/authStore";
 
 const drawerWidth = 200;
 
@@ -104,6 +104,7 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 export const SidebarHeader = ({ children }: any) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const { logout } = useAuthStore();
 
     const tabs: TabIcon[] = [
         {
@@ -130,11 +131,6 @@ export const SidebarHeader = ({ children }: any) => {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-
-    function logout() {
-        const authService: AuthService = new AuthService();
-        authService.logout();
-    }
 
     return (
         <Box sx={{ display: 'flex' }}>

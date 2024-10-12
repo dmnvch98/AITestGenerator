@@ -28,7 +28,8 @@ public class Jwt {
 
     public String generateAccessToken(User user) {
         final LocalDateTime now = LocalDateTime.now();
-        final Instant accessExpirationInstant = now.plusMinutes(40).atZone(ZoneId.systemDefault()).toInstant();
+        final Instant accessExpirationInstant = now.plusSeconds(10).atZone(ZoneId.systemDefault()).toInstant();
+//        final Instant accessExpirationInstant = now.plusMinutes(40).atZone(ZoneId.systemDefault()).toInstant();
         final Date date = Date.from(accessExpirationInstant);
         return Jwts.builder()
             .setSubject(user.getEmail())
@@ -66,7 +67,7 @@ public class Jwt {
         return validateToken(refreshToken, jwtRefreshSecret);
     }
 
-    private String getLoginFromToken(String token, String secret) {
+    private String getLoginFromToken(final String token, final String secret) {
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }

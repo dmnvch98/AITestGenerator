@@ -1,4 +1,4 @@
-import customAxios from "../interceptors/custom_axios";
+import axiosInstance from "../interceptors/axiosInstance";
 import {AxiosError} from "axios";
 import {FileUploadResponseDto} from "../store/fileStore";
 
@@ -10,7 +10,7 @@ class FileService {
             formData.append('file', file);
         });
         try {
-            const response =  await customAxios.post('/api/v1/files/', formData, {
+            const response =  await axiosInstance.post('/api/v1/files/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -23,7 +23,7 @@ class FileService {
 
     getFiles = async () => {
         try {
-            const response = await customAxios.get(`/api/v1/files/`);
+            const response = await axiosInstance.get(`/api/v1/files/`);
             return response.data.fileHashes;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -33,7 +33,7 @@ class FileService {
 
     deleteFile = async (hashedFileName: string) => {
         try {
-            const response = await customAxios.delete(`/api/v1/files/${hashedFileName}`);
+            const response = await axiosInstance.delete(`/api/v1/files/${hashedFileName}`);
             return response.status;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -43,7 +43,7 @@ class FileService {
 
     deleteFilesInBatch = async (hashesFileNames: string[]) => {
         try {
-            const response = await customAxios.post('/api/v1/files/delete', hashesFileNames);
+            const response = await axiosInstance.post('/api/v1/files/delete', hashesFileNames);
             return response.status;
         } catch (e: unknown) {
             const error = e as AxiosError;

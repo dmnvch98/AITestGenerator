@@ -1,4 +1,4 @@
-import customAxios from "../interceptors/custom_axios";
+import customAxios from "../interceptors/axiosInstance";
 import { ExportTestRequestDto } from "../store/tests/exportStore";
 
 class ExportService {

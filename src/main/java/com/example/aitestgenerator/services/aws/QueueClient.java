@@ -63,7 +63,7 @@ public class QueueClient {
         try {
             receiptMessageIdMap.remove(receipt);
             queue.deleteMessage(new DeleteMessageRequest(queueUrl, receipt));
-            log.info("Message was deleted from the queue. Receipt : {} ", receipt);
+            log.info("Message was deleted from the queue. Receipt : {} ", receipt.substring(0, 10));
         } catch (Exception e) {
             log.error("An error occurred during deleting message from the queue. Receipt : {}", receipt);
         }
@@ -89,6 +89,20 @@ public class QueueClient {
 
         queue.changeMessageVisibility(request);
     }
+
+    public void purgeQueue() {
+        try {
+            log.info("Purging all messages from the queue: {}", queueUrl);
+            PurgeQueueRequest purgeQueueRequest = new PurgeQueueRequest().withQueueUrl(queueUrl);
+            queue.purgeQueue(purgeQueueRequest);
+            log.info("Queue purged successfully.");
+        } catch (PurgeQueueInProgressException e) {
+            log.error("Purge already in progress. Please wait and try again.", e);
+        } catch (AmazonSQSException e) {
+            log.error("An error occurred while purging the queue: {}", e.getMessage());
+        }
+    }
+
 
 
 }

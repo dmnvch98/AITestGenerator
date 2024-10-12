@@ -2,25 +2,27 @@ package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.converters.TestConverter;
 import com.example.aitestgenerator.converters.TestGenerationConverter;
+import com.example.aitestgenerator.models.TestGenerationActivity;
 import com.example.aitestgenerator.dto.tests.CreateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.dto.tests.TestsResponseDto;
 import com.example.aitestgenerator.dto.tests.TextGenerationHistoryDto;
-import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.exceptions.ResourceNotFoundException;
 import com.example.aitestgenerator.generators.models.GenerateTestRequest;
 import com.example.aitestgenerator.models.*;
-import com.example.aitestgenerator.models.enums.GenerationStatus;
+import com.example.aitestgenerator.models.enums.ActivityStatus;
 import com.example.aitestgenerator.services.*;
 import com.example.aitestgenerator.services.aws.StorageClient;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.example.aitestgenerator.utils.Utils.generateCid;
 
 @Component
 @RequiredArgsConstructor
@@ -38,78 +40,52 @@ public class TestFacade {
   private final TestGenerationConverter testGenerationConverter;
   private final ActivityService activityService;
 
-  private final UserService userService;
-
   public Test save(final CreateTestRequestDto request, final Long userId) {
     final Test test = testConverter.convert(request, userId);
     return testService.save(test);
   }
 
-//  public void generateTestByTextSendMessage(final Long userId, final Long textId) {
-//    final Text text = textService.findAllByIdAndUserIdOrThrow(textId, userId);
-//
-//    final TestGeneratingHistory history = textGenerationHistoryConverter
-//        .getWaiting(userService.findUserById(userId));
-//
-//    historyService.save(history);
-//    final GenerateTestMessage message = GenerateTestMessage
-//        .builder()
-//        .historyId(history.getId())
-//        .textId(textId)
-//        .userId(userId)
-//        .build();
-//    commandService.sendCommand(message);
-//  }
-
   public void prepareTestGeneration(final Long userId, final GenerateTestRequestDto dto) {
-    final String hashedFileName = dto.getHashedFileName();
-    log.info("Received command to generation test by file=[{}], userId=[{}]", hashedFileName, userId);
-    final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(userId, hashedFileName);
+    final String cid = generateCid();
+    MDC.put("cid", cid);
+    log.info("Received command to generation test, command=[{}]", dto);
 
-    TestGeneratingHistory history = testGenerationConverter.getWaiting(userService.findUserById(userId));
+    final FileHash fileHash = Optional.ofNullable(dto)
+          .map(GenerateTestRequestDto::getHashedFileName)
+          .filter(StringUtils::isNotBlank)
+          .map(hash -> fileHashService.getByHashedFilenameAndUserId(userId, hash))
+          .orElseThrow(() -> new IllegalArgumentException("File cannot be empty"));
+    final String hashedFileName = fileHash.getHashedFilename();
 
-    if (fileHash == null || !storageClient.doesFileExist(userId, hashedFileName)) {
+    if (!storageClient.doesFileExist(userId, fileHash.getHashedFilename())) {
       log.error("File=[{}] not found for userId=[{}]", hashedFileName, userId);
-      activityService.failGeneration(history, GenerationFailReason.FILE_NOT_FOUND);
       throw new ResourceNotFoundException(hashedFileName);
     }
 
-    history.setFileName(fileHash.getOriginalFilename());
+    final String hashKey = "generations:user:" + userId;
 
-    historyService.save(history);
-    final GenerateTestMessage message = testGenerationConverter.convert(dto, hashedFileName, userId, history.getId());
+    activityService.createWaitingActivity(fileHash, cid, dto, userId);
+
+    final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
     commandService.sendCommand(message);
   }
 
   public void generateTestReceiveMessage(final GenerateTestMessage message) {
     log.info("Received message to generate test. Message=[{}]", message);
-    TestGeneratingHistory history = historyService.findById(message.getHistoryId());
-    final FileHash fileHash = fileHashService.getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
+    activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
 
-    if (history != null) {
-      history = testGenerationConverter.getInProcess(history, message.getReceipt());
-      historyService.save(history);
-    } else {
-      activityService.failGeneration(message.getReceipt(),
-            new ResourceNotFoundException("History not found for test generation: " + message.getHistoryId()));
-      return;
-    }
-
+    final FileHash fileHash = fileHashService
+          .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
     final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
-    final GenerateTestRequest request = testGenerationConverter.convert(message, history, userContent, message.getUserId(), fileHash);
+    final GenerateTestRequest request = testGenerationConverter.convert(message, userContent, fileHash);
 
-    final Test test = testGenerationService.generateTest(request);
-    log.info("Saving test");
+    final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
     testService.save(test);
-    log.info("Test is saved");
 
-    history = history.toBuilder()
-          .testId(test.getId())
-          .testTitle(test.getTitle())
-          .build();
-    log.info("Saving history. History id: {}", history.getId());
-    activityService.finishGeneration(history, message.getReceipt());
-    log.info("History is saved. History id: {}", history.getId());
+    final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
+    final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
+    historyService.save(history);
+    activityService.finishActivity(message.getReceipt(), message.getUserId(), message.getCid());
   }
 
   public void deleteTest(final Long testId, final Long userId) {
@@ -140,7 +116,7 @@ public class TestFacade {
 
   public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {
     final List<TestGeneratingHistory> historyDtos = Optional.ofNullable(status)
-        .map(GenerationStatus::valueOf)
+        .map(ActivityStatus::valueOf)
         .map(s -> historyService.findAllByGenerationStatus(userId, s))
         .orElse(historyService.getAllByUserId(userId));
 
@@ -151,10 +127,17 @@ public class TestFacade {
   }
 
   public List<TextGenerationHistoryDto> getCurrentHistories(final Long userId) {
-    return historyService.findAllByUserIdAndGenerationStatusIn(userId, List.of(GenerationStatus.WAITING, GenerationStatus.IN_PROCESS))
+    return historyService.findAllByUserIdAndGenerationStatusIn(userId, List.of(ActivityStatus.WAITING, ActivityStatus.IN_PROCESS))
         .stream()
         .map(testGenerationConverter::historyToDto)
         .collect(Collectors.toList());
+  }
+
+  private Map<String, String> getRetryContextParamsMap(final GenerateTestMessage message){
+    final Map<String, String> retryContextParams = new HashMap<>();
+    retryContextParams.put("cid", message.getCid());
+    retryContextParams.put("hashKey", message.getHashKey());
+    return retryContextParams;
   }
 
 }

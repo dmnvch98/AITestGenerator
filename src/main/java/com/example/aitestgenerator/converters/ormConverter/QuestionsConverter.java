@@ -1,10 +1,8 @@
-package com.example.aitestgenerator.converters;
+package com.example.aitestgenerator.converters.ormConverter;
 
 import com.example.aitestgenerator.dto.tests.QuestionDto;
-import com.example.aitestgenerator.models.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
