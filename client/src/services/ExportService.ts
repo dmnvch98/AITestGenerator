@@ -1,10 +1,17 @@
-import customAxios from "../interceptors/axiosInstance";
-import { ExportTestRequestDto } from "../store/tests/exportStore";
+import {getAxiosInstance} from "../interceptors/getAxiosInstance";
+import {ExportTestRequestDto} from "../store/tests/exportStore";
 
 class ExportService {
+
+    private readonly axiosInstance;
+
+    constructor() {
+        this.axiosInstance = getAxiosInstance();
+    }
+
     exportTest = async (dto: ExportTestRequestDto, testId: number, testTitle: string) => {
         try {
-            const { data } = await customAxios({
+            const { data } = await this.axiosInstance({
                 url: `/api/v1/tests/${testId}/export`,
                 method: 'POST',
                 data: dto,
@@ -12,7 +19,7 @@ class ExportService {
             });
 
             // Нормализуем название теста и формируем имя файла
-            const normalizedTitle = testTitle.slice(0,15).replace(" ", "_");
+            const normalizedTitle = testTitle.slice(0, 15).replace(" ", "_");
             const filename = `${normalizedTitle}.${dto.exportFormat.toLowerCase()}`;
 
             // Создаем и вызываем ссылку для скачивания файла

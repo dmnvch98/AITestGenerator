@@ -36,8 +36,6 @@ export interface UserStore {
     loading: boolean;
     setLoading: (flag: boolean) => void;
     getTestGenCurrentActivitiesLongPoll: () => void;
-    isAuthenticated: boolean,
-    setAuthenticated: (authStatus: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set: any, get: any) => ({
@@ -45,10 +43,6 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
     currentActivities: [],
     loading: false,
     user: undefined,
-    isAuthenticated: false,
-    setAuthenticated: (authStatus: boolean) => {
-      set({authStatus: authStatus});
-    },
     setLoading: (flag) => {
         set({loading: flag})
     },

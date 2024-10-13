@@ -11,7 +11,7 @@ import {TestPass} from "./pages/tests/TestPass";
 import {TestResults} from "./pages/tests/TestResultMultiple";
 import {appColors} from "./styles/appColors";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
-import { UserTestResults } from './pages/tests/UserTestResults';
+import {UserTestResults} from './pages/tests/UserTestResults';
 import SignUp from './pages/auth/SignUp';
 import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/edit/TestPageEdit";
@@ -44,42 +44,46 @@ function App() {
         },
     });
 
-    const { getTestGenCurrentActivitiesLongPoll, getTestGenCurrentActivities } = useUserStore();
-    const { isAuthenticated} = useAuthStore();
+    const { authenticated, checkAuthentication } = useAuthStore();
+    const { getTestGenCurrentActivities, getTestGenCurrentActivitiesLongPoll } = useUserStore();
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (authenticated) {
             getTestGenCurrentActivities();
             getTestGenCurrentActivitiesLongPoll();
+        } else {
+            checkAuthentication();
         }
-    }, [isAuthenticated, getTestGenCurrentActivities, getTestGenCurrentActivitiesLongPoll]);
+    }, [authenticated]);
 
     return (
-            <ThemeProvider theme={theme}>
-                    <Router>
-                        <div className="App">
-                            <Routes>
-                                <Route path="/texts" element={<Texts/>}/>
-                                <Route path="/sign-in" element={<LoginPage/>}/>
-                                <Route path="/sign-up" element={<SignUp/>}/>
-                                <Route path="/add-text" element={<AddText/>}/>
-                                <Route path="/texts/:id" element={<TextPage/>}/>
-                                <Route path="/tests" element={<TestsPage/>}/>
-                                <Route path="/tests/create" element={<TestPageCreate/>}/>
-                                <Route path="/tests/:id" element={<TestPageView/>}/>
-                                <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
-                                <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
-                                <Route path="/tests/pass" element={<TestPass/>}/>
-                                <Route path="/tests/result" element={<TestResults/>}/>
-                                <Route path="/tests/results" element={<UserTestResults/>}/>
-                                <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>} />
-                                <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
-                                <Route path="/files" element={<Files/>}/>
-                                <Route path="*" element={<Navigate to="/sign-in" replace />} />
-                            </Routes>
-                        </div>
-                    </Router>
-            </ThemeProvider>
+
+        <ThemeProvider theme={theme}>
+            <Router>
+                    <div className="App">
+                        <Routes>
+                            <Route path="/texts" element={<Texts/>}/>
+                            <Route path="/sign-in" element={<LoginPage/>}/>
+                            <Route path="/sign-up" element={<SignUp/>}/>
+                            <Route path="/add-text" element={<AddText/>}/>
+                            <Route path="/texts/:id" element={<TextPage/>}/>
+                            <Route path="/tests" element={<TestsPage/>}/>
+                            <Route path="/tests/create" element={<TestPageCreate/>}/>
+                            <Route path="/tests/:id" element={<TestPageView/>}/>
+                            <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
+                            <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
+                            <Route path="/tests/pass" element={<TestPass/>}/>
+                            <Route path="/tests/result" element={<TestResults/>}/>
+                            <Route path="/tests/results" element={<UserTestResults/>}/>
+                            <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>}/>
+                            <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
+                            <Route path="/files" element={<Files/>}/>
+                            <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
+                        </Routes>
+                    </div>
+                    )
+            </Router>
+        </ThemeProvider>
     );
 }
 

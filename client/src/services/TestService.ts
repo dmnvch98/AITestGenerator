@@ -1,4 +1,4 @@
-import axiosInstance from "../interceptors/axiosInstance";
+import {getAxiosInstance} from "../interceptors/getAxiosInstance";
 import {AxiosError} from "axios";
 import {
     BulkDeleteTestsRequestDto,
@@ -10,9 +10,15 @@ import {
 
 class TestService {
 
+    private readonly axiosInstance;
+
+    constructor() {
+        this.axiosInstance = getAxiosInstance();
+    }
+
     saveUserTest = async (dto: CreateTestRequestDto) => {
         try {
-            const response = await axiosInstance.post("/api/v1/tests", dto);
+            const response = await this.axiosInstance.post("/api/v1/tests", dto);
             return response.status === 201;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -22,7 +28,7 @@ class TestService {
 
     generateTest = async (dto: GenerateTestRequestDto) => {
         try {
-            const response = await axiosInstance.post("/api/v1/tests/generate", dto);
+            const response = await this.axiosInstance.post("/api/v1/tests/generate", dto);
             return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -32,7 +38,7 @@ class TestService {
 
     generateTestByFile = async (request: GenerateTestRequest) => {
         try {
-            const response = await axiosInstance.post(`/api/v1/tests/generate`, request);
+            const response = await this.axiosInstance.post(`/api/v1/tests/generate`, request);
             return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -44,7 +50,7 @@ class TestService {
         try {
             const url = "/api/v1/tests";
             const params = ids ? {ids: ids.join(",")} : undefined;
-            const response = await axiosInstance.get(url, {params});
+            const response = await this.axiosInstance.get(url, {params});
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -54,7 +60,7 @@ class TestService {
 
     deleteTest = async (id: number) => {
         try {
-            const response = await axiosInstance.delete("/api/v1/tests/" + id);
+            const response = await this.axiosInstance.delete("/api/v1/tests/" + id);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -64,7 +70,7 @@ class TestService {
 
     bulkTestDelete = async (requestDto: BulkDeleteTestsRequestDto) => {
         try {
-            const response = await axiosInstance.delete("/api/v1/tests", {data: requestDto});
+            const response = await this.axiosInstance.delete("/api/v1/tests", {data: requestDto});
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -75,7 +81,7 @@ class TestService {
     upsert = async (test: UserTest | CreateTestRequestDto) => {
         try {
             console.log(test);
-            const response = await axiosInstance.put("/api/v1/tests", test);
+            const response = await this.axiosInstance.put("/api/v1/tests", test);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -85,7 +91,7 @@ class TestService {
 
     getCurrentTestGenActivities = async () => {
         try {
-            const { data } = await axiosInstance.get(`/api/v1/activities`);
+            const { data } = await this.axiosInstance.get(`/api/v1/activities`);
             return data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -97,7 +103,7 @@ class TestService {
     getUserTestById = async (id: number) => {
         try {
             const url = `/api/v1/tests/${id}`;
-            const response = await axiosInstance.get(url);
+            const response = await this.axiosInstance.get(url);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

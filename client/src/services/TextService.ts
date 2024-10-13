@@ -1,11 +1,18 @@
 import {AxiosError} from "axios";
-import axiosInstance from "../interceptors/axiosInstance";
+import {getAxiosInstance} from "../interceptors/getAxiosInstance";
 import {UserText} from "../store/textStore";
 
 class TextService {
+
+    private readonly axiosInstance;
+
+    constructor() {
+        this.axiosInstance = getAxiosInstance();
+    }
+
     getAllUserTexts = async () => {
         try {
-            const response = await axiosInstance.get("/api/v1/texts/");
+            const response = await this.axiosInstance.get("/api/v1/texts/");
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -15,7 +22,7 @@ class TextService {
 
     getUserTextsByIdsIn = async (ids: number[]) => {
         try {
-            const response = await axiosInstance.get("/api/v1/texts/", {
+            const response = await this.axiosInstance.get("/api/v1/texts/", {
                 params: {ids: ids.join(',')}
             });
             return response.data;
@@ -27,7 +34,7 @@ class TextService {
 
     saveText = async (text: UserText) => {
         try {
-            const response = await axiosInstance.post("/api/v1/texts/", text);
+            const response = await this.axiosInstance.post("/api/v1/texts/", text);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -37,7 +44,7 @@ class TextService {
 
     deleteText = async (id: number) => {
         try {
-            const response = await axiosInstance.delete("/api/v1/texts/" + id);
+            const response = await this.axiosInstance.delete("/api/v1/texts/" + id);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -47,7 +54,7 @@ class TextService {
 
     deleteInBatch = async (ids: number[]) => {
         try {
-            const response = await axiosInstance.patch("/api/v1/texts/", ids);
+            const response = await this.axiosInstance.patch("/api/v1/texts/", ids);
             return response.status == 204;
         } catch (e: unknown) {
             const error = e as AxiosError;
@@ -57,7 +64,7 @@ class TextService {
 
     updateText = async (text: UserText) => {
         try {
-            const response = await axiosInstance.put("/api/v1/texts/", text);
+            const response = await this.axiosInstance.put("/api/v1/texts/", text);
             return response.data
         } catch (e: unknown) {
             const error = e as AxiosError;

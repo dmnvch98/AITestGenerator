@@ -1,11 +1,18 @@
 import { TestResult } from '../store/tests/passTestStore';
-import axiosInstance from '../interceptors/axiosInstance';
+import {getAxiosInstance} from '../interceptors/getAxiosInstance';
 import { AxiosError } from 'axios';
 
 class TestResultService {
+
+  private readonly axiosInstance;
+
+  constructor() {
+    this.axiosInstance = getAxiosInstance();
+  }
+
   saveTestResult = async (dto: TestResult, testId: number) => {
     try {
-      const response = await axiosInstance.post(`/api/v1/tests/${testId}/result`, dto);
+      const response = await this.axiosInstance.post(`/api/v1/tests/${testId}/result`, dto);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;
@@ -16,7 +23,7 @@ class TestResultService {
   getSingleTestResult = async (testId: number, resultId: number) => {
     try {
       const response =
-          await axiosInstance.get(`/api/v1/tests/${testId}/result/${resultId}`);
+          await this.axiosInstance.get(`/api/v1/tests/${testId}/result/${resultId}`);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;
@@ -27,7 +34,7 @@ class TestResultService {
   getAllUserTestResults = async () => {
     try {
       const response =
-          await axiosInstance.get(`/api/v1/tests/results`);
+          await this.axiosInstance.get(`/api/v1/tests/results`);
       return response.data;
     } catch (e: unknown) {
       const error = e as AxiosError;

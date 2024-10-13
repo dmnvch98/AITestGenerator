@@ -1,12 +1,19 @@
-import axiosInstance from "../interceptors/axiosInstance";
+import { getAxiosInstance } from "../interceptors/getAxiosInstance";
 
 class AuthService {
+
+  private readonly axiosInstance;
+
+  constructor() {
+    this.axiosInstance = getAxiosInstance();
+  }
+
   signup = async (email: string, password: string) => {
-    return await axiosInstance.post(`/api/v1/users`, { email, password });
+    return await this.axiosInstance.post(`/api/v1/users`, { email, password });
   };
 
   login = async (email: string, password: string) => {
-    return await axiosInstance.post('/api/v1/auth/login', {
+    return await this.axiosInstance.post('/api/v1/auth/login', {
       email,
       password,
       role: "USER"
@@ -14,12 +21,13 @@ class AuthService {
   };
 
   logout = async () => {
-    await axiosInstance.post('/api/v1/auth/logout');
+    await this.axiosInstance.post('/api/v1/auth/logout');
   };
 
   refresh = async () => {
-    return await axiosInstance.post('/api/v1/auth/refresh');
-  }
+    return await this.axiosInstance.post('/api/v1/auth/refresh');
+  };
+
 }
 
 export default new AuthService();
