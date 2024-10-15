@@ -51,6 +51,10 @@ customAxios.interceptors.response.use(
             return refreshTokenPromise;
         }
 
+        if (error.response && error.response.status >= 500) {
+            window.location.href = '/500';
+        }
+
         return Promise.reject(error);
     }
 );

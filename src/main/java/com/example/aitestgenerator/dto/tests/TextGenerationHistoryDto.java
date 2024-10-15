@@ -14,8 +14,8 @@ public class TextGenerationHistoryDto {
     private final Long userId;
     private final long testId;
     private final String testTitle;
-    private final LocalDateTime generationStart;
-    private final LocalDateTime generationEnd;
+    private final LocalDateTime startDate;
+    private final LocalDateTime endDate;
     private final ActivityStatus status;
     private final String fileName;
     private final Integer failCode;

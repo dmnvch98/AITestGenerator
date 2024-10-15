@@ -27,7 +27,7 @@ public enum GenerationFailReason {
     HTTP_EXCEPTION_LIMIT_EXCEEDED(OpenAiHttpException.class,
           "You exceeded your current quota, please check your plan and billing details. .*", true, 2),
     REGION_NOT_SUPPORTED(OpenAiHttpException.class, "Country, region, or territory not supported.*", true, 3),
-    REQUEST_TOO_LARGE(OpenAiHttpException.class, "Request too large.*", true, 4),
+    REQUEST_TOO_LARGE(OpenAiHttpException.class, "Request too large .*", true, 4),
     //11000
     PARSE_EXCEPTION(JsonParseException.class, "Unexpected character: .*", true, 1),
     //12000

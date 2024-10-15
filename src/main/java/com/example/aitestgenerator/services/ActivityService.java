@@ -3,13 +3,11 @@ package com.example.aitestgenerator.services;
 import com.example.aitestgenerator.config.redis.RedisService;
 import com.example.aitestgenerator.converters.ActivityConverter;
 import com.example.aitestgenerator.converters.TestGenerationConverter;
-import com.example.aitestgenerator.dto.activity.TestGenerationActivityDto;
 import com.example.aitestgenerator.models.TestGenerationActivity;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.TestGeneratingHistory;
-import com.example.aitestgenerator.notifiets.ActivityNotifier;
 import com.example.aitestgenerator.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +26,10 @@ public class ActivityService {
     private final TestGenerationConverter historyConverter;
     private final RedisService<TestGenerationActivity> redisService;
     private final TestGeneratingHistoryService historyService;
-    private final ActivityNotifier activityNotifier;
+
+    public void saveActivity(final TestGenerationActivity activity) {
+        redisService.saveUserActivity(activity.getUserId(), activity.getCid(), activity);
+    }
 
     public TestGenerationActivity getActivity(final String hashKey, final String cid) {
         return redisService.getUserActivity(hashKey, cid, TestGenerationActivity.class);
@@ -42,8 +43,6 @@ public class ActivityService {
                                       final GenerateTestRequestDto requestDto, final Long userId) {
         final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId);
         redisService.saveUserActivity(userId, cid, waitingActivity);
-        final TestGenerationActivityDto dto = activityConverter.convert(waitingActivity);
-        activityNotifier.publishActivity(userId, dto);
     }
 
     public void createInProgressActivity(final Long userId, final String cid, final String messageReceipt) {
@@ -53,21 +52,28 @@ public class ActivityService {
         final TestGenerationActivity inProcessActivity = activityConverter
               .getInProgressActivity(currentActivity, messageReceipt);
         redisService.saveUserActivity(userId, inProcessActivity.getCid(), inProcessActivity);
-        final TestGenerationActivityDto dto = activityConverter.convert(inProcessActivity);
-        activityNotifier.publishActivity(userId, dto);
+    }
+
+    private void createFinishedActivity(final TestGenerationActivity activity) {
+        final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity);
+        redisService.saveUserActivity(activity.getUserId(), activity.getCid(), finishedActivity);
+    }
+
+    public void deleteUserActivity(final Long userId, final String cid) {
+        redisService.deleteUserActivity(userId, cid);
+    }
+
+    public void deleteUserActivities(final Long userId, final List<String> cids) {
+        redisService.deleteUserActivities(userId, cids);
     }
 
     public void finishActivity(final String messageReceipt, final Long userId, final String cid) {
         final String hashKey = Utils.getHashKey(userId);
         final TestGenerationActivity currentActivity = redisService
               .getUserActivity(hashKey, cid, TestGenerationActivity.class);
-        final TestGenerationActivity finishedActivity = activityConverter
-              .getFinishedActivity(currentActivity);
-        final TestGenerationActivityDto dto = activityConverter.convert(finishedActivity);
-        activityNotifier.publishActivity(userId, dto);
 
+        createFinishedActivity(currentActivity);
         commandService.deleteMessage(messageReceipt);
-        redisService.deleteUserActivity(userId, cid);
     }
 
     public void failActivity(final String hashKey, final String cid, final GenerationFailReason failReason) {
@@ -82,13 +88,9 @@ public class ActivityService {
             if (receipt != null) {
                 commandService.deleteMessage(receipt);
             }
-
-            final TestGenerationActivityDto dto = activityConverter.getFailedActivity(activity);
-            activityNotifier.publishActivity(userId, dto);
         }
 
         redisService.deleteUserActivity(userId, cid);
-
 
     }
 

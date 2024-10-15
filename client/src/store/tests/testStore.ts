@@ -118,9 +118,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
         const { setAlert, getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            setAlert([{ id: Date.now(), message: 'Тест успешно удален', severity: 'success' }])
+            setAlert([{ id: Date.now(), message: 'Тест успешно удален', severity: 'success' }]);
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении теста', severity: 'error' }])
+            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении теста', severity: 'error' }]);
         }
     },
     getUserTestsByIdIn: async (ids: number[]) => {

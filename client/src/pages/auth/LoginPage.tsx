@@ -8,8 +8,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar } from '@mui/material';
 import { AxiosError } from 'axios';
-import {useUserStore} from "../../store/userStore";
-import {useAuthStore} from "./authStore";
+import useAuthStore from "./authStore";
 
 function LoginPage() {
   const [email, setEmail] = useState('');

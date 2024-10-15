@@ -14,7 +14,7 @@ const DeletableStatuses = new Set([
 
 export const ActiveJobBadge = () => {
     const MAX_FILENAME_LENGTH = 30;
-    const { currentActivities, deleteCurrentActivity } = useUserStore();
+    const { currentActivities, deleteCurrentUserActivities } = useUserStore();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -27,8 +27,8 @@ export const ActiveJobBadge = () => {
     }, []);
 
     const handleDelete = useCallback((item: ActivityDto) => {
-        deleteCurrentActivity(item);
-    }, [deleteCurrentActivity]);
+        // deleteCurrentUserActivities(item);
+    }, [deleteCurrentUserActivities]);
 
     const truncateString = useCallback((str: string) => (
         str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str

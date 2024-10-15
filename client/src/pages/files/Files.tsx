@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import { Box, Button, Snackbar, CircularProgress, Alert } from "@mui/material";
-import { FileUploadModal } from "../../components/FileUploadModal";
-import { FilesTable } from "../../components/files/FilesTable";
-import { LoggedInUserPage } from "../../components/main/LoggedInUserPage";
-import { ConfirmationDialog } from "../../components/main/ConfirmationDialog";
+import {Box, Button, Snackbar, CircularProgress, Alert} from "@mui/material";
+import {FileUploadModal} from "../../components/FileUploadModal";
+import {FilesTable} from "../../components/files/FilesTable";
+import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
+import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 import useFileStore from "../../store/fileStore";
-import { FileDto } from "../../store/fileStore";
+import {FileDto} from "../../store/fileStore";
 import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
 import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import {useUserStore} from "../../store/userStore";
+import Link from "@mui/material/Link";
 
 const FilesContent = () => {
     const {
@@ -28,10 +29,10 @@ const FilesContent = () => {
         deleteFile
     } = useFileStore();
 
-    const { generateTestByFile } = useTestStore();
-    const { maxQuestionsCount, minAnswersCount, temperature, topP } = useGenerateTestStore();
-    const { setAlert } = useFileStore();
-    const { getTestGenCurrentActivities } = useUserStore();
+    const {generateTestByFile} = useTestStore();
+    const {maxQuestionsCount, minAnswersCount, temperature, topP} = useGenerateTestStore();
+    const {setAlert} = useFileStore();
+    const {getTestGenCurrentActivities} = useUserStore();
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
@@ -113,16 +114,20 @@ const FilesContent = () => {
 
     return (
         <>
-            <Typography variant="h5" align="left" sx={{ mb: 2 }}>
+            <Typography variant="h5" align="left" sx={{mb: 1}}>
                 Файлы
             </Typography>
-            <Typography variant="subtitle1" align="left" sx={{mt: 2}} gutterBottom>
-                Загрузите файл для генерации теста. После загрузки, выберете: Действия → Сгенерировать тест.
-            </Typography>
+            <Alert severity="info" icon={false} sx={{ mb: 2 }}>
+                <Box textAlign="left">
+                    Загрузите файл для генерации теста. После загрузки выберите: Действия → Сгенерировать тест.
+                    <br/>
+                    Статус активных генераций можно посмотреть <Link href="/tests?activeTab=history" underline="hover" color="inherit"><b>здесь</b></Link>.
+                </Box>
+            </Alert>
 
-            <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-start">
+            <Box display="flex" sx={{mb: 2}} justifyContent="flex-start">
                 <Button
-                    sx={{ mr: 2 }}
+                    sx={{mr: 2}}
                     variant="outlined"
                     onClick={handleAdd}
                     disabled={isLoading}
@@ -131,7 +136,7 @@ const FilesContent = () => {
                 </Button>
 
                 <Button
-                    sx={{ mr: 2 }}
+                    sx={{mr: 2}}
                     variant="outlined"
                     color="error"
                     onClick={openDeleteModal}
@@ -141,9 +146,9 @@ const FilesContent = () => {
                 </Button>
             </Box>
 
-            <FilesTable actions={actions} />
+            <FilesTable actions={actions}/>
 
-            <FileUploadModal open={uploadModalOpen} onClose={handleModalClose} />
+            <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 
             <GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>
 
@@ -152,11 +157,11 @@ const FilesContent = () => {
                 autoHideDuration={6000}
                 onClose={clearAlerts}
             >
-                <Box sx={{ maxWidth: '400px' }}>
+                <Box sx={{maxWidth: '400px'}}>
                     {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} sx={{ mb: 0.5, textAlign: 'left' }}
+                        <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
                                onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{ __html: alert.message }} />
+                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
                         </Alert>
                     ))}
                 </Box>
@@ -166,8 +171,8 @@ const FilesContent = () => {
                 open={isLoading}
                 onClose={() => setIsLoading(false)}
             >
-                <Alert key={Math.random()} severity="info" sx={{ mb: 0.5 }} icon={<CircularProgress size={18} />}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <Alert key={Math.random()} severity="info" sx={{mb: 0.5}} icon={<CircularProgress size={18}/>}>
+                    <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
                         <span>Загрузка файлов</span>
                     </Box>
                 </Alert>
@@ -186,5 +191,5 @@ const FilesContent = () => {
 }
 
 export const Files = () => {
-    return <LoggedInUserPage mainContent={<FilesContent />} />;
+    return <LoggedInUserPage mainContent={<FilesContent/>}/>;
 };

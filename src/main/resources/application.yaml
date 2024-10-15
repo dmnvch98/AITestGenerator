@@ -21,6 +21,13 @@ spring:
     properties:
       hibernate.dialect: ${JPA_HIBERNATE_DIALECT}
 
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 file-upload:
   allowed-extensions: ${FILE_UPLOAD_ALLOWED_EXTENSIONS}
 
@@ -42,6 +49,7 @@ aws:
   sqs-url: ${AWS_SQS_URL}
 
 generation:
+  key: ${GENERATE_TEST_SECRET}
   models:
     question: ${GENERATION_MODELS_QUESTION}
     answers: ${GENERATION_MODELS_ANSWERS}

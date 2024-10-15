@@ -21,8 +21,7 @@ import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import FolderIcon from '@mui/icons-material/Folder';
-import {ActiveJobBadge} from "./ActiveJobBadge";
-import {useAuthStore} from "../../pages/auth/authStore";
+import useAuthStore from "../../pages/auth/authStore";
 
 const drawerWidth = 200;
 
@@ -157,13 +156,10 @@ export const SidebarHeader = ({ children }: any) => {
                                     ГенТест
                                 </Typography>
                                 <Box display="flex" alignItems="center">
-                                    <ActiveJobBadge />
                                     <Link href="/sign-in" underline="none">
                                         <Button
-                                            sx={{ color: 'black', ml: 4 }}
-                                            onClick={() => {
-                                                logout();
-                                            }}
+                                            sx={{ color: 'black' }}
+                                            onClick={logout}
                                         >
                                             Выход
                                         </Button>

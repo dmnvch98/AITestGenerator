@@ -11,13 +11,18 @@ import {TestRatingForm} from "./components/TestRatingForm";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
-    const {selectedTest, getUserTestById, alerts, clearAlerts, deleteAlert, getRating} = useTestStore();
+    const {selectedTest, getUserTestById, alerts, setAlert, clearAlerts, deleteAlert, getRating} = useTestStore();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     useEffect(() => {
-        getUserTestById(Number(id));
+        getUserTestById(Number(id)).then(test => {
+            if (!test) {
+                navigate('/tests');
+                setAlert([{ id: Date.now(), message: 'Тест не найден', severity: 'error' }]);
+            }
+        })
         getRating(Number(id));
     }, [id, getUserTestById]);
 

@@ -1,7 +1,6 @@
 // userStore.ts
 import create from 'zustand';
 import AuthService from "../../services/AuthService";
-import UserService from "../../services/UserService";
 
 interface AuthStore {
     authenticated: boolean;
@@ -10,11 +9,10 @@ interface AuthStore {
     login: (email: string, password: string) => Promise<Record<string, any> | null>;
     logout: () => Promise<void>;
     refresh: () => Promise<void>;
-    checkAuthentication: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
-    authenticated: false,
+const useAuthStore = create<AuthStore>((set, get) => ({
+    authenticated: localStorage.getItem('JWT') !== null,
 
     setAuthenticated: (status) => {
         set({authenticated: status});
@@ -66,9 +64,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             console.error('Ошибка при обновлении токена:', error);
         }
     },
-
-    checkAuthentication: async () => {
-        const response = await UserService.isAuthenticated();
-        set({authenticated: Boolean(response)})
-    }
 }));
+
+export default useAuthStore;

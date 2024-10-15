@@ -1,0 +1,46 @@
+server:
+  port: 8080
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 30MB
+
+  datasource:
+    url: jdbc:postgresql://localhost:35432/test_generator
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+file-upload:
+  allowed-extensions: pdf, docx
+security:
+  secret: SECRET
+  refresh-secret: REFRESH_SECRET
+  allowed-origin: http://localhost:3001,http://192.168.0.142:3001
+
+csrf:
+  cookie_domain: localhost
+aws:
+  region: us-east-1
+  access-key: foo
+  secret-key: bar
+  queue-name: test-queue
+  s3-bucket: files-bucket
+  url: http://localhost:4566
+  sqs-url: http://localhost:4566/000000000000/${aws.queue-name}
+generation:
+  key: 123
+  models:
+    question: gpt-4o-mini
+    answers: gpt-4o-mini
+retry:
+  attempt: 2

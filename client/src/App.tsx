@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import './App.css';
 import LoginPage from "./pages/auth/LoginPage";
@@ -19,8 +19,8 @@ import {TestsPage} from "./pages/tests/TestPage";
 import {TestGenerationHistory} from "./pages/history/TestGenerationHistory";
 import {PrintTestPage} from "./pages/tests/print/PrintTestPage";
 import {TestPageCreate} from "./pages/tests/create/TestPageCreate";
-import {useUserStore} from "./store/userStore";
-import {useAuthStore} from "./pages/auth/authStore";
+import useAuthStore from "./pages/auth/authStore";
+import ServerErrorPage from "./pages/errors/ServerErrorPage";
 
 function App() {
     const theme = createTheme({
@@ -44,42 +44,43 @@ function App() {
         },
     });
 
-    const { authenticated, checkAuthentication } = useAuthStore();
-    const { getTestGenCurrentActivities, getTestGenCurrentActivitiesLongPoll } = useUserStore();
-
-    useEffect(() => {
-        if (authenticated) {
-            getTestGenCurrentActivities();
-            getTestGenCurrentActivitiesLongPoll();
-        } else {
-            checkAuthentication();
-        }
-    }, [authenticated]);
+    const { authenticated } = useAuthStore();
 
     return (
 
         <ThemeProvider theme={theme}>
             <Router>
                     <div className="App">
-                        <Routes>
-                            <Route path="/texts" element={<Texts/>}/>
-                            <Route path="/sign-in" element={<LoginPage/>}/>
-                            <Route path="/sign-up" element={<SignUp/>}/>
-                            <Route path="/add-text" element={<AddText/>}/>
-                            <Route path="/texts/:id" element={<TextPage/>}/>
-                            <Route path="/tests" element={<TestsPage/>}/>
-                            <Route path="/tests/create" element={<TestPageCreate/>}/>
-                            <Route path="/tests/:id" element={<TestPageView/>}/>
-                            <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
-                            <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
-                            <Route path="/tests/pass" element={<TestPass/>}/>
-                            <Route path="/tests/result" element={<TestResults/>}/>
-                            <Route path="/tests/results" element={<UserTestResults/>}/>
-                            <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>}/>
-                            <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
-                            <Route path="/files" element={<Files/>}/>
-                            <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
-                        </Routes>
+                        {authenticated
+                            ? <Routes>
+                                <Route path="/texts" element={<Texts/>}/>
+                                <Route path="/sign-in" element={<LoginPage/>}/>
+                                <Route path="/sign-up" element={<SignUp/>}/>
+                                <Route path="/add-text" element={<AddText/>}/>
+                                <Route path="/texts/:id" element={<TextPage/>}/>
+                                <Route path="/tests" element={<TestsPage/>}/>
+                                <Route path="/tests/create" element={<TestPageCreate/>}/>
+                                <Route path="/tests/:id" element={<TestPageView/>}/>
+                                <Route path="/tests/:id/edit" element={<TestPageEdit/>}/>
+                                <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
+                                <Route path="/tests/pass" element={<TestPass/>}/>
+                                <Route path="/tests/result" element={<TestResults/>}/>
+                                <Route path="/tests/results" element={<UserTestResults/>}/>
+                                <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>}/>
+                                <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
+                                <Route path="/files" element={<Files/>}/>
+                                <Route path="/500" element={<ServerErrorPage/>}/>
+                                <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
+                            </Routes>
+                            : (
+                                <Routes>
+                                    <Route path="/sign-in" element={<LoginPage/>}/>
+                                    <Route path="/sign-up" element={<SignUp/>}/>
+                                    <Route path="/500" element={<ServerErrorPage/>}/>
+                                    <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
+                                </Routes>
+                            )
+                        }
                     </div>
                     )
             </Router>

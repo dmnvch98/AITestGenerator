@@ -1,5 +1,5 @@
 import {ActivityDto, TestGenHistory} from "../../store/userStore";
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     Table,
     TableBody,
@@ -57,8 +57,8 @@ export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGe
                                     </Link>
                                 </TableCell>
                                 <TableCell>{th.fileName}</TableCell>
-                                <TableCell>{DateTimeUtils.formatDateTime(th.generationStart)}</TableCell>
-                                <TableCell>{DateTimeUtils.formatDateTime(th.generationEnd)}</TableCell>
+                                <TableCell>{DateTimeUtils.formatDateTime(th.startDate)}</TableCell>
+                                <TableCell>{DateTimeUtils.formatDateTime(th.endDate)}</TableCell>
                                 <TableCell><StatusIndicator status={th.status}/></TableCell>
                                 <TableCell>
                                 {th.failCode && (

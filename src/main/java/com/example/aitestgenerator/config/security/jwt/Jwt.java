@@ -2,7 +2,6 @@ package com.example.aitestgenerator.config.security.jwt;
 
 import com.example.aitestgenerator.models.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;
@@ -53,7 +52,7 @@ public class Jwt {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
+        } catch (Exception e) {
             return false;
         }
     }

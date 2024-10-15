@@ -73,6 +73,18 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleHttpException(final IllegalArgumentException e, final WebRequest request) {
+
+        return handleExceptionInternal(
+              e,
+              new ApiErrorResponse(e, HttpStatus.BAD_REQUEST),
+              new HttpHeaders(),
+              HttpStatus.BAD_REQUEST,
+              request
+        );
+    }
+
     private ApiErrorResponse createError(HttpStatusCode httpStatus, String message) {
         return ApiErrorResponse.builder()
             .httpStatus(httpStatus)

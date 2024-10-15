@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import UserService from "../services/UserService";
+import UserService, {BulkActivityDeleteDto} from "../services/UserService";
 import {GenerationStatus} from "./types";
 import TestService from "../services/TestService";
 import ActivityService from "../services/activities/ActivityService";
@@ -16,8 +16,8 @@ export interface TestGenHistory extends ActivityDto {
 
 export interface ActivityDto {
     uuid: string,
-    generationStart: Date,
-    generationEnd: Date,
+    startDate: Date,
+    endDate: Date,
     status: GenerationStatus,
     testId?: number,
     fileName: string,
@@ -30,13 +30,19 @@ export interface UserStore {
     currentActivities: ActivityDto[];
     testGenHistoryPast: TestGenHistory[],
     getTestGenCurrentActivities: () => void,
-    addCurrentActivity: (activity: ActivityDto) => void,
-    deleteCurrentActivity: (activity: ActivityDto) => void,
+    deleteCurrentUserActivities: () => void,
     getTestGenHistory: () => void;
     loading: boolean;
     setLoading: (flag: boolean) => void;
     getTestGenCurrentActivitiesLongPoll: () => void;
+    deleteFinishedUserActivitiesFromServer: () => void;
+    initState: () => void;
 }
+
+const DeletableStatuses = new Set([
+    GenerationStatus.FAILED,
+    GenerationStatus.SUCCESS,
+]);
 
 export const useUserStore = create<UserStore>((set: any, get: any) => ({
     testGenHistoryPast: [],
@@ -62,33 +68,63 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             const { data }: { data?: ActivityDto[] } = await ActivityService.longPolling();
             if (Array.isArray(data) && data.length > 0) {
                 set({ currentActivities: data });
+                const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
+                if (inProcessJobs > 0) {
+                    await getTestGenCurrentActivitiesLongPoll();
+                }
             }
-            getTestGenCurrentActivitiesLongPoll();
+            return;
         } catch (error) {
             console.error(error);
             setTimeout(getTestGenCurrentActivitiesLongPoll, 5000);
         }
     },
 
-    addCurrentActivity: (activity) => {
+    deleteCurrentUserActivities: async () => {
         const { currentActivities } = get();
-        const index = currentActivities.findIndex((obj: { cid: string; }) => obj.cid === activity.cid);
-        let updatedHistory;
-        if (index !== -1) {
-            updatedHistory = [...currentActivities.slice(0, index), activity, ...currentActivities.slice(index + 1)];
-        } else {
-            updatedHistory = [...currentActivities, activity];
+
+        const activitiesToDelete = currentActivities.filter((a: ActivityDto) => DeletableStatuses.has(a.status));
+        if (activitiesToDelete.length === 0) {
+            return;
         }
-        set({ testGenHistoryCurrent: updatedHistory });
+
+        const updatedActivities = currentActivities.filter((a: ActivityDto) =>
+            !activitiesToDelete.some((activity: ActivityDto) => activity.cid === a.cid)
+        );
+
+        set({ currentActivities: updatedActivities });
     },
 
-    deleteCurrentActivity: (activity) => {
+    deleteFinishedUserActivitiesFromServer: async () => {
         const { currentActivities } = get();
-        const index = currentActivities.indexOf(activity);
-        if (index !== -1) {
-            const updatedActivities = [...currentActivities.slice(0, index), ...currentActivities.slice(index + 1)];
-            set({ currentActivities: updatedActivities });
+
+        const activitiesToDelete = currentActivities.filter((a: ActivityDto) => DeletableStatuses.has(a.status));
+        if (activitiesToDelete.length === 0) {
+            return;
         }
+
+        const deleteDto: BulkActivityDeleteDto = {
+            cids: activitiesToDelete.map((a: ActivityDto) => a.cid)
+        };
+
+        await UserService.deleteCurrentUserActivities(deleteDto);
+    },
+
+    initState: async () => {
+        const { getTestGenCurrentActivitiesLongPoll, deleteFinishedUserActivitiesFromServer } = get();
+        const data : ActivityDto[] = await TestService.getCurrentTestGenActivities();
+        if (Array.isArray(data)) {
+            set({ currentActivities: data });
+        }
+        if (data.length > 0) {
+            await deleteFinishedUserActivitiesFromServer();
+            const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
+            if (inProcessJobs > 0) {
+                await getTestGenCurrentActivitiesLongPoll();
+            }
+        }
+        return;
     }
+
 
 }))

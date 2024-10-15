@@ -16,27 +16,30 @@ import java.util.List;
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
 
-    private final List<String> allowedOrigins;
+  private final List<String> allowedOrigins;
+  private final String secret;
 
-    public MvcConfiguration(@Value("${security.allowed-origin}") final String allowedOrigins) {
-        this.allowedOrigins = Arrays.stream(allowedOrigins.split(",")).toList();
-    }
+  public MvcConfiguration(@Value("${security.allowed-origin}") final String allowedOrigins,
+                          @Value("${generation.key}") final String secret) {
+    this.allowedOrigins = Arrays.stream(allowedOrigins.split(",")).toList();
+    this.secret = secret;
+  }
 
-    @Bean
-    public OpenAiService openAiService () {
-        return new OpenAiService(System.getenv("GENERATE_TEST_SECRET"), Duration.ofSeconds(60));
-    }
+  @Bean
+  public OpenAiService openAiService() {
+    return new OpenAiService(secret, Duration.ofSeconds(60));
+  }
 
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
-        config.setAllowCredentials(true);
-        config.addAllowedMethod("*");
-        config.addAllowedHeader("*");
+  @Bean
+  public CorsFilter corsFilter() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(allowedOrigins);
+    config.setAllowCredentials(true);
+    config.addAllowedMethod("*");
+    config.addAllowedHeader("*");
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return new CorsFilter(source);
+  }
 }

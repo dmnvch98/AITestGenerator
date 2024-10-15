@@ -41,8 +41,15 @@ public class UserService {
 
     public User save(User user) {
         log.info("Saving user. Email: {}", user.getEmail());
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            log.error("User with such email already exists: {}", user.getEmail());
+            throw new IllegalArgumentException("User with such email already exists");
+        }
+
         return userRepository.save(user);
     }
+
 
     public User findUserById(Long id) {
         log.debug("Searching user by id: {}", id);

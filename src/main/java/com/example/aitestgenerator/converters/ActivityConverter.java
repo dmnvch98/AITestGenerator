@@ -5,6 +5,7 @@ import com.example.aitestgenerator.models.TestGenerationActivity;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.models.enums.ActivityStatus;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -48,6 +49,7 @@ public interface ActivityConverter {
           .fileName(activity.getFileName())
           .requestDto(activity.getRequestDto())
           .userId(activity.getUserId())
+          .cid(activity.getCid())
           .messageReceipt(activity.getMessageReceipt())
           .build();
   }
@@ -59,6 +61,7 @@ public interface ActivityConverter {
           .startDate(activity.getStartDate())
           .endDate(LocalDateTime.now())
           .fileName(activity.getFileName())
+          .cid(activity.getCid())
           .build();
   }
 
@@ -70,4 +73,8 @@ public interface ActivityConverter {
   }
 
   TestGenerationActivityDto convert(final TestGenerationActivity activity);
+
+  @Mapping(source = "userId", target = "userId")
+  TestGenerationActivity convert(final TestGenerationActivityDto dto, final Long userId);
+
 }

@@ -4,7 +4,10 @@ import com.example.aitestgenerator.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -14,8 +17,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Setter
 public class RedisService<T> {
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -31,6 +35,7 @@ public class RedisService<T> {
         }
     }
 
+    @Cacheable(value = "generation")
     public T getUserActivity(final String hashKey, final String cid, final Class<T> clazz) {
         final Object activityJson = redisTemplate.opsForHash().get(hashKey, cid);
 
@@ -45,6 +50,7 @@ public class RedisService<T> {
         }
     }
 
+//    @Cacheable(value = "generation")
     public Set<T> getUserActivities(final String hashKey, final Class<T> clazz) {
         final Map<Object, Object> entries = redisTemplate.opsForHash().entries(hashKey);
 
@@ -63,9 +69,17 @@ public class RedisService<T> {
             .collect(Collectors.toSet());
     }
 
+    @CacheEvict(value = "generations", key = "#cid")
     public void deleteUserActivity(final Long userId, final String cid) {
         final String hashKey = Utils.getHashKey(userId);
         redisTemplate.opsForHash().delete(hashKey, cid);
+    }
+
+    @CacheEvict(value = "generation", allEntries = true)
+    public void deleteUserActivities(final Long userId, final Collection<String> cids) {
+        final String hashKey = Utils.getHashKey(userId);
+
+        redisTemplate.opsForHash().delete(hashKey, cids.toArray());
     }
 
     public void deleteAllKeys() {
