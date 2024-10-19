@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {styled, useTheme, Theme, CSSObject} from '@mui/material/styles';
+import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -17,11 +17,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
-import {Button, Grid} from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import Link from "@mui/material/Link";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
+import { useLocation } from 'react-router-dom';
 
 const drawerWidth = 200;
 
@@ -33,12 +34,6 @@ const openedMixin = (theme: Theme): CSSObject => ({
     }),
     overflowX: 'hidden',
 });
-
-interface TabIcon {
-    name: string;
-    icon: any;
-    redirect: string;
-}
 
 const closedMixin = (theme: Theme): CSSObject => ({
     transition: theme.transitions.create('width', {
@@ -52,12 +47,11 @@ const closedMixin = (theme: Theme): CSSObject => ({
     },
 });
 
-const DrawerHeader = styled('div')(({theme}) => ({
+const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
 }));
 
@@ -67,7 +61,7 @@ interface AppBarProps extends MuiAppBarProps {
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({theme, open}) => ({
+})<AppBarProps>(({ theme, open }) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
@@ -83,8 +77,8 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
-    ({theme, open}) => ({
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+    ({ theme, open }) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
@@ -100,10 +94,17 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
     }),
 );
 
+interface TabIcon {
+    name: string;
+    icon: any;
+    redirect: string;
+}
+
 export const SidebarHeader = ({ children }: any) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const { logout } = useAuthStore();
+    const location = useLocation();
 
     const tabs: TabIcon[] = [
         {
@@ -183,10 +184,9 @@ export const SidebarHeader = ({ children }: any) => {
                             <ListItem disablePadding sx={{ display: 'block' }}>
                                 <ListItemButton
                                     sx={{
-                                        minHeight: 48,
+                                        minHeight: 58,
                                         justifyContent: open ? 'initial' : 'center',
-                                        px: 2.5,
-                                        mb: 2,
+                                        backgroundColor: location.pathname === t.redirect ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
                                     }}
                                 >
                                     <ListItemIcon

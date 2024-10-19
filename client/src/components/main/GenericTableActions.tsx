@@ -1,9 +1,10 @@
-import React from 'react';
-import { DataGrid, GridColDef, GridRowIdGetter } from '@mui/x-data-grid';
-import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import React, {useEffect} from 'react';
+import {DataGrid, GridColDef, GridRowIdGetter} from '@mui/x-data-grid';
+import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { tableLables } from './helper';
-import { ConfirmationButton, ConfirmationButtonProps } from './ConfirmationButton';
+import {tableLables} from './helper';
+import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
+import Typography from "@mui/material/Typography";
 
 interface Action<T> {
     label?: string;
@@ -17,7 +18,7 @@ interface ActionsProps<T> {
     actions: Action<T>[];
 }
 
-export const Actions = <T,>({ item, actions }: ActionsProps<T>) => {
+export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -31,7 +32,7 @@ export const Actions = <T,>({ item, actions }: ActionsProps<T>) => {
     return (
         <Box>
             <IconButton onClick={handleClick}>
-                <SettingsIcon />
+                <SettingsIcon/>
             </IconButton>
 
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
@@ -74,29 +75,47 @@ interface GenericTableProps<T> {
     actions: (item: T) => Action<T>[];
     rowIdGetter: (row: T) => number;
     onSelectionModelChange?: (ids: number[]) => void;
+    loading?: boolean;
 }
 
-export const GenericTableActions = <T,>({
-                                            data,
-                                            columns,
-                                            actions,
-                                            rowIdGetter,
-                                            onSelectionModelChange,
-                                        }: GenericTableProps<T>) => {
+export const NoRows = () => {
+    return (
+        <>
+            <Typography variant="h6" sx={{position: 'absolute'}}>
+                No data available
+            </Typography>
+        </>
+    );
+}
+
+export const GenericTableActions = <T, >({
+                                             data,
+                                             columns,
+                                             actions,
+                                             rowIdGetter,
+                                             onSelectionModelChange,
+                                             loading
+                                         }: GenericTableProps<T>) => {
     const actionColumn: GridColDef = {
         field: 'actions',
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
-            return <Actions item={item} actions={actions(item)} />;
+            return <Actions item={item} actions={actions(item)}/>;
         },
         sortable: false,
         disableColumnMenu: true,
     };
 
+    useEffect(() => {
+        console.log('loading: ' + loading)
+    }, [])
+
     return (
         <Box>
             <DataGrid
+                loading={loading}
+                autoHeight
                 rows={data.map((item, idx) => ({
                     order: idx + 1,
                     ...item,
@@ -111,10 +130,13 @@ export const GenericTableActions = <T,>({
                 }}
                 initialState={{
                     pagination: {
-                        paginationModel: { page: 0, pageSize: 15 },
+                        paginationModel: {page: 0, pageSize: 15},
                     },
                 }}
                 localeText={tableLables}
+                // slots={{
+                //     noRowsOverlay: NoRows
+                // }}
             />
         </Box>
     );

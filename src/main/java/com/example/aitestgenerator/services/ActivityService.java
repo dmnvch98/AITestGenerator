@@ -67,13 +67,13 @@ public class ActivityService {
         redisService.deleteUserActivities(userId, cids);
     }
 
-    public void finishActivity(final String messageReceipt, final Long userId, final String cid) {
-        final String hashKey = Utils.getHashKey(userId);
-        final TestGenerationActivity currentActivity = redisService
-              .getUserActivity(hashKey, cid, TestGenerationActivity.class);
+    public void finishActivity(final TestGenerationActivity activity) {
+//        final String hashKey = Utils.getHashKey(userId);
+//        final TestGenerationActivity currentActivity = redisService
+//              .getUserActivity(hashKey, cid, TestGenerationActivity.class);
 
-        createFinishedActivity(currentActivity);
-        commandService.deleteMessage(messageReceipt);
+        createFinishedActivity(activity);
+        commandService.deleteMessage(activity.getMessageReceipt());
     }
 
     public void failActivity(final String hashKey, final String cid, final GenerationFailReason failReason) {

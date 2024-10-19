@@ -1,26 +1,30 @@
 import React from 'react';
-import { GridColDef } from '@mui/x-data-grid';
-import { GenericTableActions } from "../main/GenericTableActions";
+import {GridColDef} from '@mui/x-data-grid';
+import {GenericTableActions} from "../main/GenericTableActions";
 import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../utils/DateTimeUtils";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
-import { Box, Typography } from '@mui/material';
+import {Box, Typography} from '@mui/material';
 
 const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase();
     if (extension === 'pdf') {
-        return <PictureAsPdfIcon sx={{ color: '#FF0000' }} />;
+        return <PictureAsPdfIcon sx={{color: '#FF0000'}}/>;
     }
     if (extension === 'doc' || extension === 'docx') {
-        return <DescriptionIcon sx={{ color: '#2B579A' }} />;
+        return <DescriptionIcon sx={{color: '#2B579A'}}/>;
     }
     return null;
 };
 
+interface FilesTableProps {
+    actions: (file: FileDto) => any[],
+    loading: boolean
+}
 
-export const FilesTable = ({ actions }: { actions: (file: FileDto) => any[] }) => {
-    const { fileDtos, setSelectedFileHashes } = useFileStore();
+export const FilesTable = ({actions, loading}: FilesTableProps) => {
+    const {fileDtos, setSelectedFileHashes} = useFileStore();
 
     const columns: GridColDef[] = [
         {
@@ -32,7 +36,7 @@ export const FilesTable = ({ actions }: { actions: (file: FileDto) => any[] }) =
                 return (
                     <Box display="flex" alignItems="center">
                         {getFileIcon(file.originalFilename)}
-                        <Typography sx={{ ml: 1 }}>{file.originalFilename}</Typography>
+                        <Typography sx={{ml: 1}}>{file.originalFilename}</Typography>
                     </Box>
                 );
             }
@@ -55,6 +59,7 @@ export const FilesTable = ({ actions }: { actions: (file: FileDto) => any[] }) =
             actions={actions}
             rowIdGetter={(row) => row.id as number}
             onSelectionModelChange={setSelectedFileHashes}
+            loading={loading}
         />
     );
 };

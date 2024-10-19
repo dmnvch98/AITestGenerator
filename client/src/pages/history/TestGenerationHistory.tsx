@@ -9,16 +9,23 @@ import { Alert } from "@mui/material";
 
 const TestGenHistoryPast = () => {
     const { getTestGenHistory, testGenHistoryPast } = useUserStore();
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const fetchHistory = async () => {
+        setLoading(true);
+        await getTestGenHistory();
+        setLoading(false);
+    }
 
     useEffect(() => {
-        getTestGenHistory();
-    }, [getTestGenHistory]);
+        fetchHistory();
+    }, []);
 
     return (
         <>
             <Box display="flex" sx={{ mb: 2 }} justifyContent="flex-end">
             </Box>
-            <TestGenHistoryTable testGenHistory={testGenHistoryPast} />
+            <TestGenHistoryTable testGenHistory={testGenHistoryPast} loading={loading}/>
         </>
     );
 };
@@ -30,8 +37,16 @@ const TestGenHistoryCurrent = () => {
         deleteFinishedUserActivitiesFromServer
     } = useUserStore();
 
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const fetchActivity = async () => {
+        setLoading(true);
+        await initState();
+        setLoading(false);
+    }
+
     useEffect(() => {
-        initState();
+        fetchActivity();
     }, [])
 
     useEffect(() => {
@@ -50,7 +65,7 @@ const TestGenHistoryCurrent = () => {
                 </Typography>
             </Alert>
 
-            <TestGenHistoryTable testGenHistory={currentActivities} />
+            <TestGenHistoryTable testGenHistory={currentActivities} loading={loading}/>
         </>
     );
 };

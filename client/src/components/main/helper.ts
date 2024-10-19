@@ -1,6 +1,6 @@
 export const tableLables = {
 // Root
-    noRowsLabel: 'Нет строк',
+    noRowsLabel: 'Нет данных для отображения',
     noResultsOverlayLabel: 'Результаты не найдены.',
 
     // Density selector toolbar button text

@@ -1,6 +1,5 @@
-// userStore.ts
-import create from 'zustand';
 import AuthService from "../../services/AuthService";
+import {create} from "zustand";
 
 interface AuthStore {
     authenticated: boolean;

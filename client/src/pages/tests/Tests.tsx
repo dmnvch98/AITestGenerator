@@ -24,6 +24,8 @@ export const Tests = () => {
 
     const {toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
     const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
 
     const navigate = useNavigate();
 
@@ -32,8 +34,14 @@ export const Tests = () => {
         setDeleteTestFlag(false);
     };
 
+    const fetchTest = async () => {
+        setLoading(true);
+        await getAllUserTests();
+        setLoading(false);
+    };
+
     useEffect(() => {
-        getAllUserTests();
+        fetchTest();
     }, [])
 
     const handleBulkDelete = useCallback(() => {
@@ -80,7 +88,7 @@ export const Tests = () => {
                     onSubmit={handleBulkDelete}
                 />
             </Box>
-            <TestTable onSelectionModelChange={onMultiTestSelection}/>
+            <TestTable onSelectionModelChange={onMultiTestSelection} loading={loading}/>
             <Snackbar
                 open={alerts.length > 0}
                 autoHideDuration={6000}

@@ -36,10 +36,17 @@ const FilesContent = () => {
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<FileDto | null>(null); // Добавляем состояние для хранения выбранного файла
+    const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    const fetchFiles = async () => {
+        setLoading(true);
+        await getFiles();
+        setLoading(false);
+    };
 
     useEffect(() => {
-        getFiles();
+        fetchFiles();
     }, []);
 
     const handleAdd = () => {
@@ -146,7 +153,7 @@ const FilesContent = () => {
                 </Button>
             </Box>
 
-            <FilesTable actions={actions}/>
+            <FilesTable actions={actions} loading={loading}/>
 
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 

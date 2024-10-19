@@ -85,7 +85,7 @@ public class TestFacade {
     final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
     final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
     historyService.save(history);
-    activityService.finishActivity(message.getReceipt(), message.getUserId(), message.getCid());
+    activityService.finishActivity(currentActivity);
   }
 
   public void deleteTest(final Long testId, final Long userId) {

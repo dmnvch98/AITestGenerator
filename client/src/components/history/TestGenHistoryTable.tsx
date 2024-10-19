@@ -2,12 +2,11 @@ import {ActivityDto, TestGenHistory} from "../../store/userStore";
 import React, {useState} from 'react';
 import {
     Table,
-    TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Button,
+    Button, CircularProgress, Grid,
 } from '@mui/material';
 import DateTimeUtils from '../../utils/DateTimeUtils';
 import Link from '@mui/material/Link';
@@ -16,14 +15,15 @@ import StatusIndicator from "../status/StatusIndicator";
 
 interface TestGenHistoryTableProps {
     testGenHistory: TestGenHistory[] | ActivityDto[];
+    loading: boolean;
 }
 
-export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGenHistory }) => {
+export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({testGenHistory, loading}) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [failCode, setFailCode] = useState<number | null>(null);
 
     const showErrorButton = () => {
-        return testGenHistory.some(t => t.failCode );
+        return testGenHistory.some(t => t.failCode);
     };
 
     const handleOpenModal = (code: number) => {
@@ -45,35 +45,50 @@ export const TestGenHistoryTable: React.FC<TestGenHistoryTableProps> = ({ testGe
                             {showErrorButton() && <TableCell>Детали ошибки</TableCell>}
                         </TableRow>
                     </TableHead>
-                    <TableBody>
-                        {testGenHistory.map((th, index) => (
-                            <TableRow key={index}>
-                                <TableCell>
-                                    <Link
-                                        color='inherit'
-                                        underline='none'
-                                        href={`/tests/${th.testId}`}>
-                                        {th.testTitle}
-                                    </Link>
-                                </TableCell>
-                                <TableCell>{th.fileName}</TableCell>
-                                <TableCell>{DateTimeUtils.formatDateTime(th.startDate)}</TableCell>
-                                <TableCell>{DateTimeUtils.formatDateTime(th.endDate)}</TableCell>
-                                <TableCell><StatusIndicator status={th.status}/></TableCell>
-                                <TableCell>
-                                {th.failCode && (
-                                        <Button
-                                            variant="outlined"
-                                            color="primary"
-                                            onClick={() => handleOpenModal(th.failCode)}
-                                        >
-                                            Посмотреть
-                                        </Button>
-                                )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
+                    {
+                        loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} sx={{border: 'none'}}>
+                                        <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
+                                            <CircularProgress />
+                                        </Grid>
+                                    </TableCell>
+                                </TableRow>
+                        ) :
+                            (
+                                testGenHistory.map((th, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <Link
+                                                color='inherit'
+                                                underline='none'
+                                                href={`/tests/${th.testId}`}>
+                                                {th.testTitle}
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell>{th.fileName}</TableCell>
+                                        <TableCell>{DateTimeUtils.formatDateTime(th.startDate)}</TableCell>
+                                        <TableCell>{DateTimeUtils.formatDateTime(th.endDate)}</TableCell>
+                                        <TableCell><StatusIndicator status={th.status}/></TableCell>
+                                        <TableCell>
+                                            {
+                                                th.failCode &&
+                                                (
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        onClick={() => handleOpenModal(th.failCode)}
+                                                    >
+                                                        Посмотреть
+                                                    </Button>
+                                                )
+                                            }
+
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            ))
+                    }
                 </Table>
             </TableContainer>
 
