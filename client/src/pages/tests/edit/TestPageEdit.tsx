@@ -10,15 +10,14 @@ export const TestPageEdit = () => {
     const { selectedTest, getUserTestById, clearSelectedTest } = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
 
+    const loadData = async () => {
+        setIsLoading(true);
+        await getUserTestById(Number(id));
+        setIsLoading(false);
+    };
+
     useEffect(() => {
-        const loadData = async () => {
-            setIsLoading(true);
-            await getUserTestById(Number(id));
-            setIsLoading(false);
-        };
-
         loadData();
-
         return () => clearSelectedTest();
     }, [id, getUserTestById, clearSelectedTest]);
 

@@ -4,10 +4,11 @@ import {AlertMessage} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 
 export interface UserTest {
-    id: number,
-    title: string,
-    questions: Question[],
-    rating?: number
+    id: number;
+    title: string;
+    questions: Question[];
+    rating?: number;
+    fileName: string;
 }
 
 export interface CreateTestRequestDto {

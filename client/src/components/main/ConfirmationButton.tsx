@@ -1,30 +1,50 @@
-import React, { useState } from 'react';
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
+import { SxProps } from "@mui/system";
+import { Theme } from "@mui/material/styles";
 
 export interface ConfirmationButtonProps {
     buttonTitle: string;
     dialogTitle: string;
     dialogContent: string;
     variant: 'button' | 'menuItem';
-    disabled?: boolean
+    disabled?: boolean;
+    fullWidth?: boolean;
+    sx?: SxProps<Theme>;
 }
 
 interface Props {
     config: ConfirmationButtonProps;
     onSubmit: () => void;
     onClose?: () => void;
+    show?: boolean; // Добавляем флаг show
 }
 
-export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose }) => {
+export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose, show }) => {
     const [open, setOpen] = useState(false);
 
+    // Используем useEffect, чтобы обновить состояние, когда изменяется флаг show
+    useEffect(() => {
+        if (show === false) {
+            setOpen(false); // Закрываем модалку, если show равно false
+        }
+    }, [show]);
+
     const handleClickOpen = () => {
-        setOpen(true);
+        if (show !== false) { // Проверяем значение show
+            setOpen(true);
+        } else {
+            onSubmit(); // Если show false, вызываем onSubmit сразу
+        }
     };
 
     const handleMenuItemClick = () => {
-        setOpen(true);
-    }
+        if (show !== false) { // Проверяем значение show
+            setOpen(true);
+        } else {
+            onSubmit(); // Если show false, вызываем onSubmit сразу
+        }
+    };
 
     const handleClose = () => {
         setOpen(false);
@@ -40,8 +60,7 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose 
     return (
         <>
             {config.variant === 'menuItem'
-                ? <MenuItem
-                    onClick={handleMenuItemClick}>
+                ? <MenuItem onClick={handleMenuItemClick}>
                     {config.buttonTitle}
                 </MenuItem>
                 :
@@ -49,6 +68,8 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose 
                     disabled={config?.disabled}
                     variant="outlined"
                     color="secondary"
+                    fullWidth={config.fullWidth}
+                    sx={config.sx}
                     onClick={handleClickOpen}>
                     {config.buttonTitle}
                 </Button>
@@ -63,11 +84,11 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose 
                 <DialogTitle id="confirmation-dialog-title">{config.dialogTitle}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="confirmation-dialog-content">
-                        <span dangerouslySetInnerHTML={{__html: config.dialogContent}}/>
+                        <span dangerouslySetInnerHTML={{ __html: config.dialogContent }} />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleClose}>
+                    <Button onClick={handleClose}>
                         Отмена
                     </Button>
                     <Button onClick={handleConfirm} color="primary">

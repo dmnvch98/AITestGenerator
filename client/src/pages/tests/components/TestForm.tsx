@@ -6,7 +6,7 @@ import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDi
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
 import {TestViewModeSelector} from "../edit/components/TestViewModeSelector";
-import {TestFormActionButtons} from "../edit/components/ActionButtonProps";
+import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
 
 interface TestFormProps {
@@ -24,6 +24,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
+    const [isTestModified, setIsTestModified] = useState(false);
 
     useEffect(() => {
         if (isEditMode && initialTest && !hasSaved) setLocalTest({...initialTest});
@@ -38,6 +39,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                     setHasSaved(true);
                     setLocalTest(resp);
                     setLastSavedTest(resp);
+                    setIsTestModified(false);
                 }
             });
         } else {
@@ -51,12 +53,14 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
             questions: [...localTest.questions, createNewQuestion()],
         });
         setCurrentQuestionIndex(localTest.questions.length);
+        setIsTestModified(true);
     };
 
     const handleDeleteQuestion = (id: string) => {
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setCurrentQuestionIndex(updatedQuestions.length - 1);
         setLocalTest({...localTest, questions: updatedQuestions});
+        setIsTestModified(true);
         if (invalidQuestions.map(q => q.id).includes(id)) {
             const newInvalidQuestions = invalidQuestions.filter(q => q.id !== id);
             setInvalidQuestions(newInvalidQuestions);
@@ -68,6 +72,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
             q.id === updatedQuestion.id ? updatedQuestion : q
         );
         setLocalTest({...localTest, questions: updatedQuestions});
+        setIsTestModified(true);
     };
 
     const handleReset = () => {
@@ -75,6 +80,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
         setLocalTest(resetTest);
         setCurrentQuestionIndex(0);
         setInvalidQuestions([]);
+        setIsTestModified(false);
     };
 
     return (
@@ -113,11 +119,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode}) => 
                 <Paper sx={{maxWidth: 230, p: 2, position: "fixed"}}>
                     <TestViewModeSelector viewMode={viewMode} onChange={setViewMode}/>
                     <Divider sx={{mb: 3}}/>
-                    <TestFormActionButtons
+                    <TestFormActions
                         onSave={handleSave}
                         onAddQuestion={handleAddQuestion}
                         onReset={handleReset}
                         onExit={() => navigate("/tests")}
+                        isTestModified={isTestModified}
                     />
                     {viewMode === 'paginated' && (
                         <QuestionPagination

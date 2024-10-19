@@ -7,7 +7,7 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Paper, Tooltip,
+    Paper, Tooltip, CircularProgress,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Rating from '@mui/material/Rating';
@@ -130,9 +130,10 @@ const RatingDisplay: React.FC<{
 
 interface TestRatingFormProps {
     id: number;
+    loading: boolean;
 }
 
-export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id }) => {
+export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id, loading }) => {
     const { updateRating, selectedTestRating } = useTestStore();
     const [rating, setRating] = useState<number>(5);
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
@@ -169,22 +170,26 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id }) => {
     }
 
     return (
-        <Box>
-            {isEditing ? (
-                <RatingInput
-                    rating={rating}
-                    feedback={feedback}
-                    onRatingChange={handleRatingChange}
-                    onFeedbackChange={handleFeedbackChange}
-                    onSubmit={handleSubmit}
-                    onExit={toggleEdit}
-                />
-            ) : (
-                <RatingDisplay
-                    rating={rating}
-                    onEdit={toggleEdit}
-                />
-            )}
-        </Box>
+        loading ? (
+            <CircularProgress />
+        ) : (
+            <Box>
+                {isEditing ? (
+                    <RatingInput
+                        rating={rating}
+                        feedback={feedback}
+                        onRatingChange={handleRatingChange}
+                        onFeedbackChange={handleFeedbackChange}
+                        onSubmit={handleSubmit}
+                        onExit={toggleEdit}
+                    />
+                ) : (
+                    <RatingDisplay
+                        rating={rating}
+                        onEdit={toggleEdit}
+                    />
+                )}
+            </Box>
+        )
     );
 };
