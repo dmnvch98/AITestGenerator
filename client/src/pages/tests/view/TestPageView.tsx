@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useTestStore } from "../../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import { Alert, Box, Button, CircularProgress, Divider, Paper, Snackbar } from "@mui/material";
+import {Alert, Box, Button, Divider, Paper, Snackbar, Skeleton, CircularProgress} from "@mui/material";
 import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
 import { QuestionPagination } from "../edit/components/QuestionPagination";
 import { QuestionListView, QuestionPaginatedView } from "../edit/components/TestDisplayMode";
@@ -25,14 +25,18 @@ const TestPageViewContent = () => {
                 navigate('/tests');
                 setAlert([{ id: Date.now(), message: 'Тест не найден', severity: 'error' }]);
             }
-        })
-        setTestLoading(false);
+        });
+        setTimeout(() => {
+            setTestLoading(false);
+        }, 200);
     }
 
     const fetchRaiting = async () => {
         setRatingLoading(true);
         await getRating(Number(id));
-        setRatingLoading(false);
+        setTimeout(() => {
+            setRatingLoading(false);
+        }, 200);
     }
 
     useEffect(() => {
@@ -53,15 +57,21 @@ const TestPageViewContent = () => {
             <Box flexGrow={1} mr="250px">
                 <Paper sx={{ minHeight: '100px', pb: 0.25 }}>
                     <Box sx={{ ml: 4, mr: 4, pt: 2 }}>
-                        <Typography
-                            align="left"
-                            sx={{
-                                fontWeight: 600,
-                                fontSize: "24px",
-                            }}
-                        >
-                            {selectedTest?.title}
-                        </Typography>
+                        {testLoading ? (
+                            <Typography component="div" key={'h3'} variant={'h3'}>
+                                <Skeleton />
+                            </Typography>
+                        ) : (
+                            <Typography
+                                align="left"
+                                sx={{
+                                    fontWeight: 600,
+                                    fontSize: "24px",
+                                }}
+                            >
+                                {selectedTest?.title}
+                            </Typography>
+                        )}
                     </Box>
                     <Divider sx={{ mt: 2, mb: 2 }} />
 
@@ -93,12 +103,13 @@ const TestPageViewContent = () => {
             <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
                 <Box sx={{ width: '230px', position: "fixed" }}>
                     <Paper sx={{ p: 2 }}>
-                        <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} />
+                        <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={testLoading} />
                         <Divider sx={{ mb: 3 }} />
                         <Button
                             fullWidth
                             variant="outlined"
                             onClick={handleEdit}
+                            disabled={testLoading}
                             sx={{ mb: 2 }}
                         >
                             Редактировать
@@ -116,7 +127,8 @@ const TestPageViewContent = () => {
                                 currentIndex={currentQuestionIndex}
                                 totalQuestions={selectedTest?.questions?.length as number}
                                 onChange={setCurrentQuestionIndex}
-                                invalidQuestionNumbers={[]} // Возможно, нужно будет передать фактические номера недопустимых вопросов
+                                invalidQuestionNumbers={[]}
+                                loading={testLoading}
                             />
                         )}
                     </Paper>

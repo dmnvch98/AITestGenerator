@@ -37,12 +37,8 @@ const TestGenHistoryCurrent = () => {
         deleteFinishedUserActivitiesFromServer
     } = useUserStore();
 
-    const [loading, setLoading] = useState<boolean>(false);
-
     const fetchActivity = async () => {
-        setLoading(true);
         await initState();
-        setLoading(false);
     }
 
     useEffect(() => {
@@ -65,7 +61,7 @@ const TestGenHistoryCurrent = () => {
                 </Typography>
             </Alert>
 
-            <TestGenHistoryTable testGenHistory={currentActivities} loading={loading}/>
+            <TestGenHistoryTable testGenHistory={currentActivities} loading={false}/>
         </>
     );
 };

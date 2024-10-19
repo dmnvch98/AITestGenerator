@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { useTestStore } from "../../../store/tests/testStore";
 import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
 import { TestForm } from "../components/TestForm";
-import { CircularProgress, Box } from "@mui/material";
 
 export const TestPageEdit = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestById, clearSelectedTest } = useTestStore();
+    const { selectedTest, getUserTestById, clearSelectedTest, setAlert } = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     const loadData = async () => {
         setIsLoading(true);
-        await getUserTestById(Number(id));
-        setIsLoading(false);
+        await getUserTestById(Number(id)).then(test => {
+            if (!test) {
+                navigate('/tests');
+                setAlert([{ id: Date.now(), message: 'Тест не найден', severity: 'error' }]);
+            }
+        });
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 200);
     };
 
     useEffect(() => {
@@ -24,16 +31,11 @@ export const TestPageEdit = () => {
     return (
         <LoggedInUserPage
             mainContent={
-                isLoading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-                        <CircularProgress />
-                    </Box>
-                ) : (
                     <TestForm
                         initialTest={selectedTest}
                         isEditMode={true}
+                        isLoading={isLoading}
                     />
-                )
             }
         />
     );

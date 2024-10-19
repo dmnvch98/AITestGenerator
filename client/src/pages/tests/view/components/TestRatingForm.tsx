@@ -171,7 +171,12 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id, loading }) =
 
     return (
         loading ? (
-            <CircularProgress />
+            <Paper>
+                <Box sx={{ height: '270px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <CircularProgress />
+                </Box>
+            </Paper>
+
         ) : (
             <Box>
                 {isEditing ? (

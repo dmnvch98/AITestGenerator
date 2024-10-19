@@ -8,15 +8,16 @@ interface ActionButtonsProps {
     onReset: () => void;
     onExit: () => void;
     isTestModified: boolean;
+    isLoading: boolean;
 }
 
-export const TestFormActions: React.FC<ActionButtonsProps> = ({onSave, onAddQuestion, onReset, onExit, isTestModified}) => {
+export const TestFormActions: React.FC<ActionButtonsProps> = ({onSave, onAddQuestion, onReset, onExit, isTestModified, isLoading}) => {
     return (
         <>
-            <Button sx={{mb: 2, width: "100%"}} variant="contained" onClick={onSave}>
+            <Button sx={{mb: 2, width: "100%"}} variant="contained" onClick={onSave} disabled={!isTestModified || isLoading}>
                 Сохранить
             </Button>
-            <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="primary" onClick={onAddQuestion}>
+            <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="primary" onClick={onAddQuestion} disabled={isLoading}>
                 Добавить вопрос
             </Button>
             <Tooltip title="Сбрасывает несохраненные изменения" enterDelay={500} leaveDelay={200}>
@@ -27,7 +28,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({onSave, onAddQues
                     dialogTitle: "Подтверждение сброса",
                     dialogContent: "Вы уверены, что хотите сбросить тест до последнего сохранненого состояния? Все несохраненные изменения будут потеряны.",
                     variant: "button",
-                    disabled: !isTestModified,
+                    disabled: !isTestModified || isLoading,
                     fullWidth: true,
                     sx: {mb: 2}
                 }}
