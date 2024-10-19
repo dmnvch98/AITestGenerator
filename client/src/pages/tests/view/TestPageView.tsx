@@ -8,10 +8,11 @@ import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
 import { QuestionPagination } from "../edit/components/QuestionPagination";
 import { QuestionListView, QuestionPaginatedView } from "../edit/components/TestDisplayMode";
 import { TestRatingForm } from "./components/TestRatingForm";
+import {AlertMessage} from "../../../store/types";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestById, alerts, setAlert, clearAlerts, deleteAlert, getRating } = useTestStore();
+    const { selectedTest, getUserTestById, alerts, addAlert, clearAlerts, deleteAlert, getRating } = useTestStore();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -23,7 +24,7 @@ const TestPageViewContent = () => {
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                setAlert([{ id: Date.now(), message: 'Тест не найден', severity: 'error' }]);
+                addAlert(new AlertMessage('Тест не найден', 'error'))
             }
         });
         setTimeout(() => {

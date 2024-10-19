@@ -21,5 +21,6 @@ public class FileUploadResponseDto {
 
         private final String fileName;
         private final UploadStatus status;
+        private final String description;
     }
 }

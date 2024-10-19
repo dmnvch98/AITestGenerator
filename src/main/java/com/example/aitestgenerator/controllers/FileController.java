@@ -39,6 +39,7 @@ public class FileController {
               FileUploadResponseDto.FileResult
                       .builder()
                       .status(status)
+                      .description(status.getDescription())
                       .fileName(file.getOriginalFilename())
                       .build();
       fileResults.add(fileResult);

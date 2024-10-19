@@ -21,7 +21,7 @@ public class Utils {
     public static int countTokens(String text) {
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
 
-        Encoding encoding = registry.getEncodingForModel(ModelType.GPT_3_5_TURBO_16K);
+        Encoding encoding = registry.getEncodingForModel(ModelType.GPT_4O_MINI);
 
         return encoding.countTokens(text);
     }

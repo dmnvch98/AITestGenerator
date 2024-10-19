@@ -75,6 +75,7 @@ export interface TestStore {
     setTestGenerationStarted: (flag: boolean) => void;
     alerts: AlertMessage[],
     setAlert: (alert: AlertMessage[]) => void;
+    addAlert: (alert: AlertMessage) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
     upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
@@ -114,14 +115,17 @@ export const useTestStore = create<TestStore>((set, get) => ({
         const {tests} = await TestService.getUserTests()
         set({tests: tests})
     },
+    addAlert: (alert: AlertMessage) => {
+        get().alerts.push(alert);
+    },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
-        const { setAlert, getAllUserTests } = get();
+        const { addAlert, getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            setAlert([{ id: Date.now(), message: 'Тест успешно удален', severity: 'success' }]);
+            addAlert(new AlertMessage('Тест успешно удален', 'success'));
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении теста', severity: 'error' }]);
+            addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
         }
     },
     getUserTestsByIdIn: async (ids: number[]) => {
@@ -154,14 +158,14 @@ export const useTestStore = create<TestStore>((set, get) => ({
         alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
     })),
     upsert: async (test): Promise<UserTest | null> => {
-        const { setAlert, getAllUserTests} = get();
+        const { addAlert, getAllUserTests} = get();
         const response = await TestService.upsert(test);
         if (response) {
             getAllUserTests();
-            setAlert([{ id: Date.now(), message: 'Тест успешно обновлен', severity: 'success' }])
+            addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
             return response as UserTest;
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении теста', severity: 'error' }])
+            addAlert(new AlertMessage('Произошла ошибка при обновлении теста', 'error'));
             return null;
         }
     },
@@ -174,29 +178,29 @@ export const useTestStore = create<TestStore>((set, get) => ({
         return response;
     },
     saveTest: async (test) => {
-        const { setAlert} = get();
+        const { addAlert } = get();
         const response = await TestService.saveUserTest(test);
         if (response) {
-            setAlert([{ id: Date.now(), message: 'Тест успешно сохранен', severity: 'success' }])
+            addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при сохранении теста', severity: 'error' }])
+            addAlert(new AlertMessage('Произошла ошибка при сохранении теста', 'error'));
         }
     },
     bulkDeleteTest: async (request) => {
         const response = await TestService.bulkTestDelete(request);
-        const { setAlert, getAllUserTests } = get();
+        const { addAlert, getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            setAlert([{ id: Date.now(), message: 'Тесты успешно удалены', severity: 'success' }])
+            addAlert(new AlertMessage('Тесты успешно удалены', 'success'));
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при удалении тестов', severity: 'error' }])
+            addAlert(new AlertMessage('Произошла ошибка при удалении тестов', 'error'));
         }
     },
     updateRating: async (id, request) => {
         const response = await TestRatingService.upsert(id, request);
-        const { setAlert, selectedTest, selectTest } = get();
+        const { addAlert, selectedTest, selectTest } = get();
         if (response) {
-            setAlert([{ id: Date.now(), message: 'Рейтинг успешно обновлен', severity: 'success' }]);
+            addAlert(new AlertMessage('Рейтинг успешно обновлен', 'success'));
             if (selectedTest) {
                 const updatedTest: UserTest = {
                     rating: request.rating,
@@ -205,7 +209,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
                 selectTest(updatedTest);
             }
         } else {
-            setAlert([{ id: Date.now(), message: 'Произошла ошибка при обновлении рейтинга', severity: 'error' }])
+            addAlert(new AlertMessage('Произошла ошибка при обновлении рейтинга', 'error'));
         }
     },
     getRating: async (id) => {

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import FileService from '../services/FileService';
 import { AxiosError } from 'axios';
 import {AlertMessage} from "./types";
+import {v4 as uuidv4} from "uuid";
 
 export interface FileDto {
     id: number;
@@ -11,25 +12,26 @@ export interface FileDto {
     uploadTime: Date;
 }
 
-export const UploadStatus = {
-    SUCCESS: 'SUCCESS',
-    FAILED: 'FAILED',
-    ALREADY_UPLOADED: 'ALREADY_UPLOADED',
-    INVALID_EXTENSION: 'INVALID_EXTENSION'
-} as const;
+export enum UploadStatus {
+    SUCCESS = 'SUCCESS',
+    FAILED = 'FAILED',
+    ALREADY_UPLOADED = 'ALREADY_UPLOADED',
+    INVALID_EXTENSION = 'INVALID_EXTENSION',
+    TOO_LARGE = 'TOO_LARGE'
+}
 
-export type UploadStatus = (typeof UploadStatus)[keyof typeof UploadStatus];
-
-export const UploadStatusMessages: Record<UploadStatus, string> = {
-    [UploadStatus.SUCCESS]: 'Файл успешно загружен',
-    [UploadStatus.FAILED]: 'Не удалось загрузить файл',
-    [UploadStatus.ALREADY_UPLOADED]: 'Файл с таким именем уже существует',
-    [UploadStatus.INVALID_EXTENSION]: 'Неверное разрешение файла'
+const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'> = {
+    [UploadStatus.SUCCESS]: 'success',
+    [UploadStatus.FAILED]: 'error',
+    [UploadStatus.ALREADY_UPLOADED]: 'error',
+    [UploadStatus.INVALID_EXTENSION]: 'error',
+    [UploadStatus.TOO_LARGE]: 'error'
 };
 
 interface FileResult {
     fileName: string;
     status: UploadStatus;
+    description: string;
 }
 
 export interface FileUploadResponseDto {
@@ -48,7 +50,8 @@ interface FileStore {
     uploadFiles: () => Promise<void>;
     getFiles: () => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
-    setAlert: (alert: AlertMessage[]) => void;
+    setAlerts: (alert: AlertMessage[]) => void;
+    addAlert: (alert: AlertMessage) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
     setFileDtos: (fileDtos: FileDto[]) => void;
@@ -73,7 +76,10 @@ const useFileStore = create<FileStore>((set, get) => ({
     removeFile: (index) => set((state) => ({filesToUpload: state.filesToUpload.filter((_, i) => i !== index)})),
     clearFiles: () => set({filesToUpload: []}),
 
-    setAlert: (alerts) => set((state) => ({alerts: [...state.alerts, ...alerts]})),
+    setAlerts: (alerts) => set((state) => ({alerts: [...state.alerts, ...alerts]})),
+    addAlert: (alert: AlertMessage) => {
+        get().alerts.push(alert);
+    },
     clearAlerts: () => set({alerts: []}),
     setFileDtos: (fileDtos: FileDto[]) => {set({fileDtos: fileDtos});},
     deleteAlert: (alertToDelete) => set((state) => ({
@@ -81,23 +87,27 @@ const useFileStore = create<FileStore>((set, get) => ({
     })),
 
     uploadFiles: async () => {
-        const { filesToUpload, setAlert, clearFiles, getFiles } = get();
+        const { filesToUpload, addAlert, clearFiles, getFiles } = get();
         set({ isLoading: true, error: null });
 
         try {
             const response = await FileService.uploadFiles(filesToUpload);
-            if (response && response.fileResults.length > 0) {
-                response.fileResults.map(resp => {
-                    if (resp.status !== UploadStatus.SUCCESS ) {
-                        setAlert([{id: Date.now(), message: UploadStatusMessages[resp.status] + ' - ' + resp.fileName, severity: 'warning'}])
+            if (response?.fileResults.length) {
+                response.fileResults.forEach(({ status, description, fileName }) => {
+                    const severity = severityMap[status];
+                    if (severity) {
+                        const message = `${description} - <b>${fileName}</b>`;
+                        const alert = new AlertMessage(message, severity);
+                        addAlert(alert);
+                    } else {
+                        console.error('Severity not found for status:', status);
                     }
-                })
+                });
             }
-            setAlert([{id: Date.now(), message: 'Загрузка файлов завершена', severity: 'success'}]);
             clearFiles();
         } catch (error) {
             const axiosError = error as AxiosError;
-            setAlert([{ id: Date.now(), message: 'Ошибка при загрузке файлов: ' + (axiosError.response?.data || axiosError.message), severity: 'error' }]);
+            addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов: ' + (axiosError.response?.data || axiosError.message), severity: 'error' });
             set({ error: axiosError.message });
         } finally {
             set({ isLoading: false });
@@ -112,12 +122,12 @@ const useFileStore = create<FileStore>((set, get) => ({
     },
 
     deleteFile: async (fileDto: FileDto) => {
-        const { setAlert, getFiles } = get();
+        const { addAlert, getFiles } = get();
         const response = await FileService.deleteFile(fileDto.hashedFilename);
 
         response === 204
-            ? setAlert([{ id: Date.now(), message: `Файл <b>${fileDto.originalFilename}</b> успешно удален`, severity: 'success' }])
-            : setAlert([{ id: Date.now(), message: `Ошибка при удалении <b>${fileDto.originalFilename}</b>`, severity: 'error' }]);
+            ? addAlert({ id: uuidv4(), message: `Файл <b>${fileDto.originalFilename}</b> успешно удален`, severity: 'success' })
+            : addAlert({ id: uuidv4(), message: `Ошибка при удалении <b>${fileDto.originalFilename}</b>`, severity: 'error' });
 
         getFiles();
     },
@@ -135,14 +145,14 @@ const useFileStore = create<FileStore>((set, get) => ({
         set({selectedFileHashes: hashedFileNames});
     },
     deleteFilesInBatch: async () => {
-        const { selectedFileHashes, setAlert, getFiles} = get();
+        const { selectedFileHashes, addAlert, getFiles} = get();
         const response = await FileService.deleteFilesInBatch(selectedFileHashes);
         response === 204
-            ? setAlert([{ id: Date.now(), message: `Файлы успешно удалены`, severity: 'success' }])
-            : setAlert([{ id: Date.now(), message: `Ошибка при удалении файлов`, severity: 'error' }]);
+            ? addAlert({ id: uuidv4(), message: `Файлы успешно удалены`, severity: 'success' })
+            : addAlert({ id: uuidv4(), message: `Ошибка при удалении файлов`, severity: 'error' });
         set({selectedFileHashes: []});
         getFiles();
-    }
+    },
 }));
 
 export default useFileStore;

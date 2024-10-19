@@ -21,13 +21,6 @@ spring:
     properties:
       hibernate.dialect: ${JPA_HIBERNATE_DIALECT}
 
-  cache:
-    type: redis
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
 file-upload:
   allowed-extensions: ${FILE_UPLOAD_ALLOWED_EXTENSIONS}
 

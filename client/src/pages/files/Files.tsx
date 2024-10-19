@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Box, Button, Snackbar, CircularProgress, Alert} from "@mui/material";
+import {Box, Button, Snackbar, Alert} from "@mui/material";
 import {FileUploadModal} from "../../components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
@@ -12,6 +12,7 @@ import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
+import {AlertMessage} from "../../store/types";
 
 const FilesContent = () => {
     const {
@@ -23,7 +24,6 @@ const FilesContent = () => {
         uploadModalOpen,
         setUploadModalOpen,
         isLoading,
-        setIsLoading,
         deleteFilesInBatch,
         selectedFileHashes,
         deleteFile
@@ -31,7 +31,7 @@ const FilesContent = () => {
 
     const {generateTestByFile} = useTestStore();
     const {maxQuestionsCount, minAnswersCount, temperature, topP} = useGenerateTestStore();
-    const {setAlert} = useFileStore();
+    const {addAlert} = useFileStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -81,7 +81,7 @@ const FilesContent = () => {
     };
 
     const generationStartSuccessful = () => {
-        setAlert([{id: Date.now(), message: 'Генерация теста начата', severity: 'success'}]);
+        addAlert(new AlertMessage('Генерация теста начата', 'success'));
         getTestGenCurrentActivities();
     }
 
@@ -97,7 +97,7 @@ const FilesContent = () => {
             generateTestByFile(request).then((r) => {
                 r
                     ? generationStartSuccessful()
-                    : setAlert([{id: Date.now(), message: 'Ошибка при генерации теста', severity: 'error'}])
+                    : new AlertMessage('Ошибка при генерации теста', 'error');
             });
         }
         closeGenTestModal();
@@ -128,7 +128,8 @@ const FilesContent = () => {
                 <Box textAlign="left">
                     Загрузите файл для генерации теста. После загрузки выберите: Действия → Сгенерировать тест.
                     <br/>
-                    Статус активных генераций можно посмотреть <Link href="/tests?activeTab=history" underline="hover" color="inherit"><b>здесь</b></Link>.
+                    Статус активных генераций можно посмотреть <Link href="/tests?activeTab=history" underline="hover"
+                                                                     color="inherit"><b>здесь</b></Link>.
                 </Box>
             </Alert>
 
@@ -167,22 +168,13 @@ const FilesContent = () => {
                 <Box sx={{maxWidth: '400px'}}>
                     {alerts.map(alert => (
                         <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
-                               onClose={() => deleteAlert(alert)}>
+                               onClose={() => {
+                                   deleteAlert(alert)
+                               }}>
                             <span dangerouslySetInnerHTML={{__html: alert.message}}/>
                         </Alert>
                     ))}
                 </Box>
-            </Snackbar>
-
-            <Snackbar
-                open={isLoading}
-                onClose={() => setIsLoading(false)}
-            >
-                <Alert key={Math.random()} severity="info" sx={{mb: 0.5}} icon={<CircularProgress size={18}/>}>
-                    <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
-                        <span>Загрузка файлов</span>
-                    </Box>
-                </Alert>
             </Snackbar>
 
             <ConfirmationDialog
@@ -190,7 +182,7 @@ const FilesContent = () => {
                 onClose={() => setDeleteModalOpen(false)}
                 onConfirm={handleDelete}
                 title="Подтверждение удаления"
-                children="Вы уверены что хотите удалить выбранные файлы? Все связанные с ними сущности будут удалены"
+                children="Вы уверены что хотите удалить выбранные файлы?"
             />
 
         </>

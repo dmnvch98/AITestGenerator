@@ -12,8 +12,10 @@ import com.example.aitestgenerator.dto.texts.FileHashesResponseDto;
 import com.example.aitestgenerator.exceptions.*;
 import com.example.aitestgenerator.models.FileHash;
 import com.example.aitestgenerator.models.enums.UploadStatus;
+import com.example.aitestgenerator.services.FileExtractorService;
 import com.example.aitestgenerator.services.FileHashService;
 import com.example.aitestgenerator.services.aws.StorageClient;
+import com.example.aitestgenerator.utils.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +34,10 @@ public class FileFacade {
   private final FileHashService fileHashService;
   private final StorageClient storageClient;
   private final FileHashConverter converter;
+  private final FileExtractorService fileExtractorService;
   @Value("${file-upload.allowed-extensions}")
   private final List<String> allowedFileExtensions;
+  private final static Integer MAX_TOKENS = 6500;
 
   @Transactional
   public UploadStatus saveFile(final long userId, final MultipartFile file) {
@@ -50,14 +54,27 @@ public class FileFacade {
       return UploadStatus.ALREADY_UPLOADED;
     }
 
+    int tokensCount;
+    try {
+      final String fileContent = fileExtractorService.getContentFromFile(file);
+      tokensCount = Utils.countTokens(fileContent);
+      if (tokensCount > MAX_TOKENS) {
+        return UploadStatus.TOO_LARGE;
+      }
+    } catch (final IOException e) {
+      log.error("An error occurred when parsing user file. User id=[{}], fileName=[{}]", userId, originalFileName);
+      return UploadStatus.FAILED;
+    }
+
     try {
       storageClient.uploadFile(userId, fileNameHash, file.getInputStream(), metadata);
       final FileHash fileHash = FileHash.builder()
-              .hashedFilename(fileNameHash)
-              .originalFilename(originalFileName)
-              .uploadTime(LocalDateTime.now())
-              .userId(userId)
-              .build();
+            .hashedFilename(fileNameHash)
+            .originalFilename(originalFileName)
+            .uploadTime(LocalDateTime.now())
+            .userId(userId)
+            .tokensCount(tokensCount)
+            .build();
 
       fileHashService.save(fileHash);
     } catch (IOException e) {

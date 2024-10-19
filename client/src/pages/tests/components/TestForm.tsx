@@ -17,7 +17,7 @@ interface TestFormProps {
 
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLoading}) => {
     const navigate = useNavigate();
-    const {alerts, clearAlerts, deleteAlert, setAlert, upsert} = useTestStore();
+    const {alerts, clearAlerts, deleteAlert, addAlert, upsert} = useTestStore();
     const [localTest, setLocalTest] = useState<UserTest | CreateTestRequestDto>(() => isEditMode && initialTest ? {...initialTest} : createNewTest());
     const [testTitleError] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id?: string }[]>([]);
@@ -32,7 +32,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
     }, [initialTest, hasSaved, isEditMode]);
 
     const handleSave = () => {
-        const {valid, invalidQuestions} = validateTest(localTest, setAlert, setCurrentQuestionIndex);
+        const {valid, invalidQuestions} = validateTest(localTest, addAlert, setCurrentQuestionIndex);
         if (valid) {
             upsert(localTest).then(resp => {
                 if (resp != null) {

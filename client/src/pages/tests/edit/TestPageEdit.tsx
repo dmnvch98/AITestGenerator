@@ -3,10 +3,11 @@ import {useNavigate, useParams} from "react-router-dom";
 import { useTestStore } from "../../../store/tests/testStore";
 import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
 import { TestForm } from "../components/TestForm";
+import {AlertMessage} from "../../../store/types";
 
 export const TestPageEdit = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestById, clearSelectedTest, setAlert } = useTestStore();
+    const { selectedTest, getUserTestById, clearSelectedTest, addAlert } = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -15,7 +16,7 @@ export const TestPageEdit = () => {
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                setAlert([{ id: Date.now(), message: 'Тест не найден', severity: 'error' }]);
+                addAlert(new AlertMessage('Тест не найден', 'error'))
             }
         });
         setTimeout(() => {

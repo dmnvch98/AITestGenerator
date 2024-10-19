@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, DragEvent } from 'react';
+import React, {useState, ChangeEvent, DragEvent} from 'react';
 import {
     Box,
     Button,
@@ -11,7 +11,7 @@ import {
     List,
     ListItem,
     ListItemIcon,
-    ListItemText,
+    ListItemText, Alert,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -20,17 +20,28 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useFileStore from "../store/fileStore";
 import {AlertMessage} from "../store/types";
+import {v4 as uuidv4} from "uuid";
 
 interface FileUploadModalProps {
     open: boolean;
     onClose: () => void;
 }
 
-export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose }) => {
-    const {filesToUpload, addFiles, removeFile, uploadFiles, setAlert, getFiles, setUploadModalOpen, setIsLoading} = useFileStore();
+export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose}) => {
+    const {
+        filesToUpload,
+        addFiles,
+        removeFile,
+        uploadFiles,
+        setAlerts,
+        addAlert,
+        getFiles,
+        setUploadModalOpen,
+        setIsLoading
+    } = useFileStore();
     const [dragOver, setDragOver] = useState(false);
 
-    const MAX_FILES = 6;
+    const MAX_FILES = 5;
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     const handleFileUpload = (event: ChangeEvent<HTMLInputElement> | DragEvent) => {
@@ -44,20 +55,20 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
         newFiles.forEach(file => {
             if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
                 invalidFiles.push({
-                    id: Date.now() + Math.random(),
+                    id: uuidv4() + Math.random(),
                     message: `<b>${file.name}</b> не PDF/Word документ`,
                     severity: 'error'
                 });
             } else if (file.size > MAX_FILE_SIZE) {
                 invalidFiles.push({
-                    id: Date.now() + Math.random(),
-                    message: `<b>${file.name}</b> превышает 5 MБ`,
+                    id: uuidv4() + Math.random(),
+                    message: `<b>${file.name}</b> превышает ${MAX_FILE_SIZE} MБ`,
                     severity: 'error'
                 });
             } else if (filesToUpload.length + validFiles.length >= MAX_FILES) {
                 invalidFiles.push({
-                    id: Date.now() + Math.random(),
-                    message: `<b>${file.name}</b> превышает лимит в 6 файлов`,
+                    id: uuidv4() + Math.random(),
+                    message: `<b>${file.name}</b> превышает лимит в ${MAX_FILES} файлов`,
                     severity: 'error'
                 });
             } else {
@@ -65,7 +76,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
             }
         });
 
-        setAlert(invalidFiles);
+        setAlerts(invalidFiles);
         addFiles(validFiles);
     };
 
@@ -89,12 +100,14 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
     };
 
     const getIcon = (type: string) => {
-        if (type === 'application/pdf') return <PictureAsPdfIcon sx={{ color: '#FF0000' }} />;
-        if (type === 'application/msword' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return <DescriptionIcon sx={{ color: '#2B579A' }} />;
+        if (type === 'application/pdf') return <PictureAsPdfIcon sx={{color: '#FF0000'}}/>;
+        if (type === 'application/msword' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return <DescriptionIcon
+            sx={{color: '#2B579A'}}/>;
         return null;
     };
 
     const handleSend = async () => {
+        addAlert(new AlertMessage('Загрузка файлов...', 'info'));
         setIsLoading(true);
         setUploadModalOpen(false);
         await uploadFiles();
@@ -116,15 +129,20 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         color: (theme) => theme.palette.grey[500],
                     }}
                 >
-                    <CloseIcon />
+                    <CloseIcon/>
                 </IconButton>
             </DialogTitle>
             <DialogContent
-                sx={{ overflow: 'auto' }}
+                sx={{overflow: 'auto'}}
             >
-                <Typography variant="body2" gutterBottom>
-                    Добавьте сюда свои документы. Вы можете загрузить максимум 6 документов.
-                </Typography>
+                <Alert severity="info" icon={false} sx={{mb: 2}}>
+                    <Typography variant="body2" gutterBottom>
+                        <b>Требования к файлу:</b> до 5 страниц формата А4 с шрифтом Time New Roman и размером текста
+                        14.
+                        <br/>
+                        Добавьте сюда свои документы. Вы можете загрузить максимум 5 документов.
+                    </Typography>
+                </Alert>
                 <Box
                     sx={{
                         border: '2px dashed grey',
@@ -133,15 +151,14 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         textAlign: 'center',
                         cursor: 'pointer',
                         backgroundColor: dragOver ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-                        mb: 2,
-                        minHeight: 100
+                        minHeight: 200
                     }}
                     onClick={() => document.getElementById('fileInput')?.click()}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                 >
-                    <CloudUploadIcon sx={{ fontSize: 48, color: 'grey.500' }} />
+                    <CloudUploadIcon sx={{fontSize: 48, color: 'grey.500'}}/>
                     <Typography variant="body1">Перетащите файл сюда</Typography>
                     <Typography variant="body2">5 МБ максимум на каждый файл</Typography>
                 </Box>
@@ -149,7 +166,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                     id="fileInput"
                     type="file"
                     multiple
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                     onChange={handleFileUpload}
                     accept=".pdf,.doc,.docx"
                 />
@@ -157,13 +174,14 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                     {filesToUpload.map((file, index) => (
                         <ListItem key={index}
                                   secondaryAction={
-                                      <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteFile(index)}>
-                                          <DeleteIcon />
+                                      <IconButton edge="end" aria-label="delete"
+                                                  onClick={() => handleDeleteFile(index)}>
+                                          <DeleteIcon/>
                                       </IconButton>
                                   }
                         >
                             <ListItemIcon>{getIcon(file.type)}</ListItemIcon>
-                            <ListItemText primary={file.name} />
+                            <ListItemText primary={file.name}/>
                         </ListItem>
                     ))}
                 </List>
