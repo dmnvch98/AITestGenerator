@@ -1,7 +1,8 @@
 package com.example.aitestgenerator.facades;
 
 import com.example.aitestgenerator.converters.ActivityConverter;
-import com.example.aitestgenerator.dto.activity.TestGenerationActivityDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityResponseDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityRequestDto;
 import com.example.aitestgenerator.models.TestGenerationActivity;
 import com.example.aitestgenerator.services.ActivityService;
 import com.example.aitestgenerator.utils.Utils;
@@ -18,11 +19,11 @@ public class ActivityFacade {
   private final ActivityService activityService;
   private final ActivityConverter activityConverter;
 
-  public void save(final TestGenerationActivityDto dto, final Long userId) {
+  public void save(final TestGenerationActivityRequestDto dto, final Long userId) {
     activityService.saveActivity(activityConverter.convert(dto, userId));
   }
 
-  public Set<TestGenerationActivityDto> getUserActivities(final Long userId) {
+  public Set<TestGenerationActivityResponseDto> getUserActivities(final Long userId) {
     final String hashKey = Utils.getHashKey(userId);
     final Set<TestGenerationActivity> activities = activityService.getUserActivities(hashKey);
     return activityConverter.convert(activities);

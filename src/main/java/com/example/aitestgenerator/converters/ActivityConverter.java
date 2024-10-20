@@ -1,13 +1,17 @@
 package com.example.aitestgenerator.converters;
 
-import com.example.aitestgenerator.dto.activity.TestGenerationActivityDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityResponseDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityRequestDto;
+import com.example.aitestgenerator.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.aitestgenerator.models.TestGenerationActivity;
 import com.example.aitestgenerator.dto.tests.GenerateTestRequestDto;
 import com.example.aitestgenerator.models.enums.ActivityStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +43,8 @@ public interface ActivityConverter {
        .build();
   }
 
-  default TestGenerationActivity getFinishedActivity(final TestGenerationActivity activity) {
+  default TestGenerationActivity getFinishedActivity(final TestGenerationActivity activity, final Long testId,
+                                                     final String testTitle) {
     return TestGenerationActivity.builder()
           .uuid(activity.getUuid())
           .status(ActivityStatus.SUCCESS)
@@ -51,30 +56,54 @@ public interface ActivityConverter {
           .userId(activity.getUserId())
           .cid(activity.getCid())
           .messageReceipt(activity.getMessageReceipt())
+          .testId(testId)
+          .testTitle(testTitle)
           .build();
   }
 
-  default TestGenerationActivityDto getFailedActivity(final TestGenerationActivity activity) {
-    return TestGenerationActivityDto.builder()
+  default TestGenerationActivity getFailedActivity(final TestGenerationActivity activity,
+                                                   final GenerationFailReason failReason) {
+    return TestGenerationActivity.builder()
           .uuid(activity.getUuid())
           .status(ActivityStatus.FAILED)
           .startDate(activity.getStartDate())
           .endDate(LocalDateTime.now())
           .fileName(activity.getFileName())
           .cid(activity.getCid())
+          .failReason(failReason)
+          .userId(activity.getUserId())
           .build();
   }
 
-  default Set<TestGenerationActivityDto> convert(final Set<TestGenerationActivity> activities) {
+  default TestGenerationActivity getFailedWaitingActivity(final String cid, final String fileName,
+                                                   final GenerationFailReason failReason) {
+    return TestGenerationActivity.builder()
+          .status(ActivityStatus.FAILED)
+          .endDate(LocalDateTime.now())
+          .fileName(fileName)
+          .cid(cid)
+          .failReason(failReason)
+          .build();
+  }
+
+  default Set<TestGenerationActivityResponseDto> convert(final Set<TestGenerationActivity> activities) {
     return activities
           .stream()
           .map(this::convert)
           .collect(Collectors.toSet());
   }
 
-  TestGenerationActivityDto convert(final TestGenerationActivity activity);
+  @Mapping(source = "failReason", target = "failCode", qualifiedByName = "convertFailReason")
+  TestGenerationActivityResponseDto convert(final TestGenerationActivity activity);
 
   @Mapping(source = "userId", target = "userId")
-  TestGenerationActivity convert(final TestGenerationActivityDto dto, final Long userId);
+  TestGenerationActivity convert(final TestGenerationActivityRequestDto dto, final Long userId);
+
+  @Named("convertFailReason")
+  default Integer convertFailReason(final GenerationFailReason failReason) {
+    return Optional.ofNullable(failReason)
+          .map(GenerationFailReason::getFailCode)
+          .orElse(null);
+  }
 
 }

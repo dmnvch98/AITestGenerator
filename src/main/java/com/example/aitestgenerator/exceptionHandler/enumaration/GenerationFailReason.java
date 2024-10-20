@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
-public enum GenerationFailReason {
+public enum GenerationFailReason implements Serializable {
 
     //1
     UNKNOWN(TestGenException.class, null, false, 1),

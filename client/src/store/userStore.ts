@@ -6,7 +6,11 @@ import ActivityService from "../services/activities/ActivityService";
 
 export interface TestGenHistory extends ActivityDto {
     id: number,
+    startDate: Date,
+    endDate: Date,
+    status: GenerationStatus,
     testTitle: string,
+    fileName: string,
     testId: number,
     textTitle: string,
     textId: number,
@@ -19,9 +23,9 @@ export interface ActivityDto {
     startDate: Date,
     endDate: Date,
     status: GenerationStatus,
-    testId?: number,
-    fileName: string,
     testTitle: string,
+    fileName: string,
+    testId?: number,
     failCode: number;
     cid: string;
 }

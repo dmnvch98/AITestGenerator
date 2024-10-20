@@ -48,44 +48,61 @@ public class TestFacade {
   public void prepareTestGeneration(final Long userId, final GenerateTestRequestDto dto) {
     final String cid = generateCid();
     MDC.put("cid", cid);
+    final String hashKey = "generations:user:" + userId;
     log.info("Received command to generation test, command=[{}]", dto);
 
-    final FileHash fileHash = Optional.ofNullable(dto)
-          .map(GenerateTestRequestDto::getHashedFileName)
-          .filter(StringUtils::isNotBlank)
-          .map(hash -> fileHashService.getByHashedFilenameAndUserId(userId, hash))
-          .orElseThrow(() -> new IllegalArgumentException("File cannot be empty"));
-    final String hashedFileName = fileHash.getHashedFilename();
+    try {
+      final FileHash fileHash = Optional.ofNullable(dto)
+            .map(GenerateTestRequestDto::getHashedFileName)
+            .filter(StringUtils::isNotBlank)
+            .map(hash -> fileHashService.getByHashedFilenameAndUserId(userId, hash))
+            .orElseThrow(() -> new IllegalArgumentException("File cannot be empty"));
+      final String hashedFileName = fileHash.getHashedFilename();
 
-    if (!storageClient.doesFileExist(userId, fileHash.getHashedFilename())) {
-      log.error("File=[{}] not found for userId=[{}]", hashedFileName, userId);
-      throw new ResourceNotFoundException(hashedFileName);
+      if (!storageClient.doesFileExist(userId, fileHash.getHashedFilename())) {
+        log.error("File=[{}] not found for userId=[{}]", hashedFileName, userId);
+        throw new ResourceNotFoundException(hashedFileName);
+      }
+
+      activityService.createWaitingActivity(fileHash, cid, dto, userId);
+
+      final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
+      commandService.sendCommand(message);
+    } catch (final Exception e) {
+      if (e instanceof IllegalArgumentException || e instanceof ResourceNotFoundException) {
+        throw e;
+      }
+      log.error("An error occurred when queuing test generation. GenerateTestRequestDto=[{}]", dto, e);
+      try {
+        activityService.failWaitingActivity(hashKey, cid, dto, e);
+      } catch (final Exception err) {
+        log.error("An error occurred when failing waiting activity", err);
+      }
     }
-
-    final String hashKey = "generations:user:" + userId;
-
-    activityService.createWaitingActivity(fileHash, cid, dto, userId);
-
-    final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
-    commandService.sendCommand(message);
   }
 
   public void generateTestReceiveMessage(final GenerateTestMessage message) {
-    log.info("Received message to generate test. Message=[{}]", message);
-    activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
+    try {
+      log.info("Received message to generate test. Message=[{}]", message);
+      activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
 
-    final FileHash fileHash = fileHashService
-          .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
-    final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
-    final GenerateTestRequest request = testGenerationConverter.convert(message, userContent, fileHash);
+      final FileHash fileHash = fileHashService
+            .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
+      final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
+      final GenerateTestRequest request = testGenerationConverter.convert(message, userContent, fileHash);
 
-    final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
-    testService.save(test);
+      final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
+      testService.save(test);
 
-    final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
-    final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
-    historyService.save(history);
-    activityService.finishActivity(currentActivity);
+      final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
+      final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
+      historyService.save(history);
+      activityService.finishActivity(currentActivity, test.getId(), test.getTitle());
+    } catch (final Exception e) {
+      log.error("An error occurred when generating test. Message=[{}]", message, e);
+      activityService.failActivity(message.getHashKey(), message.getCid(), e);
+    }
+
   }
 
   public void deleteTest(final Long testId, final Long userId) {

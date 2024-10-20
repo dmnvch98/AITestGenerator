@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @ToString
-public class TestGenerationActivityDto implements Serializable {
+public class TestGenerationActivityResponseDto implements Serializable {
 
   @Builder.Default
   private final UUID uuid = UUID.randomUUID();
@@ -22,5 +22,8 @@ public class TestGenerationActivityDto implements Serializable {
   private final LocalDateTime endDate;
   private final ActivityStatus status;
   private final String fileName;
+  private final Long testId;
+  private final String testTitle;
+  private final Integer failCode;
   private final String cid;
 }

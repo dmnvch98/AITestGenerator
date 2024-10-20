@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,6 +27,7 @@ public class ActivityService {
     private final TestGenerationConverter historyConverter;
     private final RedisService<TestGenerationActivity> redisService;
     private final TestGeneratingHistoryService historyService;
+    private final FileHashService fileHashService;
 
     public void saveActivity(final TestGenerationActivity activity) {
         redisService.saveUserActivity(activity.getUserId(), activity.getCid(), activity);
@@ -54,8 +56,8 @@ public class ActivityService {
         redisService.saveUserActivity(userId, inProcessActivity.getCid(), inProcessActivity);
     }
 
-    private void createFinishedActivity(final TestGenerationActivity activity) {
-        final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity);
+    private void createFinishedActivity(final TestGenerationActivity activity, final Long testId, final String testTitle) {
+        final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity, testId, testTitle);
         redisService.saveUserActivity(activity.getUserId(), activity.getCid(), finishedActivity);
     }
 
@@ -67,12 +69,8 @@ public class ActivityService {
         redisService.deleteUserActivities(userId, cids);
     }
 
-    public void finishActivity(final TestGenerationActivity activity) {
-//        final String hashKey = Utils.getHashKey(userId);
-//        final TestGenerationActivity currentActivity = redisService
-//              .getUserActivity(hashKey, cid, TestGenerationActivity.class);
-
-        createFinishedActivity(activity);
+    public void finishActivity(final TestGenerationActivity activity, final Long testId, final String testTitle) {
+        createFinishedActivity(activity, testId, testTitle);
         commandService.deleteMessage(activity.getMessageReceipt());
     }
 
@@ -81,22 +79,49 @@ public class ActivityService {
         final Long userId = Utils.getUserIdFromHashKey(hashKey);
 
         if (activity != null) {
-            final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
-            historyService.save(failedHistory);
-            final String receipt = activity.getMessageReceipt();
-
-            if (receipt != null) {
-                commandService.deleteMessage(receipt);
-            }
+            failActivity(activity, failReason);
         }
 
         redisService.deleteUserActivity(userId, cid);
+    }
 
+    private void failActivity(final TestGenerationActivity activity, final GenerationFailReason failReason) {
+        final TestGenerationActivity failedActivity = activityConverter.getFailedActivity(activity, failReason);
+        redisService.saveUserActivity(failedActivity.getUserId(), failedActivity.getCid(), failedActivity);
+        final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
+        historyService.save(failedHistory);
+        final String receipt = activity.getMessageReceipt();
+
+        if (receipt != null) {
+            commandService.deleteMessage(receipt);
+        }
     }
 
     public void failActivity(final String hashKey, final String cid, final Throwable cause) {
         final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(cause);
         failActivity(hashKey, cid, failReason);
+    }
+
+    public void failWaitingActivity(final String hashKey, final String cid, final GenerateTestRequestDto dto, final Throwable cause) {
+        final GenerationFailReason failReason = GenerationFailReason.extractFailureCode(cause);
+        final TestGenerationActivity waitingActivity = redisService.getUserActivity(hashKey, cid, TestGenerationActivity.class);
+        if (waitingActivity != null) {
+            failActivity(waitingActivity, failReason);
+        } else {
+            final Long userId = Utils.getUserIdFromHashKey(hashKey);
+            final String originalFileName = Optional.ofNullable(dto)
+                  .map(GenerateTestRequestDto::getHashedFileName)
+                  .map(h -> fileHashService.getByHashedFilenameAndUserId(userId, h))
+                  .map(FileHash::getOriginalFilename)
+                  .orElse(null);
+
+            final TestGeneratingHistory failedHistory = historyConverter.getFailedHistoryWhenNoActivity(dto, userId,
+                  failReason, cid, originalFileName);
+            final TestGenerationActivity failedActivity = activityConverter
+                  .getFailedWaitingActivity(cid, originalFileName, failReason);
+            redisService.saveUserActivity(userId, cid, failedActivity);
+            historyService.save(failedHistory);
+        }
     }
 
     public void failActivityIfFatal(final String hashKey, final String cid, final Throwable cause) {

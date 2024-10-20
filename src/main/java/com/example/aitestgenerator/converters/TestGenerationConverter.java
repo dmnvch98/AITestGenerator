@@ -67,4 +67,18 @@ public interface TestGenerationConverter {
        .build();
   }
 
+  default TestGeneratingHistory getFailedHistoryWhenNoActivity(final GenerateTestRequestDto dto, final Long userId,
+                                                               final GenerationFailReason failReason, final String cid,
+                                                               final String fileName) {
+    return TestGeneratingHistory.builder()
+          .endDate(LocalDateTime.now())
+          .cid(cid)
+          .failReason(failReason.name())
+          .requestDto(dto)
+          .status(ActivityStatus.FAILED)
+          .fileName(fileName)
+          .userId(userId)
+          .build();
+  }
+
 }

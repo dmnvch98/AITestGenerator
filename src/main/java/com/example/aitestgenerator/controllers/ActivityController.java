@@ -2,9 +2,9 @@ package com.example.aitestgenerator.controllers;
 
 import com.example.aitestgenerator.config.security.service.PrincipalUser;
 import com.example.aitestgenerator.dto.activity.BulkActivityDeleteDto;
-import com.example.aitestgenerator.dto.activity.TestGenerationActivityDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityResponseDto;
+import com.example.aitestgenerator.dto.activity.TestGenerationActivityRequestDto;
 import com.example.aitestgenerator.facades.ActivityFacade;
-import com.example.aitestgenerator.models.enums.ActivityStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -26,13 +25,13 @@ public class ActivityController {
     private final ActivityFacade activityFacade;
 
   @PostMapping
-    public void saveActivity(final Authentication authentication, @RequestBody final TestGenerationActivityDto dto) {
+    public void saveActivity(final Authentication authentication, @RequestBody final TestGenerationActivityRequestDto dto) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         activityFacade.save(dto, userId);
     }
 
     @GetMapping
-    public Set<TestGenerationActivityDto> getActivities(final Authentication authentication) {
+    public Set<TestGenerationActivityResponseDto> getActivities(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return activityFacade.getUserActivities(userId);
     }
@@ -52,7 +51,7 @@ public class ActivityController {
     }
 
     @GetMapping("/long-poll")
-    public ResponseEntity<Set<TestGenerationActivityDto>> longPoll(final Authentication authentication) {
+    public ResponseEntity<Set<TestGenerationActivityResponseDto>> longPoll(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         try {
             // Параметры ожидания
@@ -67,7 +66,7 @@ public class ActivityController {
                 TimeUnit.MILLISECONDS.sleep(5000);
 
                 // Получаем активность пользователя
-                final Set<TestGenerationActivityDto> activityDtos = activityFacade.getUserActivities(userId);
+                final Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId);
 
                 if (CollectionUtils.isNotEmpty(activityDtos)) {
                     return ResponseEntity.ok(activityDtos); // Возвращаем полученные данные
