@@ -34,7 +34,6 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
         removeFile,
         uploadFiles,
         setAlerts,
-        addAlert,
         getFiles,
         setUploadModalOpen,
         setIsLoading
@@ -107,7 +106,6 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
     };
 
     const handleSend = async () => {
-        addAlert(new AlertMessage('Загрузка файлов...', 'info'));
         setIsLoading(true);
         setUploadModalOpen(false);
         await uploadFiles();

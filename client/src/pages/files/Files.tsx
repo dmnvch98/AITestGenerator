@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Box, Button, Snackbar, Alert} from "@mui/material";
+import {Box, Button, Snackbar, Alert, CircularProgress} from "@mui/material";
 import {FileUploadModal} from "../../components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
@@ -13,6 +13,7 @@ import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
 import {AlertMessage} from "../../store/types";
+import {v4 as uuidv4} from "uuid";
 
 const FilesContent = () => {
     const {
@@ -162,7 +163,7 @@ const FilesContent = () => {
 
             <Snackbar
                 open={alerts.length > 0}
-                autoHideDuration={6000}
+                autoHideDuration={10000}
                 onClose={clearAlerts}
             >
                 <Box sx={{maxWidth: '400px'}}>
@@ -174,6 +175,16 @@ const FilesContent = () => {
                             <span dangerouslySetInnerHTML={{__html: alert.message}}/>
                         </Alert>
                     ))}
+                </Box>
+            </Snackbar>
+
+            <Snackbar
+                open={isLoading}
+            >
+                <Box sx={{width: '400px'}}>
+                    <Alert key={uuidv4()} severity='info' sx={{mb: 0.5, textAlign: 'left'}} icon={<CircularProgress size={24}/>}>
+                       Загрузка файлов... Это может занять некоторое время
+                    </Alert>
                 </Box>
             </Snackbar>
 
