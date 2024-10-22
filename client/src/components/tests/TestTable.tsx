@@ -73,7 +73,7 @@ interface Props {
 export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) => {
     const { tests, deleteTest, selectTest, selectedTest } = useTestStore();
     const { setTestIdsToPass } = usePassTestStore();
-    const { toggleModelOpen, modalOpen: openExportDialog, exportTest} = useExportStore();
+    const { exportTest } = useExportStore();
     const navigate = useNavigate();
 
     const columns: GridColDef[] = [
@@ -118,17 +118,12 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) 
                     deleteTest,
                     setTestIdsToPass,
                     selectTest,
-                    // toggleModelOpen,
                     exportTest
                 )}
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={onSelectionModelChange}
                 loading={loading}
             />
-
-            <Dialog open={openExportDialog} onClose={toggleModelOpen}>
-                <ExportModal test={selectedTest} />
-            </Dialog>
         </Box>
     );
 };
