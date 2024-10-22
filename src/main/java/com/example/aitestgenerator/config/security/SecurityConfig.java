@@ -30,9 +30,8 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
-            .requestMatchers( "/ws/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/sse/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/users/sign-up").hasAuthority("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/v1/activities/all").hasAuthority("ADMIN")
             .anyRequest()
             .authenticated()
         )

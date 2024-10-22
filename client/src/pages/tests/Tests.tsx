@@ -19,7 +19,8 @@ export const Tests = () => {
         alerts,
         clearAlerts,
         deleteAlert,
-        bulkDeleteTest
+        bulkDeleteTest,
+        clearState
     } = useTestStore();
 
     const {toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
@@ -42,6 +43,9 @@ export const Tests = () => {
 
     useEffect(() => {
         fetchTest();
+        return () => {
+            clearState();
+        }
     }, [])
 
     const handleBulkDelete = useCallback(() => {

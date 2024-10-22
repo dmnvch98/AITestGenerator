@@ -65,8 +65,6 @@ export interface TestStore {
     deleteTest: (ids: number) => void,
     generateTestFlag: boolean,
     toggleGenerateTestFlag: () => void,
-    maxQuestionsNumber: number | string,
-    setMaxQuestionsNumber: (questionsNumber: number) => void;
     generateTestValidationErrorFlag: boolean;
     setGenerateTestValidationErrorFlag: (flag: boolean) => void;
     selectedTextId: number | undefined,
@@ -83,6 +81,7 @@ export interface TestStore {
     bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
     updateRating: (id: number, request: TestRatingDto) => void;
     getRating: (id: number) => void;
+    clearState: () => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -90,10 +89,20 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTest: undefined,
     selectedTestRating: undefined,
     generateTestFlag: false,
-    maxQuestionsNumber: "",
     generateTestValidationErrorFlag: false,
     selectedTextId: undefined,
     alerts: [],
+
+    clearState: () => {
+        set({
+            tests: [],
+            selectedTest: undefined,
+            selectedTestRating: undefined,
+            generateTestFlag: false,
+            generateTestValidationErrorFlag: false,
+            selectedTextId: undefined,
+        })
+    },
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest});
     },
@@ -134,9 +143,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     toggleGenerateTestFlag: () => {
         set({generateTestFlag: !get().generateTestFlag})
-    },
-    setMaxQuestionsNumber: (questionsNumber: number) => {
-        set({maxQuestionsNumber: questionsNumber})
     },
     setGenerateTestValidationErrorFlag: (flag: boolean) => {
         set({generateTestValidationErrorFlag: flag})

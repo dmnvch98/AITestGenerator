@@ -19,12 +19,10 @@ const handlePass = (setTestIdsToPass: (ids: number[]) => void, navigate: ReturnT
 };
 
 const handleExport = (
-    selectTest: (test: UserTest) => void,
-    toggleOpenExportDialog: () => void,
+    exportTest: (test: UserTest) => void,
     test: UserTest
 ) => {
-    selectTest(test);
-    toggleOpenExportDialog();
+    exportTest(test);
 };
 
 const getActions = (
@@ -33,7 +31,8 @@ const getActions = (
     deleteTest: (id: number) => void,
     setTestIdsToPass: (ids: number[]) => void,
     selectTest: (test: UserTest) => void,
-    toggleOpenExportDialog: () => void
+    // toggleOpenExportDialog: () => void,
+    exportTest: (test: UserTest) => void
 ) => [
     {
         label: 'Просмотр',
@@ -57,8 +56,8 @@ const getActions = (
         onClick: () => handlePass(setTestIdsToPass, navigate, test),
     },
     {
-        label: 'Экспорт',
-        onClick: () => handleExport(selectTest, toggleOpenExportDialog, test),
+        label: 'Экспорт (Gift)',
+        onClick: () => handleExport(exportTest, test),
     },
     {
         label: 'Печать',
@@ -74,7 +73,7 @@ interface Props {
 export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) => {
     const { tests, deleteTest, selectTest, selectedTest } = useTestStore();
     const { setTestIdsToPass } = usePassTestStore();
-    const { toggleModelOpen, modalOpen: openExportDialog} = useExportStore();
+    const { toggleModelOpen, modalOpen: openExportDialog, exportTest} = useExportStore();
     const navigate = useNavigate();
 
     const columns: GridColDef[] = [
@@ -119,7 +118,8 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) 
                     deleteTest,
                     setTestIdsToPass,
                     selectTest,
-                    toggleModelOpen
+                    // toggleModelOpen,
+                    exportTest
                 )}
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={onSelectionModelChange}

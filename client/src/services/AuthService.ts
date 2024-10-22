@@ -9,7 +9,7 @@ class AuthService {
   }
 
   signup = async (email: string, password: string) => {
-    return await this.axiosInstance.post(`/api/v1/users`, { email, password });
+    return await this.axiosInstance.post(`/api/v1/users/sign-up`, { email, password });
   };
 
   login = async (email: string, password: string) => {

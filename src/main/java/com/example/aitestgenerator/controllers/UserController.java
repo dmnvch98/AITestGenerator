@@ -16,7 +16,7 @@ public class UserController {
 
     private final UserFacade userFacade;
 
-    @PostMapping
+    @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto save(@RequestBody CreateUserRequestDto userDto) {
         return userFacade.save(userDto);

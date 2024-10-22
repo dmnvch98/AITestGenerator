@@ -5,6 +5,7 @@ import com.example.aitestgenerator.dto.activity.BulkActivityDeleteDto;
 import com.example.aitestgenerator.dto.activity.TestGenerationActivityResponseDto;
 import com.example.aitestgenerator.dto.activity.TestGenerationActivityRequestDto;
 import com.example.aitestgenerator.facades.ActivityFacade;
+import com.example.aitestgenerator.models.TestGenerationActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +26,7 @@ public class ActivityController {
 
     private final ActivityFacade activityFacade;
 
-  @PostMapping
+    @PostMapping
     public void saveActivity(final Authentication authentication, @RequestBody final TestGenerationActivityRequestDto dto) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         activityFacade.save(dto, userId);
@@ -48,6 +50,11 @@ public class ActivityController {
     public void userActivitiesBulkDelete(final Authentication authentication, @RequestBody final BulkActivityDeleteDto dto) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         activityFacade.deleteUserActivities(userId, dto.getCids());
+    }
+
+    @GetMapping("/all")
+    public List<TestGenerationActivity> getAllActivities() {
+      return activityFacade.getAllObjectsFromHashes();
     }
 
     @GetMapping("/long-poll")

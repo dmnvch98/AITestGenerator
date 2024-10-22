@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
@@ -70,6 +71,13 @@ public class AuthController {
 
     @PostMapping("/logout")
     public void logout(final HttpServletRequest request, final HttpServletResponse response) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            final String accessToken = authorizationHeader.substring(7);
+            final String userEmail = jwt.getLoginFromAccessToken(accessToken);
+            userService.clearRefreshToken(userEmail);
+        }
         Cookie requestCookie = WebUtils.getCookie(request, "JWT_REFRESH");
         if (requestCookie != null) {
             addCookie(response, "", 0);
@@ -78,8 +86,7 @@ public class AuthController {
 
     private void generateRefreshToken(User user, final String email, final HttpServletResponse response) {
         final String newRefreshToken = jwt.generateRefreshToken(email);
-        user.setRefreshToken(newRefreshToken);
-        userService.updateUser(user);
+        userService.updateRefreshToken(user, newRefreshToken);
         addCookie(response, newRefreshToken, Duration.ofDays(30).toSeconds());
     }
 

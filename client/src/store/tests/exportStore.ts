@@ -4,12 +4,12 @@ import {UserTest} from "./testStore";
 
 export interface ExportTestRequestDto {
     exportFormat: string;
-    filePath: string;
-    questionsLabel: string;
-    questionTextLabel: string;
-    answerOptionsLabel: string;
-    optionTextLabel: string;
-    isCorrectLabel: string;
+    filePath?: string;
+    questionsLabel?: string;
+    questionTextLabel?: string;
+    answerOptionsLabel?: string;
+    optionTextLabel?: string;
+    isCorrectLabel?: string;
 }
 
 export interface ExportStore {
@@ -39,7 +39,7 @@ export interface ExportStore {
 export const useExportStore = create<ExportStore>((set, get) => ({
     modalOpen: false,
     toggleModelOpen: () => set({modalOpen: !get().modalOpen}),
-    exportFormat: "JSON",
+    exportFormat: "Gift",
     setExportFormat: (format) => set({exportFormat: format}),
     filePath: "",
     setFilePath: (path) => set({filePath: path}),
@@ -58,14 +58,9 @@ export const useExportStore = create<ExportStore>((set, get) => ({
     selectedTestTitle: "",
     setSelectedTestTitle: (testTitle: string) => set({selectedTestTitle: testTitle}),
     exportTest: async (test: UserTest) => {
+        const {exportFormat} = get();
         const dto: ExportTestRequestDto = {
-            exportFormat: get().exportFormat,
-            filePath: get().filePath,
-            questionsLabel: get().questionsLabel,
-            questionTextLabel: get().questionTextLabel,
-            answerOptionsLabel: get().answerOptionsLabel,
-            optionTextLabel: get().optionTextLabel,
-            isCorrectLabel: get().isCorrectLabel,
+            exportFormat
         }
         await ExportService.exportTest(dto, test.id, test.title)
     }

@@ -97,7 +97,7 @@ public class TestFacade {
       final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
       final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
       historyService.save(history);
-      activityService.finishActivity(currentActivity, test.getId(), test.getTitle());
+      activityService.finishActivity(currentActivity, test.getId(), test.getTitle(), message.getUserId(), message.getCid());
     } catch (final Exception e) {
       log.error("An error occurred when generating test. Message=[{}]", message, e);
       activityService.failActivity(message.getHashKey(), message.getCid(), e);

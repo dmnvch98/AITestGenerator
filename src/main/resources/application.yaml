@@ -28,6 +28,7 @@ security:
   secret: ${SECURITY_SECRET}
   refresh-secret: ${SECURITY_REFRESH_SECRET}
   allowed-origin: ${SECURITY_ALLOWED_ORIGIN}
+  refresh-db-secret: ${SECURITY_REFRESH_DB_SECRET}
 
 csrf:
   cookie_domain: ${CSRF_COOKIE_DOMAIN}

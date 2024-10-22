@@ -5,8 +5,7 @@ import {
     DialogContent,
     DialogTitle, InputLabel,
     MenuItem,
-    Select,
-    TextField
+    Select
 } from "@mui/material";
 import {useExportStore} from "../../store/tests/exportStore";
 import {UserTest} from "../../store/tests/testStore";
@@ -46,51 +45,52 @@ export const ExportModal = ({ test }: ExportModalProps) => {
                     variant="outlined"
                     label="Export Format"
                 >
-                    <MenuItem value="CSV">CSV</MenuItem>
-                    <MenuItem value="JSON">JSON</MenuItem>
-                    <MenuItem value="XML">XML</MenuItem>
+                    {/*<MenuItem value="CSV">CSV</MenuItem>*/}
+                    {/*<MenuItem value="JSON">JSON</MenuItem>*/}
+                    {/*<MenuItem value="XML">XML</MenuItem>*/}
+                    <MenuItem value="Gift">Gift</MenuItem>
                 </Select>
 
-                <TextField
-                    label="Метка списка вопросов"
-                    variant="outlined"
-                    fullWidth
-                    value={questionsLabel}
-                    onChange={(e) => setQuestionsLabel(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    label="Метка текста вопроса"
-                    variant="outlined"
-                    fullWidth
-                    value={questionTextLabel}
-                    onChange={(e) => setQuestionTextLabel(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    label="Метка списка ответов"
-                    variant="outlined"
-                    fullWidth
-                    value={answerOptionsLabel}
-                    onChange={(e) => setAnswerOptionsLabel(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    label="Метка текста ответа"
-                    variant="outlined"
-                    fullWidth
-                    value={optionTextLabel}
-                    onChange={(e) => setOptionTextLabel(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    label="Метка корректности ответа"
-                    variant="outlined"
-                    fullWidth
-                    value={isCorrectLabel}
-                    onChange={(e) => setIsCorrectLabel(e.target.value)}
-                    margin="normal"
-                />
+                {/*<TextField*/}
+                {/*    label="Метка списка вопросов"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    value={questionsLabel}*/}
+                {/*    onChange={(e) => setQuestionsLabel(e.target.value)}*/}
+                {/*    margin="normal"*/}
+                {/*/>*/}
+                {/*<TextField*/}
+                {/*    label="Метка текста вопроса"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    value={questionTextLabel}*/}
+                {/*    onChange={(e) => setQuestionTextLabel(e.target.value)}*/}
+                {/*    margin="normal"*/}
+                {/*/>*/}
+                {/*<TextField*/}
+                {/*    label="Метка списка ответов"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    value={answerOptionsLabel}*/}
+                {/*    onChange={(e) => setAnswerOptionsLabel(e.target.value)}*/}
+                {/*    margin="normal"*/}
+                {/*/>*/}
+                {/*<TextField*/}
+                {/*    label="Метка текста ответа"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    value={optionTextLabel}*/}
+                {/*    onChange={(e) => setOptionTextLabel(e.target.value)}*/}
+                {/*    margin="normal"*/}
+                {/*/>*/}
+                {/*<TextField*/}
+                {/*    label="Метка корректности ответа"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    value={isCorrectLabel}*/}
+                {/*    onChange={(e) => setIsCorrectLabel(e.target.value)}*/}
+                {/*    margin="normal"*/}
+                {/*/>*/}
             </DialogContent>
             <DialogActions>
                 <Button onClick={toggleModelOpen}>Отменить</Button>

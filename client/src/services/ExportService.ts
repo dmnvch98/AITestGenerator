@@ -19,14 +19,14 @@ class ExportService {
             });
 
             // Нормализуем название теста и формируем имя файла
-            const normalizedTitle = testTitle.slice(0, 15).replace(" ", "_");
-            const filename = `${normalizedTitle}.${dto.exportFormat.toLowerCase()}`;
+            // const normalizedTitle = testTitle.slice(0, 100).replace(" ", "_");
+            // const filename = `${normalizedTitle}.${dto.exportFormat.toLowerCase()}`;
 
             // Создаем и вызываем ссылку для скачивания файла
             const url = window.URL.createObjectURL(new Blob([data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', filename); // Используем имя файла на основе формата
+            link.setAttribute('download', testTitle); // Используем имя файла на основе формата
             document.body.appendChild(link);
             link.click();
             link.parentNode?.removeChild(link);

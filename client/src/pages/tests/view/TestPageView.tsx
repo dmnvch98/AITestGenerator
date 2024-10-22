@@ -12,7 +12,16 @@ import {AlertMessage} from "../../../store/types";
 
 const TestPageViewContent = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestById, alerts, addAlert, clearAlerts, deleteAlert, getRating } = useTestStore();
+    const {
+        selectedTest,
+        getUserTestById,
+        alerts,
+        addAlert,
+        clearAlerts,
+        deleteAlert,
+        getRating,
+        clearState
+    } = useTestStore();
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -44,6 +53,12 @@ const TestPageViewContent = () => {
         fetchTest();
         fetchRaiting();
     }, [id, getUserTestById]);
+
+    useEffect(() => {
+        return () => {
+            clearState();
+        }
+    }, []);
 
     const handleEdit = () => {
         navigate(`/tests/${id}/edit`);

@@ -7,7 +7,7 @@ import {AlertMessage} from "../../../store/types";
 
 export const TestPageEdit = () => {
     const { id } = useParams();
-    const { selectedTest, getUserTestById, clearSelectedTest, addAlert } = useTestStore();
+    const { selectedTest, getUserTestById, clearSelectedTest, addAlert, clearState } = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -28,6 +28,12 @@ export const TestPageEdit = () => {
         loadData();
         return () => clearSelectedTest();
     }, [id, getUserTestById, clearSelectedTest]);
+
+    useEffect(() => {
+        return () => {
+            clearState();
+        }
+    }, [])
 
     return (
         <LoggedInUserPage

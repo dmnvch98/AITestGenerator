@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { Alert, Container, Snackbar } from '@mui/material';
+import { Alert, Container, Snackbar, FormControl, FormHelperText } from '@mui/material';
 import { AxiosError } from 'axios';
 import useAuthStore from "./authStore";
 
@@ -14,7 +14,7 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const [emailValid, setEmailValid] = useState(false);
+  const [emailValid, setEmailValid] = useState(true); // По умолчанию валидно
   const [notFound, setNotFound] = useState(false);
   const { login } = useAuthStore();
 
@@ -23,10 +23,13 @@ function LoginPage() {
     return re.test(email);
   };
 
-  const handleEmailChange = (e: any) => {
-    const emailInput = e.target.value;
-    setEmail(emailInput);
-    setEmailValid(validateEmail(emailInput));
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handleEmailBlur = () => {
+    // Валидация только при потере фокуса
+    setEmailValid(validateEmail(email));
   };
 
   const handleLogin = async () => {
@@ -37,8 +40,9 @@ function LoginPage() {
       }
     } catch (error) {
       const axiosError = error as AxiosError;
+      // Проверяем, если ошибка Axios и статус 404
       if (axiosError.isAxiosError && axiosError.response && axiosError.response.status === 404) {
-        setNotFound(true);
+        setNotFound(true); // Устанавливаем notFound в true для открытия Snackbar
       } else {
         console.error('Login error:', axiosError);
       }
@@ -47,6 +51,10 @@ function LoginPage() {
 
   const isFormValid = () => {
     return emailValid && password.length > 0;
+  };
+
+  const handleCloseSnackbar = () => {
+    setNotFound(false); // Закрываем Snackbar
   };
 
   return (
@@ -81,34 +89,38 @@ function LoginPage() {
                 noValidate
                 sx={{ mt: 1 }}
             >
-              <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email адрес"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={email}
-                  onChange={handleEmailChange}
-                  error={!emailValid && email.length > 0}
-                  helperText={!emailValid && email.length > 0 ? "Неверный формат" : ""}
-              />
-              <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-              />
+              <FormControl fullWidth error={!emailValid && email.length > 0}>
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    id="email"
+                    label="Email адрес"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    value={email}
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur} // Валидация по потере фокуса
+                />
+                <FormHelperText>
+                  {!emailValid && email.length > 0 ? "Неверный формат" : ""}
+                </FormHelperText>
+              </FormControl>
+              <FormControl fullWidth>
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    name="password"
+                    label="Пароль"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+              </FormControl>
               <Button
                   type="submit"
                   fullWidth
@@ -121,11 +133,11 @@ function LoginPage() {
             </Box>
           </Box>
           <Snackbar
-              open={notFound}
+              open={notFound} // Проверяем состояние notFound
               autoHideDuration={3000}
-              onClose={() => setNotFound(!notFound)}
+              onClose={handleCloseSnackbar} // Обработчик закрытия
           >
-            <Alert severity="error">
+            <Alert severity="error" onClose={handleCloseSnackbar}>
               Пользователь не найден
             </Alert>
           </Snackbar>

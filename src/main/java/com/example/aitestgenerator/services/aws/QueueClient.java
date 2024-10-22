@@ -3,6 +3,7 @@ package com.example.aitestgenerator.services.aws;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import com.example.aitestgenerator.models.GenerateTestMessage;
+import com.example.aitestgenerator.services.redis.GenericRedisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -23,9 +23,10 @@ public class QueueClient {
     @Value("${aws.sqs-url}")
     public String queueUrl;
 
+    private final GenericRedisService redisService;
     private final AmazonSQS queue;
     private final ObjectMapper objectMapper;
-    private final Map<String, String> receiptMessageIdMap = new ConcurrentHashMap<>();
+    private final String IN_PROCESS_PREFIX = "message_in_process_";
 
     public Optional<GenerateTestMessage> getMessage() {
         final ReceiveMessageResult receiveMessageResult = queue.receiveMessage(new ReceiveMessageRequest(queueUrl)
@@ -36,22 +37,20 @@ public class QueueClient {
             return Optional.empty();
         }
         final Message message = messages.get(0);
-        final Optional<String> receiptToUpdate = receiptMessageIdMap.entrySet()
-              .stream()
-              .filter(entry -> entry.getValue().equals(message.getMessageId()))
-              .map(Map.Entry::getKey)
-              .findFirst();
+        final String messageId = message.getMessageId();
+        final String processingKey = IN_PROCESS_PREFIX + message.getMessageId();
 
-        if (receiptToUpdate.isPresent()) {
-            log.info("Skipping message with id {} as it's already processing. Updating visibility timeout", message.getMessageId());
-            updateVisibilityTimeout(receiptToUpdate.get());
+        if (redisService.getObjectAsString(processingKey, String.class).isPresent()) {
+            log.info("Message {} is already being processed, skipping.", messageId);
+            extendVisibilityTimeout(message);
             return Optional.empty();
         }
+
         final String messageBody = message.getBody();
         try {
-            receiptMessageIdMap.put(message.getReceiptHandle(), message.getMessageId());
+            redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
-            generateTestMessage.setReceipt(message.getReceiptHandle());
+            generateTestMessage.setReceipt(message.getMessageId());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
             log.error("An error occurred while parsing message body: {}", e.getMessage());
@@ -59,13 +58,16 @@ public class QueueClient {
         }
     }
 
-    public void deleteMessage(final String receipt) {
+    public void deleteMessage(final String messageId) {
         try {
-            receiptMessageIdMap.remove(receipt);
-            queue.deleteMessage(new DeleteMessageRequest(queueUrl, receipt));
-            log.info("Message was deleted from the queue. Receipt : {} ", receipt.substring(0, 10));
+            final String processingKey = IN_PROCESS_PREFIX + messageId;
+            final Optional<String> receipt = redisService.getObjectAsString(processingKey, String.class);
+            receipt.ifPresent(s -> queue.deleteMessage(new DeleteMessageRequest(queueUrl, s)));
+            redisService.deleteObjectAsString(processingKey);
+
+            log.info("Message was deleted from the queue. Message : {} ", messageId.substring(0, 10));
         } catch (Exception e) {
-            log.error("An error occurred during deleting message from the queue. Receipt : {}", receipt);
+            log.error("An error occurred during deleting message from the queue. Message id : {}", messageId);
         }
     }
 
@@ -88,6 +90,16 @@ public class QueueClient {
               .withVisibilityTimeout(timeoutInSeconds);
 
         queue.changeMessageVisibility(request);
+    }
+
+    private void extendVisibilityTimeout(Message message) {
+        ChangeMessageVisibilityRequest request = new ChangeMessageVisibilityRequest()
+              .withQueueUrl(queueUrl)
+              .withReceiptHandle(message.getReceiptHandle())
+              .withVisibilityTimeout(timeoutInSeconds);
+
+        queue.changeMessageVisibility(request);
+        log.info("Extended visibility timeout for message: {}", message.getMessageId());
     }
 
     public void purgeQueue() {

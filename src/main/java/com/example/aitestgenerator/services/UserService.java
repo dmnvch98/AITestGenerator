@@ -39,6 +39,14 @@ public class UserService {
         }
     }
 
+    public void updateRefreshToken(final User user, final String token) {
+        userRepository.updateRefreshToken(user.getEmail(), token);
+    }
+
+    public void clearRefreshToken(final String email) {
+        userRepository.updateRefreshToken(email, null);
+    }
+
     public User save(User user) {
         log.info("Saving user. Email: {}", user.getEmail());
 

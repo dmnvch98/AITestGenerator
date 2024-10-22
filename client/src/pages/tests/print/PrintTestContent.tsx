@@ -60,12 +60,22 @@ export const PrintTestContent = () => {
         showAnswers,
         showHeader
     } = useTextSettingsStore();
-    const {selectedTest, getUserTestById} = useTestStore();
+    const {selectedTest, getUserTestById, clearState} = useTestStore();
+
+    const fetchTest = async () => {
+        setLoading(true);
+        await getUserTestById(Number(id));
+        setLoading(false);
+    }
 
     useEffect(() => {
-        setLoading(true);
-        getUserTestById(Number(id));
-        setLoading(false);
+        fetchTest();
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            clearState();
+        }
     }, []);
 
     return (

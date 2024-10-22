@@ -36,4 +36,8 @@ public class ActivityFacade {
   public void deleteUserActivities(final Long userId, final List<String> cids) {
     activityService.deleteUserActivities(userId, cids);
   }
+
+  public List<TestGenerationActivity> getAllObjectsFromHashes() {
+    return activityService.getAllObjectsFromHashes();
+  }
 }
