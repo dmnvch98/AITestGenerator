@@ -1,4 +1,4 @@
-import React, from 'react';
+import React from 'react';
 import {DataGrid, GridColDef, GridRowIdGetter} from '@mui/x-data-grid';
 import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';

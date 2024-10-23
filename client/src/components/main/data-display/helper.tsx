@@ -10,30 +10,8 @@ import {v4 as uuidv4} from "uuid";
 export const getActionItemsList = (actions: ActionIcon[]) => {
     return (
         <List sx={{ ml: -1 }}>
-            {actions.map((a, index) => (
+            {actions.map((a) => (
                 getActionItem(a)
-                // <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-                //     <ListItemButton
-                //         disabled={a.disabled}
-                //         sx={{
-                //             minHeight: 48,
-                //             justifyContent: 'center',
-                //             backgroundColor: 'inherit',
-                //         }}
-                //         onClick={a.onClick} // Перенесено сюда для упрощения
-                //     >
-                //         <ListItemIcon
-                //             sx={{
-                //                 minWidth: 0,
-                //                 mr: 3,
-                //                 justifyContent: 'center',
-                //             }}
-                //         >
-                //             {a.icon}
-                //         </ListItemIcon>
-                //         <ListItemText primary={a.name} sx={{ opacity: 1 }} />
-                //     </ListItemButton>
-                // </ListItem>
             ))}
         </List>
     );

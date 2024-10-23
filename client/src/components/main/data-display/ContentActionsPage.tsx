@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { Drawer, Paper } from "@mui/material";
+import { Drawer } from "@mui/material";
 import { LoggedInUserPage } from "../LoggedInUserPage";
 import React from "react";
 
@@ -22,9 +22,9 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                     transition: 'margin-right 0.3s',
                 }}
             >
-                <Paper sx={{ overflowY: 'auto' }}>
+                <Box sx={{ overflowY: 'auto' }}>
                     {content}
-                </Paper>
+                </Box>
             </Box>
 
             <Drawer

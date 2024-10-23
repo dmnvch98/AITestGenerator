@@ -1,30 +1,26 @@
 import React, { useRef } from 'react';
 import {Box} from '@mui/material';
-import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
 import {PrintTestSettings} from "./PrintTestSettings";
 import {PrintTestContent} from "./PrintTestContent";
-
-const PrintTestPageContent: React.FC = () => {
-    const componentRef = useRef<HTMLDivElement>(null);
-
-    return (
-        <Box display="flex" flexDirection="column" width="91%">
-            <Box display="flex" flexWrap="wrap">
-                <Box ref={componentRef} flexGrow={1}>
-                    <PrintTestContent/>
-                </Box>
-                <Box>
-                    <PrintTestSettings printRef={componentRef} />
-                </Box>
-            </Box>
-        </Box>
-    );
-};
+import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
 
 export const PrintTestPage = () => {
+    const componentRef = useRef<HTMLDivElement>(null);
+
+    const Content = (
+        <Box ref={componentRef} flexGrow={1}>
+            <PrintTestContent/>
+        </Box>
+    );
+
+    const Actions = (
+        <Box>
+            <PrintTestSettings printRef={componentRef} />
+        </Box>
+    )
     return (
         <>
-        <LoggedInUserPage mainContent={<PrintTestPageContent/>}/>
+            <ContentActionsPage content={Content} actions={Actions}/>
         </>
     )
 };
