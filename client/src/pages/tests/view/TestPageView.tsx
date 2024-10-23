@@ -1,17 +1,25 @@
-import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
 import React, { useEffect, useState } from "react";
 import { useTestStore } from "../../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import {Alert, Box, Button, Divider, Paper, Snackbar, Skeleton, CircularProgress} from "@mui/material";
+import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert} from "@mui/material";
 import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
 import { QuestionPagination } from "../edit/components/QuestionPagination";
 import { QuestionListView, QuestionPaginatedView } from "../edit/components/TestDisplayMode";
 import { TestRatingForm } from "./components/TestRatingForm";
-import {AlertMessage} from "../../../store/types";
+import { AlertMessage } from "../../../store/types";
+import { TestViewActions } from "./components/TestViewActions";
+import { useExportStore } from "../../../store/tests/exportStore";
+import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
 
-const TestPageViewContent = () => {
+export const TestPageView: React.FC = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [testLoading, setTestLoading] = useState<boolean>(true);
+    const [ratingLoading, setRatingLoading] = useState<boolean>(true);
+
     const {
         selectedTest,
         getUserTestById,
@@ -22,37 +30,29 @@ const TestPageViewContent = () => {
         getRating,
         clearState
     } = useTestStore();
-    const navigate = useNavigate();
-    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [testLoading, setTestLoading] = useState<boolean>(true);
-    const [ratingLoading, setRatingLoading] = useState<boolean>(true);
+    const { exportTest } = useExportStore();
 
     const fetchTest = async () => {
         setTestLoading(true);
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                addAlert(new AlertMessage('Тест не найден', 'error'))
+                addAlert(new AlertMessage('Тест не найден', 'error'));
             }
         });
-        setTimeout(() => {
-            setTestLoading(false);
-        }, 200);
+        setTestLoading(false);
     }
 
-    const fetchRaiting = async () => {
+    const fetchRating = async () => {
         setRatingLoading(true);
         await getRating(Number(id));
-        setTimeout(() => {
-            setRatingLoading(false);
-        }, 200);
+        setRatingLoading(false);
     }
 
     useEffect(() => {
         fetchTest();
-        fetchRaiting();
-    }, [id, getUserTestById]);
+        fetchRating();
+    }, [id]);
 
     useEffect(() => {
         return () => {
@@ -68,105 +68,96 @@ const TestPageViewContent = () => {
         navigate('/tests');
     }
 
-    return (
-        <Box display="flex" flexDirection="row" position="relative" sx={{ mb: 2 }}>
-            <Box flexGrow={1} mr="250px">
-                <Paper sx={{ minHeight: '100px', pb: 0.25 }}>
-                    <Box sx={{ ml: 4, mr: 4, pt: 2 }}>
-                        {testLoading ? (
-                            <Typography component="div" key={'h3'} variant={'h3'}>
-                                <Skeleton />
-                            </Typography>
-                        ) : (
-                            <Typography
-                                align="left"
-                                sx={{
-                                    fontWeight: 600,
-                                    fontSize: "24px",
-                                }}
-                            >
-                                {selectedTest?.title}
-                            </Typography>
-                        )}
-                    </Box>
-                    <Divider sx={{ mt: 2, mb: 2 }} />
+    const handlePrint = () => {
+        navigate(`/tests/${id}/print`);
+    }
 
-                    {testLoading ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        viewMode === 'list' ? (
-                            <QuestionListView
-                                questions={selectedTest?.questions || []}
-                                editMode={false}
-                                invalidQuestions={[]} onDelete={() => {}}
-                                onQuestionChange={() => { }} />
-                        ) : (
-                            <QuestionPaginatedView
-                                questions={selectedTest?.questions || []}
-                                currentQuestionIndex={currentQuestionIndex}
-                                onSelectQuestion={setCurrentQuestionIndex}
-                                editMode={false} // Просмотр, а не редактирование
-                                invalidQuestions={[]}
-                                onDelete={() => {}}
-                                onQuestionChange={() => { }} />
-                        )
-                    )}
-                </Paper>
+    const handleExport = () => {
+        selectedTest && exportTest(selectedTest);
+    }
+
+    const Content = (
+        <Box>
+            <Box sx={{ ml: 4, mr: 4, pt: 2 }}>
+                {testLoading ? (
+                    <Typography component="div" key={'h3'} variant={'h3'}>
+                        <Skeleton />
+                    </Typography>
+                ) : (
+                    <Typography align="left" sx={{ fontWeight: 600, fontSize: "24px" }}>
+                        {selectedTest?.title}
+                    </Typography>
+                )}
             </Box>
+            <Divider sx={{ mt: 2, mb: 2 }} />
 
-            <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
-                <Box sx={{ width: '230px', position: "fixed" }}>
-                    <Paper sx={{ p: 2 }}>
-                        <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={testLoading} />
-                        <Divider sx={{ mb: 3 }} />
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            onClick={handleEdit}
-                            disabled={testLoading}
-                            sx={{ mb: 2 }}
-                        >
-                            Редактировать
-                        </Button>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            color="secondary"
-                            onClick={handleExit}
-                        >
-                            Выйти
-                        </Button>
-                        {viewMode === 'paginated' && (
-                            <QuestionPagination
-                                currentIndex={currentQuestionIndex}
-                                totalQuestions={selectedTest?.questions?.length as number}
-                                onChange={setCurrentQuestionIndex}
-                                invalidQuestionNumbers={[]}
-                                loading={testLoading}
-                            />
-                        )}
-                    </Paper>
-                    <Box sx={{ mt: 2 }}>
-                        {selectedTest && selectedTest.fileName && <TestRatingForm id={selectedTest.id} loading={ratingLoading} />}
-                    </Box>
+            {testLoading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress />
                 </Box>
-            </Box>
-
+            ) : (
+                viewMode === 'list' ? (
+                    <QuestionListView
+                        questions={selectedTest?.questions || []}
+                        editMode={false}
+                        invalidQuestions={[]}
+                        onDelete={() => {}}
+                        onQuestionChange={() => {}}
+                    />
+                ) : (
+                    <QuestionPaginatedView
+                        questions={selectedTest?.questions || []}
+                        currentQuestionIndex={currentQuestionIndex}
+                        onSelectQuestion={setCurrentQuestionIndex}
+                        editMode={false}
+                        invalidQuestions={[]}
+                        onDelete={() => {}}
+                        onQuestionChange={() => {}}
+                    />
+                )
+            )}
             <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
-                <Box sx={{ maxWidth: '400px' }}>
+                <Box sx={{maxWidth: '400px'}}>
                     {alerts.map(alert => (
                         <Alert key={alert.id} severity={alert.severity} onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{ __html: alert.message }} />
+                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
                         </Alert>
                     ))}
                 </Box>
             </Snackbar>
         </Box>
     );
-}
 
-export const TestPageView = () => {
-    return <LoggedInUserPage mainContent={<TestPageViewContent />} />;
+    const Actions = (
+        <Box>
+            <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={testLoading} />
+            <TestViewActions
+                onEdit={handleEdit}
+                isLoading={testLoading}
+                onExit={handleExit}
+                onPrint={handlePrint}
+                onExport={handleExport}
+            />
+            {viewMode === 'paginated' && (
+                <Box sx={{mb: 3}}>
+                    <QuestionPagination
+                        currentIndex={currentQuestionIndex}
+                        totalQuestions={selectedTest?.questions?.length as number}
+                        onChange={setCurrentQuestionIndex}
+                        invalidQuestionNumbers={[]}
+                        loading={testLoading}
+                    />
+                </Box>
+            )}
+            {selectedTest && selectedTest.fileName && (
+                <Box sx={{ mt: 2 }}>
+                    <TestRatingForm id={selectedTest.id} loading={ratingLoading} />
+                </Box>
+            )}
+        </Box>
+    );
+
+    return (
+        <ContentActionsPage content={Content} actions={Actions} />
+    );
 }

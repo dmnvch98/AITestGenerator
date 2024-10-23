@@ -17,7 +17,7 @@ export const QuestionPagination: React.FC<QuestionPaginationProps> = ({
                                                                           loading
                                                                       }) => {
     return (
-        <Box sx={{mt: 3}}>
+        <Box>
             <Divider sx={{mb: 3}}/>
             <Typography align="left" variant="subtitle2" sx={{mb: 1}}>Номер вопроса:</Typography>
             {
@@ -43,8 +43,8 @@ export const QuestionPagination: React.FC<QuestionPaginationProps> = ({
                                     {...item}
                                     sx={{
                                         ...(invalidQuestionNumbers.includes(item.page as number) && {
-                                            backgroundColor: 'red',
                                             color: 'black',
+                                            border: '2px solid #ff604f'
                                         })
                                     }}
                                 />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Box,
     Button,
@@ -7,11 +7,11 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Paper, Tooltip, CircularProgress,
+    Tooltip, CircularProgress, Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Rating from '@mui/material/Rating';
-import { useTestStore } from '../../../../store/tests/testStore';
+import {useTestStore} from '../../../../store/tests/testStore';
 
 const highlightStyle = '0 0 5px 1px rgba(163, 204, 190, 0.8)';
 
@@ -22,57 +22,57 @@ const RatingInput: React.FC<{
     onFeedbackChange: (feedback: string) => void;
     onSubmit: () => void;
     onExit: () => void;
-}> = ({ rating, feedback, onRatingChange, onFeedbackChange, onSubmit, onExit }) => (
-    <Box sx={{ boxShadow: rating === 0 ? highlightStyle : 'none' }}>
-    <Accordion defaultExpanded>
-        <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="rating-content"
-            id="rating-header"
-        >
-            <Typography variant="subtitle1" component="div">
-                Оцените тест
-            </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-            <Box sx={{ maxWidth: 400 }}>
-                <Box sx={{ textAlign: 'left', mt: -2 }}>
-                    <Rating
-                        name="test-rating"
-                        value={rating}
-                        onChange={(_, newRating) => onRatingChange(newRating!)}
-                        size="medium"
-                        precision={1}
-                    />
-                </Box>
-
-                {rating !== null && rating < 5 && (
-                    <Box mt={2}>
-                        <TextField
-                            fullWidth
-                            label="Отзыв"
-                            placeholder="Поле необязательное"
-                            multiline
-                            rows={3}
-                            value={feedback}
-                            onChange={(e) => onFeedbackChange(e.target.value)}
-                            variant="outlined"
-                            InputLabelProps={{ shrink: true }}
-                            sx={{
-                                '& .MuiInputBase-input': {
-                                    fontSize: '14px',
-                                },
-                            }}
+}> = ({rating, feedback, onRatingChange, onFeedbackChange, onSubmit, onExit}) => (
+    <Box sx={{boxShadow: rating === 0 ? highlightStyle : 'none'}}>
+        <Accordion defaultExpanded>
+            <AccordionSummary
+                expandIcon={<ExpandMoreIcon/>}
+                aria-controls="rating-content"
+                id="rating-header"
+            >
+                <Typography variant="subtitle1" component="div">
+                    Оцените тест
+                </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                <Box sx={{maxWidth: 400}}>
+                    <Box sx={{textAlign: 'left', mt: -2}}>
+                        <Rating
+                            name="test-rating"
+                            value={rating}
+                            onChange={(_, newRating) => onRatingChange(newRating!)}
+                            size="medium"
+                            precision={1}
                         />
                     </Box>
-                )}
 
-                <Box mt={2}>
-                    <Tooltip
-                        title={rating === 0 ? "Пожалуйста, поставьте оценку перед отправкой." : ""}
-                        arrow
-                        disableHoverListener={rating !== 0}
-                    >
+                    {rating !== null && rating < 5 && (
+                        <Box mt={2}>
+                            <TextField
+                                fullWidth
+                                label="Отзыв"
+                                placeholder="Поле необязательное"
+                                multiline
+                                rows={3}
+                                value={feedback}
+                                onChange={(e) => onFeedbackChange(e.target.value)}
+                                variant="outlined"
+                                InputLabelProps={{shrink: true}}
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontSize: '14px',
+                                    },
+                                }}
+                            />
+                        </Box>
+                    )}
+
+                    <Box mt={2}>
+                        <Tooltip
+                            title={rating === 0 ? "Пожалуйста, поставьте оценку перед отправкой." : ""}
+                            arrow
+                            disableHoverListener={rating !== 0}
+                        >
                         <span>
                             <Button
                                 size="small"
@@ -85,47 +85,48 @@ const RatingInput: React.FC<{
                                 Отправить
                             </Button>
                         </span>
-                    </Tooltip>
-                    {rating > 0 &&
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            color="secondary"
-                            onClick={onExit}
-                            fullWidth
-                            sx={{mt: 1.5}}
-                        >
-                            Выйти
-                        </Button>}
+                        </Tooltip>
+                        {rating > 0 &&
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="secondary"
+                                onClick={onExit}
+                                fullWidth
+                                sx={{mt: 1.5}}
+                            >
+                                Выйти
+                            </Button>}
+                    </Box>
                 </Box>
-            </Box>
-        </AccordionDetails>
-    </Accordion>
+            </AccordionDetails>
+        </Accordion>
     </Box>
 );
 
 const RatingDisplay: React.FC<{
     rating: number;
     onEdit: () => void;
-}> = ({ rating, onEdit }) => (
-    <Paper sx={{ p: 2 }}>
-        <Box sx={{ textAlign: 'left' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="subtitle2" sx={{ mr: 1 }}>
+}> = ({rating, onEdit}) => (
+    <Box>
+        <Divider sx={{mb: 3}}/>
+        <Box sx={{textAlign: 'left'}}>
+            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                <Typography variant="subtitle2" sx={{mr: 1}}>
                     Рейтинг:
                 </Typography>
-                <Rating name="read-only" value={rating} readOnly size="small" />
+                <Rating name="read-only" value={rating} readOnly size="small"/>
             </Box>
             <Button
                 variant="outlined"
                 color="primary"
                 onClick={onEdit}
                 size="small"
-                sx={{ mt: 2, width: '100%' }}>
+                sx={{mt: 2, width: '100%'}}>
                 Изменить
             </Button>
         </Box>
-    </Paper>
+    </Box>
 );
 
 interface TestRatingFormProps {
@@ -133,8 +134,8 @@ interface TestRatingFormProps {
     loading: boolean;
 }
 
-export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id, loading }) => {
-    const { updateRating, selectedTestRating } = useTestStore();
+export const TestRatingForm: React.FC<TestRatingFormProps> = ({id, loading}) => {
+    const {updateRating, selectedTestRating} = useTestStore();
     const [rating, setRating] = useState<number>(5);
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
     const [isEditing, setIsEditing] = useState<boolean>(true); // Флаг для определения режима редактирования
@@ -161,7 +162,7 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id, loading }) =
 
     const handleSubmit = () => {
         rating === 5 && setFeedback(undefined);
-        updateRating(id, { rating, feedback });
+        updateRating(id, {rating, feedback});
         setIsEditing(!isEditing);
     };
 
@@ -171,11 +172,9 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({ id, loading }) =
 
     return (
         loading ? (
-            <Paper>
-                <Box sx={{ height: '270px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <CircularProgress />
-                </Box>
-            </Paper>
+            <Box sx={{height: '270px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <CircularProgress/>
+            </Box>
 
         ) : (
             <Box>

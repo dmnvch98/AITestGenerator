@@ -21,6 +21,7 @@ import {PrintTestPage} from "./pages/tests/print/PrintTestPage";
 import {TestPageCreate} from "./pages/tests/create/TestPageCreate";
 import useAuthStore from "./pages/auth/authStore";
 import ServerErrorPage from "./pages/errors/ServerErrorPage";
+import SidebarLayout from "./components/main/data-display/SidebarLayout";
 
 function App() {
     const theme = createTheme({
@@ -70,6 +71,7 @@ function App() {
                                 <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                                 <Route path="/files" element={<Files/>}/>
                                 <Route path="/500" element={<ServerErrorPage/>}/>
+                                <Route path="/sandbox" element={<SidebarLayout/>}/>
                                 <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                             </Routes>
                             : (

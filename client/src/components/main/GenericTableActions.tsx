@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React, from 'react';
 import {DataGrid, GridColDef, GridRowIdGetter} from '@mui/x-data-grid';
 import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import {tableLables} from './helper';
+import {tableLables} from './dataGridLabels';
 import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
 import Typography from "@mui/material/Typography";
 
@@ -107,10 +107,6 @@ export const GenericTableActions = <T, >({
         disableColumnMenu: true,
     };
 
-    useEffect(() => {
-        console.log('loading: ' + loading)
-    }, [])
-
     return (
         <Box>
             <DataGrid
@@ -134,9 +130,6 @@ export const GenericTableActions = <T, >({
                     },
                 }}
                 localeText={tableLables}
-                // slots={{
-                //     noRowsOverlay: NoRows
-                // }}
             />
         </Box>
     );

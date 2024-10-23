@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
-import {Box, Paper, Snackbar, Alert, Divider, CircularProgress} from "@mui/material";
+import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
 import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDisplayMode";
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
 import {TestViewModeSelector} from "../edit/components/TestViewModeSelector";
 import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
+import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
 
 interface TestFormProps {
     initialTest?: UserTest;
@@ -84,69 +85,40 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
         setIsTestModified(false);
     };
 
-    return (
-        <Box display="flex" flexDirection="row" position="relative">
-            <Box flexGrow={1} mr="250px">
-                <Paper sx={{minHeight: '100px'}}>
-                    <Box sx={{ml: 4, mr: 4, pt: 2}}>
-                        <TestTitleInput title={localTest.title || ""}
-                                        isLoading={isLoading as boolean}
-                                        onChange={(e) => setLocalTest({...localTest, title: e.target.value})}
-                                        error={testTitleError}/>
-                    </Box>
-
-                    {isLoading ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        viewMode === 'list' ? (
-                            <QuestionListView
-                                questions={localTest.questions}
-                                invalidQuestions={invalidQuestions}
-                                onDelete={handleDeleteQuestion}
-                                onQuestionChange={handleQuestionChange}
-                                editMode={true}
-                            />
-                        ) : (
-                            <QuestionPaginatedView
-                                questions={localTest.questions}
-                                currentQuestionIndex={currentQuestionIndex}
-                                invalidQuestions={invalidQuestions}
-                                onDelete={handleDeleteQuestion}
-                                onQuestionChange={handleQuestionChange}
-                                onSelectQuestion={setCurrentQuestionIndex}
-                                editMode={true}
-                            />
-                        )
-                    )}
-                </Paper>
+    const Content = (
+        <Box>
+            <Box sx={{ml: 4, mr: 4, pt: 2}}>
+                <TestTitleInput title={localTest.title || ""}
+                                isLoading={isLoading as boolean}
+                                onChange={(e) => setLocalTest({...localTest, title: e.target.value})}
+                                error={testTitleError}/>
             </Box>
 
-            <Box display="flex" flexDirection="column" justifyContent="flex-start" alignItems="flex-end">
-                <Paper sx={{maxWidth: 230, p: 2, position: "fixed"}}>
-                    <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={isLoading}/>
-                    <Divider sx={{mb: 3}}/>
-                    <TestFormActions
-                        isLoading={isLoading as boolean}
-                        onSave={handleSave}
-                        onAddQuestion={handleAddQuestion}
-                        onReset={handleReset}
-                        onExit={() => navigate("/tests")}
-                        isTestModified={isTestModified}
+            {isLoading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress/>
+                </Box>
+            ) : (
+                viewMode === 'list' ? (
+                    <QuestionListView
+                        questions={localTest.questions}
+                        invalidQuestions={invalidQuestions}
+                        onDelete={handleDeleteQuestion}
+                        onQuestionChange={handleQuestionChange}
+                        editMode={true}
                     />
-                    {viewMode === 'paginated' && (
-                        <QuestionPagination
-                            loading={isLoading}
-                            currentIndex={currentQuestionIndex}
-                            totalQuestions={localTest.questions.length}
-                            onChange={setCurrentQuestionIndex}
-                            invalidQuestionNumbers={invalidQuestions.map(q => q.index + 1)}
-                        />
-                    )}
-                </Paper>
-            </Box>
-
+                ) : (
+                    <QuestionPaginatedView
+                        questions={localTest.questions}
+                        currentQuestionIndex={currentQuestionIndex}
+                        invalidQuestions={invalidQuestions}
+                        onDelete={handleDeleteQuestion}
+                        onQuestionChange={handleQuestionChange}
+                        onSelectQuestion={setCurrentQuestionIndex}
+                        editMode={true}
+                    />
+                )
+            )}
             <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
                 <Box sx={{maxWidth: '400px'}}>
                     {alerts.map(alert => (
@@ -157,5 +129,32 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
                 </Box>
             </Snackbar>
         </Box>
+    )
+
+    const Actions = (
+        <Box>
+            <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={isLoading}/>
+            <TestFormActions
+                isLoading={isLoading as boolean}
+                onSave={handleSave}
+                onAddQuestion={handleAddQuestion}
+                onReset={handleReset}
+                onExit={() => navigate("/tests")}
+                isTestModified={isTestModified}
+            />
+            {viewMode === 'paginated' && (
+                <QuestionPagination
+                    loading={isLoading}
+                    currentIndex={currentQuestionIndex}
+                    totalQuestions={localTest.questions.length}
+                    onChange={setCurrentQuestionIndex}
+                    invalidQuestionNumbers={invalidQuestions.map(q => q.index + 1)}
+                />
+            )}
+        </Box>
+    )
+
+    return (
+        <ContentActionsPage content={Content} actions={Actions}/>
     );
 };

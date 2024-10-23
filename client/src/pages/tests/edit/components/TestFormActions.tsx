@@ -1,6 +1,16 @@
-import React from 'react';
-import {Button, Tooltip} from "@mui/material";
-import {ConfirmationButton} from "../../../../components/main/ConfirmationButton";
+import React, {useState} from 'react';
+import {ActionIcon} from "../../../../store/types";
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import RestoreIcon from '@mui/icons-material/Restore';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import {getActionItemsList} from "../../../../components/main/data-display/helper";
 
 interface ActionButtonsProps {
     onSave: () => void;
@@ -11,43 +21,101 @@ interface ActionButtonsProps {
     isLoading: boolean;
 }
 
-export const TestFormActions: React.FC<ActionButtonsProps> = ({onSave, onAddQuestion, onReset, onExit, isTestModified, isLoading}) => {
+export const TestFormActions: React.FC<ActionButtonsProps> = ({
+                                                                  onSave,
+                                                                  onAddQuestion,
+                                                                  onReset,
+                                                                  onExit,
+                                                                  isTestModified,
+                                                                  isLoading
+                                                              }) => {
+    const [dialogOpen, setDialogOpen] = useState(false); // Состояние для диалога
+    const [dialogConfig, setDialogConfig] = useState<{
+        title: string;
+        content: string;
+        onConfirm: () => void
+    } | null>(null); // Конфигурация диалога
+
+    const openDialog = (title: string, content: string, onConfirm: () => void) => {
+        setDialogConfig({title, content, onConfirm});
+        setDialogOpen(true);
+    };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+        setDialogConfig(null); // Сброс конфигурации при закрытии
+    };
+
+    const actions: ActionIcon[] = [
+        {
+            name: 'Сохранить',
+            icon: <SaveAltIcon/>,
+            onClick: onSave,
+            disabled: !isTestModified || isLoading
+        },
+        {
+            name: 'Новый вопрос',
+            icon: <QuestionMarkIcon/>,
+            onClick: onAddQuestion,
+            disabled: isLoading
+        },
+        {
+            name: 'Выйти',
+            icon: <ArrowBackIcon/>,
+            onClick: () => {
+                isTestModified
+                    ? openDialog(
+                        'Подтвердите выход',
+                        'Вы уверены, что хотите выйти? Все несохраненные изменения будут потеряны.',
+                        onExit
+                    )
+                    : onExit()
+            }
+        },
+        {
+            name: 'Сбросить',
+            icon: <RestoreIcon/>,
+            onClick: () => openDialog(
+                'Подтвердите сброс',
+                'Вы уверены, что хотите сбросить все изменения?',
+                onReset
+            ),
+            disabled: !isTestModified || isLoading
+        }
+    ];
+
     return (
-        <>
-            <Button sx={{mb: 2, width: "100%"}} variant="contained" onClick={onSave} disabled={!isTestModified || isLoading}>
-                Сохранить
-            </Button>
-            <Button sx={{mb: 2, width: "100%"}} variant="outlined" color="primary" onClick={onAddQuestion} disabled={isLoading}>
-                Добавить вопрос
-            </Button>
-            <Tooltip title="Сбрасывает несохраненные изменения" enterDelay={500} leaveDelay={200}>
-        <span>
-            <ConfirmationButton
-                config={{
-                    buttonTitle: "Сбросить",
-                    dialogTitle: "Подтверждение сброса",
-                    dialogContent: "Вы уверены, что хотите сбросить тест до последнего сохранненого состояния? Все несохраненные изменения будут потеряны.",
-                    variant: "button",
-                    disabled: !isTestModified || isLoading,
-                    fullWidth: true,
-                    sx: {mb: 2}
-                }}
-                onSubmit={onReset}
-            />
-        </span>
-            </Tooltip>
-            <ConfirmationButton
-                config={{
-                    buttonTitle: "Выйти",
-                    dialogTitle: "Подтверждение выхода",
-                    dialogContent: "Вы уверены, что хотите выйти? Все несохраненные изменения будут потеряны.",
-                    variant: "button",
-                    fullWidth: true,
-                    sx: {mb: 2}
-                }}
-                onSubmit={onExit}
-                show={isTestModified}
-            />
-        </>
+        <div>
+            {getActionItemsList(actions)}
+
+            <Dialog
+                open={dialogOpen}
+                onClose={closeDialog}
+                aria-labelledby="confirmation-dialog-title"
+                aria-describedby="confirmation-dialog-content"
+            >
+                {dialogConfig && (
+                    <>
+                        <DialogTitle id="confirmation-dialog-title">{dialogConfig.title}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="confirmation-dialog-content">
+                                {dialogConfig.content}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={closeDialog}>
+                                Отмена
+                            </Button>
+                            <Button onClick={() => {
+                                dialogConfig.onConfirm();
+                                closeDialog();
+                            }} color="primary">
+                                Подтвердить
+                            </Button>
+                        </DialogActions>
+                    </>
+                )}
+            </Dialog>
+        </div>
     );
 };

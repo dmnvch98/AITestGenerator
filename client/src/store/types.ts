@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from "uuid";
+import {ConfirmationButtonProps} from "../components/main/ConfirmationButton";
 
 export class AlertMessage {
     id: string;
@@ -24,4 +25,12 @@ export interface User {
     email: string,
     firstName: string,
     lastName: string
+}
+
+export interface ActionIcon {
+    name: string;
+    icon: any;
+    onClick: () => void;
+    disabled?: boolean;
+    confirmProps?: ConfirmationButtonProps;
 }

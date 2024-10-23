@@ -13,7 +13,6 @@ const drawerWidth = 240;
 const ContentActions: React.FC<Props> = ({ content, actions }) => {
     return (
         <Box sx={{ display: 'flex' }}>
-            {/* Основной контент */}
             <Box
                 component="main"
                 sx={{
@@ -28,17 +27,16 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                 </Paper>
             </Box>
 
-            {/* Drawer (Сайдбар) */}
             <Drawer
-                variant="permanent" // Сайдбар всегда открыт
-                anchor="right" // Положение сайдбара справа
+                variant="permanent"
+                anchor="right"
                 sx={{
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        height: '100vh', // Высота сайдбара
+                        height: '100vh',
                         mt: 8,
-                        overflowY: 'auto', // Включаем вертикальную прокрутку
+                        overflowY: 'auto',
                     },
                 }}
             >

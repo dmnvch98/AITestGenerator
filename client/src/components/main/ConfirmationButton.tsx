@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
 import { SxProps } from "@mui/system";
 import { Theme } from "@mui/material/styles";
+import {ReactJSXElement} from "@emotion/react/types/jsx-namespace";
 
 export interface ConfirmationButtonProps {
-    buttonTitle: string;
+    buttonTitle?: string;
     dialogTitle: string;
     dialogContent: string;
-    variant: 'button' | 'menuItem';
+    variant?: 'button' | 'menuItem' | 'listItem'
+    icon?: any,
     disabled?: boolean;
     fullWidth?: boolean;
     sx?: SxProps<Theme>;
@@ -17,10 +19,11 @@ interface Props {
     config: ConfirmationButtonProps;
     onSubmit: () => void;
     onClose?: () => void;
-    show?: boolean; // Добавляем флаг show
+    show?: boolean;
+    button?: ReactJSXElement;
 }
 
-export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose, show }) => {
+export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose, show, button }) => {
     const [open, setOpen] = useState(false);
 
     // Используем useEffect, чтобы обновить состояние, когда изменяется флаг show
@@ -57,23 +60,34 @@ export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose,
         onClose && onClose();
     };
 
+    const renderButton = () => {
+        switch (config.variant) {
+            case 'menuItem':
+                return (
+                    <MenuItem onClick={handleClickOpen}>
+                        {config.buttonTitle}
+                    </MenuItem>
+                );
+            case 'button':
+            default:
+                return (
+                    <Button
+                        disabled={config?.disabled}
+                        variant="outlined"
+                        color="secondary"
+                        fullWidth={config.fullWidth}
+                        sx={config.sx}
+                        onClick={handleClickOpen}
+                    >
+                        {config.buttonTitle}
+                    </Button>
+                );
+        }
+    };
+
     return (
         <>
-            {config.variant === 'menuItem'
-                ? <MenuItem onClick={handleMenuItemClick}>
-                    {config.buttonTitle}
-                </MenuItem>
-                :
-                <Button
-                    disabled={config?.disabled}
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={config.fullWidth}
-                    sx={config.sx}
-                    onClick={handleClickOpen}>
-                    {config.buttonTitle}
-                </Button>
-            }
+            {renderButton()}
 
             <Dialog
                 open={open}

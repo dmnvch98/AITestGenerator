@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import { useTestStore } from "../../../store/tests/testStore";
-import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
-import { TestForm } from "../components/TestForm";
+import {useTestStore} from "../../../store/tests/testStore";
+import {TestForm} from "../components/TestForm";
 import {AlertMessage} from "../../../store/types";
 
 export const TestPageEdit = () => {
-    const { id } = useParams();
-    const { selectedTest, getUserTestById, clearSelectedTest, addAlert, clearState } = useTestStore();
+    const {id} = useParams();
+    const {selectedTest, getUserTestById, clearSelectedTest, addAlert, clearState} = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -36,14 +35,11 @@ export const TestPageEdit = () => {
     }, [])
 
     return (
-        <LoggedInUserPage
-            mainContent={
-                    <TestForm
-                        initialTest={selectedTest}
-                        isEditMode={true}
-                        isLoading={isLoading}
-                    />
-            }
+        <TestForm
+            initialTest={selectedTest}
+            isEditMode={true}
+            isLoading={isLoading}
         />
+
     );
 };
