@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
-import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
+import {Box, Snackbar, Alert, CircularProgress, Paper} from "@mui/material";
 import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDisplayMode";
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
@@ -86,7 +86,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
     };
 
     const Content = (
-        <Box>
+        <Paper>
             <Box sx={{ml: 4, mr: 4, pt: 2}}>
                 <TestTitleInput title={localTest.title || ""}
                                 isLoading={isLoading as boolean}
@@ -128,7 +128,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
                     ))}
                 </Box>
             </Snackbar>
-        </Box>
+        </Paper>
     )
 
     const Actions = (

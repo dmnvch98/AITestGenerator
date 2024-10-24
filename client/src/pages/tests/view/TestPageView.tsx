@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTestStore } from "../../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert} from "@mui/material";
+import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert, Paper} from "@mui/material";
 import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
 import { QuestionPagination } from "../edit/components/QuestionPagination";
 import { QuestionListView, QuestionPaginatedView } from "../edit/components/TestDisplayMode";
@@ -77,7 +77,7 @@ export const TestPageView: React.FC = () => {
     }
 
     const Content = (
-        <Box>
+        <Paper>
             <Box sx={{ ml: 4, mr: 4, pt: 2 }}>
                 {testLoading ? (
                     <Typography component="div" key={'h3'} variant={'h3'}>
@@ -125,7 +125,7 @@ export const TestPageView: React.FC = () => {
                     ))}
                 </Box>
             </Snackbar>
-        </Box>
+        </Paper>
     );
 
     const Actions = (

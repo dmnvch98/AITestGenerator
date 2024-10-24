@@ -17,12 +17,11 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    bgcolor: 'background.default',
                     marginRight: `${drawerWidth}px`,
                     transition: 'margin-right 0.3s',
                 }}
             >
-                <Box sx={{ overflowY: 'auto' }}>
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                     {content}
                 </Box>
             </Box>
