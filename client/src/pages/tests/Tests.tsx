@@ -68,13 +68,6 @@ export const Tests = () => {
                 <Button
                     sx={{ mr: 2 }}
                     variant="outlined"
-                    onClick={() => navigate("/tests/pass")}
-                >
-                    Пройти выбранное
-                </Button>
-                <Button
-                    sx={{ mr: 2 }}
-                    variant="outlined"
                     onClick={() => navigate("/tests/create")}
                 >
                     Создать тест

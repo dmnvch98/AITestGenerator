@@ -1,6 +1,7 @@
 .center-mode {
     width: 21cm;
     max-width: 21cm;
+    min-height: 29.7cm;
     padding: 0.5cm 1cm 2cm;
     border: 1px solid #999;
     box-sizing: border-box;

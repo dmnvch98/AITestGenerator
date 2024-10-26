@@ -16,10 +16,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { Button, Grid } from "@mui/material";
 import Link from "@mui/material/Link";
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
 import { useLocation } from 'react-router-dom';
@@ -109,13 +108,8 @@ export const SidebarHeader = ({ children }: any) => {
     const tabs: TabIcon[] = [
         {
             name: 'Тесты',
-            icon: <LocalLibraryIcon />,
+            icon: <ArticleOutlinedIcon />,
             redirect: '/tests',
-        },
-        {
-            name: 'Тексты',
-            icon: <TextSnippetIcon />,
-            redirect: '/texts',
         },
         {
             name: 'Файлы',
@@ -185,13 +179,13 @@ export const SidebarHeader = ({ children }: any) => {
                                 <ListItemButton
                                     sx={{
                                         minHeight: 58,
-                                        justifyContent: open ? 'initial' : 'center',
+                                        justifyContent: 'center',
                                         backgroundColor: location.pathname === t.redirect ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
                                     }}
                                 >
                                     <ListItemIcon
                                         sx={{
-                                            mr: open ? 3 : 'auto',
+                                            mr: 'auto',
                                             justifyContent: 'center',
                                         }}
                                     >
