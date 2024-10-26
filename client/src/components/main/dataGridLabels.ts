@@ -8,7 +8,7 @@ export const tableLables = {
     toolbarDensityLabel: 'Плотность',
     toolbarDensityCompact: 'Компактная',
     toolbarDensityStandard: 'Стандартная',
-    toolbarDensityComfortable: 'Удобная',
+    toolbarDensityComfortable: 'Широкая',
 
     // Columns selector toolbar button text
     toolbarColumns: 'Колонки',

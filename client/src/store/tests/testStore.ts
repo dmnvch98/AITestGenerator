@@ -9,6 +9,7 @@ export interface UserTest {
     questions: Question[];
     rating?: number;
     fileName: string;
+    createdAt: Date;
 }
 
 export interface CreateTestRequestDto {

@@ -1,10 +1,17 @@
 import React from 'react';
-import {DataGrid, GridColDef, GridRowIdGetter} from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridColDef, GridEventListener,
+    GridRowIdGetter,
+    GridToolbarContainer,
+    GridToolbarQuickFilter
+} from '@mui/x-data-grid';
 import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {tableLables} from './dataGridLabels';
 import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
-import Typography from "@mui/material/Typography";
+import {SxProps} from "@mui/system";
+import {Theme} from "@mui/material/styles";
 
 interface Action<T> {
     label?: string;
@@ -69,6 +76,17 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
     );
 };
 
+const CustomToolbar = () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarQuickFilter
+                placeholder="Поиск..."
+                size="small"
+            />
+        </GridToolbarContainer>
+    );
+};
+
 interface GenericTableProps<T> {
     data: T[];
     columns: GridColDef[];
@@ -76,16 +94,8 @@ interface GenericTableProps<T> {
     rowIdGetter: (row: T) => number;
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
-}
-
-export const NoRows = () => {
-    return (
-        <>
-            <Typography variant="h6" sx={{position: 'absolute'}}>
-                No data available
-            </Typography>
-        </>
-    );
+    handleEvent?: GridEventListener<any>;
+    sx?: SxProps<Theme>;
 }
 
 export const GenericTableActions = <T, >({
@@ -94,10 +104,13 @@ export const GenericTableActions = <T, >({
                                              actions,
                                              rowIdGetter,
                                              onSelectionModelChange,
-                                             loading
+                                             loading,
+                                             handleEvent,
+                                             sx
                                          }: GenericTableProps<T>) => {
     const actionColumn: GridColDef = {
         field: 'actions',
+        resizable: true,
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
@@ -112,8 +125,7 @@ export const GenericTableActions = <T, >({
             <DataGrid
                 loading={loading}
                 autoHeight
-                rows={data.map((item, idx) => ({
-                    order: idx + 1,
+                rows={data.map(item => ({
                     ...item,
                 }))}
                 columns={[...columns, actionColumn]}
@@ -130,6 +142,9 @@ export const GenericTableActions = <T, >({
                     },
                 }}
                 localeText={tableLables}
+                slots={{ toolbar: CustomToolbar }}
+                onCellClick={handleEvent}
+                sx={sx}
             />
         </Box>
     );

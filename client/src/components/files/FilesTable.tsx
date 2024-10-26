@@ -29,8 +29,9 @@ export const FilesTable = ({actions, loading}: FilesTableProps) => {
     const columns: GridColDef[] = [
         {
             field: 'originalFilename',
-            minWidth: 600,
+            minWidth: 750,
             headerName: 'Заголовок',
+            flex: 1,
             renderCell: (params) => {
                 const file: FileDto = params.row;
                 return (
@@ -43,8 +44,9 @@ export const FilesTable = ({actions, loading}: FilesTableProps) => {
         },
         {
             field: 'uploadTime',
-            minWidth: 300,
+            minWidth: 150,
             headerName: 'Дата загрузки',
+            flex: 1,
             renderCell: (params) => {
                 const file: FileDto = params.row;
                 return DateTimeUtils.formatDate(file.uploadTime);

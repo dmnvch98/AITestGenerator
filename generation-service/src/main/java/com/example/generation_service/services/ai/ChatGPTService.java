@@ -16,7 +16,7 @@ public class ChatGPTService implements AIService {
     private final OpenAiService openAiService;
 
     @Override
-    public String send(final String model, final List<ChatMessage> messages, final JsonNode schema, final double temperature, final double topP) {
+    public String send(final String model, final List<ChatMessage> messages, final JsonNode schema, final double temperature, final double topP, long timeout) throws Exception {
 
         final ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -27,6 +27,6 @@ public class ChatGPTService implements AIService {
                 .stream(false)
                 .build();
 
-        return openAiService.createChatCompletion(request).getChoices().get(0).getMessage().getContent();
+        return openAiService.createCompletionWithTimeout(request, timeout).getChoices().get(0).getMessage().getContent();
     }
 }

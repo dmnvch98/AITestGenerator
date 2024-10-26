@@ -80,7 +80,6 @@ public class ActivityService {
     public void finishActivity(final TestGenerationActivity activity, final Long testId, final String testTitle,
                                final Long userId, final String cid) {
         createFinishedActivity(activity, testId, testTitle, userId, cid);
-        commandService.deleteMessage(activity.getMessageReceipt());
     }
 
     public void failActivity(final String hashKey, final String cid, final GenerationFailReason failReason) {
@@ -96,11 +95,6 @@ public class ActivityService {
         log.info("Saved failed activity=[{}]", failedActivity);
         final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
         historyService.save(failedHistory);
-        final String receipt = activity.getMessageReceipt();
-
-        if (receipt != null) {
-            commandService.deleteMessage(receipt);
-        }
     }
 
     public void failActivity(final String hashKey, final String cid, final Throwable cause) {

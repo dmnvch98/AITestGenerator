@@ -40,15 +40,15 @@ public class AnswerGenerator {
     private final ObjectMapper objectMapper;
 
 
-    public GenerateAnswersResponseDto generateData(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto) throws JsonProcessingException {
-        log.info("Sending prompt to generation test. User id: {}", request.getUserId());
+    public GenerateAnswersResponseDto generateData(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto, final long timeout) throws Exception {
+        log.info("Sending prompt to generation test. User id: {}, timeout: {}", request.getUserId(), timeout);
 
         final LocalDateTime startTime = LocalDateTime.now();
 
         final List<ChatMessage> messages = prepareMessages(request, questionsResponseDto);
         final JsonNode responseSchema = objectMapper.readTree(readFileContents(ANSWERS_SCHEMA_FILE));
 
-        final String result = aiService.send(model, messages, responseSchema, request.getTemperature(), request.getTopP());
+        final String result = aiService.send(model, messages, responseSchema, request.getTemperature(), request.getTopP(), timeout);
         log.info("Test generation is done. User id: {}", request.getUserId());
 //        handleTokensCount(request.getUserId(), request.getText(), getContextPrompt(), result, startTime);
 

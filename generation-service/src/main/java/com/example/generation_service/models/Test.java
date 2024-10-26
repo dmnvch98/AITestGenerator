@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import org.hibernate.annotations.ColumnTransformer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,8 @@ public class Test {
 
     @Column(name = "title")
     private String title;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Convert(converter = QuestionsConverter.class)
     @Column(name = "questions", columnDefinition = "jsonb")

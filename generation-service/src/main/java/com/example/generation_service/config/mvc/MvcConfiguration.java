@@ -27,7 +27,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
   @Bean
   public OpenAiService openAiService() {
-    return new OpenAiService(secret, Duration.ofSeconds(60));
+    return new OpenAiService(secret, Duration.ofSeconds(300));
   }
 
   @Bean

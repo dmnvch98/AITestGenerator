@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,8 @@ public enum GenerationFailReason implements Serializable {
     //13000
     SOCKET_TIMEOUT(SocketTimeoutException.class, "timeout.*", false, 1),
     //14000
-    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true, 1);
+    UNKNOWN_HOST_EXCEPTION(UnknownHostException.class, "api.openai.com: nodename nor servname provided, or not known.*", true, 1),
+    TIMEOUT_EXCEPTION(TimeoutException.class, "Request timed out after.*", false, 1);
 
     private final Class<? extends Throwable> cause;
     private final String messageRegex;
@@ -56,6 +58,7 @@ public enum GenerationFailReason implements Serializable {
         groupCodes.put(FileNotFoundException.class, 12000);
         groupCodes.put(SocketTimeoutException.class, 13000);
         groupCodes.put(UnknownHostException.class, 14000);
+        groupCodes.put(TimeoutException.class, 15000);
         return groupCodes;
     }
 

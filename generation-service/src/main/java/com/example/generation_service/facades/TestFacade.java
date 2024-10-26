@@ -82,7 +82,6 @@ public class TestFacade {
   }
 
   public void generateTestReceiveMessage(final GenerateTestMessage message) {
-    try {
       log.info("Received message to generate test. Message=[{}]", message);
       activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
 
@@ -98,11 +97,6 @@ public class TestFacade {
       final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
       historyService.save(history);
       activityService.finishActivity(currentActivity, test.getId(), test.getTitle(), message.getUserId(), message.getCid());
-    } catch (final Exception e) {
-      log.error("An error occurred when generating test. Message=[{}]", message, e);
-      activityService.failActivity(message.getHashKey(), message.getCid(), e);
-    }
-
   }
 
   public void deleteTest(final Long testId, final Long userId) {

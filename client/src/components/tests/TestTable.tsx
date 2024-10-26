@@ -1,12 +1,14 @@
 import React from 'react';
-import { GridColDef } from '@mui/x-data-grid';
+import {GridColDef, GridEventListener} from '@mui/x-data-grid';
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { UserTest, useTestStore } from "../../store/tests/testStore";
-import { usePassTestStore } from "../../store/tests/passTestStore";
 import { useExportStore } from "../../store/tests/exportStore";
 import {GenericTableActions} from "../main/GenericTableActions";
 import {ConfirmationButtonProps} from "../main/ConfirmationButton";
+import DateTimeUtils from "../../utils/DateTimeUtils";
+import {SxProps} from "@mui/system";
+import {Theme} from "@mui/material/styles";
 
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
@@ -62,34 +64,41 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) 
     const { exportTest } = useExportStore();
     const navigate = useNavigate();
 
-    const columns: GridColDef[] = [
-        {
-            field: 'order',
-            headerName: '#',
+    const handleEvent: GridEventListener<'cellClick'> = (params) => {
+        if (params.field === 'title' || params.field === 'fileName' || params.field === 'createdAt') {
+            navigate(`/tests/${params.row.id}`);
+        }
+    }
+
+    const style: SxProps<Theme> = {
+        '& .MuiDataGrid-cell:hover': {
+            cursor: 'pointer'
         },
+    }
+
+    const columns: GridColDef[] = [
         {
             field: 'fileName',
             headerName: 'Файл',
             minWidth: 250,
+            flex: 1
         },
         {
+            field: 'createdAt',
+            headerName: 'Время создания',
+            minWidth: 150,
+            flex: 1,
+            renderCell: (params) => (
+                <Box>
+                    {DateTimeUtils.formatDateTime(params.value)}
+                </Box>
+            )
+        },
+        {
+            flex: 1,
             field: 'title',
             headerName: 'Заголовок',
             minWidth: 550,
-            renderCell: (params) => (
-                <Box
-                    onClick={() => navigate(`/tests/${params.row.id}`)}
-                    sx={{
-                        cursor: 'pointer',
-                        height: '100%',
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}
-                >
-                    {params.value}
-                </Box>
-            )
         },
     ];
 
@@ -107,6 +116,8 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) 
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={onSelectionModelChange}
                 loading={loading}
+                handleEvent={handleEvent}
+                sx={style}
             />
         </Box>
     );

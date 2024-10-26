@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.example.generation_service.utils.Utils.*;
@@ -35,12 +34,12 @@ public class QuestionGenerator extends Generator<GenerateQuestionsResponseDto> {
     private final ObjectMapper objectMapper;
 
     @Override
-    public GenerateQuestionsResponseDto generateData(final GenerateTestRequest request) throws IOException {
-        log.info("Sending prompt to generation questions. User id: {}", request.getUserId());
+    public GenerateQuestionsResponseDto generateData(final GenerateTestRequest request, final long timeout) throws Exception {
+        log.info("Sending prompt to generation questions. User id: {}, timeout: {}", request.getUserId(), timeout);
 
         final JsonNode responseSchema = objectMapper.readTree(readFileContents(QUESTIONS_SCHEMA_FILE));
         final List<ChatMessage> chatMessages = prepareMessages(request);
-        final String result = aiService.send(model, chatMessages, responseSchema, request.getTemperature(), request.getTopP());
+        final String result = aiService.send(model, chatMessages, responseSchema, request.getTemperature(), request.getTopP(), timeout);
         log.info("Question generation is done. User id: {}", request.getUserId());
         return converter.convert(result);
     }

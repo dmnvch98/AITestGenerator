@@ -16,7 +16,7 @@ import static com.example.generation_service.utils.Utils.countTokens;
 
 public abstract class Generator<T> {
 
-    public abstract T generateData(final GenerateTestRequest request) throws IOException;
+    public abstract T generateData(final GenerateTestRequest request, final long timeout) throws Exception;
 
     @Autowired
     protected OpenAiService openAiService;

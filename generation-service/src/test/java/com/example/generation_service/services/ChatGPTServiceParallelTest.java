@@ -62,7 +62,7 @@ public class ChatGPTServiceParallelTest {
       tasks.add(() -> {
         List<ChatMessage> messages = List.of(new ChatMessage("user", "Привет как твои дела, ковбой? я соскучился"));
         // Параметры для метода send, подставьте ваши значения
-        return chatGPTService.send("gpt-4o-mini", messages, schema, 0.5, 0.8);
+        return chatGPTService.send("gpt-4o-mini", messages, schema, 0.5, 0.8, );
       });
     }
 

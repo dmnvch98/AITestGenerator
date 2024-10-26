@@ -2,6 +2,7 @@ package com.example.generation_service.scheduler;
 
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.GenerateTestMessage;
+import com.example.generation_service.services.ActivityService;
 import com.example.generation_service.services.CommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class CommandsScheduler {
 
   private final CommandService commandService;
   private final TestFacade testFacade;
+  private final ActivityService activityService;
 
   private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -38,6 +40,9 @@ public class CommandsScheduler {
         testFacade.generateTestReceiveMessage(command);
       } catch (Exception e) {
         log.error("Error processing command: {}", command, e);
+        activityService.failActivity(command.getHashKey(), command.getCid(), e);
+      } finally {
+        commandService.deleteMessage(command.getReceipt());
       }
     });
   }

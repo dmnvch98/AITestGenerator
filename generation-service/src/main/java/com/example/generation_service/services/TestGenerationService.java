@@ -20,23 +20,27 @@ import java.util.Map;
 @Slf4j
 public class TestGenerationService {
 
+    private final static int initialTimeout = 100000;
+    private final static double timeoutMultiplier = 1.5;
+
     private final QuestionGenerator questionGenerator;
     private final AnswerGenerator answerGenerator;
     private final RetryTemplate retryTemplate;
     private final TestConverter testConverter;
 
-    public Test generateTest(final GenerateTestRequest request, Map<String, String> retryContextParamsMap) {
+    public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) {
       final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
       final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
 
       return testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
     }
 
-    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, Map<String, String> retryContextParamsMap) {
+    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) {
         try {
             return retryTemplate.execute(context -> {
                 setRetryContextParams(context, retryContextParamsMap);
-                return questionGenerator.generateData(request);
+                long timeout = calculateTimeout(context.getRetryCount());
+                return questionGenerator.generateData(request, timeout);
             });
         } catch (final Exception e) {
             throw new RuntimeException("Questions generation failed for userId = " + request.getUserId() +
@@ -51,7 +55,8 @@ public class TestGenerationService {
         try {
             return retryTemplate.execute(context -> {
                 setRetryContextParams(context, retryContextParamsMap);
-                return answerGenerator.generateData(request, questionsResponseDto);
+                long timeout = calculateTimeout(context.getRetryCount());
+                return answerGenerator.generateData(request, questionsResponseDto, timeout);
             });
         } catch (final Exception e) {
             throw new RuntimeException("Generation of answers failed for userId = " + request.getUserId() +
@@ -63,6 +68,10 @@ public class TestGenerationService {
         for (Map.Entry<String, String> entry : retryContextParamsMap.entrySet()) {
             context.setAttribute(entry.getKey(), entry.getValue());
         }
+    }
+
+    private long calculateTimeout(int retryCount) {
+        return (long) (initialTimeout * Math.pow(timeoutMultiplier, retryCount));
     }
 
 }

@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @RequestMapping("/api/v1/tests")
 @RequiredArgsConstructor
@@ -23,10 +26,11 @@ public class ExportController {
             @RequestBody ExportTestRequestDto requestDto,
             Authentication authentication
     ) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        ExportedTest fileData = exportFacade.export(requestDto, testId, userId);
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        final ExportedTest fileData = exportFacade.export(requestDto, testId, userId);
+        final String encodedFileName = URLEncoder.encode(fileData.getFileName(), StandardCharsets.UTF_8);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + fileData.getFileName() +"\"")
+                .header("Content-Disposition", "attachment; filename=\"" + encodedFileName +"\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(fileData.getBytes());
     }
