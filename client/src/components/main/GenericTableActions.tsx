@@ -78,10 +78,18 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
 
 const CustomToolbar = () => {
     return (
-        <GridToolbarContainer>
+        <GridToolbarContainer
+            sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                pt: 2,
+                pr: 2
+            }}
+        >
             <GridToolbarQuickFilter
                 placeholder="Поиск..."
                 size="small"
+                sx={{width: '350px'}}
             />
         </GridToolbarContainer>
     );
@@ -142,7 +150,7 @@ export const GenericTableActions = <T, >({
                     },
                 }}
                 localeText={tableLables}
-                slots={{ toolbar: CustomToolbar }}
+                slots={{toolbar: CustomToolbar}}
                 onCellClick={handleEvent}
                 sx={sx}
             />

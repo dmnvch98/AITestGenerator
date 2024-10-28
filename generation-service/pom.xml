@@ -19,7 +19,13 @@
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
     </properties>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit -->
+
+        <dependency>
+            <groupId>xyz.capybara</groupId>
+            <artifactId>clamav-client</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.redis</groupId>
             <artifactId>testcontainers-redis</artifactId>
@@ -67,27 +73,11 @@
             <artifactId>jaxb-api</artifactId>
             <version>2.3.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.theokanning.openai-gpt3-java/service -->
+
         <dependency>
-            <groupId>com.theokanning.openai-gpt3-java</groupId>
+            <groupId>com.github.dmnvch98.openai-java</groupId>
             <artifactId>service</artifactId>
-            <version>0.18.2</version>
-            <scope>system</scope>
-            <systemPath>/Users/Yauhen/IdeaProjects/AITestGenerator/libs/service-0.18.2.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>com.theokanning.openai-gpt3-java</groupId>
-            <artifactId>api</artifactId>
-            <version>0.18.2</version>
-            <scope>system</scope>
-            <systemPath>/Users/Yauhen/IdeaProjects/AITestGenerator/libs/api-0.18.2.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>com.theokanning.openai-gpt3-java</groupId>
-            <artifactId>client</artifactId>
-            <version>0.18.2</version>
+            <version>ff2e335d74</version>
         </dependency>
 
         <dependency>
@@ -175,5 +165,20 @@
             <version>5.2.3</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
 
 </project>

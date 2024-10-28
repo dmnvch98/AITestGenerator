@@ -3,7 +3,6 @@ package com.example.generation_service.models;
 import java.time.LocalDateTime;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +33,6 @@ public class FileHash {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "tokensCount")
-    @JsonIgnore
-    private Integer tokensCount;
-
+    @Column(name = "data")
+    private String data;
 }

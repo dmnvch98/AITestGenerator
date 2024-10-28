@@ -65,7 +65,7 @@ public class QueueClient {
             receipt.ifPresent(s -> queue.deleteMessage(new DeleteMessageRequest(queueUrl, s)));
             redisService.deleteObjectAsString(processingKey);
 
-            log.info("Message was deleted from the queue. Message : {} ", messageId.substring(0, 10));
+            log.info("Message was deleted from the queue. Message : {} ", messageId.substring(0, 8));
         } catch (Exception e) {
             log.error("An error occurred during deleting message from the queue. Message id : {}", messageId);
         }
@@ -81,15 +81,6 @@ public class QueueClient {
             log.error("An error occurred during saving message to the queue. Message: {}",
                   message, e);
         }
-    }
-
-    private void updateVisibilityTimeout(final String receiptHandle) {
-        final ChangeMessageVisibilityRequest request = new ChangeMessageVisibilityRequest()
-              .withQueueUrl(queueUrl)
-              .withReceiptHandle(receiptHandle)
-              .withVisibilityTimeout(timeoutInSeconds);
-
-        queue.changeMessageVisibility(request);
     }
 
     private void extendVisibilityTimeout(Message message) {

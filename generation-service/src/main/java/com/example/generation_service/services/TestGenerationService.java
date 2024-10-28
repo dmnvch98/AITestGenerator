@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class TestGenerationService {
 
-    private final static int initialTimeout = 100000;
+    private final static int initialTimeout = 60000;
     private final static double timeoutMultiplier = 1.5;
 
     private final QuestionGenerator questionGenerator;
