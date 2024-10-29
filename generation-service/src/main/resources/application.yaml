@@ -56,3 +56,8 @@ retry:
 logging:
   pattern:
     console: ${LOGGING_PATTERN_CONSOLE}
+
+bytescale:
+  appId: ${BYTESCALE_APP_ID}
+  publicKey: ${BYTESCALE_PUBLIC_KEY}
+  secretKey: ${BYTESCALE_SECRET_KEY}

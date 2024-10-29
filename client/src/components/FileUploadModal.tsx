@@ -41,7 +41,8 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
     const [dragOver, setDragOver] = useState(false);
 
     const MAX_FILES = 5;
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const MAX_FILE_SIZE_MB = 5;
+    const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
     const handleFileUpload = (event: ChangeEvent<HTMLInputElement> | DragEvent) => {
         const newFiles = event.type === 'change'
@@ -61,7 +62,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
             } else if (file.size > MAX_FILE_SIZE) {
                 invalidFiles.push({
                     id: uuidv4() + Math.random(),
-                    message: `<b>${file.name}</b> превышает ${MAX_FILE_SIZE} MБ`,
+                    message: `<b>${file.name}</b> превышает ${MAX_FILE_SIZE_MB} MБ`,
                     severity: 'error'
                 });
             } else if (filesToUpload.length + validFiles.length >= MAX_FILES) {
