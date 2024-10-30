@@ -17,7 +17,7 @@ public class PDFExtractor implements FileExtractor {
     try (InputStream inputStream = fileUrl.openStream();
          PDDocument document = PDDocument.load(inputStream)) {
       PDFTextStripper pdfStripper = new PDFTextStripper();
-      return Utils.removeNewLines(pdfStripper.getText(document));
+        return Utils.removeNewLines(pdfStripper.getText(document));
     } catch (IOException e) {
       throw new IllegalArgumentException("Error when parsing PDF document. File url: " + fileUrl.getPath(), e);
 
@@ -26,8 +26,10 @@ public class PDFExtractor implements FileExtractor {
 
   @Override
   public String extract(InputStream inputStream) throws IOException {
-    PDDocument document = PDDocument.load(inputStream);
-    PDFTextStripper pdfStripper = new PDFTextStripper();
-    return Utils.removeNewLines(pdfStripper.getText(document));
+      try (PDDocument document = PDDocument.load(inputStream)) {
+          PDFTextStripper pdfStripper = new PDFTextStripper();
+          return Utils.removeNewLines(pdfStripper.getText(document));
+      }
   }
+
 }

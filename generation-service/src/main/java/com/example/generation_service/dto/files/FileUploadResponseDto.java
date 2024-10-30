@@ -12,15 +12,21 @@ import java.util.List;
 @Getter
 public class FileUploadResponseDto {
 
-    private final List<FileResult> fileResults;
+    private final List<FileUploadResult> fileResults;
 
     @AllArgsConstructor
-    @Builder
     @Getter
-    public static class FileResult {
+    public static class FileUploadResult {
 
         private final String fileName;
         private final UploadStatus status;
         private final String description;
+
+        @Builder
+        public FileUploadResult(String fileName, UploadStatus status) {
+            this.fileName = fileName;
+            this.status = status;
+            this.description = status.getDescription();
+        }
     }
 }

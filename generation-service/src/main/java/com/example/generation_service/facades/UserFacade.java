@@ -6,6 +6,8 @@ import com.example.generation_service.dto.users.CreateUserRequestDto;
 import com.example.generation_service.dto.users.UserResponseDto;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.models.User;
+import com.example.generation_service.models.UserFeature;
+import com.example.generation_service.services.UserFeatureService;
 import com.example.generation_service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,15 +17,18 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class UserFacade {
+
     private final UserService userService;
+    private final UserFeatureService userFeatureService;
     private final UserConverter userConverter;
     private final PasswordConfig passwordConfig;
 
     public UserResponseDto save(final CreateUserRequestDto userDto) {
-        User user = userConverter.createUserDtoToUser(userDto);
-        String hashedPassword = passwordConfig.passwordEncoder().encode(userDto.getPassword());
-        user.setPassword(hashedPassword);
-        user = userService.save(user);
+        final String hashedPassword = passwordConfig.passwordEncoder().encode(userDto.getPassword());
+        final User user = userConverter.createUserDtoToUser(userDto, hashedPassword);
+        final UserFeature userFeature = userFeatureService.createUserFeature();
+        user.addUserFeature(userFeature);
+        userService.save(user);
         return userConverter.userToCreateUserResponseDto(user);
     }
 

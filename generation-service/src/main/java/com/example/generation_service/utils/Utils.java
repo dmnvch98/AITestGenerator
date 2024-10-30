@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,26 +54,23 @@ public class Utils {
         return filename.substring(filename.lastIndexOf('.') + 1);
     }
 
-    public static String generateCid() {
-        return String.valueOf( System.currentTimeMillis());
+    public static String generateRandomCid() {
+        return String.valueOf(ThreadLocalRandom.current().nextLong(1_000_000_000_000L, 10_000_000_000_000L));
     }
 
-    public static String getHashKey(final Long userId) {
+    public static String getGenerationHashKey(final Long userId) {
         return "generations:user:" + userId;
     }
 
     public static Long getUserIdFromHashKey(String hashKey) {
-        // Регулярное выражение для извлечения ID из строки
         String regex = "generations:user:(\\d+)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(hashKey);
 
-        // Если строка соответствует шаблону, извлекаем ID
         if (matcher.matches()) {
             return Long.parseLong(matcher.group(1));
         }
 
-        // Если не удалось извлечь ID, возвращаем null или можно бросить исключение
         return null;
     }
 

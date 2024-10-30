@@ -6,12 +6,14 @@ import com.example.generation_service.utils.Utils;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Order(3)
 public class FileTokensCountValidator implements FileValidator {
 
     private final static Integer MAX_TOKENS = 6500;

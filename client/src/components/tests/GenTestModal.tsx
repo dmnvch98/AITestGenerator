@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
-import {Modal, Box, Typography, TextField, Slider, Button, Tooltip, Alert} from '@mui/material';
+import {Modal, Box, Typography, TextField, Button} from '@mui/material';
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 interface ModalFormProps {
     open: boolean;
@@ -70,16 +69,12 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 <Typography variant="h6" gutterBottom>
                     Параметры генерации
                 </Typography>
-                <Alert severity="info" icon={false}>
-                    <Box textAlign="left">
-                        Расшифровка параметров 'Температура' и 'Top P' находится в иконках ⓘ. <br/>
-                        Менять эти параметры необязательно.
-                    </Box>
-                </Alert>
-                {/*<Typography fontSize={14} gutterBottom color="#777">*/}
-                {/*    Расшифровка параметров 'Температура' и 'Top P' находится в иконках ⓘ. <br/>*/}
-                {/*    Менять эти параметры необязательно.*/}
-                {/*</Typography>*/}
+                {/*<Alert severity="info" icon={false}>*/}
+                {/*    <Box textAlign="left">*/}
+                {/*        Расшифровка параметров 'Температура' и 'Top P' находится в иконках ⓘ. <br/>*/}
+                {/*        Менять эти параметры необязательно.*/}
+                {/*    </Box>*/}
+                {/*</Alert>*/}
 
 
                 <TextField
@@ -102,37 +97,37 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                     inputProps={{ min: 0, max: 8 }}
                 />
 
-                <Box display="flex">
-                    <Typography gutterBottom>Температура</Typography>
-                    <Tooltip title="Температура контролирует степень случайности в ответах: значение 0 делает ответы более предсказуемыми, а значение 1 – более случайными и креативными.">
-                        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>
-                    </Tooltip>
-                </Box>
-                <Slider
-                    marks
-                    value={temperature}
-                    onChange={handleTemperatureChange}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    valueLabelDisplay="auto"
-                />
+                {/*<Box display="flex">*/}
+                {/*    <Typography gutterBottom>Температура</Typography>*/}
+                {/*    <Tooltip title="Температура контролирует степень случайности в ответах: значение 0 делает ответы более предсказуемыми, а значение 1 – более случайными и креативными.">*/}
+                {/*        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>*/}
+                {/*    </Tooltip>*/}
+                {/*</Box>*/}
+                {/*<Slider*/}
+                {/*    marks*/}
+                {/*    value={temperature}*/}
+                {/*    onChange={handleTemperatureChange}*/}
+                {/*    min={0}*/}
+                {/*    max={1}*/}
+                {/*    step={0.1}*/}
+                {/*    valueLabelDisplay="auto"*/}
+                {/*/>*/}
 
-                <Box display="flex">
-                    <Typography gutterBottom>Top P</Typography>
-                    <Tooltip title="Top P ограничивает выбор слов: при значении 1 учитываются все возможные слова, а при значениях ближе к 0 – только самые вероятные слова">
-                        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>
-                    </Tooltip>
-                </Box>
-                <Slider
-                    marks
-                    value={topP}
-                    onChange={handleTopPChange}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    valueLabelDisplay="auto"
-                />
+                {/*<Box display="flex">*/}
+                {/*    <Typography gutterBottom>Top P</Typography>*/}
+                {/*    <Tooltip title="Top P ограничивает выбор слов: при значении 1 учитываются все возможные слова, а при значениях ближе к 0 – только самые вероятные слова">*/}
+                {/*        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>*/}
+                {/*    </Tooltip>*/}
+                {/*</Box>*/}
+                {/*<Slider*/}
+                {/*    marks*/}
+                {/*    value={topP}*/}
+                {/*    onChange={handleTopPChange}*/}
+                {/*    min={0}*/}
+                {/*    max={1}*/}
+                {/*    step={0.1}*/}
+                {/*    valueLabelDisplay="auto"*/}
+                {/*/>*/}
 
                 <Button onClick={onSubmit} variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                     Сгенерировать

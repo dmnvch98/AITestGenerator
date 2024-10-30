@@ -29,15 +29,11 @@ export interface AnswerOption {
     isCorrect: boolean
 }
 
-export interface GenerateTestRequestDto {
-    textId: number
-}
-
 export interface GenerateTestRequest {
     maxQuestionsCount: number,
     minAnswersCount: number,
-    temperature: number,
-    topP: number,
+    // temperature: number,
+    // topP: number,
     hashedFileName: string
 }
 
@@ -58,14 +54,11 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    generateTest: (textId: number) => void,
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: () => void,
     getUserTestsByIdIn: (ids: number[]) => Promise<void>,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
-    generateTestFlag: boolean,
-    toggleGenerateTestFlag: () => void,
     generateTestValidationErrorFlag: boolean;
     setGenerateTestValidationErrorFlag: (flag: boolean) => void;
     selectedTextId: number | undefined,
@@ -89,7 +82,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     tests: [],
     selectedTest: undefined,
     selectedTestRating: undefined,
-    generateTestFlag: false,
     generateTestValidationErrorFlag: false,
     selectedTextId: undefined,
     alerts: [],
@@ -99,22 +91,12 @@ export const useTestStore = create<TestStore>((set, get) => ({
             tests: [],
             selectedTest: undefined,
             selectedTestRating: undefined,
-            generateTestFlag: false,
             generateTestValidationErrorFlag: false,
             selectedTextId: undefined,
         })
     },
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest});
-    },
-    generateTest: async (textId: number) => {
-        let dto: GenerateTestRequestDto = {
-            textId: textId
-        }
-        const response = await TestService.generateTest(dto);
-        if (response) {
-            set({testGenerationStarted: true})
-        }
     },
 
     generateTestByFile: async (request) => {
@@ -141,9 +123,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     getUserTestsByIdIn: async (ids: number[]) => {
         const userTests = await TestService.getUserTests(ids)
         set({tests: userTests});
-    },
-    toggleGenerateTestFlag: () => {
-        set({generateTestFlag: !get().generateTestFlag})
     },
     setGenerateTestValidationErrorFlag: (flag: boolean) => {
         set({generateTestValidationErrorFlag: flag})

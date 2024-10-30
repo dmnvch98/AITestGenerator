@@ -5,7 +5,7 @@ import com.example.generation_service.dto.activity.BulkActivityDeleteDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityResponseDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityRequestDto;
 import com.example.generation_service.facades.ActivityFacade;
-import com.example.generation_service.models.TestGenerationActivity;
+import com.example.generation_service.models.activity.TestGenerationActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;

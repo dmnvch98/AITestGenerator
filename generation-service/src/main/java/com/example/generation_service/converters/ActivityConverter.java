@@ -3,7 +3,7 @@ package com.example.generation_service.converters;
 import com.example.generation_service.dto.activity.TestGenerationActivityResponseDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
-import com.example.generation_service.models.TestGenerationActivity;
+import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.models.enums.ActivityStatus;
 import org.mapstruct.Mapper;

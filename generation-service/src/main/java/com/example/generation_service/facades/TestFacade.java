@@ -2,7 +2,7 @@ package com.example.generation_service.facades;
 
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
-import com.example.generation_service.models.TestGenerationActivity;
+import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.CreateTestRequestDto;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
@@ -12,6 +12,7 @@ import com.example.generation_service.generators.models.GenerateTestRequest;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
 import com.example.generation_service.services.*;
+import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.services.aws.StorageClient;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.generation_service.utils.Utils.generateCid;
+import static com.example.generation_service.utils.Utils.generateRandomCid;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class TestFacade {
   private final StorageClient storageClient;
   private final FileExtractorService extractorService;
   private final TestGenerationConverter testGenerationConverter;
-  private final ActivityService activityService;
+  private final TestGenerationActivityService activityService;
 
   public Test save(final CreateTestRequestDto request, final Long userId) {
     final Test test = testConverter.convert(request, userId);
@@ -46,7 +47,7 @@ public class TestFacade {
   }
 
   public void prepareTestGeneration(final Long userId, final GenerateTestRequestDto dto) {
-    final String cid = generateCid();
+    final String cid = generateRandomCid();
     MDC.put("cid", cid);
     final String hashKey = "generations:user:" + userId;
     log.info("Received command to generation test, command=[{}]", dto);

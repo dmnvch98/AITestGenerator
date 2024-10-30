@@ -34,6 +34,10 @@ public class FileHashService {
     return repository.existsByHashedFilenameAndUserId(hashedFileName, userId);
   }
 
+  public boolean isExistsByOriginalFilenameAndUserId(final Long userId, final String hashedFileName) {
+    return repository.existsByOriginalFilenameAndUserId(hashedFileName, userId);
+  }
+
   public FileHash getByHashedFilenameAndUserId(final Long userId, final String hashedFileName) {
     return repository.findByHashedFilenameAndUserId(hashedFileName, userId);
   }

@@ -21,7 +21,7 @@ public class GenerateTestRequestDto implements Serializable {
     @Builder.Default
     private final int maxAnswersCount = 5;
     @Builder.Default
-    private final double topP = 0.6;
+    private final double topP = 0.9;
     @Builder.Default
-    private final double temperature = 0.5;
+    private final double temperature = 0.3;
 }

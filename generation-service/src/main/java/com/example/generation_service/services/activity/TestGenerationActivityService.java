@@ -1,12 +1,15 @@
-package com.example.generation_service.services;
+package com.example.generation_service.services.activity;
 
 import com.example.generation_service.converters.ActivityConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
-import com.example.generation_service.models.TestGenerationActivity;
+import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.generation_service.models.FileHash;
 import com.example.generation_service.models.TestGeneratingHistory;
+import com.example.generation_service.services.CommandService;
+import com.example.generation_service.services.FileHashService;
+import com.example.generation_service.services.TestGeneratingHistoryService;
 import com.example.generation_service.services.redis.GenericRedisService;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ActivityService {
+public class TestGenerationActivityService {
 
     private final CommandService commandService;
     private final ActivityConverter activityConverter;
@@ -30,7 +33,7 @@ public class ActivityService {
     private final FileHashService fileHashService;
 
     public void saveActivity(final TestGenerationActivity activity) {
-        final String hashKey = Utils.getHashKey(activity.getUserId());
+        final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
         genericRedisService.saveObjectToHash(hashKey, activity.getCid(), activity);
     }
 
@@ -46,12 +49,12 @@ public class ActivityService {
     public void createWaitingActivity(final FileHash fileHash, final String cid,
                                       final GenerateTestRequestDto requestDto, final Long userId) {
         final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId);
-        final String hashKey = Utils.getHashKey(userId);
+        final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.saveObjectToHash(hashKey,cid, waitingActivity);
     }
 
     public void createInProgressActivity(final Long userId, final String cid, final String messageReceipt) {
-        final String hashKey = Utils.getHashKey(userId);
+        final String hashKey = Utils.getGenerationHashKey(userId);
         final TestGenerationActivity currentActivity = genericRedisService
               .getObjectFromHash(hashKey, cid, TestGenerationActivity.class)
               .orElse(null);
@@ -63,17 +66,17 @@ public class ActivityService {
     private void createFinishedActivity(final TestGenerationActivity activity, final Long testId,
                                         final String testTitle, final Long userId, final String cid) {
         final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity, testId, testTitle);
-        final String hashKey = Utils.getHashKey(userId);
+        final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity);
     }
 
     public void deleteUserActivity(final Long userId, final String cid) {
-        final String hashKey = Utils.getHashKey(userId);
+        final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.deleteObjectFromHash(hashKey, cid);
     }
 
     public void deleteUserActivities(final Long userId, final List<String> cids) {
-        final String hashKey = Utils.getHashKey(userId);
+        final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.deleteObjectsFromHash(hashKey, cids);
     }
 
@@ -90,7 +93,7 @@ public class ActivityService {
     private void failActivity(final TestGenerationActivity activity, final GenerationFailReason failReason) {
         log.info("Failing activity=[{}]", activity);
         final TestGenerationActivity failedActivity = activityConverter.getFailedActivity(activity, failReason);
-        final String hashKey = Utils.getHashKey(activity.getUserId());
+        final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
         genericRedisService.saveObjectToHash(hashKey, failedActivity.getCid(), failedActivity);
         log.info("Saved failed activity=[{}]", failedActivity);
         final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);

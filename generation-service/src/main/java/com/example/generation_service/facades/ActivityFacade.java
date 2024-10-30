@@ -3,8 +3,8 @@ package com.example.generation_service.facades;
 import com.example.generation_service.converters.ActivityConverter;
 import com.example.generation_service.dto.activity.TestGenerationActivityResponseDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityRequestDto;
-import com.example.generation_service.models.TestGenerationActivity;
-import com.example.generation_service.services.ActivityService;
+import com.example.generation_service.models.activity.TestGenerationActivity;
+import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ActivityFacade {
 
-  private final ActivityService activityService;
+  private final TestGenerationActivityService activityService;
   private final ActivityConverter activityConverter;
 
   public void save(final TestGenerationActivityRequestDto dto, final Long userId) {
@@ -24,7 +24,7 @@ public class ActivityFacade {
   }
 
   public Set<TestGenerationActivityResponseDto> getUserActivities(final Long userId) {
-    final String hashKey = Utils.getHashKey(userId);
+    final String hashKey = Utils.getGenerationHashKey(userId);
     final Set<TestGenerationActivity> activities = activityService.getUserActivities(hashKey);
     return activityConverter.convert(activities);
   }

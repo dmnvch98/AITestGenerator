@@ -1,7 +1,7 @@
 package com.example.generation_service.config.retriers;
 
 import com.example.generation_service.config.shutdown.ShutdownFlag;
-import com.example.generation_service.services.ActivityService;
+import com.example.generation_service.services.activity.TestGenerationActivityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.RetryCallback;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class GenerationRetryListener implements RetryListener {
 
   private final ShutdownFlag shutdownFlag;
-  private final ActivityService activityService;
+  private final TestGenerationActivityService activityService;
 
   @Override
   public <T, E extends Throwable> boolean open(final RetryContext context, final RetryCallback<T, E> callback) {

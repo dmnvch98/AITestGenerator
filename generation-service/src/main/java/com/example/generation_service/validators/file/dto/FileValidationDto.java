@@ -13,9 +13,11 @@ import java.util.Map;
 @Getter
 @Builder
 public class FileValidationDto {
+
     private final MultipartFile file;
     private UploadStatus uploadStatus;
     private Map<String, String> fileData;
+    private final Long userId;
 
     public void addFileData(final String key, final String value) {
         if (fileData == null) {

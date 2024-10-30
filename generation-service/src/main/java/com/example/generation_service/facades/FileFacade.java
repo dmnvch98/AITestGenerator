@@ -1,26 +1,26 @@
 package com.example.generation_service.facades;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.generation_service.converters.FileHashConverter;
+import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
 import com.example.generation_service.exceptions.*;
-import com.example.generation_service.models.FileHash;
-import com.example.generation_service.models.enums.UploadStatus;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
-import com.example.generation_service.validators.file.FileValidator;
-import com.example.generation_service.validators.file.dto.FileValidationDto;
+import com.example.generation_service.workers.FileUploader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.MDC;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import static com.example.generation_service.utils.Utils.generateRandomCid;
 
 @Component
 @RequiredArgsConstructor
@@ -30,34 +30,32 @@ public class FileFacade {
   private final FileHashService fileHashService;
   private final StorageClient storageClient;
   private final FileHashConverter converter;
-  private final List<FileValidator> fileValidators;
+  private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+  private final FileUploader fileUploader;
 
-  @Transactional
-  public UploadStatus saveFile(final long userId, final MultipartFile file) {
-    final FileValidationDto validationDto = validateFile(file);
+  public FileUploadResponseDto saveFiles(final Long userId, final List<MultipartFile> files) {
+    final List<FileUploadResponseDto.FileUploadResult> fileResults = new ArrayList<>();
+    final List<Future<FileUploadResponseDto.FileUploadResult>> futures = new ArrayList<>();
 
-    if (!validationDto.getUploadStatus().equals(UploadStatus.SUCCESS)) {
-      return validationDto.getUploadStatus();
+    for (final MultipartFile file : files) {
+      final Callable<FileUploadResponseDto.FileUploadResult> task = () -> {
+        final String cid = generateRandomCid();
+        MDC.put("cid", cid);
+        return fileUploader.saveFile(userId, file);
+      };
+      futures.add(executorService.submit(task));
     }
 
-    try {
-      final String originalFileName = file.getOriginalFilename();
-      final ObjectMetadata metadata = new ObjectMetadata();
-      metadata.setContentLength(file.getSize());
-
-      final String fileNameHash = DigestUtils.md5Hex(originalFileName);
-
-      storageClient.uploadFile(userId, fileNameHash, file.getInputStream(), metadata);
-
-      final FileHash fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
-              validationDto.getFileData());
-
-      fileHashService.save(fileHash);
-    } catch (IOException e) {
-      log.error("Error when saving file: {} for user id: {}", file.getOriginalFilename(), userId, e);
-      return UploadStatus.FAILED;
+    for (Future<FileUploadResponseDto.FileUploadResult> future : futures) {
+      try {
+        final FileUploadResponseDto.FileUploadResult result = future.get();
+        fileResults.add(result);
+      } catch (InterruptedException | ExecutionException e) {
+        log.error("An error occurred when uploading a file", e);
+      }
     }
-    return UploadStatus.SUCCESS;
+
+    return FileUploadResponseDto.builder().fileResults(fileResults).build();
   }
 
   public Resource getFileByHash(final long userId, final String hash) {
@@ -89,16 +87,5 @@ public class FileFacade {
       throw new ResourceNotFoundException(hashedFileName);
     }
     return true;
-  }
-
-  private FileValidationDto validateFile(final MultipartFile file) {
-    final FileValidationDto dto = converter.convertToValidateDto(file);
-    for (final FileValidator validator : fileValidators) {
-        final UploadStatus validationStatus = validator.validate(dto).getUploadStatus();
-        if (validationStatus != UploadStatus.SUCCESS) {
-            return dto;
-        }
-    }
-    return dto;
   }
 }

@@ -4,7 +4,6 @@ import {
     BulkDeleteTestsRequestDto,
     CreateTestRequestDto,
     GenerateTestRequest,
-    GenerateTestRequestDto,
     UserTest
 } from "../store/tests/testStore";
 
@@ -20,16 +19,6 @@ class TestService {
         try {
             const response = await this.axiosInstance.post("/api/v1/tests", dto);
             return response.status === 201;
-        } catch (e: unknown) {
-            const error = e as AxiosError;
-            console.log(error.message);
-        }
-    }
-
-    generateTest = async (dto: GenerateTestRequestDto) => {
-        try {
-            const response = await this.axiosInstance.post("/api/v1/tests/generate", dto);
-            return response.status == 200;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

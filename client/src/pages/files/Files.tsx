@@ -27,12 +27,12 @@ const FilesContent = () => {
         isLoading,
         deleteFilesInBatch,
         selectedFileHashes,
-        deleteFile
+        deleteFile,
+        addAlert
     } = useFileStore();
 
     const {generateTestByFile} = useTestStore();
-    const {maxQuestionsCount, minAnswersCount, temperature, topP} = useGenerateTestStore();
-    const {addAlert} = useFileStore();
+    const {maxQuestionsCount, minAnswersCount} = useGenerateTestStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -91,8 +91,6 @@ const FilesContent = () => {
             const request: GenerateTestRequest = {
                 maxQuestionsCount,
                 minAnswersCount,
-                temperature,
-                topP,
                 hashedFileName: selectedFile.hashedFilename
             }
             generateTestByFile(request).then((r) => {

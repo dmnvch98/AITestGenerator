@@ -4,6 +4,7 @@ import com.example.generation_service.models.enums.UploadStatus;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Order(1)
 public class FileExtensionValidator implements FileValidator {
 
     @Value("${file-upload.allowed-extensions}")

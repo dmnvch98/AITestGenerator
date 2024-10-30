@@ -2,7 +2,7 @@ package com.example.generation_service.scheduler;
 
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.GenerateTestMessage;
-import com.example.generation_service.services.ActivityService;
+import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.services.CommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class CommandsScheduler {
 
   private final CommandService commandService;
   private final TestFacade testFacade;
-  private final ActivityService activityService;
+  private final TestGenerationActivityService activityService;
 
   private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 

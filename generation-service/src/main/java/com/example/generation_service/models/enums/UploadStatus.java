@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum UploadStatus {
 
     SUCCESS("Загрузка завершена успешно"),
+    IN_PROCESS("Файл загружается"),
     FAILED("Загрузка не удалась из-за ошибки"),
     ALREADY_UPLOADED("Файл уже был загружен"),
     INVALID_EXTENSION("Файл имеет недопустимое расширение"),

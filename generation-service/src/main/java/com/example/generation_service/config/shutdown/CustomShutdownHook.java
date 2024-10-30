@@ -1,7 +1,7 @@
 package com.example.generation_service.config.shutdown;
 
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
-import com.example.generation_service.services.ActivityService;
+import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ public class CustomShutdownHook implements DisposableBean {
 
     private final ShutdownFlag shutdownFlag;
     private final OpenAiService openAiService;
-    private final ActivityService activityService;
+    private final TestGenerationActivityService activityService;
 
     @Override
     public void destroy() throws Exception {

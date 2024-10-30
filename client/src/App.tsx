@@ -2,7 +2,6 @@ import React from 'react';
 import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import './App.css';
 import LoginPage from "./pages/auth/LoginPage";
-import {AddText} from "./pages/texts/AddText";
 import {createTheme, ThemeProvider} from "@mui/material";
 import {TestPageView} from "./pages/tests/view/TestPageView";
 import {appColors} from "./styles/appColors";
@@ -51,7 +50,6 @@ function App() {
                             ? <Routes>
                                 <Route path="/sign-in" element={<LoginPage/>}/>
                                 <Route path="/sign-up" element={<SignUp/>}/>
-                                <Route path="/add-text" element={<AddText/>}/>
                                 <Route path="/tests" element={<TestsPage/>}/>
                                 <Route path="/tests/create" element={<TestPageCreate/>}/>
                                 <Route path="/tests/:id" element={<TestPageView/>}/>

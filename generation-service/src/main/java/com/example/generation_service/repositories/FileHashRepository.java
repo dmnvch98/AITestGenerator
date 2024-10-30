@@ -14,6 +14,8 @@ public interface FileHashRepository extends CrudRepository<FileHash, Long> {
 
     Boolean existsByHashedFilenameAndUserId(final String hashedFileName, final Long userId);
 
+    Boolean existsByOriginalFilenameAndUserId(final String originalFileName, final Long userId);
+
     List<FileHash> findAllByUserId(final long userId);
 
     void deleteAllByHashedFilenameAndUserId(final String hashedFileName, final long userId);

@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.activity;
 
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;

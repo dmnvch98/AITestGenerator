@@ -22,8 +22,8 @@ public interface FileHashConverter {
     return FileHashesResponseDto.builder().fileHashes(fileHashes).build();
   }
 
-  default FileValidationDto convertToValidateDto(final MultipartFile file) {
-    return FileValidationDto.builder().file(file).build();
+  default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId) {
+    return FileValidationDto.builder().file(file).userId(userId).build();
   }
 
   default String convertToFileDataJson(final Map<String, String> fileData) throws JsonProcessingException {

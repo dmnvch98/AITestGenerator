@@ -17,7 +17,8 @@ export enum UploadStatus {
     FAILED = 'FAILED',
     ALREADY_UPLOADED = 'ALREADY_UPLOADED',
     INVALID_EXTENSION = 'INVALID_EXTENSION',
-    TOO_LARGE = 'TOO_LARGE'
+    TOO_LARGE = 'TOO_LARGE',
+    MALWARE = 'MALWARE'
 }
 
 const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'> = {
@@ -25,7 +26,8 @@ const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'
     [UploadStatus.FAILED]: 'error',
     [UploadStatus.ALREADY_UPLOADED]: 'error',
     [UploadStatus.INVALID_EXTENSION]: 'error',
-    [UploadStatus.TOO_LARGE]: 'error'
+    [UploadStatus.TOO_LARGE]: 'error',
+    [UploadStatus.MALWARE]: 'error'
 };
 
 interface FileResult {
