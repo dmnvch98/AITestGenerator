@@ -38,7 +38,10 @@ public class ActivityController {
     @GetMapping
     public Set<TestGenerationActivityResponseDto> getActivities(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return activityFacade.getUserActivities(userId);
+        return activityFacade.getUserActivities(userId)
+                .stream()
+                .sorted(Comparator.comparingLong( x -> Long.parseLong(x.getCid())))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @DeleteMapping("/{cid}")

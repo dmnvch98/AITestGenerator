@@ -5,6 +5,7 @@ import java.util.Optional;
 
 
 import com.example.generation_service.models.FileHash;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,11 +14,9 @@ public interface FileHashRepository extends CrudRepository<FileHash, Long> {
 
     FileHash findByHashedFilenameAndUserId(final String hashedFilename, final Long userId);
 
-    Boolean existsByHashedFilenameAndUserId(final String hashedFileName, final Long userId);
-
     Boolean existsByOriginalFilenameAndUserId(final String originalFileName, final Long userId);
 
-    List<FileHash> findAllByUserId(final long userId);
+    List<FileHash> findAllByUserId(final long userId, Sort sort);
 
     void deleteAllByHashedFilenameAndUserId(final String hashedFileName, final long userId);
 

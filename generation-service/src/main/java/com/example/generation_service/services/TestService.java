@@ -2,11 +2,11 @@ package com.example.generation_service.services;
 
 import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.useractions.TrackAction;
-import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.models.*;
 import com.example.generation_service.repositories.TestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,14 +20,13 @@ import java.util.Optional;
 public class TestService {
 
     private final TestRepository testRepository;
-    private final TestConverter testConverter;
 
     public Test save(final Test test) {
         return testRepository.save(test);
     }
 
     public List<Test> findAllByUserId(Long userId) {
-        return testRepository.findAllByUserId(userId);
+        return testRepository.findAllByUserId(userId, Sort.by("createdAt").descending());
     }
 
     public void deleteTest(Long testId) {
@@ -45,7 +44,7 @@ public class TestService {
     }
 
     public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
-        return testRepository.findAllByIdInAndUserIdOrderByIdDesc(testIds, userId);
+        return testRepository.findAllByIdInAndUserId(testIds, userId, Sort.by("createdAt").descending());
     }
 
     @TrackAction(ActionType.CREATE_TEST)

@@ -28,40 +28,30 @@ public class TestGenerationService {
     private final RetryTemplate retryTemplate;
     private final TestConverter testConverter;
 
-    public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) {
+    public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
       final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
       final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
 
       return testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
     }
 
-    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) {
-        try {
-            return retryTemplate.execute(context -> {
-                setRetryContextParams(context, retryContextParamsMap);
-                long timeout = calculateTimeout(context.getRetryCount());
-                return questionGenerator.generateData(request, timeout);
-            });
-        } catch (final Exception e) {
-            throw new RuntimeException("Questions generation failed for userId = " + request.getUserId() +
-                    " fileHash = " + request.getFileHash());
-        }
+    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
+        return retryTemplate.execute(context -> {
+            setRetryContextParams(context, retryContextParamsMap);
+            long timeout = calculateTimeout(context.getRetryCount());
+            return questionGenerator.generateData(request, timeout);
+        });
     }
 
     public GenerateAnswersResponseDto generateAnswers(final GenerateTestRequest request,
                                                       final GenerateQuestionsResponseDto questionsResponseDto,
                                                       final Map<String, String> retryContextParamsMap
-                                                      ) {
-        try {
-            return retryTemplate.execute(context -> {
-                setRetryContextParams(context, retryContextParamsMap);
-                long timeout = calculateTimeout(context.getRetryCount());
-                return answerGenerator.generateData(request, questionsResponseDto, timeout);
-            });
-        } catch (final Exception e) {
-            throw new RuntimeException("Generation of answers failed for userId = " + request.getUserId() +
-                  " fileHash = " + request.getFileHash());
-        }
+                                                      ) throws Exception {
+        return retryTemplate.execute(context -> {
+            setRetryContextParams(context, retryContextParamsMap);
+            long timeout = calculateTimeout(context.getRetryCount());
+            return answerGenerator.generateData(request, questionsResponseDto, timeout);
+        });
     }
 
     private void setRetryContextParams(final AttributeAccessor context, final Map<String, String> retryContextParamsMap) {

@@ -9,6 +9,8 @@ interface ModalFormProps {
 }
 
 export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit }) => {
+    const MAX_QUESTIONS = 20;
+    const MAX_ANSWERS = 5;
     const {
         maxQuestionsCount,
         minAnswersCount,
@@ -27,12 +29,12 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
     }, [open]);
 
     const handleQuestionsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = Math.min(50, Math.max(0, parseInt(event.target.value, 10) || 0));
+        const value = Math.min(MAX_QUESTIONS, Math.max(1, parseInt(event.target.value, 10) || 1));
         setQuestions(value);
     };
 
     const handleAnswersChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = Math.min(8, Math.max(0, parseInt(event.target.value, 10) || 0));
+        const value = Math.min(MAX_ANSWERS, Math.max(1, parseInt(event.target.value, 10) || 1));
         setAnswers(value);
     };
 
@@ -69,16 +71,9 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 <Typography variant="h6" gutterBottom>
                     Параметры генерации
                 </Typography>
-                {/*<Alert severity="info" icon={false}>*/}
-                {/*    <Box textAlign="left">*/}
-                {/*        Расшифровка параметров 'Температура' и 'Top P' находится в иконках ⓘ. <br/>*/}
-                {/*        Менять эти параметры необязательно.*/}
-                {/*    </Box>*/}
-                {/*</Alert>*/}
-
 
                 <TextField
-                    label="Максимальное число вопросов (50 макс.)"
+                    label={`Максимальное число вопросов (${MAX_QUESTIONS} макс.)`}
                     type="number"
                     value={maxQuestionsCount}
                     onChange={handleQuestionsChange}
@@ -88,7 +83,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 />
 
                 <TextField
-                    label="Максимальное число вариантов ответов (8 макс.)"
+                    label={`Максимальное число вариантов ответов (${MAX_ANSWERS} макс.)`}
                     type="number"
                     value={minAnswersCount}
                     onChange={handleAnswersChange}
@@ -96,38 +91,6 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                     margin="normal"
                     inputProps={{ min: 0, max: 8 }}
                 />
-
-                {/*<Box display="flex">*/}
-                {/*    <Typography gutterBottom>Температура</Typography>*/}
-                {/*    <Tooltip title="Температура контролирует степень случайности в ответах: значение 0 делает ответы более предсказуемыми, а значение 1 – более случайными и креативными.">*/}
-                {/*        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>*/}
-                {/*    </Tooltip>*/}
-                {/*</Box>*/}
-                {/*<Slider*/}
-                {/*    marks*/}
-                {/*    value={temperature}*/}
-                {/*    onChange={handleTemperatureChange}*/}
-                {/*    min={0}*/}
-                {/*    max={1}*/}
-                {/*    step={0.1}*/}
-                {/*    valueLabelDisplay="auto"*/}
-                {/*/>*/}
-
-                {/*<Box display="flex">*/}
-                {/*    <Typography gutterBottom>Top P</Typography>*/}
-                {/*    <Tooltip title="Top P ограничивает выбор слов: при значении 1 учитываются все возможные слова, а при значениях ближе к 0 – только самые вероятные слова">*/}
-                {/*        <InfoOutlinedIcon sx={{ ml: 1, color:'#999' }} fontSize="small"/>*/}
-                {/*    </Tooltip>*/}
-                {/*</Box>*/}
-                {/*<Slider*/}
-                {/*    marks*/}
-                {/*    value={topP}*/}
-                {/*    onChange={handleTopPChange}*/}
-                {/*    min={0}*/}
-                {/*    max={1}*/}
-                {/*    step={0.1}*/}
-                {/*    valueLabelDisplay="auto"*/}
-                {/*/>*/}
 
                 <Button onClick={onSubmit} variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                     Сгенерировать

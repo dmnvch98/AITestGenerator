@@ -85,7 +85,7 @@ public class TestFacade {
     }
   }
 
-  public void generateTestReceiveMessage(final GenerateTestMessage message) {
+  public void generateTestReceiveMessage(final GenerateTestMessage message) throws Exception {
       log.info("Received message to generate test. Message=[{}]", message);
       activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
 
