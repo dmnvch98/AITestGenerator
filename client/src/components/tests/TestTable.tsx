@@ -57,9 +57,10 @@ const getActions = (
 interface Props {
     onSelectionModelChange: (testIds: number[]) => void;
     loading: boolean;
+    searchValue?: string;
 }
 
-export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) => {
+export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, searchValue }) => {
     const { tests, deleteTest } = useTestStore();
     const { exportTest } = useExportStore();
     const navigate = useNavigate();
@@ -113,6 +114,7 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading }) 
                     deleteTest,
                     exportTest
                 )}
+                searchValue={searchValue}
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={onSelectionModelChange}
                 loading={loading}

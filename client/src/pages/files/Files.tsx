@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Box, Button, Snackbar, Alert, CircularProgress} from "@mui/material";
+import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
 import {FileUploadModal} from "../../components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import {ConfirmationDialog} from "../../components/main/ConfirmationDialog";
 import useFileStore from "../../store/fileStore";
 import {FileDto} from "../../store/fileStore";
 import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
@@ -14,6 +13,7 @@ import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
 import {AlertMessage} from "../../store/types";
 import {v4 as uuidv4} from "uuid";
+import {FilesActionToolbar} from "./components/FilesActionToolbar";
 
 const FilesContent = () => {
     const {
@@ -35,10 +35,10 @@ const FilesContent = () => {
     const {maxQuestionsCount, minAnswersCount} = useGenerateTestStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
 
     const fetchFiles = async () => {
         setLoading(true);
@@ -57,15 +57,6 @@ const FilesContent = () => {
     const handleModalClose = () => {
         setUploadModalOpen(false);
         clearFiles();
-    };
-
-    const openDeleteModal = () => {
-        setDeleteModalOpen(true);
-    };
-
-    const handleDelete = async () => {
-        deleteFilesInBatch();
-        setDeleteModalOpen(false);
     };
 
     const isDeleteButtonDisabled = () => {
@@ -102,6 +93,10 @@ const FilesContent = () => {
         closeGenTestModal();
     };
 
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(event.target.value);
+    };
+
     const actions = (file: FileDto) => [
         {
             onClick: () => deleteFile(file),
@@ -132,28 +127,15 @@ const FilesContent = () => {
                 </Box>
             </Alert>
 
-            <Box display="flex" sx={{mb: 2}} justifyContent="flex-start">
-                <Button
-                    sx={{mr: 2}}
-                    variant="outlined"
-                    onClick={handleAdd}
-                    disabled={isLoading}
-                >
-                    Добавить файлы
-                </Button>
+            <FilesActionToolbar
+                onAdd={handleAdd}
+                onDelete={deleteFilesInBatch}
+                deleteDisabled={isDeleteButtonDisabled()}
+                searchValue={searchValue}
+                onSearchChange={handleSearchChange}
+            />
 
-                <Button
-                    sx={{mr: 2}}
-                    variant="outlined"
-                    color="error"
-                    onClick={openDeleteModal}
-                    disabled={isDeleteButtonDisabled()}
-                >
-                    Удалить выбранное
-                </Button>
-            </Box>
-
-            <FilesTable actions={actions} loading={loading}/>
+            <FilesTable actions={actions} loading={loading} searchValue={searchValue}/>
 
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 
@@ -185,14 +167,6 @@ const FilesContent = () => {
                     </Alert>
                 </Box>
             </Snackbar>
-
-            <ConfirmationDialog
-                open={deleteModalOpen}
-                onClose={() => setDeleteModalOpen(false)}
-                onConfirm={handleDelete}
-                title="Подтверждение удаления"
-                children="Вы уверены что хотите удалить выбранные файлы?"
-            />
 
         </>
     );

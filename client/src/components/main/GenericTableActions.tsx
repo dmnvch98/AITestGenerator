@@ -1,10 +1,8 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
     DataGrid,
     GridColDef, GridEventListener,
     GridRowIdGetter,
-    GridToolbarContainer,
-    GridToolbarQuickFilter
 } from '@mui/x-data-grid';
 import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -76,25 +74,6 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
     );
 };
 
-const CustomToolbar = () => {
-    return (
-        <GridToolbarContainer
-            sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                pt: 2,
-                pr: 2
-            }}
-        >
-            <GridToolbarQuickFilter
-                placeholder="Поиск..."
-                size="small"
-                sx={{width: '350px'}}
-            />
-        </GridToolbarContainer>
-    );
-};
-
 interface GenericTableProps<T> {
     data: T[];
     columns: GridColDef[];
@@ -103,16 +82,18 @@ interface GenericTableProps<T> {
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
     handleEvent?: GridEventListener<any>;
+    searchValue?: string,
     sx?: SxProps<Theme>;
 }
 
-export const GenericTableActions = <T, >({
+export const GenericTableActions = <T extends Record<string, any>>({
                                              data,
                                              columns,
                                              actions,
                                              rowIdGetter,
                                              onSelectionModelChange,
                                              loading,
+                                             searchValue,
                                              handleEvent,
                                              sx
                                          }: GenericTableProps<T>) => {
@@ -128,12 +109,23 @@ export const GenericTableActions = <T, >({
         disableColumnMenu: true,
     };
 
+    const filteredData = useMemo(() => {
+        if (!searchValue) return data;
+        const lowercasedSearchValue = searchValue.toLowerCase();
+
+        return data.filter((item) => {
+            return Object.values(item).some((field) =>
+                String(field).toLowerCase().includes(lowercasedSearchValue)
+            );
+        });
+    }, [data, searchValue]);
+
     return (
         <Box>
             <DataGrid
                 loading={loading}
                 autoHeight
-                rows={data.map(item => ({
+                rows={filteredData.map(item => ({
                     ...item,
                 }))}
                 columns={[...columns, actionColumn]}
@@ -150,7 +142,6 @@ export const GenericTableActions = <T, >({
                     },
                 }}
                 localeText={tableLables}
-                slots={{toolbar: CustomToolbar}}
                 onCellClick={handleEvent}
                 sx={sx}
             />

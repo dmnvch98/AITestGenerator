@@ -61,29 +61,25 @@ public class ActivityController {
     public ResponseEntity<Set<TestGenerationActivityResponseDto>> longPoll(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         try {
-            // Параметры ожидания
-            final long initialWaitTime = 30000; // 30 секунд
-            final long reducedWaitTime = 10000; // 10 секунд после успешного получения данных
-            long currentWaitTime = initialWaitTime; // Начальное время ожидания
+            final long initialWaitTime = 30000;
+            final long reducedWaitTime = 10000;
+            long currentWaitTime = initialWaitTime;
 
             final long start = System.currentTimeMillis();
 
             while (System.currentTimeMillis() - start < currentWaitTime) {
-                // Ждем 5 секунд перед проверкой
                 TimeUnit.MILLISECONDS.sleep(5000);
 
-                // Получаем активность пользователя
                 final Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId);
 
                 if (CollectionUtils.isNotEmpty(activityDtos)) {
-                    return ResponseEntity.ok(activityDtos); // Возвращаем полученные данные
+                    return ResponseEntity.ok(activityDtos);
                 }
 
-                // Уменьшаем текущее время ожидания, но не увеличиваем его
-                currentWaitTime = reducedWaitTime; // Теперь устанавливаем фиксированное время ожидания после успешного получения данных
+                currentWaitTime = reducedWaitTime;
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Восстанавливаем состояние прерывания
+            Thread.currentThread().interrupt();
         }
 
         // Если уведомлений нет, возвращаем пустой сет

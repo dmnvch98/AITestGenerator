@@ -6,7 +6,6 @@ import { ActivityDto, useUserStore } from "../../store/userStore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StatusIndicator from "../status/StatusIndicator";
 
-// Константы для статусов
 const DeletableStatuses = new Set([
     GenerationStatus.FAILED,
     GenerationStatus.SUCCESS,

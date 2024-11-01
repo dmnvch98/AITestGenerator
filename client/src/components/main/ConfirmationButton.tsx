@@ -23,29 +23,20 @@ interface Props {
     button?: ReactJSXElement;
 }
 
-export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose, show, button }) => {
+export const ConfirmationButton: React.FC<Props> = ({ config, onSubmit, onClose, show}) => {
     const [open, setOpen] = useState(false);
 
-    // Используем useEffect, чтобы обновить состояние, когда изменяется флаг show
     useEffect(() => {
         if (show === false) {
-            setOpen(false); // Закрываем модалку, если show равно false
+            setOpen(false);
         }
     }, [show]);
 
     const handleClickOpen = () => {
-        if (show !== false) { // Проверяем значение show
+        if (show !== false) {
             setOpen(true);
         } else {
-            onSubmit(); // Если show false, вызываем onSubmit сразу
-        }
-    };
-
-    const handleMenuItemClick = () => {
-        if (show !== false) { // Проверяем значение show
-            setOpen(true);
-        } else {
-            onSubmit(); // Если show false, вызываем onSubmit сразу
+            onSubmit();
         }
     };
 
