@@ -8,8 +8,7 @@ import {DeleteOutlineOutlined} from "@mui/icons-material";
 
 const AnswerOptionEdit = ({ answerOption, onOptionChange, onDelete }: { answerOption: AnswerOption, onOptionChange: (option: AnswerOption) => void, onDelete: () => void }) => {
     const handleOptionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const updatedOption = { ...answerOption, optionText: e.target.value };
-        onOptionChange(updatedOption);
+        onOptionChange({ ...answerOption, optionText: e.target.value });
     };
 
     const handleCorrectChange = (e: React.ChangeEvent<HTMLInputElement>) => {

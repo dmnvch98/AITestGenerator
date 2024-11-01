@@ -1,5 +1,7 @@
 package com.example.generation_service.facades;
 
+import com.example.generation_service.annotations.enumeration.ActionType;
+import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
 import com.example.generation_service.models.activity.TestGenerationActivity;
@@ -46,6 +48,7 @@ public class TestFacade {
     return testService.save(test);
   }
 
+  @TrackAction(ActionType.GENERATE_TEST)
   public void prepareTestGeneration(final Long userId, final GenerateTestRequestDto dto) {
     final String cid = generateRandomCid();
     MDC.put("cid", cid);
@@ -100,12 +103,12 @@ public class TestFacade {
       activityService.finishActivity(currentActivity, test.getId(), test.getTitle(), message.getUserId(), message.getCid());
   }
 
+  @TrackAction(ActionType.DELETE_TEST)
   public void deleteTest(final Long testId, final Long userId) {
     log.debug("Deleting test. Test id: {}, User Id: {}", testId, userId);
     testService.findAllByIdAndUserIdOrThrow(testId, userId);
     testService.deleteTest(testId);
   }
-
 
   public TestsResponseDto findAllByUser(final Long[] testIds, final Long userId) {
     List<Test> tests;
@@ -123,7 +126,14 @@ public class TestFacade {
   }
 
   public Test upsert(final Test test, final Long userId) {
-    return testService.upsert(test, userId);
+    final Optional<Test> existingTest = testService.findAllByIdAndUserId(test.getId(), userId);
+
+    if (existingTest.isPresent()) {
+      final Test updatedTest = updateTestFields(existingTest.get(), test);
+      return testService.updateTest(updatedTest, userId);
+    } else {
+      return testService.insertTest(testConverter.convert(test, userId), userId);
+    }
   }
 
   public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {
@@ -150,6 +160,14 @@ public class TestFacade {
     retryContextParams.put("cid", message.getCid());
     retryContextParams.put("hashKey", message.getHashKey());
     return retryContextParams;
+  }
+
+  private Test updateTestFields(final Test existingTest, final Test updateTest) {
+    existingTest.setQuestions(updateTest.getQuestions());
+    if (!existingTest.getTitle().equals(updateTest.getTitle())) {
+      existingTest.setTitle(updateTest.getTitle());
+    }
+    return existingTest;
   }
 
 }

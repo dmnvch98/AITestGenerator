@@ -1,14 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {useTestStore} from "../../../store/tests/testStore";
+import {UserTest, useTestStore} from "../../../store/tests/testStore";
 import {TestForm} from "../components/TestForm";
 import {AlertMessage} from "../../../store/types";
+import {createNewTest} from "./utils";
 
 export const TestPageEdit = () => {
     const {id} = useParams();
-    const {selectedTest, getUserTestById, clearSelectedTest, addAlert, clearState} = useTestStore();
+    const {getUserTestById, addAlert, clearState} = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
+
+    const [testToEdit, setTestToEdit] = useState<UserTest>();
 
     const loadData = async () => {
         setIsLoading(true);
@@ -17,6 +20,7 @@ export const TestPageEdit = () => {
                 navigate('/tests');
                 addAlert(new AlertMessage('Тест не найден', 'error'))
             }
+            setTestToEdit(test);
         });
         setTimeout(() => {
             setIsLoading(false);
@@ -25,8 +29,7 @@ export const TestPageEdit = () => {
 
     useEffect(() => {
         loadData();
-        return () => clearSelectedTest();
-    }, [id, getUserTestById, clearSelectedTest]);
+    }, [id, getUserTestById]);
 
     useEffect(() => {
         return () => {
@@ -36,7 +39,7 @@ export const TestPageEdit = () => {
 
     return (
         <TestForm
-            initialTest={selectedTest}
+            initialTest={testToEdit || createNewTest()}
             isEditMode={true}
             isLoading={isLoading}
         />

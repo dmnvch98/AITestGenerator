@@ -1,8 +1,8 @@
 import React from "react";
 import { Box } from "@mui/material";
-import QuestionEdit from "../../../../components/tests/questions/QuestionEdit";
 import { Question } from "../../../../store/tests/testStore";
 import {QuestionView} from "../../../../components/tests/questions/QuestionView";
+import {QuestionEdit} from "../../../../components/tests/questions/QuestionEdit";
 
 interface QuestionListViewProps {
     questions: Question[];

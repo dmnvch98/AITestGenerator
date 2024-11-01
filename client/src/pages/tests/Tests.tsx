@@ -19,7 +19,7 @@ export const Tests = () => {
 
     const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
+    const [searchValue, setSearchValue] = useState<string>('');
     const navigate = useNavigate();
 
     const fetchTest = async () => {
@@ -71,7 +71,7 @@ export const Tests = () => {
                 autoHideDuration={6000}
                 onClose={clearAlerts}
             >
-                <Box sx={{width: '400px'}}>
+                <Box sx={{maxWidth: '400px'}}>
                     {alerts.map(alert => (
                         <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
                                onClose={() => deleteAlert(alert)}>

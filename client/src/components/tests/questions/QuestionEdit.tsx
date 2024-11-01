@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from "react";
+import {useEffect, useRef} from "react";
 import { Question, AnswerOption } from "../../../store/tests/testStore";
 import {AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
 import React from "react";
@@ -20,68 +20,51 @@ export interface QuestionEditProps {
 }
 
 export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage,
-                                                              questionNumber, last, viewMode}) => {
-    const [questionText, setQuestionText] = useState(question.questionText);
-    const [answerOptions, setAnswerOptions] = useState(question.answerOptions);
+                                                              questionNumber, last, viewMode }) => {
     const errorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (errorMessage !== '') {
-            if (errorRef.current) {
-                errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        if (errorMessage !== '' && errorRef.current) {
+            errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }, [errorMessage]);
 
-    useEffect(() => {
-        setQuestionText(question.questionText);
-        setAnswerOptions(question.answerOptions);
-    }, [question]);
-
     const handleQuestionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setQuestionText(e.target.value);
-        onQuestionChange({ ...question, questionText: e.target.value, answerOptions });
+        onQuestionChange({ ...question, questionText: e.target.value });
     };
 
     const handleAddAnswerOption = () => {
         const newOption: AnswerOption = {
             id: uuidv4(),
             optionText: '',
-            isCorrect: false
+            isCorrect: false,
         };
-        const updatedOptions = [...answerOptions, newOption];
-        setAnswerOptions(updatedOptions);
-        onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
+        onQuestionChange({ ...question, answerOptions: [...question.answerOptions, newOption] });
     };
 
     const handleAnswerOptionChange = (updatedOption: AnswerOption) => {
-        const updatedOptions = answerOptions.map(option =>
+        const updatedOptions = question.answerOptions.map(option =>
             option.id === updatedOption.id ? updatedOption : option
         );
-        setAnswerOptions(updatedOptions);
-        onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
+        onQuestionChange({ ...question, answerOptions: updatedOptions });
     };
 
     const handleDeleteAnswerOption = (id: string) => {
-        const updatedOptions = answerOptions.filter(option => option.id !== id);
-        setAnswerOptions(updatedOptions);
-        onQuestionChange({ ...question, questionText, answerOptions: updatedOptions });
+        const updatedOptions = question.answerOptions.filter(option => option.id !== id);
+        onQuestionChange({ ...question, answerOptions: updatedOptions });
     };
 
     return (
-        <Box sx={{border: errorMessage ? '2px solid #ff604f' : 'none' }}>
-            <AccordionSummary
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-            >
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%'}}>
+        <Box sx={{ border: errorMessage ? '2px solid #ff604f' : 'none' }}>
+            <AccordionSummary aria-controls="panel1a-content" id="panel1a-header">
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <TextField
                         label={"Вопрос " + questionNumber}
                         placeholder="Введите вопрос"
                         multiline
                         fullWidth
                         variant="standard"
-                        value={questionText}
+                        value={question.questionText}
                         onChange={handleQuestionTextChange}
                         sx={{ '& .MuiInputBase-input': { fontWeight: 600 }, ml: 2 }}
                     />
@@ -92,7 +75,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
             </AccordionSummary>
             <AccordionDetails>
                 <Box>
-                    {answerOptions.map((answerOption, index) => (
+                    {question.answerOptions.map((answerOption, index) => (
                         <AnswerOptionEdit
                             key={index}
                             answerOption={answerOption}
@@ -111,9 +94,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestion
                 </Box>
             </AccordionDetails>
 
-            {(!last && viewMode === 'list') && <Divider sx={{mt: 2, mb: 2}}/>}
+            {(!last && viewMode === 'list') && <Divider sx={{ mt: 2, mb: 2 }} />}
         </Box>
     );
 };
-
-export default QuestionEdit;

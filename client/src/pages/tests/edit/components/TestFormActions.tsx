@@ -34,7 +34,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
         title: string;
         content: string;
         onConfirm: () => void
-    } | null>(null); // Конфигурация диалога
+    } | null>(null);
 
     const openDialog = (title: string, content: string, onConfirm: () => void) => {
         setDialogConfig({title, content, onConfirm});
@@ -43,7 +43,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
 
     const closeDialog = () => {
         setDialogOpen(false);
-        setDialogConfig(null); // Сброс конфигурации при закрытии
+        setDialogConfig(null);
     };
 
     const actions: ActionIcon[] = [

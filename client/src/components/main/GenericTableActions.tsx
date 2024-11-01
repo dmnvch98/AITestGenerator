@@ -99,7 +99,6 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                          }: GenericTableProps<T>) => {
     const actionColumn: GridColDef = {
         field: 'actions',
-        resizable: true,
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;

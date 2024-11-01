@@ -38,7 +38,7 @@ const FilesContent = () => {
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
+    const [searchValue, setSearchValue] = useState<string>('');
 
     const fetchFiles = async () => {
         setLoading(true);

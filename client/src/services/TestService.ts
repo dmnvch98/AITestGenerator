@@ -69,7 +69,6 @@ class TestService {
 
     upsert = async (test: UserTest | CreateTestRequestDto) => {
         try {
-            console.log(test);
             const response = await this.axiosInstance.put("/api/v1/tests", test);
             return response.data;
         } catch (e: unknown) {

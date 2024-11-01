@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
+import {styled, useTheme, Theme, CSSObject} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,12 +16,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Button, Grid } from "@mui/material";
+import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
-import { useLocation } from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 const drawerWidth = 200;
 
@@ -46,7 +46,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+const DrawerHeader = styled('div')(({theme}) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -60,7 +60,7 @@ interface AppBarProps extends MuiAppBarProps {
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
+})<AppBarProps>(({theme, open}) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
@@ -76,8 +76,8 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
+const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
+    ({theme, open}) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
@@ -99,21 +99,21 @@ interface TabIcon {
     redirect: string;
 }
 
-export const SidebarHeader = ({ children }: any) => {
+export const SidebarHeader = ({children}: any) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const { logout } = useAuthStore();
+    const {logout} = useAuthStore();
     const location = useLocation();
 
     const tabs: TabIcon[] = [
         {
             name: 'Тесты',
-            icon: <ArticleOutlinedIcon />,
+            icon: <ArticleOutlinedIcon/>,
             redirect: '/tests',
         },
         {
             name: 'Файлы',
-            icon: <FolderIcon />,
+            icon: <FolderIcon/>,
             redirect: '/files',
         }
     ];
@@ -127,8 +127,8 @@ export const SidebarHeader = ({ children }: any) => {
     };
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
+        <Box sx={{display: 'flex'}}>
+            <CssBaseline/>
             <AppBar position="fixed" open={open}>
                 <Toolbar>
                     <IconButton
@@ -138,10 +138,10 @@ export const SidebarHeader = ({ children }: any) => {
                         edge="start"
                         sx={{
                             marginRight: 5,
-                            ...(open && { display: 'none' }),
+                            ...(open && {display: 'none'}),
                         }}
                     >
-                        <MenuIcon />
+                        <MenuIcon/>
                     </IconButton>
 
                     <Grid container>
@@ -151,14 +151,12 @@ export const SidebarHeader = ({ children }: any) => {
                                     ГенТест
                                 </Typography>
                                 <Box display="flex" alignItems="center">
-                                    <Link href="/sign-in" underline="none">
-                                        <Button
-                                            sx={{ color: 'black' }}
-                                            onClick={logout}
-                                        >
-                                            Выход
-                                        </Button>
-                                    </Link>
+                                    <Button
+                                        sx={{color: 'black'}}
+                                        onClick={logout}
+                                    >
+                                        Выход
+                                    </Button>
                                 </Box>
                             </Box>
                         </Grid>
@@ -168,14 +166,14 @@ export const SidebarHeader = ({ children }: any) => {
             <Drawer variant="permanent" open={open}>
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        {theme.direction === 'rtl' ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
                     </IconButton>
                 </DrawerHeader>
-                <Divider />
+                <Divider/>
                 <List>
                     {tabs.map((t) => (
                         <Link href={t.redirect} underline="none" color="inherit" key={t.name}>
-                            <ListItem disablePadding sx={{ display: 'block' }}>
+                            <ListItem disablePadding sx={{display: 'block'}}>
                                 <ListItemButton
                                     sx={{
                                         minHeight: 58,
@@ -191,7 +189,7 @@ export const SidebarHeader = ({ children }: any) => {
                                     >
                                         {t.icon}
                                     </ListItemIcon>
-                                    <ListItemText primary={t.name} sx={{ opacity: open ? 1 : 0 }} />
+                                    <ListItemText primary={t.name} sx={{opacity: open ? 1 : 0}}/>
                                 </ListItemButton>
                             </ListItem>
                         </Link>
@@ -199,7 +197,7 @@ export const SidebarHeader = ({ children }: any) => {
                 </List>
             </Drawer>
 
-            <Grid container sx={{ mt: 10 }}>
+            <Grid container sx={{mt: 10}}>
                 <Grid item xs={12}>
                     {children}
                 </Grid>

@@ -2,16 +2,15 @@ import React, {useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useNavigate} from "react-router-dom";
 import {Box, Snackbar, Alert, CircularProgress, Paper} from "@mui/material";
-import {QuestionListView, QuestionPaginatedView} from "../edit/components/TestDisplayMode";
+import {QuestionPaginatedView} from "../edit/components/TestDisplayMode";
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
-import {TestViewModeSelector} from "../edit/components/TestViewModeSelector";
 import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
 
 interface TestFormProps {
-    initialTest?: UserTest;
+    initialTest: UserTest | CreateTestRequestDto;
     isEditMode: boolean;
     isLoading?: boolean;
 }
@@ -19,14 +18,13 @@ interface TestFormProps {
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLoading}) => {
     const navigate = useNavigate();
     const {alerts, clearAlerts, deleteAlert, addAlert, upsert} = useTestStore();
-    const [localTest, setLocalTest] = useState<UserTest | CreateTestRequestDto>(() => isEditMode && initialTest ? {...initialTest} : createNewTest());
+    const [localTest, setLocalTest] =
+        useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
     const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id?: string }[]>([]);
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
-    const [isTestModified, setIsTestModified] = useState(false);
 
     useEffect(() => {
         if (isEditMode && initialTest && !hasSaved) setLocalTest({...initialTest});
@@ -40,7 +38,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
                     setHasSaved(true);
                     setLocalTest(resp);
                     setLastSavedTest(resp);
-                    setIsTestModified(false);
                     setInvalidQuestions([]);
                 }
             });
@@ -49,20 +46,22 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
         }
     };
 
+    const isTestModified = () => {
+        return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
+    }
+
     const handleAddQuestion = () => {
         setLocalTest({
             ...localTest,
             questions: [...localTest.questions, createNewQuestion()],
         });
         setCurrentQuestionIndex(localTest.questions.length);
-        setIsTestModified(true);
     };
 
     const handleDeleteQuestion = (id: string) => {
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setCurrentQuestionIndex(updatedQuestions.length - 1);
         setLocalTest({...localTest, questions: updatedQuestions});
-        setIsTestModified(true);
         if (invalidQuestions.map(q => q.id).includes(id)) {
             const newInvalidQuestions = invalidQuestions.filter(q => q.id !== id);
             setInvalidQuestions(newInvalidQuestions);
@@ -70,11 +69,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
     }
 
     const handleQuestionChange = (updatedQuestion: Question) => {
-        const updatedQuestions = localTest.questions.map((q: Question) =>
-            q.id === updatedQuestion.id ? updatedQuestion : q
-        );
-        setLocalTest({...localTest, questions: updatedQuestions});
-        setIsTestModified(true);
+        setLocalTest(prevTest => ({
+            ...prevTest,
+            questions: prevTest.questions.map((q) =>
+                q.id === updatedQuestion.id ? { ...updatedQuestion } : q
+            ),
+        }));
     };
 
     const handleReset = () => {
@@ -82,7 +82,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
         setLocalTest(resetTest);
         setCurrentQuestionIndex(0);
         setInvalidQuestions([]);
-        setIsTestModified(false);
     };
 
     const Content = (
@@ -99,25 +98,15 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
                     <CircularProgress/>
                 </Box>
             ) : (
-                viewMode === 'list' ? (
-                    <QuestionListView
-                        questions={localTest.questions}
-                        invalidQuestions={invalidQuestions}
-                        onDelete={handleDeleteQuestion}
-                        onQuestionChange={handleQuestionChange}
-                        editMode={true}
-                    />
-                ) : (
-                    <QuestionPaginatedView
-                        questions={localTest.questions}
-                        currentQuestionIndex={currentQuestionIndex}
-                        invalidQuestions={invalidQuestions}
-                        onDelete={handleDeleteQuestion}
-                        onQuestionChange={handleQuestionChange}
-                        onSelectQuestion={setCurrentQuestionIndex}
-                        editMode={true}
-                    />
-                )
+                <QuestionPaginatedView
+                    questions={localTest.questions}
+                    currentQuestionIndex={currentQuestionIndex}
+                    invalidQuestions={invalidQuestions}
+                    onDelete={handleDeleteQuestion}
+                    onQuestionChange={handleQuestionChange}
+                    onSelectQuestion={setCurrentQuestionIndex}
+                    editMode={true}
+                />
             )}
             <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
                 <Box sx={{maxWidth: '400px'}}>
@@ -132,25 +121,22 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
     )
 
     const Actions = (
-        <Box>
-            <TestViewModeSelector viewMode={viewMode} onChange={setViewMode} disabled={isLoading}/>
+        <Box sx={{mt: -2}}>
             <TestFormActions
                 isLoading={isLoading as boolean}
                 onSave={handleSave}
                 onAddQuestion={handleAddQuestion}
                 onReset={handleReset}
                 onExit={() => navigate("/tests")}
-                isTestModified={isTestModified}
+                isTestModified={isTestModified()}
             />
-            {viewMode === 'paginated' && (
-                <QuestionPagination
-                    loading={isLoading}
-                    currentIndex={currentQuestionIndex}
-                    totalQuestions={localTest.questions.length}
-                    onChange={setCurrentQuestionIndex}
-                    invalidQuestionNumbers={invalidQuestions.map(q => q.index + 1)}
-                />
-            )}
+            <QuestionPagination
+                loading={isLoading}
+                currentIndex={currentQuestionIndex}
+                totalQuestions={localTest.questions.length}
+                onChange={setCurrentQuestionIndex}
+                invalidQuestionNumbers={invalidQuestions.map(q => q.index + 1)}
+            />
         </Box>
     )
 

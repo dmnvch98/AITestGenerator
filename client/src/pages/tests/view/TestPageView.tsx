@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useTestStore } from "../../../store/tests/testStore";
+import {BulkDeleteTestsRequestDto, useTestStore} from "../../../store/tests/testStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert, Paper} from "@mui/material";
@@ -28,7 +28,8 @@ export const TestPageView: React.FC = () => {
         clearAlerts,
         deleteAlert,
         getRating,
-        clearState
+        clearState,
+        bulkDeleteTest
     } = useTestStore();
     const { exportTest } = useExportStore();
 
@@ -74,6 +75,15 @@ export const TestPageView: React.FC = () => {
 
     const handleExport = () => {
         selectedTest && exportTest(selectedTest);
+    }
+
+    const handleDelete = () => {
+        if (selectedTest) {
+            const request: BulkDeleteTestsRequestDto = {
+                ids: [selectedTest.id]
+            }
+            bulkDeleteTest(request);
+        }
     }
 
     const Content = (
@@ -137,6 +147,7 @@ export const TestPageView: React.FC = () => {
                 onExit={handleExit}
                 onPrint={handlePrint}
                 onExport={handleExport}
+                onDelete={handleDelete}
             />
             {viewMode === 'paginated' && (
                 <Box sx={{mb: 3}}>

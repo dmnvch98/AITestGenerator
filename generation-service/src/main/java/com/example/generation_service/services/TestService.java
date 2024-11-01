@@ -1,5 +1,7 @@
 package com.example.generation_service.services;
 
+import com.example.generation_service.annotations.enumeration.ActionType;
+import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.models.*;
 import com.example.generation_service.repositories.TestRepository;
@@ -24,21 +26,6 @@ public class TestService {
         return testRepository.save(test);
     }
 
-//    public Test prepareTestAndSave(final Test test) {
-//        test.getQuestions().forEach(question -> {
-//            question.setTest(test);
-//            question
-//                    .getAnswerOptions()
-//                    .forEach(answerOption -> answerOption.setQuestion(question));
-//        });
-//        return testRepository.save(test);
-//    }
-
-//    public Test prepareTestAndSave(final Test test, final long userId) {
-//        test.setUserId(userId);
-//        return prepareTestAndSave(test);
-//    }
-
     public List<Test> findAllByUserId(Long userId) {
         return testRepository.findAllByUserId(userId);
     }
@@ -53,24 +40,22 @@ public class TestService {
                 HttpStatus.NOT_FOUND, String.format("Test with Id %d not found for user with id: %d", testId, userId)));
     }
 
+    public Optional<Test> findAllByIdAndUserId(Long testId, Long userId) {
+        return testRepository.findTestByIdAndUserId(testId, userId);
+    }
+
     public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
         return testRepository.findAllByIdInAndUserIdOrderByIdDesc(testIds, userId);
     }
 
-    public Test upsert(final Test test, final Long userId) {
-        final Test testToSave = Optional.ofNullable(test.getId())
-              .flatMap(id -> testRepository.findTestByIdAndUserId(id, userId))
-              .map(existingTest -> updateTestFields(existingTest, test))
-              .orElseGet(() -> testConverter.convert(test, userId));
-        return testRepository.save(testToSave);
+    @TrackAction(ActionType.CREATE_TEST)
+    public Test insertTest(final Test test, final Long userId) {
+        return testRepository.save(test);
     }
 
-    private Test updateTestFields(final Test existingTest, final Test updateTest) {
-        existingTest.setQuestions(updateTest.getQuestions());
-        if (!existingTest.getTitle().equals(updateTest.getTitle())) {
-            existingTest.setTitle(updateTest.getTitle());
-        }
-        return existingTest;
+    @TrackAction(ActionType.UPDATE_TEST)
+    public Test updateTest(final Test test, final Long userId) {
+        return testRepository.save(test);
     }
 
 }

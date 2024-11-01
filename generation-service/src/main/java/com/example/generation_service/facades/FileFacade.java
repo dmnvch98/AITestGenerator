@@ -5,22 +5,19 @@ import java.util.List;
 import java.util.concurrent.*;
 
 
+import com.example.generation_service.annotations.enumeration.ActionType;
+import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
-import com.example.generation_service.exceptions.*;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
-import com.example.generation_service.workers.FileUploader;
-import jakarta.transaction.Transactional;
+import com.example.generation_service.workers.FileWorker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.generation_service.utils.Utils.generateRandomCid;
 
 @Component
 @RequiredArgsConstructor
@@ -31,18 +28,15 @@ public class FileFacade {
   private final StorageClient storageClient;
   private final FileHashConverter converter;
   private final ExecutorService executorService = Executors.newFixedThreadPool(10);
-  private final FileUploader fileUploader;
+  private final FileWorker fileWorker;
 
+  @TrackAction(ActionType.UPLOAD_FILES)
   public FileUploadResponseDto saveFiles(final Long userId, final List<MultipartFile> files) {
     final List<FileUploadResponseDto.FileUploadResult> fileResults = new ArrayList<>();
     final List<Future<FileUploadResponseDto.FileUploadResult>> futures = new ArrayList<>();
 
     for (final MultipartFile file : files) {
-      final Callable<FileUploadResponseDto.FileUploadResult> task = () -> {
-        final String cid = generateRandomCid();
-        MDC.put("cid", cid);
-        return fileUploader.saveFile(userId, file);
-      };
+      final Callable<FileUploadResponseDto.FileUploadResult> task = () -> fileWorker.saveFile(userId, file);
       futures.add(executorService.submit(task));
     }
 
@@ -59,33 +53,21 @@ public class FileFacade {
   }
 
   public Resource getFileByHash(final long userId, final String hash) {
-    if (checkFileEligibility(userId, hash)) {
-      return storageClient.downloadFile(userId, hash);
-    } else {
-      log.warn("Exception when accessing a file.  File name: {} , user id: {}. ", hash, userId);
-      return null;
-    }
+    fileHashService.isExistsByHashedFilenameAndUserOrThrow(userId, hash);
+    return storageClient.downloadFile(userId, hash);
   }
 
-  @Transactional
-  public void deleteFileByHash(final long userId, final String hash) {
-    if (checkFileEligibility(userId, hash)) {
-      storageClient.deleteFile(userId, hash);
-    } else {
-      log.warn("Exception when deleting a file. File not found. File name: {} , user id: {}. ", hash, userId);
-    }
-    fileHashService.delete(userId, hash);
+  @TrackAction(ActionType.DELETE_FILES)
+  public void deleteFiles(final long userId, final List<String> hashes) {
+    hashes.forEach(hash -> fileWorker.deleteFileByHash(userId, hash));
+  }
+
+  @TrackAction(ActionType.DELETE_FILES)
+  public void deleteFile(final long userId, final String hash) {
+    fileWorker.deleteFileByHash(userId, hash);
   }
 
   public FileHashesResponseDto getAllUserFileDescriptions(final long userId) {
     return converter.convert(fileHashService.getAllByUserId(userId));
-  }
-
-  private boolean checkFileEligibility(final long userId, final String hashedFileName) {
-    final boolean isExists = fileHashService.isExistsByHashedFilenameAndUser(userId, hashedFileName);
-    if (!isExists) {
-      throw new ResourceNotFoundException(hashedFileName);
-    }
-    return true;
   }
 }

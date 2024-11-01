@@ -14,9 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/activities")
 @RestController
@@ -70,7 +73,10 @@ public class ActivityController {
             while (System.currentTimeMillis() - start < currentWaitTime) {
                 TimeUnit.MILLISECONDS.sleep(5000);
 
-                final Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId);
+                final Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId)
+                        .stream()
+                        .sorted(Comparator.comparing(TestGenerationActivityResponseDto::getStartDate))
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
 
                 if (CollectionUtils.isNotEmpty(activityDtos)) {
                     return ResponseEntity.ok(activityDtos);
@@ -82,7 +88,6 @@ public class ActivityController {
             Thread.currentThread().interrupt();
         }
 
-        // Если уведомлений нет, возвращаем пустой сет
         return ResponseEntity.ok(Set.of());
     }
 

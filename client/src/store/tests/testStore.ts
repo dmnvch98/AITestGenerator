@@ -177,7 +177,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
         const { addAlert, getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            addAlert(new AlertMessage('Тесты успешно удалены', 'success'));
+            addAlert(new AlertMessage('Тест(ы) успешно удалены', 'success'));
         } else {
             addAlert(new AlertMessage('Произошла ошибка при удалении тестов', 'error'));
         }

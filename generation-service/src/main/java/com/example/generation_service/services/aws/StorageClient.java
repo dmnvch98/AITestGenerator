@@ -24,11 +24,11 @@ public class StorageClient {
   @Value("${aws.s3-bucket}")
   private String bucketName;
 
-  public void uploadFile(final long userId, final String fileHash, final InputStream inputStream,
+  public void uploadFile(final long userId, final String fileHash, final String fileName, final InputStream inputStream,
                          final ObjectMetadata metadata) {
     final String key = generateFileKey(userId, fileHash);
     amazonS3.putObject(bucketName, key, inputStream, metadata);
-    log.info("Uploaded file [{}] to storage", key);
+    log.info("Uploaded file [{}] to storage path [{}]", fileName, key);
   }
 
   public Resource downloadFile(final long userId, final String fileHash) {

@@ -1,6 +1,8 @@
 package com.example.generation_service.workers;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.generation_service.annotations.cid.GenerateCid;
+import com.example.generation_service.annotations.enumeration.CidType;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.models.FileHash;
@@ -22,7 +24,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class FileUploader {
+public class FileWorker {
 
     private final StorageClient storageClient;
     private final List<FileValidator> fileValidators;
@@ -30,8 +32,8 @@ public class FileUploader {
     private final FileHashService fileHashService;
 
     @Transactional
+    @GenerateCid(CidType.RANDOM)
     public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file) {
-        log.info("Starting file uploading: [{}]", file.getOriginalFilename());
         final FileValidationDto validationDto = validateFile(file, userId);
 
         if (!validationDto.getUploadStatus().equals(UploadStatus.SUCCESS)) {
@@ -45,7 +47,7 @@ public class FileUploader {
 
             final String fileNameHash = DigestUtils.md5Hex(originalFileName);
 
-            storageClient.uploadFile(userId, fileNameHash, file.getInputStream(), metadata);
+            storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
             final FileHash fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
                     validationDto.getFileData());
@@ -58,11 +60,24 @@ public class FileUploader {
         return buildResponse(UploadStatus.SUCCESS, file);
     }
 
+    @Transactional
+    public void deleteFileByHash(final long userId, final String hash) {
+        fileHashService.isExistsByHashedFilenameAndUserOrThrow(userId, hash);
+        try {
+            storageClient.deleteFile(userId, hash);
+            fileHashService.delete(userId, hash);
+        } catch (final Exception e) {
+            log.error("An error occurred when deleting file by hash [{}]", hash);
+        }
+    }
+
     private FileValidationDto validateFile(final MultipartFile file, final Long userId) {
+        log.info("Starting file validation before uploading: [{}]", file.getOriginalFilename());
         final FileValidationDto dto = converter.convertToValidateDto(file, userId);
         for (final FileValidator validator : fileValidators) {
             final UploadStatus validationStatus = validator.validate(dto).getUploadStatus();
             if (validationStatus != UploadStatus.SUCCESS) {
+                log.info("File [{}] didn't pass validation by reason [{}]", file.getOriginalFilename(), validationStatus);
                 return dto;
             }
         }

@@ -42,7 +42,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFile(@PathVariable final String fileHash, final Authentication authentication) {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    fileFacade.deleteFileByHash(userId, fileHash);
+    fileFacade.deleteFile(userId, fileHash);
   }
 
   @GetMapping("/")
@@ -55,7 +55,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteInBatch(@RequestBody List<String> hashes, Authentication authentication) {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    hashes.forEach((hash) -> fileFacade.deleteFileByHash(userId, hash));
+    fileFacade.deleteFiles(userId, hashes);
   }
 
 

@@ -3,6 +3,7 @@ package com.example.generation_service.services;
 import java.util.List;
 
 
+import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.models.FileHash;
 import com.example.generation_service.repositories.FileHashRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,9 @@ public class FileHashService {
     return repository.findAllByUserId(userId);
   }
 
-  public boolean isExistsByHashedFilenameAndUser(final Long userId, final String hashedFileName) {
-    return repository.existsByHashedFilenameAndUserId(hashedFileName, userId);
+  public void isExistsByHashedFilenameAndUserOrThrow(final Long userId, final String hashedFileName) {
+    repository.getFileHashesByHashedFilenameAndUserId(hashedFileName, userId)
+            .orElseThrow(() -> new ResourceNotFoundException(hashedFileName));
   }
 
   public boolean isExistsByOriginalFilenameAndUserId(final Long userId, final String hashedFileName) {

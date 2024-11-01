@@ -1,6 +1,7 @@
 package com.example.generation_service.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 
 import com.example.generation_service.models.FileHash;
@@ -19,5 +20,7 @@ public interface FileHashRepository extends CrudRepository<FileHash, Long> {
     List<FileHash> findAllByUserId(final long userId);
 
     void deleteAllByHashedFilenameAndUserId(final String hashedFileName, final long userId);
+
+    Optional<FileHash> getFileHashesByHashedFilenameAndUserId(final String hashedFileName, final long userId);
 
 }
