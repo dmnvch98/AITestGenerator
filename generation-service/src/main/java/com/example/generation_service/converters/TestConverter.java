@@ -8,6 +8,7 @@ import com.example.generation_service.models.Test;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -28,6 +29,14 @@ public interface TestConverter {
         return TestsResponseDto.builder()
               .tests(tests.stream().map(this::convert).toList())
               .build();
+    }
+
+    default TestsResponseDto convert(final Page<Test> pageTest) {
+        return TestsResponseDto.builder()
+                .tests(pageTest.getContent().stream().map(this::convert).toList())
+                .totalPages(pageTest.getTotalPages())
+                .totalElements(pageTest.getNumberOfElements())
+                .build();
     }
 
     @Named("getOriginalFilename")

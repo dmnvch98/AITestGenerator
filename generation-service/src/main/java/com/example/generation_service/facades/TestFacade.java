@@ -20,6 +20,7 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -118,6 +119,11 @@ public class TestFacade {
       tests = testService.findAllByUserId(userId);
     }
 
+    return testConverter.convert(tests);
+  }
+
+  public TestsResponseDto findUserTests(final Long userId, final String search, int page, int size, String sortBy, String sortDirection) {
+    final Page<Test> tests = testService.findUserTests(userId, search, page, size, sortBy, sortDirection);
     return testConverter.convert(tests);
   }
 

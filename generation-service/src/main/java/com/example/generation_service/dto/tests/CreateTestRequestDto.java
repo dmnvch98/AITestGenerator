@@ -13,5 +13,6 @@ public class CreateTestRequestDto {
 
   private final String title;
   private final List<QuestionDto> questions;
+  private final String language;
 
 }

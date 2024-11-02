@@ -5,6 +5,7 @@ import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.Test;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,6 @@ public class TestController {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.save(test, userId);
     }
-
-//    @PostMapping("/generate")
-//    public void generateTestAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
-//        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-//        testFacade.generateTestByTextSendMessage(userId, dto.getTextId());
-//    }
 
     @PostMapping("/generate")
     public void generateTestByFileAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
@@ -83,5 +78,18 @@ public class TestController {
             final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.getCurrentHistories(userId);
+    }
+
+    @GetMapping("/filter")
+    public TestsResponseDto getProducts(
+            final Authentication authentication,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String sortDirection
+    ) {
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        return testFacade.findUserTests(userId, search, page, size, sortBy, sortDirection);
     }
 }
