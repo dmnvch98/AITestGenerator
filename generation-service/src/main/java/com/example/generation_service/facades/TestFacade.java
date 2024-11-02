@@ -111,17 +111,6 @@ public class TestFacade {
     testService.deleteTest(testId);
   }
 
-  public TestsResponseDto findAllByUser(final Long[] testIds, final Long userId) {
-    List<Test> tests;
-    if (testIds != null && testIds.length > 0) {
-      tests = testService.findAllByIdInAndUserId(Arrays.asList(testIds), userId);
-    } else {
-      tests = testService.findAllByUserId(userId);
-    }
-
-    return testConverter.convert(tests);
-  }
-
   public TestsResponseDto findUserTests(final Long userId, final String search, int page, int size, String sortBy, String sortDirection) {
     final Page<Test> tests = testService.findUserTests(userId, search, page, size, sortBy, sortDirection);
     return testConverter.convert(tests);

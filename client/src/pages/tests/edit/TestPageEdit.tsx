@@ -10,7 +10,6 @@ export const TestPageEdit = () => {
     const {getUserTestById, addAlert, clearState} = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-
     const [testToEdit, setTestToEdit] = useState<UserTest>();
 
     const loadData = async () => {

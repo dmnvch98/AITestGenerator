@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {Box, Snackbar, Alert, CircularProgress, Paper} from "@mui/material";
 import {QuestionPaginatedView} from "../edit/components/TestDisplayMode";
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
@@ -17,6 +17,7 @@ interface TestFormProps {
 
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLoading}) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const {alerts, clearAlerts, deleteAlert, addAlert, upsert} = useTestStore();
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
@@ -84,6 +85,15 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
         setInvalidQuestions([]);
     };
 
+    const handleReturnToPrevPage = () => {
+        const prevUrl = location?.state?.previousLocationPathname || '/tests';
+        navigate(prevUrl);
+    }
+
+    const handleExit = () => {
+        navigate("/tests");
+    }
+
     const Content = (
         <Paper>
             <Box sx={{ml: 4, mr: 4, pt: 2}}>
@@ -127,7 +137,8 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
                 onSave={handleSave}
                 onAddQuestion={handleAddQuestion}
                 onReset={handleReset}
-                onExit={() => navigate("/tests")}
+                onExit={handleExit}
+                onReturn={handleReturnToPrevPage}
                 isTestModified={isTestModified()}
             />
             <QuestionPagination

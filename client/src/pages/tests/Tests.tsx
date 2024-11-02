@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { BulkDeleteTestsRequestDto, useTestStore } from "../../store/tests/testStore";
 import { TestTable } from "../../components/tests/TestTable";
-import {Alert, Box, Snackbar} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Alert, Box, Snackbar } from "@mui/material";
+import {useLocation, useNavigate} from "react-router-dom";
 import { TestsActionToolbar } from "./components/actions/TestsActionToolbar";
 import { QueryOptions } from "../../store/types";
 import { GridSortModel } from "@mui/x-data-grid";
 
 export const Tests = () => {
     const CREATE_TEST_URL = "/tests/create";
-
+    const location = useLocation();
     const {
         getAllUserTests,
         alerts,
@@ -22,17 +22,11 @@ export const Tests = () => {
     const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const navigate = useNavigate();
-    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 15 });
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'createdAt', sort: 'desc' }]);
 
-    const searchOptions: QueryOptions = {
-        page: paginationModel.page,
-        size: paginationModel.pageSize,
-        sortBy: sortModel[0]?.field,
-        sortDirection: sortModel[0]?.sort ?? 'asc',
-        search: searchValue.length > 0 ? searchValue : undefined
-    };
 
     const fetchTest = async (options?: QueryOptions) => {
         if (!loading) {
@@ -43,8 +37,26 @@ export const Tests = () => {
     };
 
     useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchValue(searchValue);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchValue]);
+
+    useEffect(() => {
+        const searchOptions: QueryOptions = {
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            sortBy: sortModel[0]?.field,
+            sortDirection: sortModel[0]?.sort ?? 'asc',
+            search: debouncedSearchValue
+        };
+
         fetchTest(searchOptions);
-    }, [paginationModel, sortModel]);
+    }, [debouncedSearchValue, paginationModel, sortModel]);
 
     const handleBulkDelete = useCallback(() => {
         if (selectedTestIds.length > 0) {
@@ -52,6 +64,7 @@ export const Tests = () => {
                 ids: selectedTestIds
             }
             bulkDeleteTest(request);
+            setSelectedTestIds([])
         }
     }, [selectedTestIds]);
 
@@ -60,7 +73,11 @@ export const Tests = () => {
     }, []);
 
     const handleAdd = () => {
-        navigate(CREATE_TEST_URL);
+        navigate(CREATE_TEST_URL, { state: { previousLocationPathname: location.pathname }});
+    };
+
+    const handleClearSearch = () => {
+        setSearchValue('');
     }
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +92,12 @@ export const Tests = () => {
                 deleteDisabled={selectedTestIds.length === 0}
                 searchValue={searchValue}
                 onSearchChange={handleSearchChange}
+                onSearchClear={handleClearSearch}
             />
             <TestTable
                 onSelectionModelChange={onMultiTestSelection}
                 loading={loading}
-                searchValue={searchValue}
                 rowCount={totalElements}
-                onQueryChange={fetchTest}
                 paginationModel={paginationModel}
                 setPaginationModel={setPaginationModel}
                 sortModel={sortModel}
@@ -102,5 +118,5 @@ export const Tests = () => {
                 </Box>
             </Snackbar>
         </>
-    )
-}
+    );
+};

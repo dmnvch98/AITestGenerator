@@ -38,9 +38,7 @@ class TestService {
 
     getUserTests = async (options?: QueryOptions) => {
         try {
-            const url = "/api/v1/tests/filter";
-            console.log(options)
-            // const params = ids ? {ids: ids.join(",")} : undefined;
+            const url = "/api/v1/tests";
             const response = await this.axiosInstance.get(url, {params: options});
             return response.data;
         } catch (e: unknown) {

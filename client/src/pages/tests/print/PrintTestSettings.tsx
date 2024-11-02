@@ -8,12 +8,14 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import {getActionItem} from "../../../components/main/data-display/helper";
 import List from "@mui/material/List";
+import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 
 interface TestPrintActionsProps {
     printRef: React.RefObject<HTMLDivElement>;
+    handleReturn: () =>  void;
 }
 
-export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef}) => {
+export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef, handleReturn}) => {
     const {
         titleFontSize,
         setTitleFontSize,
@@ -30,7 +32,7 @@ export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef}) =
         showAnswers,
         setShowAnswers,
         showHeader,
-        setShowHeader
+        setShowHeader,
     } = useTextSettingsStore();
 
     const navigate = useNavigate();
@@ -53,11 +55,18 @@ export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef}) =
         onClick: () => {},
     }
 
-    const actionItemExit: ActionIcon = {
-        name: 'Выйти',
-        icon: <ArrowBackIcon/>,
-        onClick: handleExit
-    }
+    const actions: ActionIcon[] = [
+        {
+            name: 'Выйти',
+            icon: <ExitToAppOutlinedIcon/>,
+            onClick: handleExit
+        },
+        {
+            name: 'Вернуться',
+            icon: <ArrowBackIcon/>,
+            onClick: handleReturn
+        },
+    ]
 
     return (
         <Box sx={{width: '100%', textAlign: 'start'}}>
@@ -66,9 +75,10 @@ export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef}) =
                     trigger={() => getActionItem(actionItemPrint)}
                     content={() => printRef.current}
                 />
-                {getActionItem(actionItemExit)}
+                {actions.map(action => (
+                    getActionItem(action)
+                ))}
             </List>
-
             <Divider sx={{mb: 2}}/>
 
             <Box sx={{width: '100%', textAlign: 'start'}}>

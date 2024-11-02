@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {BulkDeleteTestsRequestDto, useTestStore} from "../../../store/tests/testStore";
-import { useNavigate, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert, Paper} from "@mui/material";
 import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
@@ -15,6 +15,7 @@ import {ContentActionsPage} from "../../../components/main/data-display/ContentA
 export const TestPageView: React.FC = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [viewMode, setViewMode] = useState<'list' | 'paginated'>('paginated');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [testLoading, setTestLoading] = useState<boolean>(true);
@@ -62,7 +63,7 @@ export const TestPageView: React.FC = () => {
     }, []);
 
     const handleEdit = () => {
-        navigate(`/tests/${id}/edit`);
+        navigate(`/tests/${id}/edit`, { state: { previousLocationPathname: location.pathname } });
     }
 
     const handleExit = () => {
@@ -70,7 +71,7 @@ export const TestPageView: React.FC = () => {
     }
 
     const handlePrint = () => {
-        navigate(`/tests/${id}/print`);
+        navigate(`/tests/${id}/print`, { state: { previousLocationPathname: location.pathname } });
     }
 
     const handleExport = () => {

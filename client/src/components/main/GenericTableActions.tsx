@@ -1,18 +1,15 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback} from 'react';
 import {
     DataGrid,
     GridColDef, GridEventListener,
-    GridRowIdGetter, GridSortCellParams, GridSortItem, GridSortModel,
+    GridRowIdGetter, GridSortModel,
 } from '@mui/x-data-grid';
-import {Box, debounce, IconButton, Menu, MenuItem} from '@mui/material';
+import {Box, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {tableLables} from './dataGridLabels';
 import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
-import {QueryOptions} from "../../store/types";
-import {GridSortDirection} from "@mui/x-data-grid/models/gridSortModel";
-import TestService from "../../services/TestService";
 
 interface Action<T> {
     label?: string;
@@ -108,30 +105,6 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                                                        sortModel,
                                                                        setSortModel
                                                                    }: GenericTableProps<T>) => {
-    // const [paginationModel, setPaginationModel] = useState({
-    //     page: 0,
-    //     pageSize: 15,
-    // });
-
-    // const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
-
-    // const debouncedOnQueryChange = useCallback(
-    //     debounce((newQueryOptions) => {
-    //         onQueryChange && onQueryChange(newQueryOptions);
-    //     }, 500),
-    //     []
-    // );
-
-    // useEffect(() => {
-    //     const newQueryOptions = {
-    //         page: paginationModel.page,
-    //         size: paginationModel.pageSize,
-    //         sortBy: sortModel[0]?.field,
-    //         sortDirection: sortModel[0]?.sort ?? 'asc',
-    //         search: searchValue
-    //     };
-    //     debouncedOnQueryChange(newQueryOptions);
-    // }, [paginationModel, sortModel, searchValue, debouncedOnQueryChange]);
 
     const handlePaginationModelChange = useCallback((newPaginationModel: { page: number, pageSize: number }) => {
         setPaginationModel && setPaginationModel(newPaginationModel);

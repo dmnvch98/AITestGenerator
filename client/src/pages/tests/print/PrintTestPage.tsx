@@ -3,9 +3,18 @@ import {Box} from '@mui/material';
 import {PrintTestSettings} from "./PrintTestSettings";
 import {PrintTestContent} from "./PrintTestContent";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export const PrintTestPage = () => {
+
     const componentRef = useRef<HTMLDivElement>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleReturnToPrevPage = () => {
+        const prevUrl = location?.state?.previousLocationPathname || '/tests';
+        navigate(prevUrl);
+    }
 
     const Content = (
         <Box ref={componentRef} flexGrow={1}>
@@ -15,7 +24,7 @@ export const PrintTestPage = () => {
 
     const Actions = (
         <Box>
-            <PrintTestSettings printRef={componentRef} />
+            <PrintTestSettings printRef={componentRef} handleReturn={handleReturnToPrevPage} />
         </Box>
     )
     return (

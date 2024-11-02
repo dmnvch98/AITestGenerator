@@ -5,7 +5,6 @@ import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.models.*;
 import com.example.generation_service.repositories.TestRepository;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +29,6 @@ public class TestService {
 
     public Test save(final Test test) {
         return testRepository.save(test);
-    }
-
-    public List<Test> findAllByUserId(Long userId) {
-        return testRepository.findAllByUserId(userId, Sort.by("createdAt").descending());
     }
 
     public Page<Test> findUserTests(final Long userId, final String search, final int page, final int size,
@@ -80,10 +75,6 @@ public class TestService {
 
     public Optional<Test> findAllByIdAndUserId(Long testId, Long userId) {
         return testRepository.findTestByIdAndUserId(testId, userId);
-    }
-
-    public List<Test> findAllByIdInAndUserId(List<Long> testIds, Long userId) {
-        return testRepository.findAllByIdInAndUserId(testIds, userId, Sort.by("createdAt").descending());
     }
 
     @TrackAction(ActionType.CREATE_TEST)

@@ -9,7 +9,6 @@ import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 import DateTimeUtils from "../../utils/DateTimeUtils";
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
-import {QueryOptions} from "../../store/types";
 
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
@@ -60,7 +59,6 @@ interface Props {
     loading: boolean;
     searchValue?: string;
     rowCount?: number;
-    onQueryChange: (options: QueryOptions) => void;
     paginationModel: { page: number, pageSize: number },
     setPaginationModel: (params: { page: number, pageSize: number }) => void;
     sortModel: GridSortModel;
@@ -71,7 +69,6 @@ export const TestTable: React.FC<Props> = ({
                                                onSelectionModelChange,
                                                loading,
                                                rowCount,
-                                               onQueryChange,
                                                paginationModel,
                                                setPaginationModel,
                                                sortModel,

@@ -5,7 +5,6 @@ import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.Test;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +29,6 @@ public class TestController {
     public void generateTestByFileAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         testFacade.prepareTestGeneration(userId, dto);
-    }
-
-    @GetMapping
-    public TestsResponseDto findAllByUser(@RequestParam(value = "ids", required = false) Long[] ids, Authentication authentication) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.findAllByUser(ids, userId);
     }
 
     @GetMapping("/{id}")
@@ -80,7 +73,7 @@ public class TestController {
         return testFacade.getCurrentHistories(userId);
     }
 
-    @GetMapping("/filter")
+    @GetMapping
     public TestsResponseDto getProducts(
             final Authentication authentication,
             @RequestParam(required = false) String search,

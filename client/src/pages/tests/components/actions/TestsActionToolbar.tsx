@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Button, TextField, InputAdornment } from '@mui/material';
+import {Box, Button, TextField, InputAdornment, IconButton} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import {ConfirmationButton} from "../../../../components/main/ConfirmationButton";
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface ActionToolbarProps {
     onAdd: () => void;
@@ -11,14 +12,15 @@ interface ActionToolbarProps {
     onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     deleteButtonTitle?: string;
     addButtonTitle?: string;
+    onSearchClear: () => void;
 }
-
 export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                                                          onAdd,
                                                          onDelete,
                                                          deleteDisabled,
                                                          searchValue,
-                                                         onSearchChange
+                                                         onSearchChange,
+                                                         onSearchClear
                                                      }) => {
     return (
         <Box display="flex" alignItems="center" sx={{ mb: 2 }} justifyContent="space-between">
@@ -55,6 +57,15 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                {searchValue && searchValue?.length > 0 && (
+                                    <IconButton onClick={onSearchClear}>
+                                        <CancelIcon sx={{fontSize: 14}}/>
+                                    </IconButton>
+                                )}
                             </InputAdornment>
                         ),
                     }}
