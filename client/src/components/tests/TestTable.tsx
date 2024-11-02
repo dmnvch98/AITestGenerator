@@ -1,9 +1,9 @@
 import React from 'react';
-import {GridColDef, GridEventListener} from '@mui/x-data-grid';
-import { Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { UserTest, useTestStore } from "../../store/tests/testStore";
-import { useExportStore } from "../../store/tests/exportStore";
+import {GridColDef, GridEventListener, GridSortModel} from '@mui/x-data-grid';
+import {Box} from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {UserTest, useTestStore} from "../../store/tests/testStore";
+import {useExportStore} from "../../store/tests/exportStore";
 import {GenericTableActions} from "../main/GenericTableActions";
 import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 import DateTimeUtils from "../../utils/DateTimeUtils";
@@ -61,11 +61,24 @@ interface Props {
     searchValue?: string;
     rowCount?: number;
     onQueryChange: (options: QueryOptions) => void;
+    paginationModel: { page: number, pageSize: number },
+    setPaginationModel: (params: { page: number, pageSize: number }) => void;
+    sortModel: GridSortModel;
+    setSortModel: (params: GridSortModel) => void;
 }
 
-export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, searchValue, rowCount, onQueryChange }) => {
-    const { tests, deleteTest } = useTestStore();
-    const { exportTest } = useExportStore();
+export const TestTable: React.FC<Props> = ({
+                                               onSelectionModelChange,
+                                               loading,
+                                               rowCount,
+                                               onQueryChange,
+                                               paginationModel,
+                                               setPaginationModel,
+                                               sortModel,
+                                               setSortModel
+                                           }) => {
+    const {tests, deleteTest} = useTestStore();
+    const {exportTest} = useExportStore();
     const navigate = useNavigate();
 
     const handleEvent: GridEventListener<'cellClick'> = (params) => {
@@ -119,14 +132,16 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, se
                     deleteTest,
                     exportTest
                 )}
-                searchValue={searchValue}
                 rowIdGetter={(row) => row.id}
                 onSelectionModelChange={onSelectionModelChange}
                 loading={loading}
                 handleEvent={handleEvent}
                 sx={style}
                 rowCount={rowCount}
-                onQueryChange={onQueryChange}
+                paginationModel={paginationModel}
+                setPaginationModel={setPaginationModel}
+                sortModel={sortModel}
+                setSortModel={setSortModel}
             />
         </Box>
     );

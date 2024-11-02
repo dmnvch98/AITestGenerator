@@ -36,23 +36,36 @@ public class TestService {
         return testRepository.findAllByUserId(userId, Sort.by("createdAt").descending());
     }
 
-    public Page<Test> findUserTests(final Long userId, final String search, int page, int size, String sortBy, String sortDirection) {
+    public Page<Test> findUserTests(final Long userId, final String search, final int page, final int size,
+                                    final String sortBy, final String sortDirection) {
         try {
-            Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-            Pageable pageable = PageRequest.of(page, size, direction, sortBy);
+            final Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+            final Pageable pageable = PageRequest.of(page, size, direction, sortBy);
+            final Specification<Test> spec = Specification.where((root, query, criteriaBuilder) -> {
+                final Predicate userIdPredicate = criteriaBuilder.equal(root.get("userId"), userId);
 
-            if (search != null && !search.trim().isEmpty()) {
-                String formattedSearch = search.trim().toLowerCase() + ":*";
-                return testRepository.findTestsWithSearch(formattedSearch, userId, pageable);
-            }
-            Specification<Test> spec = Specification.where((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("userId"), userId));
+                if (search == null || search.trim().isEmpty()) {
+                    return userIdPredicate;
+                }
+                final Join<Test, TestSearchVector> searchVectorJoin = root.join("testSearchVectors");
+                final String formattedSearch = search.trim().replaceAll("\\s+", " | ");
+                final Predicate ftsPredicate = criteriaBuilder.equal(
+                        criteriaBuilder.function("fts_search", Boolean.class,
+                                searchVectorJoin.get("searchVector"),
+                                criteriaBuilder.literal("russian"),
+                                criteriaBuilder.concat(criteriaBuilder.literal(formattedSearch), criteriaBuilder.literal(":*"))
+                        ),
+                        true
+                );
+
+                return criteriaBuilder.and(userIdPredicate, ftsPredicate);
+            });
 
             return testRepository.findAll(spec, pageable);
         } catch (final Exception e) {
             log.error("Cannot get user tests", e);
             throw new IllegalArgumentException("Cannot get user tests");
         }
-
     }
 
     public void deleteTest(Long testId) {

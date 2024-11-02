@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
     DataGrid,
     GridColDef, GridEventListener,
-    GridRowIdGetter, GridSortCellParams, GridSortModel,
+    GridRowIdGetter, GridSortCellParams, GridSortItem, GridSortModel,
 } from '@mui/x-data-grid';
 import {Box, debounce, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -85,10 +85,12 @@ interface GenericTableProps<T> {
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
     handleEvent?: GridEventListener<any>;
-    searchValue?: string,
     sx?: SxProps<Theme>;
     rowCount?: number,
-    onQueryChange?: (options: QueryOptions) => void;
+    paginationModel?: { page: number, pageSize: number },
+    setPaginationModel?: (params: { page: number, pageSize: number }) => void;
+    sortModel?: GridSortModel;
+    setSortModel?: (params: GridSortModel) => void;
 }
 
 export const GenericTableActions = <T extends Record<string, any>>({
@@ -98,44 +100,46 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                                                        rowIdGetter,
                                                                        onSelectionModelChange,
                                                                        loading,
-                                                                       searchValue,
                                                                        handleEvent,
                                                                        sx,
-                                                                       onQueryChange,
                                                                        rowCount,
+                                                                       paginationModel,
+                                                                       setPaginationModel,
+                                                                       sortModel,
+                                                                       setSortModel
                                                                    }: GenericTableProps<T>) => {
-    const [paginationModel, setPaginationModel] = useState({
-        page: 0,
-        pageSize: 15,
-    });
+    // const [paginationModel, setPaginationModel] = useState({
+    //     page: 0,
+    //     pageSize: 15,
+    // });
 
-    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
+    // const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
 
-    const debouncedOnQueryChange = useCallback(
-        debounce((newQueryOptions) => {
-            onQueryChange && onQueryChange(newQueryOptions);
-        }, 500),
-        []
-    );
+    // const debouncedOnQueryChange = useCallback(
+    //     debounce((newQueryOptions) => {
+    //         onQueryChange && onQueryChange(newQueryOptions);
+    //     }, 500),
+    //     []
+    // );
 
-    useEffect(() => {
-        const newQueryOptions = {
-            page: paginationModel.page,
-            size: paginationModel.pageSize,
-            sortBy: sortModel[0]?.field,
-            sortDirection: sortModel[0]?.sort ?? 'asc',
-            search: searchValue
-        };
-        debouncedOnQueryChange(newQueryOptions);
-    }, [paginationModel, sortModel, searchValue, debouncedOnQueryChange]);
+    // useEffect(() => {
+    //     const newQueryOptions = {
+    //         page: paginationModel.page,
+    //         size: paginationModel.pageSize,
+    //         sortBy: sortModel[0]?.field,
+    //         sortDirection: sortModel[0]?.sort ?? 'asc',
+    //         search: searchValue
+    //     };
+    //     debouncedOnQueryChange(newQueryOptions);
+    // }, [paginationModel, sortModel, searchValue, debouncedOnQueryChange]);
 
     const handlePaginationModelChange = useCallback((newPaginationModel: { page: number, pageSize: number }) => {
-        setPaginationModel(newPaginationModel);
+        setPaginationModel && setPaginationModel(newPaginationModel);
     }, []);
 
     const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
-        setSortModel(newSortModel);
-        setPaginationModel((prev) => ({ ...prev, page: 0 })); // Сброс страницы на 0 при изменении сортировки
+        setSortModel && setSortModel(newSortModel);
+        paginationModel && handlePaginationModelChange({...paginationModel, page: 0});
     }, []);
 
     const actionColumn: GridColDef = {
@@ -143,7 +147,7 @@ export const GenericTableActions = <T extends Record<string, any>>({
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
-            return <Actions item={item} actions={actions(item)} />;
+            return <Actions item={item} actions={actions(item)}/>;
         },
         sortable: false,
         disableColumnMenu: true,

@@ -45,4 +45,8 @@ public class Test {
     @Column(name = "questions", columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
     private List<QuestionDto> questions;
+
+    @OneToMany(mappedBy = "test", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<TestSearchVector> testSearchVectors;
 }

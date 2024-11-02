@@ -21,10 +21,9 @@ const getFileIcon = (filename: string) => {
 interface FilesTableProps {
     actions: (file: FileDto) => any[];
     loading: boolean;
-    searchValue?: string;
 }
 
-export const FilesTable = ({actions, loading, searchValue}: FilesTableProps) => {
+export const FilesTable = ({actions, loading}: FilesTableProps) => {
     const {fileDtos, setSelectedFileHashes} = useFileStore();
 
     const columns: GridColDef[] = [
@@ -63,7 +62,6 @@ export const FilesTable = ({actions, loading, searchValue}: FilesTableProps) => 
             rowIdGetter={(row) => row.id as number}
             onSelectionModelChange={setSelectedFileHashes}
             loading={loading}
-            searchValue={searchValue}
         />
     );
 };

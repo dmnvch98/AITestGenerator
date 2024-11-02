@@ -135,7 +135,7 @@ const FilesContent = () => {
                 onSearchChange={handleSearchChange}
             />
 
-            <FilesTable actions={actions} loading={loading} searchValue={searchValue}/>
+            <FilesTable actions={actions} loading={loading}/>
 
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 

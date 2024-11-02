@@ -50,6 +50,7 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                     placeholder="Поиск"
                     value={searchValue}
                     onChange={onSearchChange}
+
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
