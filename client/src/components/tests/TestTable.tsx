@@ -9,6 +9,7 @@ import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 import DateTimeUtils from "../../utils/DateTimeUtils";
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
+import {QueryOptions} from "../../store/types";
 
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
@@ -58,9 +59,11 @@ interface Props {
     onSelectionModelChange: (testIds: number[]) => void;
     loading: boolean;
     searchValue?: string;
+    rowCount?: number;
+    onQueryChange: (options: QueryOptions) => void;
 }
 
-export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, searchValue }) => {
+export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, searchValue, rowCount, onQueryChange }) => {
     const { tests, deleteTest } = useTestStore();
     const { exportTest } = useExportStore();
     const navigate = useNavigate();
@@ -82,7 +85,8 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, se
             field: 'fileName',
             headerName: 'Файл',
             minWidth: 250,
-            flex: 1
+            flex: 1,
+            sortable: false
         },
         {
             field: 'createdAt',
@@ -100,6 +104,7 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, se
             field: 'title',
             headerName: 'Заголовок',
             minWidth: 550,
+            sortable: false
         },
     ];
 
@@ -120,6 +125,8 @@ export const TestTable: React.FC<Props> = ({ onSelectionModelChange, loading, se
                 loading={loading}
                 handleEvent={handleEvent}
                 sx={style}
+                rowCount={rowCount}
+                onQueryChange={onQueryChange}
             />
         </Box>
     );

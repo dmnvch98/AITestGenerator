@@ -4,6 +4,7 @@ import {TestTable} from "../../components/tests/TestTable";
 import {Alert, Box, Snackbar} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {TestsActionToolbar} from "./components/actions/TestsActionToolbar";
+import {QueryOptions} from "../../store/types";
 
 export const Tests = () => {
     const CREATE_TEST_URL: string = "/tests/create"
@@ -14,7 +15,8 @@ export const Tests = () => {
         clearAlerts,
         deleteAlert,
         bulkDeleteTest,
-        clearState
+        clearState,
+        totalElements
     } = useTestStore();
 
     const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
@@ -22,14 +24,13 @@ export const Tests = () => {
     const [searchValue, setSearchValue] = useState<string>('');
     const navigate = useNavigate();
 
-    const fetchTest = async () => {
+    const fetchTest = async (options?: QueryOptions) => {
         setLoading(true);
-        await getAllUserTests();
+        await getAllUserTests(options);
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchTest();
         return () => {
             clearState();
         }
@@ -65,7 +66,13 @@ export const Tests = () => {
                 searchValue={searchValue}
                 onSearchChange={handleSearchChange}
             />
-            <TestTable onSelectionModelChange={onMultiTestSelection} loading={loading} searchValue={searchValue}/>
+            <TestTable
+                onSelectionModelChange={onMultiTestSelection}
+                loading={loading}
+                searchValue={searchValue}
+                rowCount={totalElements}
+                onQueryChange={fetchTest}
+            />
             <Snackbar
                 open={alerts.length > 0}
                 autoHideDuration={6000}

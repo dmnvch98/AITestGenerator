@@ -10,19 +10,19 @@ const TestPassContent = () => {
     const testToPass = usePassTestStore(state => state.testToPass);
     const setTestsToPass = usePassTestStore(state => state.setTestsToPass);
     const saveTestResult = usePassTestStore(state => state.saveTestResult);
-    const getUserTestsByIdIn = useTestStore(state => state.getUserTestsByIdIn);
+    // const getUserTestsByIdIn = useTestStore(state => state.getUserTestsByIdIn);
     const tests = useTestStore(state => state.tests);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (tests.length === 0) {
-            getUserTestsByIdIn(testIdsToPass).then(() => {
-                setTestsToPass(tests)
-            });
-        } else {
-            setTestsToPass(tests.filter(t => testIdsToPass.includes(t.id)));
-        }
-    }, [tests]);
+    // useEffect(() => {
+    //     if (tests.length === 0) {
+    //         getUserTestsByIdIn(testIdsToPass).then(() => {
+    //             setTestsToPass(tests)
+    //         });
+    //     } else {
+    //         setTestsToPass(tests.filter(t => testIdsToPass.includes(t.id)));
+    //     }
+    // }, [tests]);
 
     const [currentTestId, setCurrentTestId] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);

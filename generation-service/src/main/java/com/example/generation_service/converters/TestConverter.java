@@ -35,7 +35,7 @@ public interface TestConverter {
         return TestsResponseDto.builder()
                 .tests(pageTest.getContent().stream().map(this::convert).toList())
                 .totalPages(pageTest.getTotalPages())
-                .totalElements(pageTest.getNumberOfElements())
+                .totalElements(pageTest.getTotalElements())
                 .build();
     }
 

@@ -12,7 +12,7 @@ public class TestsResponseDto {
 
   private final List<TestResponseDto> tests;
   private final int totalPages;
-  private final int totalElements;
+  private final long totalElements;
 
   @Getter
   @Builder

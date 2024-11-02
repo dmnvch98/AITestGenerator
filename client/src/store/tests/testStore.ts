@@ -1,6 +1,6 @@
 import {create} from "zustand";
 import TestService from "../../services/TestService";
-import {AlertMessage} from "../types";
+import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 
 export interface UserTest {
@@ -46,8 +46,16 @@ export interface TestRatingDto {
     feedback?: string;
 }
 
+export interface TestsResponseDto {
+    tests: UserTest[];
+    totalPages: number;
+    totalElements: number;
+}
+
 export interface TestStore {
     tests: UserTest[],
+    totalPages: number,
+    totalElements: number,
     selectedTest: UserTest | undefined,
     selectedTestRating: TestRatingDto | undefined;
     selectTest: (userTest: UserTest) => void,
@@ -55,8 +63,8 @@ export interface TestStore {
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
-    getAllUserTests: () => void,
-    getUserTestsByIdIn: (ids: number[]) => Promise<void>,
+    getAllUserTests: (options?: QueryOptions) => void,
+    // getUserTestsByIdIn: (ids: number[]) => Promise<void>,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
     generateTestValidationErrorFlag: boolean;
@@ -80,6 +88,8 @@ export interface TestStore {
 
 export const useTestStore = create<TestStore>((set, get) => ({
     tests: [],
+    totalPages: 0,
+    totalElements: 0,
     selectedTest: undefined,
     selectedTestRating: undefined,
     generateTestValidationErrorFlag: false,
@@ -103,9 +113,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
         const response = await TestService.generateTestByFile(request);
         return response as boolean;
     },
-    getAllUserTests: async () => {
-        const {tests} = await TestService.getUserTests()
-        set({tests: tests})
+    getAllUserTests: async (options) => {
+        const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(options)
+        set({ tests, totalPages, totalElements })
     },
     addAlert: (alert: AlertMessage) => {
         get().alerts.push(alert);
@@ -119,10 +129,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
         } else {
             addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
         }
-    },
-    getUserTestsByIdIn: async (ids: number[]) => {
-        const userTests = await TestService.getUserTests(ids)
-        set({tests: userTests});
     },
     setGenerateTestValidationErrorFlag: (flag: boolean) => {
         set({generateTestValidationErrorFlag: flag})

@@ -6,6 +6,7 @@ import {
     GenerateTestRequest,
     UserTest
 } from "../store/tests/testStore";
+import {QueryOptions} from "../store/types";
 
 class TestService {
 
@@ -35,11 +36,12 @@ class TestService {
         }
     }
 
-    getUserTests = async (ids?: number[]) => {
+    getUserTests = async (options?: QueryOptions) => {
         try {
-            const url = "/api/v1/tests";
-            const params = ids ? {ids: ids.join(",")} : undefined;
-            const response = await this.axiosInstance.get(url, {params});
+            const url = "/api/v1/tests/filter";
+            console.log(options)
+            // const params = ids ? {ids: ids.join(",")} : undefined;
+            const response = await this.axiosInstance.get(url, {params: options});
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

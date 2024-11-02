@@ -1,5 +1,6 @@
 import {v4 as uuidv4} from "uuid";
 import {ConfirmationButtonProps} from "../components/main/ConfirmationButton";
+import {GridSortDirection} from "@mui/x-data-grid/models/gridSortModel";
 
 export class AlertMessage {
     id: string;
@@ -33,4 +34,12 @@ export interface ActionIcon {
     onClick: () => void;
     disabled?: boolean;
     confirmProps?: ConfirmationButtonProps;
+}
+
+export interface QueryOptions {
+    page?: number,
+    size?: number,
+    sortBy?: string,
+    sortDirection?: GridSortDirection
+    search?: string
 }

@@ -2,6 +2,7 @@ package com.example.generation_service.models;
 
 import com.example.generation_service.converters.ormConverter.QuestionsConverter;
 import com.example.generation_service.dto.tests.QuestionDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
@@ -44,7 +45,4 @@ public class Test {
     @Column(name = "questions", columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
     private List<QuestionDto> questions;
-
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TestSearchVector> testSearchVectors;
 }

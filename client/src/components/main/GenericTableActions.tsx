@@ -1,15 +1,18 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
     DataGrid,
     GridColDef, GridEventListener,
-    GridRowIdGetter,
+    GridRowIdGetter, GridSortCellParams, GridSortModel,
 } from '@mui/x-data-grid';
-import {Box, IconButton, Menu, MenuItem} from '@mui/material';
+import {Box, debounce, IconButton, Menu, MenuItem} from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {tableLables} from './dataGridLabels';
 import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
+import {QueryOptions} from "../../store/types";
+import {GridSortDirection} from "@mui/x-data-grid/models/gridSortModel";
+import TestService from "../../services/TestService";
 
 interface Action<T> {
     label?: string;
@@ -84,61 +87,89 @@ interface GenericTableProps<T> {
     handleEvent?: GridEventListener<any>;
     searchValue?: string,
     sx?: SxProps<Theme>;
+    rowCount?: number,
+    onQueryChange?: (options: QueryOptions) => void;
 }
 
 export const GenericTableActions = <T extends Record<string, any>>({
-                                             data,
-                                             columns,
-                                             actions,
-                                             rowIdGetter,
-                                             onSelectionModelChange,
-                                             loading,
-                                             searchValue,
-                                             handleEvent,
-                                             sx
-                                         }: GenericTableProps<T>) => {
+                                                                       data,
+                                                                       columns,
+                                                                       actions,
+                                                                       rowIdGetter,
+                                                                       onSelectionModelChange,
+                                                                       loading,
+                                                                       searchValue,
+                                                                       handleEvent,
+                                                                       sx,
+                                                                       onQueryChange,
+                                                                       rowCount,
+                                                                   }: GenericTableProps<T>) => {
+    const [paginationModel, setPaginationModel] = useState({
+        page: 0,
+        pageSize: 15,
+    });
+
+    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
+
+    const debouncedOnQueryChange = useCallback(
+        debounce((newQueryOptions) => {
+            onQueryChange && onQueryChange(newQueryOptions);
+        }, 500),
+        []
+    );
+
+    useEffect(() => {
+        const newQueryOptions = {
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            sortBy: sortModel[0]?.field,
+            sortDirection: sortModel[0]?.sort ?? 'asc',
+            search: searchValue
+        };
+        debouncedOnQueryChange(newQueryOptions);
+    }, [paginationModel, sortModel, searchValue, debouncedOnQueryChange]);
+
+    const handlePaginationModelChange = useCallback((newPaginationModel: { page: number, pageSize: number }) => {
+        setPaginationModel(newPaginationModel);
+    }, []);
+
+    const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
+        setSortModel(newSortModel);
+        setPaginationModel((prev) => ({ ...prev, page: 0 })); // Сброс страницы на 0 при изменении сортировки
+    }, []);
+
     const actionColumn: GridColDef = {
         field: 'actions',
         headerName: 'Действия',
         renderCell: (params) => {
             const item: T = params.row;
-            return <Actions item={item} actions={actions(item)}/>;
+            return <Actions item={item} actions={actions(item)} />;
         },
         sortable: false,
         disableColumnMenu: true,
     };
 
-    const filteredData = useMemo(() => {
-        if (!searchValue) return data;
-        const lowercasedSearchValue = searchValue.toLowerCase();
-
-        return data.filter((item) => {
-            return Object.values(item).some((field) =>
-                String(field).toLowerCase().includes(lowercasedSearchValue)
-            );
-        });
-    }, [data, searchValue]);
-
     return (
         <Box>
             <DataGrid
+                key={data?.length}
                 loading={loading}
                 autoHeight
-                rows={filteredData.map(item => ({
-                    ...item,
-                }))}
+                rows={data}
+                rowCount={rowCount}
                 columns={[...columns, actionColumn]}
                 pageSizeOptions={[5, 10, 15]}
                 checkboxSelection
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={handlePaginationModelChange}
                 disableRowSelectionOnClick
+                sortingMode="server"
+                sortModel={sortModel}
+                onSortModelChange={handleSortModelChange}
                 getRowId={rowIdGetter as GridRowIdGetter<any>}
                 onRowSelectionModelChange={(ids) => {
                     onSelectionModelChange && onSelectionModelChange(ids as number[]);
-                }}
-                initialState={{
-                    pagination: {
-                        paginationModel: {page: 0, pageSize: 15},
-                    },
                 }}
                 localeText={tableLables}
                 onCellClick={handleEvent}
@@ -147,3 +178,4 @@ export const GenericTableActions = <T extends Record<string, any>>({
         </Box>
     );
 };
+
