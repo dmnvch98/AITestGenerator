@@ -6,7 +6,7 @@ export interface TabItem {
     children?: React.ReactNode;
     index: number;
     value: number;
-    title: string;
+    title: React.ReactNode;
 }
 
 export interface TabsPanelProps {

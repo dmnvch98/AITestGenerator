@@ -22,6 +22,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
 import {useLocation} from 'react-router-dom';
+import {ActiveJobBadge} from "./ActiveJobBadge";
 
 const drawerWidth = 200;
 
@@ -151,6 +152,10 @@ export const SidebarHeader = ({children}: any) => {
                                     ГенТест
                                 </Typography>
                                 <Box display="flex" alignItems="center">
+                                    <Box sx={{mr: 6}}>
+                                        <ActiveJobBadge/>
+                                    </Box>
+
                                     <Button
                                         sx={{color: 'black'}}
                                         onClick={logout}

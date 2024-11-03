@@ -3,7 +3,6 @@ import UserService, {BulkActivityDeleteDto} from "../services/UserService";
 import {GenerationStatus, QueryOptions} from "./types";
 import TestService from "../services/TestService";
 import ActivityService from "../services/activities/ActivityService";
-import {UserTest} from "./tests/testStore";
 
 export interface TestGenActivity {
     uuid: string,
@@ -36,7 +35,6 @@ export interface UserStore {
     totalElements: number;
     testGenHistoryPast: TestGenActivity[],
     getTestGenCurrentActivities: () => void,
-    deleteCurrentUserActivities: () => void,
     getTestGenHistory: (options?: QueryOptions) => void;
     loading: boolean;
     setLoading: (flag: boolean) => void;
@@ -88,23 +86,8 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         }
     },
 
-    deleteCurrentUserActivities: async () => {
-        const { currentActivities } = get();
-
-        const activitiesToDelete = currentActivities.filter((a: ActivityDto) => DeletableStatuses.has(a.status));
-        if (activitiesToDelete.length === 0) {
-            return;
-        }
-
-        const updatedActivities = currentActivities.filter((a: ActivityDto) =>
-            !activitiesToDelete.some((activity: ActivityDto) => activity.cid === a.cid)
-        );
-
-        set({ currentActivities: updatedActivities });
-    },
-
     deleteFinishedUserActivitiesFromServer: async () => {
-        const { currentActivities } = get();
+        const { currentActivities, getTestGenCurrentActivities } = get();
 
         const activitiesToDelete = currentActivities.filter((a: ActivityDto) => DeletableStatuses.has(a.status));
         if (activitiesToDelete.length === 0) {
@@ -116,6 +99,7 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         };
 
         await UserService.deleteCurrentUserActivities(deleteDto);
+        await getTestGenCurrentActivities();
     },
 
     initState: async () => {

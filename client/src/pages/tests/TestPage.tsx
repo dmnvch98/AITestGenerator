@@ -21,15 +21,13 @@ export const TestPageContent = () => {
                 case 'history':
                     setActiveTab(1);
                     break;
-                case 'results':
-                    setActiveTab(2);
-                    break;
                 default:
                     setActiveTab(0);
                     break;
             }
         }
     }, [location]);
+
     const tabs: TabItem[] = [
         { index: 0, value: 0, children: <Box><Tests/></Box>, title: 'Тесты' },
         { index: 1, value: 1, children: <Box><TestGenerationHistory/></Box>, title: 'История генераций' },

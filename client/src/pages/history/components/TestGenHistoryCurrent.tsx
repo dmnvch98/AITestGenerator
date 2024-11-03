@@ -9,7 +9,7 @@ import {Theme} from "@mui/material/styles";
 import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
 
-const noTestTitle = '--- Недоступно ---'
+const noTestTitle = 'Недоступно'
 
 export const TestGenHistoryCurrent = () => {
 
@@ -80,6 +80,7 @@ export const TestGenHistoryCurrent = () => {
                     rowIdGetter={(row) => row.id}
                     checkboxSelection={false}
                     handleEvent={handleEvent}
+                    rowCount={currentActivities.length}
                     sx={style}
                 />
             </Box>

@@ -19,7 +19,7 @@ export const TestGenHistoryPast = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [failCode, setFailCode] = useState<number | null>(null);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'startDate', sort: 'desc' }]);
+    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'endDate', sort: 'desc' }]);
 
     const handleOpenModal = (code: number) => {
         setFailCode(code);

@@ -32,7 +32,7 @@ public interface ActivityConverter {
 
   default TestGenerationActivity getInProgressActivity(final TestGenerationActivity activity, final String messageReceipt) {
     return TestGenerationActivity.builder()
-       .uuid(activity.getUuid())
+       .id(activity.getId())
        .status(ActivityStatus.IN_PROCESS)
        .cid(activity.getCid())
        .fileName(activity.getFileName())
@@ -45,7 +45,7 @@ public interface ActivityConverter {
   default TestGenerationActivity getFinishedActivity(final TestGenerationActivity activity, final Long testId,
                                                      final String testTitle) {
     return TestGenerationActivity.builder()
-          .uuid(activity.getUuid())
+          .id(activity.getId())
           .status(ActivityStatus.SUCCESS)
           .cid(activity.getCid())
           .startDate(activity.getStartDate())
@@ -63,7 +63,7 @@ public interface ActivityConverter {
   default TestGenerationActivity getFailedActivity(final TestGenerationActivity activity,
                                                    final GenerationFailReason failReason) {
     return TestGenerationActivity.builder()
-          .uuid(activity.getUuid())
+          .id(activity.getId())
           .status(ActivityStatus.FAILED)
           .startDate(activity.getStartDate())
           .endDate(LocalDateTime.now())

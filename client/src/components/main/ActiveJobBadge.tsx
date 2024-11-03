@@ -1,92 +1,105 @@
-import React, { useState, useCallback} from 'react';
-import { Badge, Box, IconButton, Popover, Typography, Divider, ListItemText, ListItemIcon, List, ListItem } from '@mui/material';
-import TimerIcon from '@mui/icons-material/Timer';
-import { GenerationStatus } from "../../store/types";
-import { ActivityDto, useUserStore } from "../../store/userStore";
-import DeleteIcon from "@mui/icons-material/Delete";
+import React, {useState, useCallback, useEffect} from 'react';
+import {
+    Badge,
+    Box,
+    IconButton,
+    Popover,
+    Typography,
+    Divider,
+    ListItemText,
+    ListItemIcon,
+    List,
+    ListItem
+} from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import {useUserStore} from "../../store/userStore";
 import StatusIndicator from "../status/StatusIndicator";
-
-const DeletableStatuses = new Set([
-    GenerationStatus.FAILED,
-    GenerationStatus.SUCCESS,
-]);
+import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
 
 export const ActiveJobBadge = () => {
-    const MAX_FILENAME_LENGTH = 30;
-    const { currentActivities, deleteCurrentUserActivities } = useUserStore();
+    const MAX_FILENAME_LENGTH = 35;
+    const {currentActivities, deleteFinishedUserActivitiesFromServer} = useUserStore();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+
+    useEffect(() => {
+        return () => {
+            deleteFinishedUserActivitiesFromServer();
+        };
+    }, []);
 
     const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     }, []);
 
     const handleClose = useCallback(() => {
+        deleteFinishedUserActivitiesFromServer();
         setAnchorEl(null);
     }, []);
-
-    const handleDelete = useCallback((item: ActivityDto) => {
-        // deleteCurrentUserActivities(item);
-    }, [deleteCurrentUserActivities]);
 
     const truncateString = useCallback((str: string) => (
         str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str
     ), []);
 
-    const getCurrentJobComponent = useCallback((item: ActivityDto) => {
-        if (!item) return null;
-
-        const showDeleteButton = () => {
-            return DeletableStatuses.has(item.status);
-        };
-
-        return (
-            <ListItem
-                secondaryAction={ showDeleteButton() && (
-                    <Box onClick={() => handleDelete(item)} aria-label="Delete activity">
-                        <IconButton edge="end" aria-label="delete">
-                            <DeleteIcon />
-                        </IconButton>
+    const getCurrentJobComponent = useCallback(() => {
+        if (currentActivities.length > 0) {
+            return (
+                <>
+                    {currentActivities.map(item => (
+                        <ListItem key={item.id} sx={{ml: -1}}>
+                            <ListItemIcon>
+                                <StatusIndicator status={item.status}/>
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={truncateString(item.fileName)}
+                                sx={{
+                                    whiteSpace: 'nowrap', // Prevent line breaks
+                                    overflow: 'hidden',    // Hide overflowing content
+                                    textOverflow: 'ellipsis' // Add ellipsis for overflowed text
+                                }}/>
+                        </ListItem>
+                    ))}
+                    <Box sx={{display: 'flex', justifyContent: 'flex-end', mr: 1, mb: -1}}>
+                        <Link href="/tests?activeTab=history" color="inherit" underline="none">
+                            <Button variant="text" size="small">Подробнее</Button>
+                        </Link>
                     </Box>
-                )}
-            >
-                <ListItemIcon sx={{ml: 2}}>
-                    <StatusIndicator status={item.status}/>
-                </ListItemIcon>
-                <ListItemText
-                    primary={truncateString(item.fileName)}
-                />
-            </ListItem>
-        );
-    }, [truncateString, handleDelete]);
+                </>
+            );
+        }
+
+        return null;
+    }, [currentActivities, truncateString]);
 
     const getNoJobsComponent = useCallback(() => (
-        <ListItem disablePadding sx={{ p: 2 }}>
-            <ListItemText primary='Нет активных работ' />
+        <ListItem sx={{m: 2, ml: -1}}>
+            <ListItemText primary='Нет активных работ'/>
         </ListItem>
     ), []);
 
     return (
         <Box>
             <IconButton onClick={handleClick}>
-                <Badge badgeContent={currentActivities.length} color="secondary" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                    <TimerIcon />
+                <Badge badgeContent={currentActivities.length} color="secondary"
+                       anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}>
+                    <NotificationsIcon/>
                 </Badge>
             </IconButton>
             <Popover
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                transformOrigin={{vertical: 'top', horizontal: 'center'}}
             >
-                <Box sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper' }}>
-                    <Box sx={{ p: 1, ml: 1 }}>
+                <Box sx={{width: 400, bgcolor: 'background.paper', p: 1}}>
+                    <Box sx={{ml: 1}}>
                         <Typography variant="subtitle1"><strong>Активные работы</strong></Typography>
                     </Box>
-                    <Divider />
+                    <Divider/>
                     <List>
-                        {currentActivities.length > 0 ? currentActivities.map(getCurrentJobComponent) : getNoJobsComponent()}
+                        {currentActivities.length > 0 ? getCurrentJobComponent() : getNoJobsComponent()}
                     </List>
                 </Box>
             </Popover>

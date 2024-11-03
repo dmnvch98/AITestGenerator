@@ -17,7 +17,7 @@ export const Tests = () => {
         clearAlerts,
         deleteAlert,
         bulkDeleteTest,
-        totalElements
+        totalElements,
     } = useTestStore();
 
     const [selectedTestIds, setSelectedTestIds] = useState<number[]>([]);
