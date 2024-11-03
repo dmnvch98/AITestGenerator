@@ -1,7 +1,7 @@
 package com.example.generation_service.services;
 
-import com.example.generation_service.models.UserFeature;
-import com.example.generation_service.repositories.UserFeatureRepository;
+import com.example.generation_service.models.user.UserFeature;
+import com.example.generation_service.repositories.user.UserFeatureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

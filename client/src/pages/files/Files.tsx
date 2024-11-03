@@ -11,9 +11,10 @@ import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
-import {AlertMessage} from "../../store/types";
+import {AlertMessage, QueryOptions} from "../../store/types";
 import {v4 as uuidv4} from "uuid";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
+import {GridSortModel} from "@mui/x-data-grid";
 
 const FilesContent = () => {
     const {
@@ -28,7 +29,8 @@ const FilesContent = () => {
         deleteFilesInBatch,
         selectedFileHashes,
         deleteFile,
-        addAlert
+        addAlert,
+        totalUserFiles
     } = useFileStore();
 
     const {generateTestByFile} = useTestStore();
@@ -39,16 +41,36 @@ const FilesContent = () => {
     const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [searchValue, setSearchValue] = useState<string>('');
+    const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'uploadTime', sort: 'desc' }]);
 
-    const fetchFiles = async () => {
+    const fetchFiles = async (options?: QueryOptions) => {
         setLoading(true);
-        await getFiles();
+        await getFiles(options);
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchFiles();
-    }, []);
+        const searchOptions: QueryOptions = {
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            sortBy: sortModel[0]?.field,
+            sortDirection: sortModel[0]?.sort ?? 'asc',
+            search: debouncedSearchValue
+        };
+        fetchFiles(searchOptions);
+    }, [debouncedSearchValue, paginationModel, sortModel]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchValue(searchValue);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchValue]);
 
     const handleAdd = () => {
         setUploadModalOpen(true);
@@ -97,6 +119,10 @@ const FilesContent = () => {
         setSearchValue(event.target.value);
     };
 
+    const handleClearSearch = () => {
+        setSearchValue('');
+    }
+
     const actions = (file: FileDto) => [
         {
             onClick: () => deleteFile(file),
@@ -133,9 +159,18 @@ const FilesContent = () => {
                 deleteDisabled={isDeleteButtonDisabled()}
                 searchValue={searchValue}
                 onSearchChange={handleSearchChange}
+                onSearchClear={handleClearSearch}
             />
 
-            <FilesTable actions={actions} loading={loading}/>
+            <FilesTable
+                actions={actions}
+                loading={loading}
+                rowCount={totalUserFiles}
+                paginationModel={paginationModel}
+                setPaginationModel={setPaginationModel}
+                sortModel={sortModel}
+                setSortModel={setSortModel}
+            />
 
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 

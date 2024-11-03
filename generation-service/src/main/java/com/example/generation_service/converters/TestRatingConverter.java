@@ -1,7 +1,7 @@
 package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.tests.TestRatingDto;
-import com.example.generation_service.models.TestRating;
+import com.example.generation_service.models.test.TestRating;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

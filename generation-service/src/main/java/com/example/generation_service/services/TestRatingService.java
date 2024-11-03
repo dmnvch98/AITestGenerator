@@ -2,8 +2,8 @@ package com.example.generation_service.services;
 
 import com.example.generation_service.converters.TestRatingConverter;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
-import com.example.generation_service.models.TestRating;
-import com.example.generation_service.repositories.TestRatingRepository;
+import com.example.generation_service.models.test.TestRating;
+import com.example.generation_service.repositories.test.TestRatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

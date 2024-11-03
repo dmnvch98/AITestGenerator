@@ -2,8 +2,8 @@ package com.example.generation_service.facades;
 
 import com.example.generation_service.converters.TestResultConverter;
 import com.example.generation_service.dto.tests.TestResultDto;
-import com.example.generation_service.models.Test;
-import com.example.generation_service.models.TestResult;
+import com.example.generation_service.models.test.Test;
+import com.example.generation_service.models.test.TestResult;
 import com.example.generation_service.services.TestResultService;
 import com.example.generation_service.services.TestService;
 import lombok.AllArgsConstructor;

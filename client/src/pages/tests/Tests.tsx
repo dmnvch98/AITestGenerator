@@ -10,6 +10,7 @@ import { GridSortModel } from "@mui/x-data-grid";
 export const Tests = () => {
     const CREATE_TEST_URL = "/tests/create";
     const location = useLocation();
+    const navigate = useNavigate();
     const {
         getAllUserTests,
         alerts,
@@ -23,7 +24,6 @@ export const Tests = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
-    const navigate = useNavigate();
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'createdAt', sort: 'desc' }]);
 

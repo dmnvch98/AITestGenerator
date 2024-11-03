@@ -13,9 +13,10 @@ import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 interface TestPrintActionsProps {
     printRef: React.RefObject<HTMLDivElement>;
     handleReturn: () =>  void;
-}
+    handlePrint: () => void;
+ }
 
-export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef, handleReturn}) => {
+export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef, handleReturn, handlePrint}) => {
     const {
         titleFontSize,
         setTitleFontSize,
@@ -52,7 +53,7 @@ export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef, ha
     const actionItemPrint: ActionIcon = {
         name: 'Печать',
         icon: <PrintIcon/>,
-        onClick: () => {},
+        onClick: handlePrint
     }
 
     const actions: ActionIcon[] = [

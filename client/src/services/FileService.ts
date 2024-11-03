@@ -1,6 +1,7 @@
 import {getAxiosInstance} from "../interceptors/getAxiosInstance";
 import {AxiosError} from "axios";
 import {FileUploadResponseDto} from "../store/fileStore";
+import {QueryOptions} from "../store/types";
 
 class FileService {
 
@@ -27,10 +28,10 @@ class FileService {
         }
     };
 
-    getFiles = async () => {
+    getFiles = async (options?: QueryOptions) => {
         try {
-            const response = await this.axiosInstance.get(`/api/v1/files/`);
-            return response.data.fileHashes;
+            const response = await this.axiosInstance.get('/api/v1/files/filter', {params: options});
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

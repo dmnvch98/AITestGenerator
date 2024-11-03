@@ -2,7 +2,7 @@ package com.example.generation_service.facades;
 
 import com.example.generation_service.converters.TestRatingConverter;
 import com.example.generation_service.dto.tests.TestRatingDto;
-import com.example.generation_service.models.TestRating;
+import com.example.generation_service.models.test.TestRating;
 import com.example.generation_service.services.TestRatingService;
 import com.example.generation_service.services.TestService;
 import lombok.RequiredArgsConstructor;

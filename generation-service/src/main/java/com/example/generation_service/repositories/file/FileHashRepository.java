@@ -1,16 +1,17 @@
-package com.example.generation_service.repositories;
+package com.example.generation_service.repositories.file;
 
 import java.util.List;
 import java.util.Optional;
 
 
-import com.example.generation_service.models.FileHash;
+import com.example.generation_service.models.files.FileHash;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FileHashRepository extends CrudRepository<FileHash, Long> {
+public interface FileHashRepository extends CrudRepository<FileHash, Long>, JpaSpecificationExecutor<FileHash> {
 
     FileHash findByHashedFilenameAndUserId(final String hashedFilename, final Long userId);
 

@@ -51,6 +51,19 @@ public class FileController {
     return fileFacade.getAllUserFileDescriptions(userId);
   }
 
+  @GetMapping("/filter")
+  public FileHashesResponseDto getUserFileHashes(
+          final Authentication authentication,
+          @RequestParam(required = false) String search,
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "10") int size,
+          @RequestParam(required = false, defaultValue = "id") String sortBy,
+          @RequestParam(required = false, defaultValue = "asc") String sortDirection
+  ) {
+    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    return fileFacade.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
+  }
+
   @PostMapping("/delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteInBatch(@RequestBody List<String> hashes, Authentication authentication) {

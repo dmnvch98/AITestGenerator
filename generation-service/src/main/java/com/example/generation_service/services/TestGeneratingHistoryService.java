@@ -1,8 +1,8 @@
 package com.example.generation_service.services;
 
-import com.example.generation_service.models.TestGeneratingHistory;
+import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.models.enums.ActivityStatus;
-import com.example.generation_service.repositories.TestGeneratingHistoryRepository;
+import com.example.generation_service.repositories.test.TestGeneratingHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,10 +43,4 @@ public class TestGeneratingHistoryService {
             throw new IllegalArgumentException("Cannot get user test history");
         }
     }
-
-    public List<TestGeneratingHistory> findAllByUserIdAndGenerationStatusIn(final long userId, final List<ActivityStatus> statuses) {
-        return repository.findAllByUserIdAndStatusIn(userId, statuses);
-    }
-
-
 }

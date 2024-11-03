@@ -3,7 +3,7 @@ import {AxiosError} from "axios";
 import {
     BulkDeleteTestsRequestDto,
     CreateTestRequestDto,
-    GenerateTestRequest,
+    GenerateTestRequest, TestPrintRequestDto,
     UserTest
 } from "../store/tests/testStore";
 import {QueryOptions} from "../store/types";
@@ -92,6 +92,17 @@ class TestService {
         try {
             const url = `/api/v1/tests/${id}`;
             const response = await this.axiosInstance.get(url);
+            return response.data;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+    printTest = async (dto: TestPrintRequestDto) => {
+        try {
+            const url = '/api/v1/tests/print';
+            const response = await this.axiosInstance.post(url, dto);
             return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;

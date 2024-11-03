@@ -8,6 +8,9 @@ import com.example.generation_service.exceptionHandler.enumaration.GenerationFai
 import com.example.generation_service.generators.models.GenerateTestRequest;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
+import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.test.Test;
+import com.example.generation_service.models.test.TestGeneratingHistory;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

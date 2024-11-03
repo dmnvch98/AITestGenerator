@@ -4,7 +4,7 @@ import com.example.generation_service.config.security.service.PrincipalUser;
 import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.dto.tests.print.TestPrintRequestDto;
 import com.example.generation_service.facades.TestFacade;
-import com.example.generation_service.models.Test;
+import com.example.generation_service.models.test.Test;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -69,13 +69,6 @@ public class TestController {
             ) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findUserHistory(userId, page, size, sortBy, sortDirection);
-    }
-
-    @GetMapping("/history/current")
-    public List<TextGenerationHistoryDto> getCurrentTestGenerationHistory(
-            final Authentication authentication) {
-        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.getCurrentHistories(userId);
     }
 
     @GetMapping

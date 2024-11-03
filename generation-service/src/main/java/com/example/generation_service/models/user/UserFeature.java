@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

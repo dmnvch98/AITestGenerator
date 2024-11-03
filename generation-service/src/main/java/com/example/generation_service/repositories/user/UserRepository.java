@@ -1,6 +1,6 @@
-package com.example.generation_service.repositories;
+package com.example.generation_service.repositories.user;
 
-import com.example.generation_service.models.User;
+import com.example.generation_service.models.user.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

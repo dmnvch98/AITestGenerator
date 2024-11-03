@@ -1,6 +1,6 @@
-package com.example.generation_service.repositories;
+package com.example.generation_service.repositories.test;
 
-import com.example.generation_service.models.TestResult;
+import com.example.generation_service.models.test.TestResult;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

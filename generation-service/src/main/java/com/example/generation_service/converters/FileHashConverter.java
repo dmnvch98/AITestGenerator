@@ -6,11 +6,12 @@ import java.util.Map;
 
 
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
-import com.example.generation_service.models.FileHash;
+import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 @Mapper
@@ -20,6 +21,14 @@ public interface FileHashConverter {
 
   default FileHashesResponseDto convert(final List<FileHash> fileHashes) {
     return FileHashesResponseDto.builder().fileHashes(fileHashes).build();
+  }
+
+  default FileHashesResponseDto convert(final Page<FileHash> fileHashes) {
+    return FileHashesResponseDto.builder()
+            .fileHashes(fileHashes.getContent())
+            .totalElements(fileHashes.getTotalElements())
+            .totalPages(fileHashes.getTotalPages())
+            .build();
   }
 
   default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId) {

@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.test;
 
 import jakarta.persistence.*;
 import lombok.*;

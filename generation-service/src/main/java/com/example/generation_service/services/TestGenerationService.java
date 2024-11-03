@@ -6,7 +6,7 @@ import com.example.generation_service.dto.generation.GenerateAnswersResponseDto;
 import com.example.generation_service.generators.QuestionGenerator;
 import com.example.generation_service.generators.AnswerGenerator;
 import com.example.generation_service.generators.models.GenerateTestRequest;
-import com.example.generation_service.models.Test;
+import com.example.generation_service.models.test.Test;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.AttributeAccessor;

@@ -2,9 +2,10 @@ package com.example.generation_service.services;
 
 import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.useractions.TrackAction;
-import com.example.generation_service.models.*;
-import com.example.generation_service.repositories.TestRepository;
-import com.example.generation_service.repositories.TestSearchVectorRepository;
+import com.example.generation_service.models.test.Test;
+import com.example.generation_service.models.test.TestSearchVector;
+import com.example.generation_service.repositories.test.TestRepository;
+import com.example.generation_service.repositories.test.TestSearchVectorRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;

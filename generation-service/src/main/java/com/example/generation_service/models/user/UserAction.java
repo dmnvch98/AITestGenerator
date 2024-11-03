@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.user;
 
 import com.example.generation_service.annotations.enumeration.ActionType;
 import jakarta.persistence.*;

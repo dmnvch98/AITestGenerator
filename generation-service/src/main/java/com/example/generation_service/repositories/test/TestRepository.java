@@ -1,6 +1,6 @@
-package com.example.generation_service.repositories;
+package com.example.generation_service.repositories.test;
 
-import com.example.generation_service.models.Test;
+import com.example.generation_service.models.test.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

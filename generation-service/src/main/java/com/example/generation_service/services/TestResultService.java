@@ -1,7 +1,7 @@
 package com.example.generation_service.services;
 
-import com.example.generation_service.models.TestResult;
-import com.example.generation_service.repositories.TestResultRepository;
+import com.example.generation_service.models.test.TestResult;
+import com.example.generation_service.repositories.test.TestResultRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

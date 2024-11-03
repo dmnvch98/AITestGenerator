@@ -9,6 +9,7 @@ public enum ActionType {
     GET_TEST,
     UPSERT_TEST,
     EXPORT_TEST,
+    PRINT_TEST,
     RATE_TEST,
     UPLOAD_FILES,
     DELETE_FILES,

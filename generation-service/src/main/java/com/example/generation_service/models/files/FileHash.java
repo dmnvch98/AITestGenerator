@@ -1,8 +1,10 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.files;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,5 +36,10 @@ public class FileHash {
     private Long userId;
 
     @Column(name = "data")
+    @JsonIgnore
     private String data;
+
+    @OneToMany(mappedBy = "fileHash", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FileSearchVector> fileSearchVectors;
 }

@@ -1,8 +1,8 @@
 package com.example.generation_service.annotations.useractions;
 
 import com.example.generation_service.annotations.enumeration.ActionType;
-import com.example.generation_service.models.UserAction;
-import com.example.generation_service.repositories.UserActionRepository;
+import com.example.generation_service.models.user.UserAction;
+import com.example.generation_service.repositories.user.UserActionRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

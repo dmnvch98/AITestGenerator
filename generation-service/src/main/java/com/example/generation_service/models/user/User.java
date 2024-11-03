@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.user;
 
 import com.example.generation_service.config.security.roles.Role;
 import jakarta.persistence.*;

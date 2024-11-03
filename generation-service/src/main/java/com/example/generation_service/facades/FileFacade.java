@@ -10,12 +10,14 @@ import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
+import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.workers.FileWorker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,5 +71,11 @@ public class FileFacade {
 
   public FileHashesResponseDto getAllUserFileDescriptions(final long userId) {
     return converter.convert(fileHashService.getAllByUserId(userId));
+  }
+
+  public FileHashesResponseDto getUserFileHashes(final Long userId, final String search, final int page, final int size,
+                                                 final String sortBy, final String sortDirection) {
+    Page<FileHash> fileHashPage = fileHashService.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
+    return converter.convert(fileHashPage);
   }
 }

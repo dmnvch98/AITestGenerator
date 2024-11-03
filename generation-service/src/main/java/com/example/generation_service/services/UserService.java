@@ -2,8 +2,8 @@ package com.example.generation_service.services;
 
 import com.example.generation_service.config.security.PasswordConfig;
 import com.example.generation_service.dto.auth.CredentialsDto;
-import com.example.generation_service.models.User;
-import com.example.generation_service.repositories.UserRepository;
+import com.example.generation_service.models.user.User;
+import com.example.generation_service.repositories.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

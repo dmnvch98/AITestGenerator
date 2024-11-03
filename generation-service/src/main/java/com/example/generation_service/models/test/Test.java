@@ -1,4 +1,4 @@
-package com.example.generation_service.models;
+package com.example.generation_service.models.test;
 
 import com.example.generation_service.converters.ormConverter.QuestionsConverter;
 import com.example.generation_service.dto.tests.QuestionDto;

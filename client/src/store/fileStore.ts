@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import FileService from '../services/FileService';
 import { AxiosError } from 'axios';
-import {AlertMessage} from "./types";
+import {AlertMessage, QueryOptions} from "./types";
 import {v4 as uuidv4} from "uuid";
 
 export interface FileDto {
@@ -50,19 +50,19 @@ interface FileStore {
     removeFile: (index: number) => void;
     clearFiles: () => void;
     uploadFiles: () => Promise<void>;
-    getFiles: () => Promise<void>;
+    getFiles: (options?: QueryOptions) => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     setAlerts: (alert: AlertMessage[]) => void;
     addAlert: (alert: AlertMessage) => void;
     clearAlerts: () => void;
     deleteAlert: (alert: AlertMessage) => void;
-    setFileDtos: (fileDtos: FileDto[]) => void;
     uploadModalOpen: boolean,
     setUploadModalOpen: (flag: boolean) => void;
     setIsLoading: (flag: boolean) => void;
     selectedFileHashes: string[];
     setSelectedFileHashes: (fileIds: number[]) => void;
     deleteFilesInBatch: () => void;
+    totalUserFiles: number;
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
@@ -73,6 +73,7 @@ const useFileStore = create<FileStore>((set, get) => ({
     error: null,
     uploadModalOpen: false,
     selectedFileHashes: [],
+    totalUserFiles: 0,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
     removeFile: (index) => set((state) => ({filesToUpload: state.filesToUpload.filter((_, i) => i !== index)})),
@@ -83,7 +84,6 @@ const useFileStore = create<FileStore>((set, get) => ({
         get().alerts.push(alert);
     },
     clearAlerts: () => set({alerts: []}),
-    setFileDtos: (fileDtos: FileDto[]) => {set({fileDtos: fileDtos});},
     deleteAlert: (alertToDelete) => set((state) => ({
         alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
     })),
@@ -117,10 +117,9 @@ const useFileStore = create<FileStore>((set, get) => ({
         }
     },
 
-    getFiles: async () => {
-        const response = await FileService.getFiles();
-        const { setFileDtos } = get();
-        setFileDtos(response);
+    getFiles: async (options?: QueryOptions) => {
+        const { fileHashes, totalElements } = await FileService.getFiles(options);
+        set({fileDtos: fileHashes, totalUserFiles: totalElements})
     },
 
     deleteFile: async (fileDto: FileDto) => {

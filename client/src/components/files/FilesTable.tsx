@@ -1,5 +1,5 @@
 import React from 'react';
-import {GridColDef} from '@mui/x-data-grid';
+import {GridColDef, GridSortModel} from '@mui/x-data-grid';
 import {GenericTableActions} from "../main/GenericTableActions";
 import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../utils/DateTimeUtils";
@@ -21,9 +21,14 @@ const getFileIcon = (filename: string) => {
 interface FilesTableProps {
     actions: (file: FileDto) => any[];
     loading: boolean;
+    rowCount?: number;
+    paginationModel: { page: number, pageSize: number },
+    setPaginationModel: (params: { page: number, pageSize: number }) => void;
+    sortModel: GridSortModel;
+    setSortModel: (params: GridSortModel) => void;
 }
 
-export const FilesTable = ({actions, loading}: FilesTableProps) => {
+export const FilesTable = ({actions, loading, rowCount, paginationModel, sortModel, setSortModel, setPaginationModel}: FilesTableProps) => {
     const {fileDtos, setSelectedFileHashes} = useFileStore();
 
     const columns: GridColDef[] = [
@@ -62,6 +67,11 @@ export const FilesTable = ({actions, loading}: FilesTableProps) => {
             rowIdGetter={(row) => row.id as number}
             onSelectionModelChange={setSelectedFileHashes}
             loading={loading}
+            rowCount={rowCount}
+            paginationModel={paginationModel}
+            setPaginationModel={setPaginationModel}
+            sortModel={sortModel}
+            setSortModel={setSortModel}
         />
     );
 };

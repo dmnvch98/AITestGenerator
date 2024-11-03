@@ -1,6 +1,6 @@
 package com.example.generation_service.config.security.jwt;
 
-import com.example.generation_service.models.User;
+import com.example.generation_service.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

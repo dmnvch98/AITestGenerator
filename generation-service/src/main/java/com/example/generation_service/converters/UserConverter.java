@@ -2,7 +2,7 @@ package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.users.CreateUserRequestDto;
 import com.example.generation_service.dto.users.UserResponseDto;
-import com.example.generation_service.models.User;
+import com.example.generation_service.models.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -1,6 +1,6 @@
 package com.example.generation_service.config.security.service;
 
-import com.example.generation_service.models.User;
+import com.example.generation_service.models.user.User;
 import com.example.generation_service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

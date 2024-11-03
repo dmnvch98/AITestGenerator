@@ -10,6 +10,9 @@ import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequest;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
+import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.test.Test;
+import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.*;
 import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.services.aws.StorageClient;
@@ -136,13 +139,6 @@ public class TestFacade {
   public TestGenHistoryResponseDto findUserHistory(final Long userId, int page, int size, String sortBy, String sortDirection) {
     final Page<TestGeneratingHistory> tests = historyService.findUserHistory(userId, page, size, sortBy, sortDirection);
     return testGenerationConverter.convert(tests);
-  }
-
-  public List<TextGenerationHistoryDto> getCurrentHistories(final Long userId) {
-    return historyService.findAllByUserIdAndGenerationStatusIn(userId, List.of(ActivityStatus.WAITING, ActivityStatus.IN_PROCESS))
-        .stream()
-        .map(testGenerationConverter::historyToDto)
-        .collect(Collectors.toList());
   }
 
   private Map<String, String> getRetryContextParamsMap(final GenerateTestMessage message){

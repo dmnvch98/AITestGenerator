@@ -1,8 +1,8 @@
 package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.tests.TestResultDto;
-import com.example.generation_service.models.Test;
-import com.example.generation_service.models.TestResult;
+import com.example.generation_service.models.test.Test;
+import com.example.generation_service.models.test.TestResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

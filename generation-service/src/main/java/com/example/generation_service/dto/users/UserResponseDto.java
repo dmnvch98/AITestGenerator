@@ -1,6 +1,6 @@
 package com.example.generation_service.dto.users;
 
-import com.example.generation_service.models.UserFeature;
+import com.example.generation_service.models.user.UserFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

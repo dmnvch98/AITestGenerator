@@ -5,7 +5,7 @@ import com.example.generation_service.annotations.cid.GenerateCid;
 import com.example.generation_service.annotations.enumeration.CidType;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
-import com.example.generation_service.models.FileHash;
+import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.enums.UploadStatus;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;

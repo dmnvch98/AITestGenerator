@@ -1,6 +1,6 @@
 package com.example.generation_service.generators.models;
 
-import com.example.generation_service.models.FileHash;
+import com.example.generation_service.models.files.FileHash;
 import lombok.Builder;
 import lombok.Getter;
 

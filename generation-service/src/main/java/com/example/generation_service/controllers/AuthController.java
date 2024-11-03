@@ -6,7 +6,7 @@ import java.time.Duration;
 import com.example.generation_service.config.security.jwt.Jwt;
 import com.example.generation_service.dto.auth.CredentialsDto;
 import com.example.generation_service.dto.auth.JwtResponse;
-import com.example.generation_service.models.User;
+import com.example.generation_service.models.user.User;
 import com.example.generation_service.services.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

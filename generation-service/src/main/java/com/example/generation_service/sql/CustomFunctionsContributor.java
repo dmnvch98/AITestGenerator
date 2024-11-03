@@ -1,4 +1,4 @@
-package com.example.generation_service.models.sql;
+package com.example.generation_service.sql;
 
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.boot.model.FunctionContributor;

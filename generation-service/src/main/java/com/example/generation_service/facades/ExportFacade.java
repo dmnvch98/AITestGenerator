@@ -1,7 +1,7 @@
 package com.example.generation_service.facades;
 
 import com.example.generation_service.dto.tests.export.ExportTestRequestDto;
-import com.example.generation_service.models.Test;
+import com.example.generation_service.models.test.Test;
 import com.example.generation_service.services.TestService;
 import com.example.generation_service.services.export.ExportService;
 import com.example.generation_service.services.export.model.ExportedTest;

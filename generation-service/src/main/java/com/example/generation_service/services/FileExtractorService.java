@@ -1,7 +1,7 @@
 package com.example.generation_service.services;
 
 import com.example.generation_service.extractors.FileExtractorFabric;
-import com.example.generation_service.models.FileHash;
+import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
