@@ -18,7 +18,8 @@ public class TestGenerationActivity implements Serializable {
 
   @Builder.Default
   private final UUID uuid = UUID.randomUUID();
-  private final LocalDateTime startDate;
+  @Builder.Default
+  private final LocalDateTime startDate = LocalDateTime.now();
   private final LocalDateTime endDate;
   private final ActivityStatus status;
   private final String messageReceipt;
@@ -30,7 +31,4 @@ public class TestGenerationActivity implements Serializable {
   private final String testTitle;
   private final GenerationFailReason failReason;
 
-  public static TestGenerationActivity empty() {
-    return TestGenerationActivity.builder().build();
-  }
 }

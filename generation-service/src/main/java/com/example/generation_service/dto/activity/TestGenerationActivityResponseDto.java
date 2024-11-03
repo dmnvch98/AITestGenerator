@@ -17,7 +17,7 @@ import java.util.UUID;
 public class TestGenerationActivityResponseDto implements Serializable {
 
   @Builder.Default
-  private final UUID uuid = UUID.randomUUID();
+  private final UUID id = UUID.randomUUID();
   private final LocalDateTime startDate;
   private final LocalDateTime endDate;
   private final ActivityStatus status;

@@ -4,6 +4,17 @@
   "schema": {
     "type": "object",
     "properties": {
+      "language": {
+        "type": "string",
+        "enum": [
+          "russian",
+          "english",
+          "spanish",
+          "french",
+          "german",
+          "unknown"
+        ]
+      },
       "title": {
         "type": "string"
       },
@@ -44,6 +55,7 @@
       }
     },
     "required": [
+      "language",
       "title",
       "questions"
     ],

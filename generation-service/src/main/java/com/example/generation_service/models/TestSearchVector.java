@@ -25,7 +25,7 @@ public class TestSearchVector {
     private Long testId;
 
     @Column(name = "search_vector", columnDefinition = "tsvector")
-    private String searchVector;
+    private Object searchVector;
 
     @Column(name = "language", length = 50)
     private String language;

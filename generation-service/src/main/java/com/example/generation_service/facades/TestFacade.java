@@ -4,11 +4,8 @@ import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
+import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.models.activity.TestGenerationActivity;
-import com.example.generation_service.dto.tests.CreateTestRequestDto;
-import com.example.generation_service.dto.tests.GenerateTestRequestDto;
-import com.example.generation_service.dto.tests.TestsResponseDto;
-import com.example.generation_service.dto.tests.TextGenerationHistoryDto;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequest;
 import com.example.generation_service.models.*;
@@ -22,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,6 +84,7 @@ public class TestFacade {
     }
   }
 
+  @Transactional
   public void generateTestReceiveMessage(final GenerateTestMessage message) throws Exception {
       log.info("Received message to generate test. Message=[{}]", message);
       activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
@@ -131,16 +130,12 @@ public class TestFacade {
     }
   }
 
-  public List<TextGenerationHistoryDto> getTestGenerationHistory(final Long userId, final String status) {
-    final List<TestGeneratingHistory> historyDtos = Optional.ofNullable(status)
-        .map(ActivityStatus::valueOf)
-        .map(s -> historyService.findAllByGenerationStatus(userId, s))
-        .orElse(historyService.getAllByUserId(userId));
+  @TrackAction(ActionType.PRINT_TEST)
+  public void trackPrint(final Long testId, final Long userId) {}
 
-    return historyDtos
-        .stream()
-        .map(testGenerationConverter::historyToDto)
-        .collect(Collectors.toList());
+  public TestGenHistoryResponseDto findUserHistory(final Long userId, int page, int size, String sortBy, String sortDirection) {
+    final Page<TestGeneratingHistory> tests = historyService.findUserHistory(userId, page, size, sortBy, sortDirection);
+    return testGenerationConverter.convert(tests);
   }
 
   public List<TextGenerationHistoryDto> getCurrentHistories(final Long userId) {

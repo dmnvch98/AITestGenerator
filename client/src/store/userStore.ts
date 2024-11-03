@@ -1,10 +1,12 @@
 import {create} from "zustand";
 import UserService, {BulkActivityDeleteDto} from "../services/UserService";
-import {GenerationStatus} from "./types";
+import {GenerationStatus, QueryOptions} from "./types";
 import TestService from "../services/TestService";
 import ActivityService from "../services/activities/ActivityService";
+import {UserTest} from "./tests/testStore";
 
-export interface TestGenHistory extends ActivityDto {
+export interface TestGenActivity {
+    uuid: string,
     id: number,
     startDate: Date,
     endDate: Date,
@@ -12,8 +14,6 @@ export interface TestGenHistory extends ActivityDto {
     testTitle: string,
     fileName: string,
     testId: number,
-    textTitle: string,
-    textId: number,
     failCode: number;
     cid: string;
 }
@@ -31,11 +31,13 @@ export interface ActivityDto {
 }
 
 export interface UserStore {
-    currentActivities: ActivityDto[];
-    testGenHistoryPast: TestGenHistory[],
+    currentActivities: TestGenActivity[];
+    totalPages: number,
+    totalElements: number;
+    testGenHistoryPast: TestGenActivity[],
     getTestGenCurrentActivities: () => void,
     deleteCurrentUserActivities: () => void,
-    getTestGenHistory: () => void;
+    getTestGenHistory: (options?: QueryOptions) => void;
     loading: boolean;
     setLoading: (flag: boolean) => void;
     getTestGenCurrentActivitiesLongPoll: () => void;
@@ -50,15 +52,17 @@ const DeletableStatuses = new Set([
 
 export const useUserStore = create<UserStore>((set: any, get: any) => ({
     testGenHistoryPast: [],
+    totalElements: 0,
+    totalPages: 0,
     currentActivities: [],
     loading: false,
     user: undefined,
     setLoading: (flag) => {
         set({loading: flag})
     },
-    getTestGenHistory: async () => {
-        const response = await UserService.getTestGenerationHistory(undefined);
-        set({testGenHistoryPast: response})
+    getTestGenHistory: async (options?: QueryOptions) => {
+        const {history, totalPages, totalElements} = await UserService.getTestGenerationHistory(options);
+        set({testGenHistoryPast: history, totalPages, totalElements})
     },
 
     getTestGenCurrentActivities: async () => {

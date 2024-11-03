@@ -77,7 +77,8 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
 interface GenericTableProps<T> {
     data: T[];
     columns: GridColDef[];
-    actions: (item: T) => Action<T>[];
+    actions?: (item: T) => Action<T>[];
+    checkboxSelection?: boolean;
     rowIdGetter: (row: T) => number;
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
@@ -95,6 +96,7 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                                                        columns,
                                                                        actions,
                                                                        rowIdGetter,
+                                                                       checkboxSelection = true,
                                                                        onSelectionModelChange,
                                                                        loading,
                                                                        handleEvent,
@@ -115,16 +117,22 @@ export const GenericTableActions = <T extends Record<string, any>>({
         paginationModel && handlePaginationModelChange({...paginationModel, page: 0});
     }, []);
 
-    const actionColumn: GridColDef = {
-        field: 'actions',
-        headerName: 'Действия',
-        renderCell: (params) => {
-            const item: T = params.row;
-            return <Actions item={item} actions={actions(item)}/>;
-        },
-        sortable: false,
-        disableColumnMenu: true,
-    };
+    const columnsWithActions = actions
+        ? [
+            ...columns,
+            {
+                field: 'actions',
+                headerName: 'Действия',
+                renderCell: (params) => {
+                    const item: T = params.row;
+                    const actionItems = actions(item);
+                    return actionItems && actionItems.length > 0 ? <Actions item={item} actions={actionItems} /> : null;
+                },
+                sortable: false,
+                disableColumnMenu: true,
+            } as GridColDef,
+        ]
+        : columns;
 
     return (
         <Box>
@@ -134,9 +142,9 @@ export const GenericTableActions = <T extends Record<string, any>>({
                 autoHeight
                 rows={data}
                 rowCount={rowCount}
-                columns={[...columns, actionColumn]}
+                columns={columnsWithActions}
                 pageSizeOptions={[5, 10, 15]}
-                checkboxSelection
+                checkboxSelection={checkboxSelection}
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={handlePaginationModelChange}

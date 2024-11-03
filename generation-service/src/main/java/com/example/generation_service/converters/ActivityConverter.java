@@ -35,7 +35,6 @@ public interface ActivityConverter {
        .uuid(activity.getUuid())
        .status(ActivityStatus.IN_PROCESS)
        .cid(activity.getCid())
-       .startDate(LocalDateTime.now())
        .fileName(activity.getFileName())
        .requestDto(activity.getRequestDto())
        .userId(activity.getUserId())

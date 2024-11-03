@@ -9,5 +9,8 @@ public class CustomFunctionsContributor implements FunctionContributor {
     public void contributeFunctions(FunctionContributions functionContributions) {
         functionContributions.getFunctionRegistry()
                 .register("fts_search", new FullTextSearchSQLFunction("fts_search"));
+
+        functionContributions.getFunctionRegistry()
+                .register("generate_tsvector", new GenerateTSVectorSQLFunction());
     }
 }

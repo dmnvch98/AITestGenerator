@@ -1,4 +1,4 @@
-import {ActivityDto, TestGenHistory} from "../../store/userStore";
+import {ActivityDto, TestGenActivity} from "../../store/userStore";
 import React, {useState} from 'react';
 import {
     Table,
@@ -14,7 +14,7 @@ import {GenerationErrorModal} from "../generationErrors/GenerationErrorModal";
 import StatusIndicator from "../status/StatusIndicator";
 
 interface TestGenHistoryTableProps {
-    testGenHistory: TestGenHistory[] | ActivityDto[];
+    testGenHistory: TestGenActivity[] | ActivityDto[];
     loading: boolean;
 }
 

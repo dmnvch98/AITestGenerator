@@ -2,6 +2,7 @@ package com.example.generation_service.controllers;
 
 import com.example.generation_service.config.security.service.PrincipalUser;
 import com.example.generation_service.dto.tests.*;
+import com.example.generation_service.dto.tests.print.TestPrintRequestDto;
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.Test;
 import lombok.RequiredArgsConstructor;
@@ -58,12 +59,16 @@ public class TestController {
         return testFacade.upsert(test, userId);
     }
 
-    @GetMapping("/history")
-    public List<TextGenerationHistoryDto> getTestGenerationHistory(
+    @GetMapping("history")
+    public TestGenHistoryResponseDto getUserHistory(
             final Authentication authentication,
-            @RequestParam(value = "status", required = false) final String status) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "startDate") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String sortDirection
+            ) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        return testFacade.getTestGenerationHistory(userId, status);
+        return testFacade.findUserHistory(userId, page, size, sortBy, sortDirection);
     }
 
     @GetMapping("/history/current")
@@ -85,4 +90,11 @@ public class TestController {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findUserTests(userId, search, page, size, sortBy, sortDirection);
     }
+
+    @PostMapping("/print")
+    public void trackPrint(final Authentication authentication, final @RequestBody TestPrintRequestDto dto) {
+        final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        testFacade.trackPrint(dto.getTestId(), userId);
+    }
+
 }

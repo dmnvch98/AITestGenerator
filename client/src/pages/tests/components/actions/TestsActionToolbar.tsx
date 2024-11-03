@@ -1,8 +1,7 @@
 import React from 'react';
-import {Box, Button, TextField, InputAdornment, IconButton} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import {Box, Button} from '@mui/material';
 import {ConfirmationButton} from "../../../../components/main/ConfirmationButton";
-import CancelIcon from '@mui/icons-material/Cancel';
+import {SearchInput} from "../../../../components/main/search/SearchInput";
 
 interface ActionToolbarProps {
     onAdd: () => void;
@@ -44,33 +43,7 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                 />
             </Box>
 
-            <Box sx={{ flex: 1, ml: 'auto', maxWidth: 300 }}>
-                <TextField
-                    size="small"
-                    variant="standard"
-                    fullWidth
-                    placeholder="Поиск"
-                    value={searchValue}
-                    onChange={onSearchChange}
-
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon color="action" />
-                            </InputAdornment>
-                        ),
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                {searchValue && searchValue?.length > 0 && (
-                                    <IconButton onClick={onSearchClear}>
-                                        <CancelIcon sx={{fontSize: 14}}/>
-                                    </IconButton>
-                                )}
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-            </Box>
+            <SearchInput searchValue={searchValue} onSearchChange={onSearchChange} onSearchClear={onSearchClear}/>
         </Box>
     );
 };

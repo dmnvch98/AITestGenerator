@@ -4,6 +4,7 @@ import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.models.*;
 import com.example.generation_service.repositories.TestRepository;
+import com.example.generation_service.repositories.TestSearchVectorRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,9 +26,17 @@ import java.util.Optional;
 public class TestService {
 
     private final TestRepository testRepository;
+    private final TestSearchVectorRepository vectorRepository;
 
     public Test save(final Test test) {
-        return testRepository.save(test);
+        testRepository.save(test);
+        vectorRepository.insertSearchVector(
+                test.getId(),
+                test.getFileName(),
+                test.getTitle(),
+                test.getLanguage()
+        );
+        return test;
     }
 
     public Page<Test> findUserTests(final Long userId, final String search, final int page, final int size,

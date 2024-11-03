@@ -1,5 +1,6 @@
 package com.example.generation_service.converters;
 
+import com.example.generation_service.dto.tests.TestGenHistoryResponseDto;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.dto.tests.TextGenerationHistoryDto;
@@ -10,6 +11,7 @@ import com.example.generation_service.models.enums.ActivityStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -79,6 +81,14 @@ public interface TestGenerationConverter {
           .fileName(fileName)
           .userId(userId)
           .build();
+  }
+
+  default TestGenHistoryResponseDto convert(final Page<TestGeneratingHistory> pageTest) {
+    return TestGenHistoryResponseDto.builder()
+            .history(pageTest.getContent().stream().map(this::historyToDto).toList())
+            .totalPages(pageTest.getTotalPages())
+            .totalElements(pageTest.getTotalElements())
+            .build();
   }
 
 }

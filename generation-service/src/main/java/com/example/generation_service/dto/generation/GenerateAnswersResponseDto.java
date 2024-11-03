@@ -16,5 +16,6 @@ public class GenerateAnswersResponseDto {
 
     private final String title;
     private final List<QuestionDto> questions;
+    private final String language;
 
 }

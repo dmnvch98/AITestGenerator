@@ -32,8 +32,6 @@ export interface AnswerOption {
 export interface GenerateTestRequest {
     maxQuestionsCount: number,
     minAnswersCount: number,
-    // temperature: number,
-    // topP: number,
     hashedFileName: string
 }
 
@@ -52,6 +50,10 @@ export interface TestsResponseDto {
     totalElements: number;
 }
 
+export interface TestPrintRequestDto {
+    testId: number;
+}
+
 export interface TestStore {
     tests: UserTest[],
     totalPages: number,
@@ -64,7 +66,6 @@ export interface TestStore {
     setDeleteTestFlag: (flag: boolean) => void,
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: (options?: QueryOptions) => void,
-    // getUserTestsByIdIn: (ids: number[]) => Promise<void>,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
     generateTestValidationErrorFlag: boolean;
@@ -84,6 +85,7 @@ export interface TestStore {
     updateRating: (id: number, request: TestRatingDto) => void;
     getRating: (id: number) => void;
     clearState: () => void;
+    printTest: () => void;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -103,6 +105,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
             selectedTestRating: undefined,
             generateTestValidationErrorFlag: false,
             selectedTextId: undefined,
+            alerts: []
         })
     },
     selectTest: (userTest: UserTest) => {
@@ -209,5 +212,10 @@ export const useTestStore = create<TestStore>((set, get) => ({
         if (rating) {
             set({selectedTestRating: rating})
         }
+    },
+    printTest: async () => {
+        const {selectedTest} = get();
+        const testId = selectedTest && selectedTest.id;
+        testId && await TestService.printTest({testId});
     }
 }))
