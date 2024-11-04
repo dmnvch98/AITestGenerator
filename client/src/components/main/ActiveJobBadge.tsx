@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
     Badge,
     Box,
@@ -22,12 +22,6 @@ export const ActiveJobBadge = () => {
     const {currentActivities, deleteFinishedUserActivitiesFromServer} = useUserStore();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-
-    useEffect(() => {
-        return () => {
-            deleteFinishedUserActivitiesFromServer();
-        };
-    }, []);
 
     const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -54,9 +48,9 @@ export const ActiveJobBadge = () => {
                             <ListItemText
                                 primary={truncateString(item.fileName)}
                                 sx={{
-                                    whiteSpace: 'nowrap', // Prevent line breaks
-                                    overflow: 'hidden',    // Hide overflowing content
-                                    textOverflow: 'ellipsis' // Add ellipsis for overflowed text
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
                                 }}/>
                         </ListItem>
                     ))}

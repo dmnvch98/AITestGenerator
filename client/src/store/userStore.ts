@@ -103,13 +103,13 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
     },
 
     initState: async () => {
-        const { getTestGenCurrentActivitiesLongPoll, deleteFinishedUserActivitiesFromServer } = get();
+        const { getTestGenCurrentActivitiesLongPoll} = get();
         const data : ActivityDto[] = await TestService.getCurrentTestGenActivities();
         if (Array.isArray(data)) {
             set({ currentActivities: data });
         }
         if (data.length > 0) {
-            await deleteFinishedUserActivitiesFromServer();
+            // await deleteFinishedUserActivitiesFromServer();
             const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
             if (inProcessJobs > 0) {
                 await getTestGenCurrentActivitiesLongPoll();

@@ -6,13 +6,12 @@ import {GenericTableActions} from "../../../components/main/GenericTableActions"
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
 
 const noTestTitle = 'Недоступно'
 
 export const TestGenHistoryCurrent = () => {
-
     const [modalOpen, setModalOpen] = useState(false);
     const [failCode, setFailCode] = useState<number | null>(null);
     const navigate = useNavigate();
@@ -29,9 +28,6 @@ export const TestGenHistoryCurrent = () => {
 
     useEffect(() => {
         fetchActivity();
-    }, [])
-
-    useEffect(() => {
         return () => {
             deleteFinishedUserActivitiesFromServer();
         };
