@@ -21,6 +21,17 @@ export enum GenerationStatus {
     FAILED = "FAILED"
 }
 
+export enum GenerationStatusHint {
+    WAITING = "Ожидание начала генерации",
+    SUCCESS = "Генерация выполнена успешно",
+    IN_PROCESS = "Генерация в процессе",
+    FAILED = "Генерация не удалась"
+}
+
+export const getStatusHint = (status: GenerationStatus): string => {
+    return GenerationStatusHint[status] || "Неизвестный статус";
+};
+
 export interface User {
     id: number,
     email: string,

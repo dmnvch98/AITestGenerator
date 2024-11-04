@@ -1,4 +1,4 @@
-package com.example.generation_service.services;
+package com.example.generation_service.services.user;
 
 import com.example.generation_service.models.user.UserFeature;
 import com.example.generation_service.repositories.user.UserFeatureRepository;

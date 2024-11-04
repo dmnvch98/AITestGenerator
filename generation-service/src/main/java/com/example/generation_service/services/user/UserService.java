@@ -1,4 +1,4 @@
-package com.example.generation_service.services;
+package com.example.generation_service.services.user;
 
 import com.example.generation_service.config.security.PasswordConfig;
 import com.example.generation_service.dto.auth.CredentialsDto;
@@ -6,9 +6,7 @@ import com.example.generation_service.models.user.User;
 import com.example.generation_service.repositories.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +25,6 @@ public class UserService {
         return user != null && passwordConfig
             .passwordEncoder()
             .matches(credentialsDto.getPassword(), user.getPassword());
-    }
-
-    public User updateUser(User user) {
-        try {
-            return userRepository.save(user);
-        } catch (Exception e) {
-            log.error("An error occurred during updating user. User ID {} " +
-                "\nError: {}", user.getId(), e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred during updating user");
-        }
     }
 
     public void updateRefreshToken(final User user, final String token) {

@@ -10,7 +10,7 @@ import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.CommandService;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.TestGeneratingHistoryService;
-import com.example.generation_service.services.redis.GenericRedisService;
+import com.example.generation_service.services.redis.RedisService;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class TestGenerationActivityService {
     private final CommandService commandService;
     private final ActivityConverter activityConverter;
     private final TestGenerationConverter historyConverter;
-    private final GenericRedisService genericRedisService;
+    private final RedisService genericRedisService;
     private final TestGeneratingHistoryService historyService;
     private final FileHashService fileHashService;
 
@@ -55,7 +55,12 @@ public class TestGenerationActivityService {
         final String hashKey = Utils.getGenerationHashKey(userId);
         final TestGenerationActivity currentActivity = genericRedisService
               .getObjectFromHash(hashKey, cid, TestGenerationActivity.class)
-              .orElse(null);
+              .orElseGet(() -> TestGenerationActivity.builder()
+                      .userId(userId)
+                      .cid(cid)
+                      .messageReceipt(messageReceipt)
+                      .build()
+              );
         final TestGenerationActivity inProcessActivity = activityConverter
               .getInProgressActivity(currentActivity, messageReceipt);
         genericRedisService.saveObjectToHash(hashKey,cid, inProcessActivity);

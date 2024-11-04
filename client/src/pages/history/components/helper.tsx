@@ -34,7 +34,7 @@ export const createColumns = (handleOpenModal: (code: number) => void): GridColD
         },
         {
             field: 'startDate',
-            headerName: 'Начало генерации',
+            headerName: 'Начало',
             minWidth: 150,
             flex: 1,
             renderCell: (params) => (
@@ -45,7 +45,7 @@ export const createColumns = (handleOpenModal: (code: number) => void): GridColD
         },
         {
             field: 'endDate',
-            headerName: 'Конец генерации',
+            headerName: 'Конец',
             minWidth: 150,
             flex: 1,
             renderCell: (params) => (

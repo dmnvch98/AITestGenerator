@@ -109,7 +109,6 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             set({ currentActivities: data });
         }
         if (data.length > 0) {
-            // await deleteFinishedUserActivitiesFromServer();
             const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
             if (inProcessJobs > 0) {
                 await getTestGenCurrentActivitiesLongPoll();

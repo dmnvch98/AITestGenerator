@@ -7,8 +7,8 @@ import com.example.generation_service.dto.users.UserResponseDto;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.models.user.User;
 import com.example.generation_service.models.user.UserFeature;
-import com.example.generation_service.services.UserFeatureService;
-import com.example.generation_service.services.UserService;
+import com.example.generation_service.services.user.UserFeatureService;
+import com.example.generation_service.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

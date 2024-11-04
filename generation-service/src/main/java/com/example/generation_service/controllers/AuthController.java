@@ -1,13 +1,16 @@
 package com.example.generation_service.controllers;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 import com.example.generation_service.config.security.jwt.Jwt;
 import com.example.generation_service.dto.auth.CredentialsDto;
 import com.example.generation_service.dto.auth.JwtResponse;
 import com.example.generation_service.models.user.User;
-import com.example.generation_service.services.UserService;
+import com.example.generation_service.models.user.UserLoginHistory;
+import com.example.generation_service.services.user.UserLoginHistoryService;
+import com.example.generation_service.services.user.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,19 +27,26 @@ import org.springframework.web.util.WebUtils;
 @Slf4j
 public class AuthController {
     private final UserService userService;
+    private final UserLoginHistoryService loginHistoryService;
     private final Jwt jwt;
 
     @Value("${csrf.cookie_domain}")
     public String cookieDomain;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> authorize(@RequestBody final CredentialsDto credentials, HttpServletResponse response) {
+    public ResponseEntity<JwtResponse> authorize(@RequestBody final CredentialsDto credentials,
+                                                 HttpServletRequest request, HttpServletResponse response) {
+        UserLoginHistory.UserLoginHistoryBuilder loginHistoryBuilder = extractLoginInfo(credentials, request);
         if (userService.verifyUser(credentials)) {
             final User user = userService.findUserByEmail(credentials.getEmail());
             final String accessToken = jwt.generateAccessToken(user);
             generateRefreshToken(user, user.getEmail(), response);
+            final UserLoginHistory loginHistory = loginHistoryBuilder.success(true).build();
+            loginHistoryService.save(loginHistory);
             return ResponseEntity.ok(JwtResponse.builder().accessToken(accessToken).build());
         } else {
+            final UserLoginHistory loginHistory = loginHistoryBuilder.success(false).build();
+            loginHistoryService.save(loginHistory);
             return ResponseEntity.notFound().build();
         }
     }
@@ -97,4 +107,15 @@ public class AuthController {
         cookie.setMaxAge((int) maxAge);
         response.addCookie(cookie);
     }
+
+    private UserLoginHistory.UserLoginHistoryBuilder extractLoginInfo(final CredentialsDto credentials, final HttpServletRequest request) {
+        final String ipAddress = request.getRemoteAddr();
+        final String userAgent = request.getHeader("User-Agent");
+        return UserLoginHistory.builder()
+                .email(credentials.getEmail())
+                .loginTime(LocalDateTime.now())
+                .ipAddress(ipAddress)
+                .userAgent(userAgent);
+    }
+
 }

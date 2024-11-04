@@ -3,7 +3,10 @@ package com.example.generation_service.services.aws;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import com.example.generation_service.models.GenerateTestMessage;
-import com.example.generation_service.services.redis.GenericRedisService;
+import com.example.generation_service.models.activity.TestGenerationActivity;
+import com.example.generation_service.models.enums.ActivityStatus;
+import com.example.generation_service.services.redis.RedisService;
+import com.example.generation_service.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +26,7 @@ public class QueueClient {
     @Value("${aws.sqs-url}")
     public String queueUrl;
 
-    private final GenericRedisService redisService;
+    private final RedisService redisService;
     private final AmazonSQS queue;
     private final ObjectMapper objectMapper;
     private final String IN_PROCESS_PREFIX = "message_in_process_";
@@ -37,19 +40,18 @@ public class QueueClient {
             return Optional.empty();
         }
         final Message message = messages.get(0);
-        final String messageId = message.getMessageId();
         final String processingKey = IN_PROCESS_PREFIX + message.getMessageId();
-
-        if (redisService.getObjectAsString(processingKey, String.class).isPresent()) {
-            log.info("Message {} is already being processed, skipping.", messageId);
-            extendVisibilityTimeout(message);
-            return Optional.empty();
-        }
 
         final String messageBody = message.getBody();
         try {
             redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
+            if (shouldSkipMessage(generateTestMessage)) {
+                log.info("User [{}] already has active generation, extending messageId=[{}] visibility",
+                        generateTestMessage.getUserId(), message.getMessageId());
+                extendVisibilityTimeout(message);
+                return Optional.empty();
+            }
             generateTestMessage.setReceipt(message.getMessageId());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
@@ -106,6 +108,14 @@ public class QueueClient {
         }
     }
 
-
+    private boolean shouldSkipMessage(final GenerateTestMessage generateTestMessage) {
+        final String hashKey = Utils.getGenerationHashKey(generateTestMessage.getUserId());
+        final Set<TestGenerationActivity> activities = redisService.getAllObjectsFromHash(hashKey, TestGenerationActivity.class);
+        final long activitiesInProcessNum = activities
+                .stream()
+                .filter(activity -> ActivityStatus.IN_PROCESS.equals(activity.getStatus()))
+                .count();
+        return activitiesInProcessNum >= 1;
+    }
 
 }
