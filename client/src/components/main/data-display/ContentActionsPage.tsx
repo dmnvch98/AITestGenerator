@@ -21,7 +21,7 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                     transition: 'margin-right 0.3s',
                 }}
             >
-                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', mb: 10}}>
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', mb: 4}}>
                     {content}
                 </Box>
             </Box>

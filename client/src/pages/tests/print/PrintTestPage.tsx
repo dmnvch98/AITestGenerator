@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Box} from '@mui/material';
 import {PrintTestSettings} from "./PrintTestSettings";
 import {PrintTestContent} from "./PrintTestContent";
@@ -11,7 +11,13 @@ export const PrintTestPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { printTest } = useTestStore();
+    const { printTest, selectedTest } = useTestStore();
+
+    useEffect(() => {
+        if (selectedTest) {
+            document.title = selectedTest.title;
+        }
+    }, [selectedTest]);
 
     const handleReturnToPrevPage = () => {
         const prevUrl = location?.state?.previousLocationPathname || '/tests';

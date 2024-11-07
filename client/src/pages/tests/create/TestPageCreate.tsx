@@ -5,7 +5,6 @@ import {createNewTest} from "../edit/utils";
 export const TestPageCreate = () => {
     return (
         <TestForm
-            isEditMode={false}
             initialTest={createNewTest()}
         />
     );

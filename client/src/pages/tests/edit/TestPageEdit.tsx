@@ -39,7 +39,6 @@ export const TestPageEdit = () => {
     return (
         <TestForm
             initialTest={testToEdit || createNewTest()}
-            isEditMode={true}
             isLoading={isLoading}
         />
 

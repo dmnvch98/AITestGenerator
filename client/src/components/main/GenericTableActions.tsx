@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback} from 'react';
 import {
     DataGrid,
     GridColDef, GridEventListener,
@@ -107,10 +107,6 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                                                        sortModel,
                                                                        setSortModel
                                                                    }: GenericTableProps<T>) => {
-
-    useEffect(() => {
-        console.log(data);
-    }, [data]);
 
     const handlePaginationModelChange = useCallback((newPaginationModel: { page: number, pageSize: number }) => {
         setPaginationModel && setPaginationModel(newPaginationModel);

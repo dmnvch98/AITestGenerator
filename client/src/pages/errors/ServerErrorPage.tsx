@@ -17,14 +17,11 @@ const ServerErrorPage: React.FC = () => {
                     Упс! Что-то пошло не так.
                 </Typography>
                 <Typography variant="h6" gutterBottom>
-                    Мы столкнулись с проблемой на нашем сервере. Пожалуйста, попробуйте позже.
+                    Мы столкнулись с проблемой на нашем сервере. Пожалуйста, сообщите об ошибке в поддержку.
                 </Typography>
-                <Typography variant="body1" gutterBottom>
-                    Если вы хотите вернуться, вы можете вернуться на страницу входа.
-                </Typography>
-                <Link to="/sign-in" style={{ textDecoration: 'none' }}>
+                <Link to="/default-page-path" style={{ textDecoration: 'none' }}>
                     <Button variant="outlined" color="warning">
-                        Перейти на страницу входа
+                        Выйти
                     </Button>
                 </Link>
             </Box>

@@ -11,14 +11,13 @@ import {ContentActionsPage} from "../../../components/main/data-display/ContentA
 
 interface TestFormProps {
     initialTest: UserTest | CreateTestRequestDto;
-    isEditMode: boolean;
     isLoading?: boolean;
 }
 
-export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLoading}) => {
+export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {alerts, clearAlerts, deleteAlert, addAlert, upsert} = useTestStore();
+    const {alerts, clearAlerts, deleteAlert, addAlert, upsert, clearState} = useTestStore();
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
@@ -28,8 +27,14 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isEditMode, isLo
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
 
     useEffect(() => {
-        if (isEditMode && initialTest && !hasSaved) setLocalTest({...initialTest});
-    }, [initialTest, hasSaved, isEditMode]);
+        if (initialTest && !hasSaved) setLocalTest({...initialTest});
+    }, [initialTest, hasSaved]);
+
+    useEffect(() => {
+        return () => {
+            clearState();
+        }
+    }, []);
 
     const handleSave = () => {
         const {valid, invalidQuestions} = validateTest(localTest, addAlert, setCurrentQuestionIndex);

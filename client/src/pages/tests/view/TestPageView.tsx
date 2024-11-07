@@ -33,6 +33,12 @@ export const TestPageView: React.FC = () => {
         bulkDeleteTest
     } = useTestStore();
 
+    useEffect(() => {
+        if (selectedTest) {
+            document.title = selectedTest.title;
+        }
+    }, [selectedTest]);
+
     const { exportTest } = useExportStore();
 
     const fetchTest = async () => {

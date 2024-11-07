@@ -6,7 +6,6 @@ import {createTheme, ThemeProvider} from "@mui/material";
 import {TestPageView} from "./pages/tests/view/TestPageView";
 import {appColors} from "./styles/appColors";
 import {TestResultSingle} from "./pages/tests/TestResultSingle";
-import SignUp from './pages/auth/SignUp';
 import {Files} from "./pages/files/Files";
 import {TestPageEdit} from "./pages/tests/edit/TestPageEdit";
 import {TestsPage} from "./pages/tests/TestPage";
@@ -48,13 +47,14 @@ const MainRoutes = () => {
                         <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                         <Route path="/files" element={<Files/>}/>
                         <Route path="/500" element={<ServerErrorPage/>}/>
-                        <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
+                        <Route path="*" element={<Navigate to="/files" replace/>}/>
                     </Routes>
                     : (
                         <Routes>
                             <Route path="/sign-in" element={<LoginPage/>}/>
-                            <Route path="/sign-up" element={<SignUp/>}/>
+                            {/*<Route path="/sign-up" element={<SignUp/>}/>*/}
                             <Route path="/500" element={<ServerErrorPage/>}/>
+                            <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                         </Routes>
                     )
