@@ -21,7 +21,7 @@ import java.util.*;
 @Slf4j
 public class QueueClient {
 
-    private final static int timeoutInSeconds = 300;
+    private final static int timeoutInSeconds = 100;
 
     @Value("${aws.sqs-url}")
     public String queueUrl;

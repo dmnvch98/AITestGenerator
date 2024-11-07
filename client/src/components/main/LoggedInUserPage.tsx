@@ -5,7 +5,7 @@ export const LoggedInUserPage = ({ mainContent }: any) => {
     return (
         <>
            <SidebarHeader>
-               <Container maxWidth="lg">
+               <Container maxWidth="lg" sx={{mb: 4}}>
                    {mainContent}
                </Container>
            </SidebarHeader>

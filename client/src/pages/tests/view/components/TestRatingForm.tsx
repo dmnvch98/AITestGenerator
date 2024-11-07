@@ -138,7 +138,7 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({id, loading}) => 
     const {updateRating, selectedTestRating} = useTestStore();
     const [rating, setRating] = useState<number>(5);
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
-    const [isEditing, setIsEditing] = useState<boolean>(true); // Флаг для определения режима редактирования
+    const [isEditing, setIsEditing] = useState<boolean>(true);
 
     useEffect(() => {
         if (selectedTestRating) {

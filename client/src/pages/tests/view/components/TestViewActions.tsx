@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import PrintIcon from '@mui/icons-material/Print';
 import EditIcon from '@mui/icons-material/Edit';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {ActionIcon} from "../../../../store/types";
 import {getActionItemsList} from "../../../../components/main/data-display/helper";
 import Dialog from "@mui/material/Dialog";
@@ -12,6 +11,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 
 interface Props {
     onEdit: () => void;
@@ -61,11 +61,6 @@ export const TestViewActions: React.FC<Props> = ({onEdit, isLoading, onExit, onP
             onClick: onPrint
         },
         {
-            name: 'Выйти',
-            icon: <ArrowBackIcon/>,
-            onClick: onExit
-        },
-        {
             name: 'Удалить',
             icon: <DeleteIcon/>,
             onClick: () => {
@@ -78,7 +73,12 @@ export const TestViewActions: React.FC<Props> = ({onEdit, isLoading, onExit, onP
                     }
                 )
             }
-        }
+        },
+        {
+            name: 'Выйти',
+            icon: <ExitToAppOutlinedIcon/>,
+            onClick: onExit
+        },
     ];
     return (
         <div>

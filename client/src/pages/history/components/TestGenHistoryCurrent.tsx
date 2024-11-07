@@ -6,10 +6,10 @@ import {GenericTableActions} from "../../../components/main/GenericTableActions"
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
 
-const noTestTitle = 'Недоступно'
+const noTestTitle = '-- Недоступно --'
 
 export const TestGenHistoryCurrent = () => {
     const [modalOpen, setModalOpen] = useState(false);

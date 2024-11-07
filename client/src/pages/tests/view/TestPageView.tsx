@@ -32,6 +32,7 @@ export const TestPageView: React.FC = () => {
         clearState,
         bulkDeleteTest
     } = useTestStore();
+
     const { exportTest } = useExportStore();
 
     const fetchTest = async () => {
@@ -57,8 +58,10 @@ export const TestPageView: React.FC = () => {
     }, [id]);
 
     useEffect(() => {
-        return () => {
-            clearState();
+        if (selectedTest) {
+            return () => {
+                clearState();
+            }
         }
     }, []);
 

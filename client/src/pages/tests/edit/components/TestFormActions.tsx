@@ -63,19 +63,6 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
             disabled: isLoading
         },
         {
-            name: 'Выйти',
-            icon: <ExitToAppOutlinedIcon/>,
-            onClick: () => {
-                isTestModified
-                    ? openDialog(
-                        'Подтвердите выход',
-                        'Вы уверены, что хотите выйти? Все несохраненные изменения будут потеряны.',
-                        onExit
-                    )
-                    : onExit()
-            }
-        },
-        {
             name: 'Сбросить',
             icon: <RestoreIcon/>,
             onClick: () => openDialog(
@@ -96,6 +83,19 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
                         onReturn
                     )
                     : onReturn()
+            }
+        },
+        {
+            name: 'Выйти',
+            icon: <ExitToAppOutlinedIcon/>,
+            onClick: () => {
+                isTestModified
+                    ? openDialog(
+                        'Подтвердите выход',
+                        'Вы уверены, что хотите выйти? Все несохраненные изменения будут потеряны.',
+                        onExit
+                    )
+                    : onExit()
             }
         },
     ];

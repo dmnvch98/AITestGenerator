@@ -21,7 +21,7 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                     transition: 'margin-right 0.3s',
                 }}
             >
-                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', mb: 10}}>
                     {content}
                 </Box>
             </Box>
@@ -39,7 +39,7 @@ const ContentActions: React.FC<Props> = ({ content, actions }) => {
                     },
                 }}
             >
-                <Box sx={{ padding: 2, height: '100%', overflowY: 'auto' }}>
+                <Box sx={{ p: 2, overflowY: 'auto', mb: 10 }}>
                     {actions}
                 </Box>
             </Drawer>

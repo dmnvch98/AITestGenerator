@@ -10,6 +10,8 @@ import DateTimeUtils from "../../utils/DateTimeUtils";
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
 
+const noTestTitle = '-- Создан пользователем --';
+
 const handleView = (navigate: ReturnType<typeof useNavigate>, test: UserTest) => {
     navigate(`/tests/${test.id}`);
 };
@@ -118,10 +120,25 @@ export const TestTable: React.FC<Props> = ({
         },
     ];
 
+    const prepareData = (): UserTest[] => {
+        if (tests.length > 0) {
+            return tests.map(item => {
+                if (!item.fileName) {
+                    return {
+                        ...item,
+                        fileName: noTestTitle
+                    };
+                }
+                return item;
+            });
+        }
+        return tests;
+    };
+
     return (
         <Box>
             <GenericTableActions<UserTest>
-                data={tests}
+                data={prepareData()}
                 columns={columns}
                 actions={(test) => getActions(
                     test,
