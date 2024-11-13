@@ -20,11 +20,10 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.github.dmnvch98</groupId>
-            <artifactId>bytescale-java-sdk</artifactId>
-            <version>main</version>
+            <groupId>io.sensesecure</groupId>
+            <artifactId>clamav4j</artifactId>
+            <version>0.6</version>
         </dependency>
-
         <dependency>
             <groupId>com.redis</groupId>
             <artifactId>testcontainers-redis</artifactId>

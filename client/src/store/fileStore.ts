@@ -37,7 +37,7 @@ interface FileResult {
 }
 
 export interface FileUploadResponseDto {
-    fileResults: FileResult[];
+    uploadResults: FileResult[];
 }
 
 interface FileStore {
@@ -94,8 +94,8 @@ const useFileStore = create<FileStore>((set, get) => ({
 
         try {
             const response = await FileService.uploadFiles(filesToUpload);
-            if (response?.fileResults.length) {
-                response.fileResults.forEach(({ status, description, fileName }) => {
+            if (response?.uploadResults.length) {
+                response.uploadResults.forEach(({ status, description, fileName }) => {
                     const severity = severityMap[status];
                     if (severity) {
                         const message = `${description} - <b>${fileName}</b>`;
@@ -106,12 +106,12 @@ const useFileStore = create<FileStore>((set, get) => ({
                     }
                 });
             }
-            clearFiles();
         } catch (error) {
             const axiosError = error as AxiosError;
-            addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов: ' + (axiosError.response?.data || axiosError.message), severity: 'error' });
+            addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов', severity: 'error' });
             set({ error: axiosError.message });
         } finally {
+            clearFiles();
             set({ isLoading: false });
             getFiles();
         }

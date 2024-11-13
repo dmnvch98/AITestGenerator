@@ -1,8 +1,6 @@
 package com.example.generation_service.workers;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.generation_service.annotations.cid.GenerateCid;
-import com.example.generation_service.annotations.enumeration.CidType;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.models.files.FileHash;
@@ -32,7 +30,6 @@ public class FileWorker {
     private final FileHashService fileHashService;
 
     @Transactional
-    @GenerateCid(CidType.RANDOM)
     public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file) {
         final FileValidationDto validationDto = validateFile(file, userId);
 

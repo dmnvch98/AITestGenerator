@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class FileUploadResponseDto {
 
-    private final List<FileUploadResult> fileResults;
+    private final List<FileUploadResult> uploadResults;
 
     @AllArgsConstructor
     @Getter
