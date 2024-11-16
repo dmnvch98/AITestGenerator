@@ -30,9 +30,12 @@ public class TestGenerationService {
 
     public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
       final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
-      final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
-
-      return testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
+        log.info("Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(), questionsResponseDto.getQuestions().size());
+        final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
+        log.info("Test generation is done. User id: {}, questions count: [{}]", request.getUserId(), questionsResponseDto.getQuestions().size());
+      final Test test = testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
+      log.info("Converted test questions count: [{}]", test.getQuestions().size());
+      return test;
     }
 
     public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {

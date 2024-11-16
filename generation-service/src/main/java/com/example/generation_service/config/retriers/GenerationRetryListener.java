@@ -27,11 +27,6 @@ public class GenerationRetryListener implements RetryListener {
                                              final Throwable throwable) {
     if (!shutdownFlag.isShuttingDown() && throwable != null) {
       log.warn("All retry attempts exhausted");
-      final String hashKey = (String) context.getAttribute("hashKey");
-      final String cid = (String) context.getAttribute("cid");
-      if (hashKey != null && cid != null) {
-        activityService.failActivity(hashKey, cid, throwable);
-      }
     }
   }
 

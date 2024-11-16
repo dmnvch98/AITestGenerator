@@ -49,7 +49,6 @@ public class AnswerGenerator {
         final JsonNode responseSchema = objectMapper.readTree(readFileContents(ANSWERS_SCHEMA_FILE));
 
         final String result = aiService.send(model, messages, responseSchema, request.getTemperature(), request.getTopP(), timeout);
-        log.info("Test generation is done. User id: {}", request.getUserId());
 //        handleTokensCount(request.getUserId(), request.getText(), getContextPrompt(), result, startTime);
 
       return converter.convertToAnswersResponseDto(result);
