@@ -136,7 +136,7 @@ interface TestRatingFormProps {
 
 export const TestRatingForm: React.FC<TestRatingFormProps> = ({id, loading}) => {
     const {updateRating, selectedTestRating} = useTestStore();
-    const [rating, setRating] = useState<number>(5);
+    const [rating, setRating] = useState<number>(selectedTestRating?.rating ?? 5);
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
     const [isEditing, setIsEditing] = useState<boolean>(true);
 
@@ -167,6 +167,7 @@ export const TestRatingForm: React.FC<TestRatingFormProps> = ({id, loading}) => 
     };
 
     const toggleEdit = () => {
+        setRating(selectedTestRating?.rating ?? 0);
         setIsEditing(!isEditing);
     }
 

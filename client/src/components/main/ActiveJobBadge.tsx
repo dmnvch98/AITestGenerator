@@ -41,18 +41,20 @@ export const ActiveJobBadge = () => {
             return (
                 <>
                     {currentActivities.map(item => (
-                        <ListItem key={item.id} sx={{ml: -1}}>
-                            <ListItemIcon>
-                                <StatusIndicator status={item.status}/>
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={truncateString(item.fileName)}
-                                sx={{
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}/>
-                        </ListItem>
+                        <Link href="/tests?activeTab=history" color="inherit" underline="none">
+                            <ListItem key={item.id} sx={{ml: -1}}>
+                                <ListItemIcon>
+                                    <StatusIndicator status={item.status}/>
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={truncateString(item.fileName)}
+                                    sx={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}/>
+                            </ListItem>
+                        </Link>
                     ))}
                     <Box sx={{display: 'flex', justifyContent: 'flex-end', mr: 1, mb: -1}}>
                         <Link href="/tests?activeTab=history" color="inherit" underline="none">

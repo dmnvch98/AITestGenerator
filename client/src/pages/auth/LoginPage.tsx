@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -9,14 +9,14 @@ import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar, FormControl, FormHelperText } from '@mui/material';
 import { AxiosError } from 'axios';
 import useAuthStore from "./authStore";
+import { AlertMessage } from '../../store/types';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(true); // По умолчанию валидно
-  const [notFound, setNotFound] = useState(false);
-  const { login } = useAuthStore();
+  const { login, alerts, addAlert, clearAlerts, deleteAlert } = useAuthStore();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -28,9 +28,12 @@ function LoginPage() {
   };
 
   const handleEmailBlur = () => {
-    // Валидация только при потере фокуса
     setEmailValid(validateEmail(email));
   };
+
+  useEffect(() => {
+    console.log(alerts)
+  }, [alerts, addAlert]);
 
   const handleLogin = async () => {
     try {
@@ -40,10 +43,10 @@ function LoginPage() {
       }
     } catch (error) {
       const axiosError = error as AxiosError;
-      // Проверяем, если ошибка Axios и статус 404
       if (axiosError.isAxiosError && axiosError.response && axiosError.response.status === 404) {
-        setNotFound(true); // Устанавливаем notFound в true для открытия Snackbar
+        addAlert(new AlertMessage('Пользователь не найден', 'error'));
       } else {
+        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
         console.error('Login error:', axiosError);
       }
     }
@@ -51,10 +54,6 @@ function LoginPage() {
 
   const isFormValid = () => {
     return emailValid && password.length > 0;
-  };
-
-  const handleCloseSnackbar = () => {
-    setNotFound(false); // Закрываем Snackbar
   };
 
   return (
@@ -133,13 +132,20 @@ function LoginPage() {
             </Box>
           </Box>
           <Snackbar
-              open={notFound} // Проверяем состояние notFound
-              autoHideDuration={3000}
-              onClose={handleCloseSnackbar} // Обработчик закрытия
+              open={alerts.length > 0}
+              autoHideDuration={10000}
+              onClose={clearAlerts}
           >
-            <Alert severity="error" onClose={handleCloseSnackbar}>
-              Пользователь не найден
-            </Alert>
+            <Box sx={{maxWidth: '400px'}}>
+              {alerts.map(alert => (
+                  <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
+                         onClose={() => {
+                           deleteAlert(alert)
+                         }}>
+                    <span dangerouslySetInnerHTML={{__html: alert.message}}/>
+                  </Alert>
+              ))}
+            </Box>
           </Snackbar>
         </Container>
       </>

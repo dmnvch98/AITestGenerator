@@ -5,8 +5,8 @@ interface SettingsState {
     minAnswersCount: number;
     temperature: number;
     topP: number;
-    setQuestions: (value: number) => void;
-    setAnswers: (value: number) => void;
+    setQuestions: (value: any) => void;
+    setAnswers: (value: any) => void;
     setTemperature: (value: number) => void;
     setTopP: (value: number) => void;
 }

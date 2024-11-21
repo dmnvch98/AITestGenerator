@@ -27,4 +27,17 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+  clamav:
+    build:
+      context: ./antivirus
+    ports:
+      - "3310:3310"
+    volumes:
+      - ./antivirus/config/supervisor.conf:/etc/supervisor/conf.d/supervisord.conf
+      - clamav-db:/var/lib/clamav
+    container_name: clamav-container
+    command: bash -c "freshclam && /usr/bin/supervisord -n"
+    restart: always
 
+volumes:
+  clamav-db:

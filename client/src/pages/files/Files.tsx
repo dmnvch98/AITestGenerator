@@ -95,7 +95,7 @@ const FilesContent = () => {
     };
 
     const generationStartSuccessful = () => {
-        addAlert(new AlertMessage('Генерация теста начата', 'success'));
+        addAlert(new AlertMessage('Генерация теста добавлена в очередь', 'success'));
         getTestGenCurrentActivities();
     }
 
@@ -105,15 +105,22 @@ const FilesContent = () => {
                 maxQuestionsCount,
                 minAnswersCount,
                 hashedFileName: selectedFile.hashedFilename
-            }
-            generateTestByFile(request).then((r) => {
-                r
-                    ? generationStartSuccessful()
-                    : new AlertMessage('Ошибка при генерации теста', 'error');
-            });
+            };
+
+            generateTestByFile(request)
+                .then((r) => {
+                    if (r) {
+                        generationStartSuccessful();
+                    } else {
+                        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
+                    }
+                })
+                .finally(() => {
+                    closeGenTestModal();
+                });
         }
-        closeGenTestModal();
     };
+
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);

@@ -192,17 +192,18 @@ export const useTestStore = create<TestStore>((set, get) => ({
         }
     },
     updateRating: async (id, request) => {
-        const response = await TestRatingService.upsert(id, request);
+        const { success, rating } = await TestRatingService.upsert(id, request);
         const { addAlert, selectedTest, selectTest } = get();
-        if (response) {
+        if (success) {
             addAlert(new AlertMessage('Рейтинг успешно обновлен', 'success'));
-            if (selectedTest) {
-                const updatedTest: UserTest = {
-                    rating: request.rating,
-                    ...selectedTest
-                }
-                selectTest(updatedTest);
-            }
+            set({selectedTestRating: rating})
+            // if (selectedTest) {
+            //     const updatedTest: UserTest = {
+            //         rating: rating?.rating,
+            //         ...selectedTest
+            //     }
+            //     selectTest(updatedTest);
+            // }
         } else {
             addAlert(new AlertMessage('Произошла ошибка при обновлении рейтинга', 'error'));
         }

@@ -9,7 +9,6 @@ import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequest;
 import com.example.generation_service.models.*;
-import com.example.generation_service.models.enums.ActivityStatus;
 import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.generation_service.utils.Utils.generateRandomCid;
 
@@ -70,10 +68,10 @@ public class TestFacade {
         throw new ResourceNotFoundException(hashedFileName);
       }
 
-      activityService.createWaitingActivity(fileHash, cid, dto, userId);
-
       final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
       commandService.sendCommand(message);
+      activityService.createWaitingActivity(fileHash, cid, dto, userId);
+
     } catch (final Exception e) {
       if (e instanceof IllegalArgumentException || e instanceof ResourceNotFoundException) {
         throw e;

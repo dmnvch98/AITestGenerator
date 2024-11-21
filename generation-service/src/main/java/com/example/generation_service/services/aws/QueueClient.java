@@ -76,8 +76,15 @@ public class QueueClient {
     public void sendMessage(GenerateTestMessage message) {
         try {
             log.info("Adding message to the queue to generate test. Message: {}", message);
-            SendMessageRequest messageRequest =
-                    new SendMessageRequest(queueUrl, String.valueOf(objectMapper.writeValueAsString(message)));
+            final String messageGroupId = "group-id-1";
+
+            final String messageBody = objectMapper.writeValueAsString(message);
+
+            final SendMessageRequest messageRequest = new SendMessageRequest()
+                    .withQueueUrl(queueUrl)
+                    .withMessageBody(messageBody)
+                    .withMessageGroupId(messageGroupId);
+
             queue.sendMessage(messageRequest);
         } catch (Exception e) {
             log.error("An error occurred during saving message to the queue. Message: {}",

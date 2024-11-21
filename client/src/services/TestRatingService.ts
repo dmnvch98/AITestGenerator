@@ -10,14 +10,15 @@ class TestRatingService {
         this.axiosInstance = getAxiosInstance();
     }
 
-    upsert = async (testId: number, request: TestRatingDto) => {
+    upsert = async (testId: number, request: TestRatingDto): Promise<{success: boolean, rating?: TestRatingDto}> => {
         try {
             const url = `/api/v1/tests/${testId}/ratings`;
-            const { status } = await this.axiosInstance.put(url, request);
-            return status === 201;
+            const response= await this.axiosInstance.put(url, request);
+            return { success: response.status === 201, rating: response?.data};
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);
+            return { success: false };
         }
     }
 

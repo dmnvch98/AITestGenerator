@@ -28,15 +28,22 @@ public class TestGenerationService {
     private final RetryTemplate retryTemplate;
     private final TestConverter testConverter;
 
-    public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
-      final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
-        log.info("Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(), questionsResponseDto.getQuestions().size());
-        final GenerateAnswersResponseDto answersResponseDto = generateAnswers(request, questionsResponseDto, retryContextParamsMap);
-        log.info("Test generation is done. User id: {}, questions count: [{}]", request.getUserId(), questionsResponseDto.getQuestions().size());
-      final Test test = testConverter.convert(answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
-      log.info("Converted test questions count: [{}]", test.getQuestions().size());
-      return test;
-    }
+  public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap)
+      throws Exception {
+    final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
+    log.info(
+        "Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
+        questionsResponseDto.getQuestions().size());
+    final GenerateAnswersResponseDto answersResponseDto = generateAnswers(
+        request, questionsResponseDto, retryContextParamsMap);
+    log.info(
+        "Test generation is done. User id: {}, questions count: [{}]", request.getUserId(),
+        answersResponseDto.getQuestions().size());
+    final Test test = testConverter.convert(
+        answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
+    log.info("Converted test questions count: [{}]", test.getQuestions().size());
+    return test;
+  }
 
     public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
         return retryTemplate.execute(context -> {

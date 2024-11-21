@@ -1,5 +1,6 @@
 import AuthService from "../../services/AuthService";
 import {create} from "zustand";
+import { AlertMessage } from '../../store/types';
 
 interface AuthStore {
     authenticated: boolean;
@@ -8,10 +9,15 @@ interface AuthStore {
     login: (email: string, password: string) => Promise<Record<string, any>>;
     logout: () => Promise<void>;
     refresh: () => Promise<void>;
+    alerts: AlertMessage[];
+    addAlert: (alert: AlertMessage) => void;
+    deleteAlert: (alert: AlertMessage) => void;
+    clearAlerts: () => void;
 }
 
 const useAuthStore = create<AuthStore>((set, get) => ({
     authenticated: localStorage.getItem('JWT') !== null,
+    alerts: [],
 
     setAuthenticated: (status) => {
         set({authenticated: status});
@@ -57,6 +63,13 @@ const useAuthStore = create<AuthStore>((set, get) => ({
             console.error('Ошибка при обновлении токена:', error);
         }
     },
+    addAlert: (alert: AlertMessage) => {
+        get().alerts.push(alert);
+    },
+    clearAlerts: () => set({alerts: []}),
+    deleteAlert: (alertToDelete) => set((state) => ({
+        alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
+    })),
 }));
 
 export default useAuthStore;

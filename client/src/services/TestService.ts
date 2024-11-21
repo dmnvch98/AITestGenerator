@@ -31,8 +31,7 @@ class TestService {
             const response = await this.axiosInstance.post(`/api/v1/tests/generate`, request);
             return response.status == 200;
         } catch (e: unknown) {
-            const error = e as AxiosError;
-            console.log(error.message);
+            return false;
         }
     }
 
