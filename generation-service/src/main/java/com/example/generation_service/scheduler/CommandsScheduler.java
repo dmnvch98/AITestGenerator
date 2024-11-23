@@ -47,7 +47,7 @@ public class CommandsScheduler {
         log.error("Error processing command: {}", command, e);
         activityService.failActivity(command.getHashKey(), command.getCid(), e);
       } finally {
-        commandService.deleteMessage(command.getReceipt());
+        commandService.deleteMessage(command.getMessageId());
       }
     });
   }

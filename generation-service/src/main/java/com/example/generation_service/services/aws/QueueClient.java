@@ -46,13 +46,7 @@ public class QueueClient {
         try {
             redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
-//            if (shouldSkipMessage(generateTestMessage)) {
-//                log.info("User [{}] already has active generation, extending messageId=[{}] visibility",
-//                        generateTestMessage.getUserId(), message.getMessageId());
-//                extendVisibilityTimeout(message);
-//                return Optional.empty();
-//            }
-            generateTestMessage.setReceipt(message.getMessageId());
+            generateTestMessage.setMessageId(message.getMessageId());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
             log.error("An error occurred while parsing message body: {}", e.getMessage());
@@ -92,14 +86,21 @@ public class QueueClient {
         }
     }
 
-    private void extendVisibilityTimeout(Message message) {
-        ChangeMessageVisibilityRequest request = new ChangeMessageVisibilityRequest()
-              .withQueueUrl(queueUrl)
-              .withReceiptHandle(message.getReceiptHandle())
-              .withVisibilityTimeout(timeoutInSeconds);
+    public void extendVisibilityTimeout(final String messageId) {
+        final String processingKey = IN_PROCESS_PREFIX + messageId;
+        final Optional<String> receipt = redisService.getObjectAsString(processingKey, String.class);
 
-        queue.changeMessageVisibility(request);
-        log.info("Extended visibility timeout for message: {}", message.getMessageId());
+        if (receipt.isPresent()) {
+            final ChangeMessageVisibilityRequest request = new ChangeMessageVisibilityRequest()
+                    .withQueueUrl(queueUrl)
+                    .withReceiptHandle(receipt.get())
+                    .withVisibilityTimeout(timeoutInSeconds);
+
+            queue.changeMessageVisibility(request);
+            log.info("Extended visibility timeout for message receipt: {}", messageId);
+        } else {
+            log.warn("Could not extend visibility Timeout. Message receipt was not found in the queue. Message id : {}", messageId);
+        }
     }
 
     public void purgeQueue() {
@@ -113,16 +114,6 @@ public class QueueClient {
         } catch (AmazonSQSException e) {
             log.error("An error occurred while purging the queue: {}", e.getMessage());
         }
-    }
-
-    private boolean shouldSkipMessage(final GenerateTestMessage generateTestMessage) {
-        final String hashKey = Utils.getGenerationHashKey(generateTestMessage.getUserId());
-        final Set<TestGenerationActivity> activities = redisService.getAllObjectsFromHash(hashKey, TestGenerationActivity.class);
-        final long activitiesInProcessNum = activities
-                .stream()
-                .filter(activity -> ActivityStatus.IN_PROCESS.equals(activity.getStatus()))
-                .count();
-        return activitiesInProcessNum >= 1;
     }
 
 }

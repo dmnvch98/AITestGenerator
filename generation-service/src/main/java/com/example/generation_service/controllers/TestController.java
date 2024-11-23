@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/tests")
 @RequiredArgsConstructor
@@ -28,8 +26,8 @@ public class TestController {
 
     @PostMapping("/generate")
     public void generateTest(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
-//        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-//        testFacade.prepareTestGeneration(userId, dto);
+        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        testFacade.prepareTestGeneration(userId, dto);
     }
 
     @GetMapping("/{id}")

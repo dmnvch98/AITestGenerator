@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import { TextField, Button, DialogTitle, IconButton, DialogContent } from '@mui/material';
+import {TextField, Button, DialogTitle, IconButton, DialogContent} from '@mui/material';
 import Dialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
-
+import DialogActions from "@mui/material/DialogActions";
 interface ModalFormProps {
     open: boolean;
     onClose: () => void;
@@ -128,17 +128,25 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                     margin="normal"
                 />
 
+            </DialogContent>
+            <DialogActions sx={{p: 2}}>
+                <Button
+                    onClick={onClose}
+                    variant="outlined"
+                    fullWidth
+                >
+                    Отменить
+                </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
                     color="primary"
                     fullWidth
-                    sx={{ mt: 2 }}
                     disabled={isSubmitDisabled}
                 >
                     Сгенерировать
                 </Button>
-            </DialogContent>
+            </DialogActions>
         </Dialog>
     );
 };

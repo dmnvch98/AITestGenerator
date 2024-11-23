@@ -39,6 +39,7 @@ public interface ActivityConverter {
        .requestDto(activity.getRequestDto())
        .userId(activity.getUserId())
        .messageReceipt(messageReceipt)
+       .startDate(activity.getStartDate())
        .build();
   }
 

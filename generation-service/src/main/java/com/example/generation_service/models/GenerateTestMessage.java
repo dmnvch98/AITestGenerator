@@ -13,7 +13,7 @@ public class GenerateTestMessage {
     private final String hashedFileName;
     private final long userId;
     @Setter
-    private String receipt;
+    private String messageId;
     private final int maxQuestionsCount;
     private final int answersCount;
     private final int correctAnswersCount;
@@ -27,7 +27,7 @@ public class GenerateTestMessage {
         return "GenerateTestMessage{" +
               "hashedFileName='" + hashedFileName + '\'' +
               ", userId=" + userId +
-              ", receipt='" + receipt + '\'' +
+              ", mesageId='" + messageId + '\'' +
               ", maxQuestionsCount=" + maxQuestionsCount +
               ", answersCount=" + answersCount +
               ", correctAnswersCount=" + correctAnswersCount +

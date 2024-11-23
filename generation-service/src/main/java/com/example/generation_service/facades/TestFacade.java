@@ -88,7 +88,7 @@ public class TestFacade {
   @Transactional
   public void generateTestReceiveMessage(final GenerateTestMessage message) throws Exception {
       log.info("Received message to generate test. Message=[{}]", message);
-      activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getReceipt());
+      activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getMessageId());
 
       final FileHash fileHash = fileHashService
             .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
