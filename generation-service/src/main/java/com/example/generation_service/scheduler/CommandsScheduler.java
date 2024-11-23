@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
@@ -28,11 +27,17 @@ public class CommandsScheduler {
 
   @Scheduled(fixedDelay = 1000)
   public void processMessage() {
-    commandService.getCommand().ifPresent(run());
+    Optional<GenerateTestMessage> commandOpt = commandService.getCommand();
+
+    if (commandOpt.isPresent()) {
+      GenerateTestMessage command = commandOpt.get();
+      log.info("Processing command: {}", command.getCid());
+      processCommand(command);
+    }
   }
 
-  private Consumer<GenerateTestMessage> run() {
-    return command -> executorService.submit(() -> {
+  private void processCommand(GenerateTestMessage command) {
+    executorService.submit(() -> {
       try {
         Optional.of(command)
               .map(GenerateTestMessage::getCid)

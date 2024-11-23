@@ -13,12 +13,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.generation_service.utils.Utils.countTokens;
 import static com.example.generation_service.utils.Utils.readFileContents;
@@ -55,8 +61,16 @@ public class AnswerGenerator {
     }
 
     private List<ChatMessage> prepareMessages(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto) throws JsonProcessingException {
-        final String contextPrompt = readFileContents(ANSWERS_CONTEXT_PROMPT_FILE);
         final String testGenerationRequest = converter.convert(questionsResponseDto, request);
+
+        final String contextTemplate = readFileContents(ANSWERS_CONTEXT_PROMPT_FILE);
+
+        final Map<String, Object> variables = new HashMap<>();
+        variables.put("answersCount", request.getAnswersCount());
+        variables.put("correctAnswersCount", request.getCorrectAnswersCount());
+
+        final StringSubstitutor substitutor = new StringSubstitutor(variables);
+        final String contextPrompt = substitutor.replace(contextTemplate);
 
         final ChatMessage context = new ChatMessage(ChatMessageRole.SYSTEM.value(), contextPrompt);
         final ChatMessage userText = new ChatMessage(ChatMessageRole.USER.value(), testGenerationRequest);

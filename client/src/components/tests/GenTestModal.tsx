@@ -1,26 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import {Modal, Box, Typography, TextField, Button, Alert} from '@mui/material';
-import { useGenerateTestStore } from "../../store/tests/generateTestStore";
+import React, {useEffect, useState} from 'react';
+import { TextField, Button, DialogTitle, IconButton, DialogContent } from '@mui/material';
+import Dialog from "@mui/material/Dialog";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface ModalFormProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: () => void;
+    onSubmit: (maxQuestionsCount: number, minAnswersCount: number, correctAnswersValue: number) => void;
 }
 
 export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit }) => {
     const MAX_QUESTIONS = 20;
+    const MIN_QUESTIONS = 1;
     const MAX_ANSWERS = 5;
-
-    const { setQuestions, setAnswers, minAnswersCount, maxQuestionsCount } = useGenerateTestStore();
+    const MIN_ANSWERS = 2;
 
     const [questionsInput, setQuestionsInput] = useState('10');
     const [answersInput, setAnswersInput] = useState('4');
-    const [errors, setErrors] = useState({ questions: '', answers: '' });
+    const [correctAnswersInput, setCorrectAnswersInput] = useState('1');
+    const [errors, setErrors] = useState({ questions: '', answers: '', correctAnswers: '' });
 
     useEffect(() => {
         if (!open) {
-            clearFields();
+            setQuestionsInput('10');
+            setAnswersInput('4');
+            setCorrectAnswersInput('1');
         }
     }, [open]);
 
@@ -32,92 +36,96 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
         setAnswersInput(event.target.value);
     };
 
-    const validateInputs = () => {
+    const handleCorrectAnswersChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCorrectAnswersInput(event.target.value);
+    };
+
+    const validateInputs = (): { questionsValue: number, answersValue: number, correctAnswersValue: number, valid: boolean } => {
         let valid = true;
-        const errors = { questions: '', answers: '' };
+        const errors = { questions: '', answers: '', correctAnswers: '' };
 
         const questionsValue = parseInt(questionsInput, 10);
         const answersValue = parseInt(answersInput, 10);
+        const correctAnswersValue = parseInt(correctAnswersInput, 10);
 
-        if (isNaN(questionsValue) || questionsValue < 1 || questionsValue > MAX_QUESTIONS) {
-            errors.questions = `Введите число от 1 до ${MAX_QUESTIONS}`;
+        if (isNaN(questionsValue) || questionsValue < MIN_QUESTIONS || questionsValue > MAX_QUESTIONS) {
+            errors.questions = `Введите число от ${MIN_QUESTIONS} до ${MAX_QUESTIONS}`;
             valid = false;
         }
 
-        if (isNaN(answersValue) || answersValue < 1 || answersValue > MAX_ANSWERS) {
-            errors.answers = `Введите число от 1 до ${MAX_ANSWERS}`;
+        if (isNaN(answersValue) || answersValue < MIN_ANSWERS || answersValue > MAX_ANSWERS) {
+            errors.answers = `Введите число от ${MIN_ANSWERS} до ${MAX_ANSWERS}`;
+            valid = false;
+        }
+
+        if (isNaN(correctAnswersValue) || correctAnswersValue < 1 || correctAnswersValue >= answersValue) {
+            errors.correctAnswers = `Количество правильных ответов должно быть от 1 до ${answersValue - 1}`;
             valid = false;
         }
 
         setErrors(errors);
-        return valid;
+        return { questionsValue, answersValue, correctAnswersValue, valid };
     };
 
     const handleSubmit = () => {
-        if (validateInputs()) {
-            const questionsValue = parseInt(questionsInput, 10);
-            const answersValue = parseInt(answersInput, 10);
-
-            setQuestions(questionsValue);
-            setAnswers(answersValue);
+        const { questionsValue, answersValue, correctAnswersValue, valid } = validateInputs();
+        if (valid) {
+            onSubmit(questionsValue, answersValue, correctAnswersValue);
         }
-        console.log(minAnswersCount, maxQuestionsCount);
-        onSubmit();
     };
 
-    const clearFields = () => {
-        setQuestionsInput('10');
-        setAnswersInput('4');
-        setErrors({ questions: '', answers: '' });
-    };
-
-    const isSubmitDisabled = !questionsInput.trim() || !answersInput.trim();
+    const isSubmitDisabled = !questionsInput.trim() || !answersInput.trim() || !correctAnswersInput.trim();
 
     return (
-        <Modal open={open} onClose={onClose}>
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 400,
-                    bgcolor: 'background.paper',
-                    borderRadius: '8px',
-                    boxShadow: 24,
-                    p: 4,
-                }}
-            >
-                <Typography variant="h6" gutterBottom>
-                    Параметры генерации
-                </Typography>
-
-                <Alert severity="info" icon={false} sx={{ mb: 1 }}>
-                    <Box textAlign="left">
-                        Вы можете установить собственные допустимые значения
-                    </Box>
-                </Alert>
-
+        <Dialog
+            open={open}
+            onClose={onClose}
+            sx={{ '.MuiPaper-root': { width: '400px' } }}
+        >
+            <DialogTitle>
+                Параметры генерации
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent>
                 <TextField
-                    label={`Максимальное число вопросов (${MAX_QUESTIONS} макс.)`}
+                    label={`Количество вопросов (${MAX_QUESTIONS} макс.)`}
                     value={questionsInput}
                     onChange={handleQuestionsChange}
                     error={!!errors.questions}
                     helperText={errors.questions}
                     fullWidth
                     margin="normal"
-                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 />
 
                 <TextField
-                    label={`Максимальное число вариантов ответов (${MAX_ANSWERS} макс.)`}
+                    label={`Количество ответов (${MAX_ANSWERS} макс.)`}
                     value={answersInput}
                     onChange={handleAnswersChange}
                     error={!!errors.answers}
                     helperText={errors.answers}
                     fullWidth
                     margin="normal"
-                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                />
+
+                <TextField
+                    label={`Количество правильных ответов`}
+                    value={correctAnswersInput}
+                    onChange={handleCorrectAnswersChange}
+                    error={!!errors.correctAnswers}
+                    helperText={errors.correctAnswers}
+                    fullWidth
+                    margin="normal"
                 />
 
                 <Button
@@ -130,7 +138,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 >
                     Сгенерировать
                 </Button>
-            </Box>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     );
 };

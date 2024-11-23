@@ -6,7 +6,7 @@ interface AuthStore {
     authenticated: boolean;
     setAuthenticated: (status: boolean) => void;
     signup: (email: string, password: string) => Promise<Record<string, any> | null>;
-    login: (email: string, password: string) => Promise<Record<string, any>>;
+    login: (email: string, password: string) => Promise<boolean>;
     logout: () => Promise<void>;
     refresh: () => Promise<void>;
     alerts: AlertMessage[];
@@ -32,13 +32,17 @@ const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
 
-    login: async (email: string, password: string): Promise<Record<string, any>> => {
-        const response = await AuthService.login(email, password);
-        if (response && response.data) {
-            localStorage.setItem("JWT", response.data.accessToken);
+    login: async (email: string, password: string)=> {
+        const { addAlert } = get();
+        const { success, message, jwt} = await AuthService.login(email, password);
+        if (success && jwt) {
+            localStorage.setItem("JWT", jwt);
             set({authenticated: true});
+            return true;
+        } else if (message) {
+            addAlert(new AlertMessage(message, 'error'));
         }
-        return response;
+        return false;
     },
 
     logout: async () => {
@@ -64,7 +68,9 @@ const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
     addAlert: (alert: AlertMessage) => {
-        get().alerts.push(alert);
+        set((state) => ({
+            alerts: [...state.alerts, alert],
+        }));
     },
     clearAlerts: () => set({alerts: []}),
     deleteAlert: (alertToDelete) => set((state) => ({

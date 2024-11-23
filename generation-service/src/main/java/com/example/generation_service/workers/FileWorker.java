@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -42,7 +43,7 @@ public class FileWorker {
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
 
-            final String fileNameHash = DigestUtils.md5Hex(originalFileName);
+            final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
 
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 

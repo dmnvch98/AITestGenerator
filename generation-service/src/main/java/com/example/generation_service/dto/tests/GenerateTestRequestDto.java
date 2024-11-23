@@ -17,9 +17,9 @@ public class GenerateTestRequestDto implements Serializable {
     @Builder.Default
     private final int maxQuestionsCount = 5;
     @Builder.Default
-    private final int minAnswersCount = 4;
+    private final int answersCount = 4;
     @Builder.Default
-    private final int maxAnswersCount = 5;
+    private final int correctAnswersCount = 1;
     @Builder.Default
     private final double topP = 0.9;
     @Builder.Default

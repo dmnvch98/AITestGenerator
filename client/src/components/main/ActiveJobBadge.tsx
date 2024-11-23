@@ -41,8 +41,8 @@ export const ActiveJobBadge = () => {
             return (
                 <>
                     {currentActivities.map(item => (
-                        <Link href="/tests?activeTab=history" color="inherit" underline="none">
-                            <ListItem key={item.id} sx={{ml: -1}}>
+                        <Link key={item.id} href="/tests?activeTab=history" color="inherit" underline="none">
+                            <ListItem sx={{ml: -1}}>
                                 <ListItemIcon>
                                     <StatusIndicator status={item.status}/>
                                 </ListItemIcon>

@@ -11,6 +11,6 @@ public class GenerateDto {
 
     private final String content;
     private final int questionsCount;
-    private final int minAnswersCount;
-    private final int maxAnswersCount;
+    private final int answersCount;
+    private final int correctAnswersCount;
 }

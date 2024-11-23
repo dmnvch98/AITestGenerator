@@ -22,16 +22,22 @@ export const TestGenHistoryCurrent = () => {
         deleteFinishedUserActivitiesFromServer
     } = useUserStore();
 
-    const fetchActivity = async () => {
-        await initState();
-    }
-
     useEffect(() => {
+        let unmounted = false;
+        const isUnmounted = () => unmounted;
+
+        const fetchActivity = async () => {
+            await initState(isUnmounted);
+        };
+
         fetchActivity();
+
         return () => {
+            unmounted = true;
             deleteFinishedUserActivitiesFromServer();
         };
     }, []);
+
 
     const handleOpenModal = (code: number) => {
         setFailCode(code);

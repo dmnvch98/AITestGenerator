@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -7,9 +7,7 @@ import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar, FormControl, FormHelperText } from '@mui/material';
-import { AxiosError } from 'axios';
 import useAuthStore from "./authStore";
-import { AlertMessage } from '../../store/types';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,25 +29,11 @@ function LoginPage() {
     setEmailValid(validateEmail(email));
   };
 
-  useEffect(() => {
-    console.log(alerts)
-  }, [alerts, addAlert]);
-
   const handleLogin = async () => {
-    try {
-      const response = await login(email, password);
-      if (response && response.status === 200) {
+      const loginResult = await login(email, password);
+      if (loginResult) {
         navigate('/files');
       }
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.isAxiosError && axiosError.response && axiosError.response.status === 404) {
-        addAlert(new AlertMessage('Пользователь не найден', 'error'));
-      } else {
-        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
-        console.error('Login error:', axiosError);
-      }
-    }
   };
 
   const isFormValid = () => {

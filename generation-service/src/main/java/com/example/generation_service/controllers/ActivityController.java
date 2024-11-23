@@ -66,17 +66,15 @@ public class ActivityController {
     @GetMapping("/long-poll")
     public ResponseEntity<Set<TestGenerationActivityResponseDto>> longPoll(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        final long timeout = 20000;
+        final long pollingInterval = 5000;
+        final long start = System.currentTimeMillis();
+
         try {
-            final long initialWaitTime = 30000;
-            final long reducedWaitTime = 10000;
-            long currentWaitTime = initialWaitTime;
+            while (System.currentTimeMillis() - start < timeout) {
+                TimeUnit.MILLISECONDS.sleep(pollingInterval);
 
-            final long start = System.currentTimeMillis();
-
-            while (System.currentTimeMillis() - start < currentWaitTime) {
-                TimeUnit.MILLISECONDS.sleep(5000);
-
-                final Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId)
+                Set<TestGenerationActivityResponseDto> activityDtos = activityFacade.getUserActivities(userId)
                         .stream()
                         .sorted(Comparator.comparing(TestGenerationActivityResponseDto::getStartDate))
                         .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -84,8 +82,6 @@ public class ActivityController {
                 if (CollectionUtils.isNotEmpty(activityDtos)) {
                     return ResponseEntity.ok(activityDtos);
                 }
-
-                currentWaitTime = reducedWaitTime;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -93,7 +89,4 @@ public class ActivityController {
 
         return ResponseEntity.ok(Set.of());
     }
-
-
-
 }

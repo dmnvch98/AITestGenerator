@@ -27,9 +27,9 @@ public class TestController {
     }
 
     @PostMapping("/generate")
-    public void generateTestByFileAndSave(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
-        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        testFacade.prepareTestGeneration(userId, dto);
+    public void generateTest(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
+//        Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+//        testFacade.prepareTestGeneration(userId, dto);
     }
 
     @GetMapping("/{id}")

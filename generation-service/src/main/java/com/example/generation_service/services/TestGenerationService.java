@@ -41,7 +41,6 @@ public class TestGenerationService {
         answersResponseDto.getQuestions().size());
     final Test test = testConverter.convert(
         answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
-    log.info("Converted test questions count: [{}]", test.getQuestions().size());
     return test;
   }
 

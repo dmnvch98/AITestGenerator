@@ -29,8 +29,6 @@ public interface GenerationConverter {
         return MAPPER.writeValueAsString(convertRequest(questionsResponseDto, request));
     }
 
-    @Mapping(source = "request.minAnswersCount", target = "minAnswersCount")
-    @Mapping(source = "request.maxAnswersCount", target = "maxAnswersCount")
     @Mapping(source = "request.content", target = "text")
     @Mapping(source = "questionsResponseDto.questions", target = "questions", qualifiedByName = "getQuestions")
     @Mapping(source = "questionsResponseDto.title", target = "title")
@@ -40,8 +38,6 @@ public interface GenerationConverter {
         return MAPPER.writeValueAsString(convertRequest(questionsResponseDto, request));
     }
 
-    @Mapping(source = "request.minAnswersCount", target = "minAnswersCount")
-    @Mapping(source = "request.maxAnswersCount", target = "maxAnswersCount")
     @Mapping(source = "questionsResponseDto.questions", target = "questions", qualifiedByName = "getQuestions")
     @Mapping(source = "questionsResponseDto.title", target = "title")
     GenerateAnswersRequestDto convertRequest(final GenerateQuestionsResponseDto questionsResponseDto, final GenerateTestRequest request);

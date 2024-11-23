@@ -11,7 +11,7 @@ import {
     List,
     ListItem,
     ListItemIcon,
-    ListItemText, Alert,
+    ListItemText, Alert, Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -144,6 +144,10 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
                 </Alert>
                 <Box
                     sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         border: '2px dashed grey',
                         borderRadius: 1,
                         padding: 2,
@@ -171,6 +175,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
                 />
                 <List>
                     {filesToUpload.map((file, index) => (
+                        <>
                         <ListItem key={index}
                                   secondaryAction={
                                       <IconButton edge="end" aria-label="delete"
@@ -182,11 +187,14 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose})
                             <ListItemIcon>{getIcon(file.type)}</ListItemIcon>
                             <ListItemText primary={file.name}/>
                         </ListItem>
+                        {index < filesToUpload.length - 1 && <Divider/>}
+                        </>
                     ))}
                 </List>
             </DialogContent>
+            <Divider/>
             <DialogActions sx={{p: 2}}>
-                <Button onClick={handleSend} variant="contained">Отправить</Button>
+                <Button onClick={handleSend} variant="contained" sx={{width: '150px'}}>Отправить</Button>
             </DialogActions>
         </Dialog>
     );

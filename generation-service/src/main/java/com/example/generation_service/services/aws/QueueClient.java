@@ -46,12 +46,12 @@ public class QueueClient {
         try {
             redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
-            if (shouldSkipMessage(generateTestMessage)) {
-                log.info("User [{}] already has active generation, extending messageId=[{}] visibility",
-                        generateTestMessage.getUserId(), message.getMessageId());
-                extendVisibilityTimeout(message);
-                return Optional.empty();
-            }
+//            if (shouldSkipMessage(generateTestMessage)) {
+//                log.info("User [{}] already has active generation, extending messageId=[{}] visibility",
+//                        generateTestMessage.getUserId(), message.getMessageId());
+//                extendVisibilityTimeout(message);
+//                return Optional.empty();
+//            }
             generateTestMessage.setReceipt(message.getMessageId());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
@@ -76,7 +76,7 @@ public class QueueClient {
     public void sendMessage(GenerateTestMessage message) {
         try {
             log.info("Adding message to the queue to generate test. Message: {}", message);
-            final String messageGroupId = "group-id-1";
+            final String messageGroupId = "user-" + message.getUserId();
 
             final String messageBody = objectMapper.writeValueAsString(message);
 

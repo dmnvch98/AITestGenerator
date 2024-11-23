@@ -12,8 +12,8 @@ public class GenerateTestRequest {
     private final String text;
     private final Long userId;
     private final int maxQuestionsCount;
-    private final int minAnswersCount;
-    private final int maxAnswersCount;
+    private final int answersCount;
+    private final int correctAnswersCount;
     private final double topP;
     private final double temperature;
     private final String testGenKey;

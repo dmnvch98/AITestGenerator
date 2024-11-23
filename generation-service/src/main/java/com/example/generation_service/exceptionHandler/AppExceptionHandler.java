@@ -75,7 +75,7 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleHttpException(final IllegalArgumentException e, final WebRequest request) {
-
+        log.error("An error occurred...", e);
         return handleExceptionInternal(
               e,
               new ApiErrorResponse(e, HttpStatus.BAD_REQUEST),

@@ -16,6 +16,4 @@ public class GenerateAnswersRequestDto {
     private final String title;
     private final String text;
     private final List<String> questions;
-    private final int minAnswersCount;
-    private final int maxAnswersCount;
 }

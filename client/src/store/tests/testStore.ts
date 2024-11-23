@@ -31,7 +31,8 @@ export interface AnswerOption {
 
 export interface GenerateTestRequest {
     maxQuestionsCount: number,
-    minAnswersCount: number,
+    answersCount: number,
+    correctAnswersCount: number,
     hashedFileName: string
 }
 

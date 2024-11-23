@@ -40,7 +40,7 @@ export interface UserStore {
     setLoading: (flag: boolean) => void;
     getTestGenCurrentActivitiesLongPoll: () => void;
     deleteFinishedUserActivitiesFromServer: () => void;
-    initState: () => void;
+    initState: (isUnmounted?: () => boolean) => void;
 }
 
 const DeletableStatuses = new Set([
@@ -68,21 +68,25 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         set({currentActivities: response})
     },
 
-    getTestGenCurrentActivitiesLongPoll: async () => {
+    getTestGenCurrentActivitiesLongPoll: async (isUnmounted?: () => boolean) => {
         const { getTestGenCurrentActivitiesLongPoll } = get();
         try {
             const { data }: { data?: ActivityDto[] } = await ActivityService.longPolling();
+            if (isUnmounted && isUnmounted()) return;
+
             if (Array.isArray(data) && data.length > 0) {
                 set({ currentActivities: data });
                 const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
                 if (inProcessJobs > 0) {
-                    await getTestGenCurrentActivitiesLongPoll();
+                    await getTestGenCurrentActivitiesLongPoll(isUnmounted);
                 }
             }
-            return;
         } catch (error) {
+            if (isUnmounted && isUnmounted()) return;
             console.error(error);
-            setTimeout(getTestGenCurrentActivitiesLongPoll, 5000);
+            setTimeout(() => {
+                getTestGenCurrentActivitiesLongPoll(isUnmounted);
+            }, 5000);
         }
     },
 
@@ -102,20 +106,20 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         await getTestGenCurrentActivities();
     },
 
-    initState: async () => {
-        const { getTestGenCurrentActivitiesLongPoll} = get();
-        const data : ActivityDto[] = await TestService.getCurrentTestGenActivities();
+    initState: async (isUnmounted?: () => boolean) => {
+        const { getTestGenCurrentActivitiesLongPoll } = get();
+        const data: ActivityDto[] = await TestService.getCurrentTestGenActivities();
+        if (isUnmounted && isUnmounted()) return;
+
         if (Array.isArray(data)) {
             set({ currentActivities: data });
         }
         if (data.length > 0) {
             const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
             if (inProcessJobs > 0) {
-                await getTestGenCurrentActivitiesLongPoll();
+                await getTestGenCurrentActivitiesLongPoll(isUnmounted);
             }
         }
-        return;
-    }
-
+    },
 
 }))

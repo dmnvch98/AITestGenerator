@@ -8,7 +8,6 @@ import useFileStore from "../../store/fileStore";
 import {FileDto} from "../../store/fileStore";
 import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
 import {GenTestModal} from "../../components/tests/GenTestModal";
-import {useGenerateTestStore} from "../../store/tests/generateTestStore";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
 import {AlertMessage, QueryOptions} from "../../store/types";
@@ -34,7 +33,6 @@ const FilesContent = () => {
     } = useFileStore();
 
     const {generateTestByFile} = useTestStore();
-    const {maxQuestionsCount, minAnswersCount} = useGenerateTestStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
@@ -99,11 +97,13 @@ const FilesContent = () => {
         getTestGenCurrentActivities();
     }
 
-    const handleGenTestSubmit = () => {
+    const handleGenTestSubmit = (maxQuestionsCount: number, answersCount: number, correctAnswersCount: number) => {
+        closeGenTestModal();
         if (selectedFile) {
             const request: GenerateTestRequest = {
                 maxQuestionsCount,
-                minAnswersCount,
+                answersCount,
+                correctAnswersCount,
                 hashedFileName: selectedFile.hashedFilename
             };
 
