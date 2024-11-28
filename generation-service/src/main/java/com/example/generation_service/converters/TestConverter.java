@@ -19,6 +19,7 @@ public interface TestConverter {
     @Mapping(source = "problems", target = "problems")
     @Mapping(source = "userId", target = "userId")
     @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
+    @Mapping(target = "id", ignore = true)
     Test convert(final GenerateAnswersResponseDto answersDto,
                  final String problems, final long userId,
                  final FileHash fileHash);

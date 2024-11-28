@@ -97,6 +97,11 @@ const FilesContent = () => {
         getTestGenCurrentActivities();
     }
 
+    const generationStartFailed = () => {
+        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
+        getTestGenCurrentActivities();
+    }
+
     const handleGenTestSubmit = (maxQuestionsCount: number, answersCount: number, correctAnswersCount: number) => {
         closeGenTestModal();
         if (selectedFile) {
@@ -112,7 +117,7 @@ const FilesContent = () => {
                     if (r) {
                         generationStartSuccessful();
                     } else {
-                        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
+                        generationStartFailed();
                     }
                 })
                 .finally(() => {

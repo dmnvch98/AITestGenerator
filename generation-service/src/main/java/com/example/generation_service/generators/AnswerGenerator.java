@@ -15,19 +15,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.example.generation_service.utils.Utils.countTokens;
-import static com.example.generation_service.utils.Utils.readFileContents;
 
 @Component
 @Slf4j
@@ -57,10 +57,10 @@ public class AnswerGenerator {
         final String result = aiService.send(model, messages, responseSchema, request.getTemperature(), request.getTopP(), timeout);
 //        handleTokensCount(request.getUserId(), request.getText(), getContextPrompt(), result, startTime);
 
-      return converter.convertToAnswersResponseDto(result);
+        return converter.convertToAnswersResponseDto(result);
     }
 
-    private List<ChatMessage> prepareMessages(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto) throws JsonProcessingException {
+    private List<ChatMessage> prepareMessages(final GenerateTestRequest request, final GenerateQuestionsResponseDto questionsResponseDto) throws JsonProcessingException, IOException {
         final String testGenerationRequest = converter.convert(questionsResponseDto, request);
 
         final String contextTemplate = readFileContents(ANSWERS_CONTEXT_PROMPT_FILE);
@@ -78,6 +78,16 @@ public class AnswerGenerator {
         return List.of(context, userText);
     }
 
+    private String readFileContents(String fileName) throws IOException {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            if (in == null) {
+                throw new IOException("Resource file not found: " + fileName);
+            }
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
+    }
+
     private void handleTokensCount(final long userId, final String text, final String contextPrompt,
                                    final String response, final LocalDateTime startTime) {
         final GenerationInfo generationInfo = GenerationInfo
@@ -91,5 +101,4 @@ public class AnswerGenerator {
                 .build();
         generationInfoRepository.save(generationInfo);
     }
-
 }

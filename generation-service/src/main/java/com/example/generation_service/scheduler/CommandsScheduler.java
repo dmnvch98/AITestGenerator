@@ -25,7 +25,7 @@ public class CommandsScheduler {
 
   private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-  @Scheduled(fixedDelay = 1000)
+  @Scheduled(fixedDelay = 20000)
   public void processMessage() {
     final Optional<GenerateTestMessage> commandOpt = commandService.getCommand();
 

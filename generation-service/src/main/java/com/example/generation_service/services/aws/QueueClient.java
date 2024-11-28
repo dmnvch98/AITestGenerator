@@ -66,9 +66,9 @@ public class QueueClient {
         }
     }
 
-    public void sendMessage(GenerateTestMessage message) {
+    public void sendMessage(final GenerateTestMessage message) {
         try {
-            log.info("Adding message to the queue to generate test. Message: {}", message);
+            log.info("Adding message to the queue to generate test. Message: {}, URL: {}", message, queueUrl);
             final String messageGroupId = "user-" + message.getUserId();
 
             final String messageBody = objectMapper.writeValueAsString(message);
@@ -78,10 +78,10 @@ public class QueueClient {
                     .withMessageBody(messageBody)
                     .withMessageGroupId(messageGroupId);
 
-            queue.sendMessage(messageRequest);
+            final SendMessageResult result = queue.sendMessage(messageRequest);
+            log.info("Send message result : {} ", result);
         } catch (Exception e) {
-            log.error("An error occurred during saving message to the queue. Message: {}",
-                  message, e);
+            throw new IllegalArgumentException(e);
         }
     }
 
