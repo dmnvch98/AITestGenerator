@@ -27,7 +27,7 @@ public class CommandsScheduler {
 
   @Scheduled(fixedDelay = 1000)
   public void processMessage() {
-    Optional<GenerateTestMessage> commandOpt = commandService.getCommand();
+    final Optional<GenerateTestMessage> commandOpt = commandService.getCommand();
 
     if (commandOpt.isPresent()) {
       GenerateTestMessage command = commandOpt.get();
@@ -47,7 +47,7 @@ public class CommandsScheduler {
         log.error("Error processing command: {}", command, e);
         activityService.failActivity(command.getHashKey(), command.getCid(), e);
       } finally {
-        commandService.deleteMessage(command.getMessageId());
+        commandService.deleteMessage(command.getMessageId(), command.getReceipt());
       }
     });
   }

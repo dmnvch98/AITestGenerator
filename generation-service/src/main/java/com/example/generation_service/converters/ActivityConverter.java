@@ -45,6 +45,9 @@ public interface ActivityConverter {
 
   default TestGenerationActivity getFinishedActivity(final TestGenerationActivity activity, final Long testId,
                                                      final String testTitle) {
+    if (activity == null) {
+      return null;
+    }
     return TestGenerationActivity.builder()
           .id(activity.getId())
           .status(ActivityStatus.SUCCESS)

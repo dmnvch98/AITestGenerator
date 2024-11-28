@@ -14,6 +14,8 @@ public class GenerateTestMessage {
     private final long userId;
     @Setter
     private String messageId;
+    @Setter
+    private String receipt;
     private final int maxQuestionsCount;
     private final int answersCount;
     private final int correctAnswersCount;

@@ -9,9 +9,9 @@ spring:
       max-request-size: 30MB
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
     driver-class-name: ${DB_DRIVER}
 
   jpa:
@@ -20,6 +20,10 @@ spring:
       ddl-auto: ${JPA_HIBERNATE_DDL_AUTO}
     properties:
       hibernate.dialect: ${JPA_HIBERNATE_DIALECT}
+  data:
+    redis:
+      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST:localhost}
 
 file-upload:
   allowed-extensions: ${FILE_UPLOAD_ALLOWED_EXTENSIONS}
@@ -57,7 +61,7 @@ logging:
   pattern:
     console: ${LOGGING_PATTERN_CONSOLE}
 
-bytescale:
-  appId: ${BYTESCALE_APP_ID}
-  publicKey: ${BYTESCALE_PUBLIC_KEY}
-  secretKey: ${BYTESCALE_SECRET_KEY}
+clamav:
+  host: ${CLAMAV_HOST}
+  port: ${CLAMAV_PORT}
+  timeout: ${CLAMAV_TIMEOUT}

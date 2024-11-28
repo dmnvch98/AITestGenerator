@@ -45,6 +45,15 @@ public interface TestGenerationConverter {
   }
 
   default TestGeneratingHistory getSuccessHistory(final TestGenerationActivity activity, final Test test) {
+    if (activity == null) {
+      return TestGeneratingHistory.builder()
+          .testId(test.getId())
+          .testTitle(test.getTitle())
+          .endDate(LocalDateTime.now())
+          .fileName(test.getFileName())
+          .userId(test.getUserId())
+          .build();
+    }
     return TestGeneratingHistory.builder()
        .testId(test.getId())
        .testTitle(test.getTitle())

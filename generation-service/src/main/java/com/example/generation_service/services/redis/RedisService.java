@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -26,38 +27,59 @@ public class RedisService {
         try {
             String json = objectMapper.writeValueAsString(object);
             redisTemplate.opsForHash().put(key, subKey, json);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+                return;
+            }
             log.error("Failed to serialize object for key {}: {}", key, e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 
     public <T> Optional<T> getObjectFromHash(final String key, final String subKey, final Class<T> clazz) {
-        Object json = redisTemplate.opsForHash().get(key, subKey);
-        if (json == null) {
-            return Optional.empty();
-        }
         try {
-            return Optional.of(objectMapper.readValue(json.toString(), clazz));
-        } catch (JsonProcessingException e) {
-            log.error("Failed to deserialize object for key {}: {}", key, e.getMessage());
-            throw new RuntimeException(e);
+            final Object json = redisTemplate.opsForHash().get(key, subKey);
+            if (json == null) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(objectMapper.readValue(json.toString(), clazz));
+            } catch (Exception e) {
+                log.error("Failed to deserialize object for key {}: {}", key, e.getMessage());
+                return Optional.empty();
+            }
+        } catch (final Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+                return Optional.empty();
+            }
+            log.error("Cannot get object from hash: {}", key, e);
         }
+        return Optional.empty();
     }
 
     public <T> Set<T> getAllObjectsFromHash(final String key, final Class<T> clazz) {
-        Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
-        return entries.values().stream()
-            .map(Object::toString)
-            .map(json -> {
-                try {
-                    return objectMapper.readValue(json, clazz);
-                } catch (JsonProcessingException e) {
-                    log.error("Failed to deserialize object from key {}: {}", key, e.getMessage());
-                    throw new RuntimeException(e);
-                }
-            })
-            .collect(Collectors.toSet());
+        try {
+            Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
+            return entries.values().stream()
+                    .map(Object::toString)
+                    .map(json -> {
+                        try {
+                            return objectMapper.readValue(json, clazz);
+                        } catch (JsonProcessingException e) {
+                            log.error("Failed to deserialize object from key {}: {}", key, e.getMessage());
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toSet());
+        } catch (final Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+                return Collections.emptySet();
+            }
+            log.error("An error occurred when getting user activities: {}", key, e);
+        }
+        return Collections.emptySet();
     }
 
     public void deleteObjectFromHash(final String key, final String subKey) {
@@ -77,9 +99,11 @@ public class RedisService {
         try {
             String json = objectMapper.writeValueAsString(object);
             redisTemplate.opsForValue().set(key, json);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+            }
             log.error("Failed to serialize object for key {}: {}", key, e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 
@@ -90,14 +114,27 @@ public class RedisService {
         }
         try {
             return Optional.of(objectMapper.readValue(json, clazz));
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+                return Optional.empty();
+            }
             log.error("Failed to deserialize object for key {}: {}", key, e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     public void deleteObjectAsString(final String key) {
-        redisTemplate.delete(key);
+        try {
+            redisTemplate.delete(key);
+        } catch (Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+                return;
+            }
+            log.error("Failed to deserialize object for key {}: {}", key, e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public <T> List<T> getAllObjectsFromHashes(final Class<T> clazz) {

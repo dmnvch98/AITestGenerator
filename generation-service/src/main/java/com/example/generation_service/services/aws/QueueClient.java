@@ -3,10 +3,7 @@ package com.example.generation_service.services.aws;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import com.example.generation_service.models.GenerateTestMessage;
-import com.example.generation_service.models.activity.TestGenerationActivity;
-import com.example.generation_service.models.enums.ActivityStatus;
 import com.example.generation_service.services.redis.RedisService;
-import com.example.generation_service.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +44,7 @@ public class QueueClient {
             redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
             generateTestMessage.setMessageId(message.getMessageId());
+            generateTestMessage.setReceipt(message.getReceiptHandle());
             return Optional.of(generateTestMessage);
         } catch (IOException e) {
             log.error("An error occurred while parsing message body: {}", e.getMessage());
@@ -54,16 +52,17 @@ public class QueueClient {
         }
     }
 
-    public void deleteMessage(final String messageId) {
+    public void deleteMessage(final String messageId, final String receipt) {
         try {
             final String processingKey = IN_PROCESS_PREFIX + messageId;
-            final Optional<String> receipt = redisService.getObjectAsString(processingKey, String.class);
-            receipt.ifPresent(s -> queue.deleteMessage(new DeleteMessageRequest(queueUrl, s)));
+//            final Optional<String> receipt = redisService.getObjectAsString(processingKey, String.class);
+            queue.deleteMessage(new DeleteMessageRequest(queueUrl, receipt));
+//            receipt.ifPresent(s -> queue.deleteMessage(new DeleteMessageRequest(queueUrl, s)));
             redisService.deleteObjectAsString(processingKey);
 
             log.info("Message was deleted from the queue. Message : {} ", messageId.substring(0, 8));
         } catch (Exception e) {
-            log.error("An error occurred during deleting message from the queue. Message id : {}", messageId);
+            log.error("An error occurred during deleting message from the queue. Message id : {}", messageId, e);
         }
     }
 

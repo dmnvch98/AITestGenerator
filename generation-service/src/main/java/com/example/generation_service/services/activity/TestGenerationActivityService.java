@@ -70,7 +70,9 @@ public class TestGenerationActivityService {
                                         final String testTitle, final Long userId, final String cid) {
         final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity, testId, testTitle);
         final String hashKey = Utils.getGenerationHashKey(userId);
-        genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity);
+        if (finishedActivity != null) {
+            genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity);
+        }
     }
 
     public void deleteUserActivity(final Long userId, final String cid) {
