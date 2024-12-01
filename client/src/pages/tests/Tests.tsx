@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { BulkDeleteTestsRequestDto, useTestStore } from "../../store/tests/testStore";
 import { TestTable } from "../../components/tests/TestTable";
-import { Alert, Box, Snackbar } from "@mui/material";
 import {useLocation, useNavigate} from "react-router-dom";
 import { TestsActionToolbar } from "./components/actions/TestsActionToolbar";
 import { QueryOptions } from "../../store/types";
@@ -13,9 +12,6 @@ export const Tests = () => {
     const navigate = useNavigate();
     const {
         getAllUserTests,
-        alerts,
-        clearAlerts,
-        deleteAlert,
         bulkDeleteTest,
         totalElements,
     } = useTestStore();
@@ -26,8 +22,6 @@ export const Tests = () => {
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'createdAt', sort: 'desc' }]);
-
-
     const fetchTest = async (options?: QueryOptions) => {
         if (!loading) {
             setLoading(true);
@@ -103,20 +97,6 @@ export const Tests = () => {
                 sortModel={sortModel}
                 setSortModel={setSortModel}
             />
-            <Snackbar
-                open={alerts.length > 0}
-                autoHideDuration={6000}
-                onClose={clearAlerts}
-            >
-                <Box sx={{ maxWidth: '400px' }}>
-                    {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} sx={{ mb: 0.5, textAlign: 'left' }}
-                               onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{ __html: alert.message }} />
-                        </Alert>
-                    ))}
-                </Box>
-            </Snackbar>
         </>
     );
 };

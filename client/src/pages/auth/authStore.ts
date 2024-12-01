@@ -1,6 +1,7 @@
 import AuthService from "../../services/AuthService";
 import {create} from "zustand";
 import { AlertMessage } from '../../store/types';
+import NotificationService from "../../services/notification/NotificationService";
 
 interface AuthStore {
     authenticated: boolean;
@@ -10,7 +11,6 @@ interface AuthStore {
     logout: () => Promise<void>;
     refresh: () => Promise<void>;
     alerts: AlertMessage[];
-    addAlert: (alert: AlertMessage) => void;
     deleteAlert: (alert: AlertMessage) => void;
     clearAlerts: () => void;
 }
@@ -33,14 +33,13 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     },
 
     login: async (email: string, password: string)=> {
-        const { addAlert } = get();
         const { success, message, jwt} = await AuthService.login(email, password);
         if (success && jwt) {
             localStorage.setItem("JWT", jwt);
             set({authenticated: true});
             return true;
         } else if (message) {
-            addAlert(new AlertMessage(message, 'error'));
+            NotificationService.addAlert(new AlertMessage(message, 'error'));
         }
         return false;
     },
@@ -66,11 +65,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
         } catch (error) {
             console.error('Ошибка при обновлении токена:', error);
         }
-    },
-    addAlert: (alert: AlertMessage) => {
-        set((state) => ({
-            alerts: [...state.alerts, alert],
-        }));
     },
     clearAlerts: () => set({alerts: []}),
     deleteAlert: (alertToDelete) => set((state) => ({

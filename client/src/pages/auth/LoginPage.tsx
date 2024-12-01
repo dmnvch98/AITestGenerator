@@ -14,7 +14,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(true); // По умолчанию валидно
-  const { login, alerts, addAlert, clearAlerts, deleteAlert } = useAuthStore();
+  const { login, alerts, clearAlerts, deleteAlert } = useAuthStore();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;

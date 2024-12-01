@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
-import {FileUploadModal} from "../../components/FileUploadModal";
+import {FileUploadModal} from "./components/FileUploadModal";
 import {FilesTable} from "../../components/files/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import useFileStore from "../../store/fileStore";
@@ -14,13 +14,11 @@ import {AlertMessage, QueryOptions} from "../../store/types";
 import {v4 as uuidv4} from "uuid";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
+import NotificationService from "../../services/notification/NotificationService";
 
 const FilesContent = () => {
     const {
         getFiles,
-        alerts,
-        clearAlerts,
-        deleteAlert,
         clearFiles,
         uploadModalOpen,
         setUploadModalOpen,
@@ -28,7 +26,6 @@ const FilesContent = () => {
         deleteFilesInBatch,
         selectedFileHashes,
         deleteFile,
-        addAlert,
         totalUserFiles
     } = useFileStore();
 
@@ -93,12 +90,12 @@ const FilesContent = () => {
     };
 
     const generationStartSuccessful = () => {
-        addAlert(new AlertMessage('Генерация теста добавлена в очередь', 'success'));
+        NotificationService.addAlert(new AlertMessage('Генерация теста добавлена в очередь', 'success'));
         getTestGenCurrentActivities();
     }
 
     const generationStartFailed = () => {
-        addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
+        NotificationService.addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
         getTestGenCurrentActivities();
     }
 
@@ -187,23 +184,6 @@ const FilesContent = () => {
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 
             <GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>
-
-            <Snackbar
-                open={alerts.length > 0}
-                autoHideDuration={10000}
-                onClose={clearAlerts}
-            >
-                <Box sx={{maxWidth: '400px'}}>
-                    {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
-                               onClose={() => {
-                                   deleteAlert(alert)
-                               }}>
-                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
-                        </Alert>
-                    ))}
-                </Box>
-            </Snackbar>
 
             <Snackbar
                 open={isLoading}

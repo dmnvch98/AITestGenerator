@@ -2,6 +2,8 @@ import {create} from "zustand";
 import TestService from "../../services/TestService";
 import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
+import {useNotificationStore} from "../notificationStore";
+import NotificationService from "../../services/notification/NotificationService";
 
 export interface UserTest {
     id: number;
@@ -75,11 +77,6 @@ export interface TestStore {
     setSelectedTextId: (id: number) => void;
     testGenerationStarted: boolean;
     setTestGenerationStarted: (flag: boolean) => void;
-    alerts: AlertMessage[],
-    setAlert: (alert: AlertMessage[]) => void;
-    addAlert: (alert: AlertMessage) => void;
-    clearAlerts: () => void;
-    deleteAlert: (alert: AlertMessage) => void;
     upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
     saveTest: (test: CreateTestRequestDto) => void;
     bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
@@ -97,7 +94,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTestRating: undefined,
     generateTestValidationErrorFlag: false,
     selectedTextId: undefined,
-    alerts: [],
 
     clearState: () => {
         set({
@@ -106,7 +102,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
             selectedTestRating: undefined,
             generateTestValidationErrorFlag: false,
             selectedTextId: undefined,
-            alerts: []
         })
     },
     selectTest: (userTest: UserTest) => {
@@ -122,16 +117,16 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({ tests, totalPages, totalElements })
     },
     addAlert: (alert: AlertMessage) => {
-        get().alerts.push(alert);
+        useNotificationStore.getState().addAlert(alert);
     },
     deleteTest: async (id: number) => {
         const response = await TestService.deleteTest(id);
-        const { addAlert, getAllUserTests } = get();
+        const { getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            addAlert(new AlertMessage('Тест успешно удален', 'success'));
+            NotificationService.addAlert(new AlertMessage('Тест успешно удален', 'success'));
         } else {
-            addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
+            NotificationService.addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
         }
     },
     setGenerateTestValidationErrorFlag: (flag: boolean) => {
@@ -148,20 +143,15 @@ export const useTestStore = create<TestStore>((set, get) => ({
     setDeleteTestFlag: (flag: boolean) => {
         set({deleteTestFlag: flag});
     },
-    setAlert: (alerts) => set((state) => ({alerts: [...state.alerts, ...alerts]})),
-    clearAlerts: () => set({alerts: []}),
-    deleteAlert: (alertToDelete) => set((state) => ({
-        alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
-    })),
     upsert: async (test): Promise<UserTest | null> => {
-        const { addAlert, getAllUserTests} = get();
+        const { getAllUserTests} = get();
         const response = await TestService.upsert(test);
         if (response) {
             getAllUserTests();
-            addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
+            NotificationService.addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
             return response as UserTest;
         } else {
-            addAlert(new AlertMessage('Произошла ошибка при обновлении теста', 'error'));
+            NotificationService.addAlert(new AlertMessage('Произошла ошибка при обновлении теста', 'error'));
             return null;
         }
     },
@@ -174,39 +164,30 @@ export const useTestStore = create<TestStore>((set, get) => ({
         return response;
     },
     saveTest: async (test) => {
-        const { addAlert } = get();
         const response = await TestService.saveUserTest(test);
         if (response) {
-            addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
+            NotificationService.addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
         } else {
-            addAlert(new AlertMessage('Произошла ошибка при сохранении теста', 'error'));
+            NotificationService.addAlert(new AlertMessage('Произошла ошибка при сохранении теста', 'error'));
         }
     },
     bulkDeleteTest: async (request) => {
         const response = await TestService.bulkTestDelete(request);
-        const { addAlert, getAllUserTests } = get();
+        const { getAllUserTests } = get();
         if (response) {
             getAllUserTests();
-            addAlert(new AlertMessage('Тест(ы) успешно удалены', 'success'));
+            NotificationService.addAlert(new AlertMessage('Тест(ы) успешно удалены', 'success'));
         } else {
-            addAlert(new AlertMessage('Произошла ошибка при удалении тестов', 'error'));
+            NotificationService.addAlert(new AlertMessage('Произошла ошибка при удалении тестов', 'error'));
         }
     },
     updateRating: async (id, request) => {
         const { success, rating } = await TestRatingService.upsert(id, request);
-        const { addAlert, selectedTest, selectTest } = get();
         if (success) {
-            addAlert(new AlertMessage('Рейтинг успешно обновлен', 'success'));
+            NotificationService.addAlert(new AlertMessage('Рейтинг успешно обновлен', 'success'));
             set({selectedTestRating: rating})
-            // if (selectedTest) {
-            //     const updatedTest: UserTest = {
-            //         rating: rating?.rating,
-            //         ...selectedTest
-            //     }
-            //     selectTest(updatedTest);
-            // }
         } else {
-            addAlert(new AlertMessage('Произошла ошибка при обновлении рейтинга', 'error'));
+            NotificationService.addAlert(new AlertMessage('Произошла ошибка при обновлении рейтинга', 'error'));
         }
     },
     getRating: async (id) => {

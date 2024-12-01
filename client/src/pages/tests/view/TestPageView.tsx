@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {BulkDeleteTestsRequestDto, useTestStore} from "../../../store/tests/testStore";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import {Box, Divider, Skeleton, CircularProgress, Snackbar, Alert, Paper} from "@mui/material";
+import {Box, Divider, Skeleton, CircularProgress, Paper} from "@mui/material";
 import { TestViewModeSelector } from "../edit/components/TestViewModeSelector";
 import { QuestionPagination } from "../edit/components/QuestionPagination";
 import { QuestionListView, QuestionPaginatedView } from "../edit/components/TestDisplayMode";
@@ -11,6 +11,7 @@ import { AlertMessage } from "../../../store/types";
 import { TestViewActions } from "./components/TestViewActions";
 import { useExportStore } from "../../../store/tests/exportStore";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
+import NotificationService from "../../../services/notification/NotificationService";
 
 export const TestPageView: React.FC = () => {
     const { id } = useParams();
@@ -24,10 +25,6 @@ export const TestPageView: React.FC = () => {
     const {
         selectedTest,
         getUserTestById,
-        alerts,
-        addAlert,
-        clearAlerts,
-        deleteAlert,
         getRating,
         clearState,
         bulkDeleteTest
@@ -46,7 +43,7 @@ export const TestPageView: React.FC = () => {
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                addAlert(new AlertMessage('Тест не найден', 'error'));
+                NotificationService.addAlert(new AlertMessage('Тест не найден', 'error'));
             }
         });
         setTestLoading(false);
@@ -136,15 +133,6 @@ export const TestPageView: React.FC = () => {
                     />
                 )
             )}
-            <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
-                <Box sx={{maxWidth: '400px'}}>
-                    {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
-                        </Alert>
-                    ))}
-                </Box>
-            </Snackbar>
         </Paper>
     );
 

@@ -17,7 +17,7 @@ interface TestFormProps {
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {alerts, clearAlerts, deleteAlert, addAlert, upsert, clearState} = useTestStore();
+    const {upsert, clearState} = useTestStore();
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     }, []);
 
     const handleSave = () => {
-        const {valid, invalidQuestions} = validateTest(localTest, addAlert, setCurrentQuestionIndex);
+        const {valid, invalidQuestions} = validateTest(localTest, setCurrentQuestionIndex);
         if (valid) {
             upsert(localTest).then(resp => {
                 if (resp != null) {
@@ -123,15 +123,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
                     editMode={true}
                 />
             )}
-            <Snackbar open={alerts.length > 0} autoHideDuration={6000} onClose={clearAlerts}>
-                <Box sx={{maxWidth: '400px'}}>
-                    {alerts.map(alert => (
-                        <Alert key={alert.id} severity={alert.severity} onClose={() => deleteAlert(alert)}>
-                            <span dangerouslySetInnerHTML={{__html: alert.message}}/>
-                        </Alert>
-                    ))}
-                </Box>
-            </Snackbar>
         </Paper>
     )
 

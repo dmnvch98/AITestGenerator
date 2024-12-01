@@ -4,10 +4,11 @@ import {UserTest, useTestStore} from "../../../store/tests/testStore";
 import {TestForm} from "../components/TestForm";
 import {AlertMessage} from "../../../store/types";
 import {createNewTest} from "./utils";
+import NotificationService from "../../../services/notification/NotificationService";
 
 export const TestPageEdit = () => {
     const {id} = useParams();
-    const {getUserTestById, addAlert, clearState} = useTestStore();
+    const {getUserTestById, clearState} = useTestStore();
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
     const [testToEdit, setTestToEdit] = useState<UserTest>();
@@ -17,7 +18,7 @@ export const TestPageEdit = () => {
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                addAlert(new AlertMessage('Тест не найден', 'error'))
+                NotificationService.addAlert(new AlertMessage('Тест не найден', 'error'))
             }
             setTestToEdit(test);
         });

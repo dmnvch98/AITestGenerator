@@ -18,9 +18,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useFileStore from "../store/fileStore";
-import {AlertMessage} from "../store/types";
-import {v4 as uuidv4} from "uuid";
+import useFileStore from "../../../store/fileStore";
 
 interface FileUploadModalProps {
     open: boolean;
@@ -30,54 +28,21 @@ interface FileUploadModalProps {
 export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose}) => {
     const {
         filesToUpload,
-        addFiles,
         removeFile,
         uploadFiles,
-        setAlerts,
         getFiles,
         setUploadModalOpen,
-        setIsLoading
+        setIsLoading,
+        validateFilesThenUpload
     } = useFileStore();
     const [dragOver, setDragOver] = useState(false);
-
-    const MAX_FILES = 5;
-    const MAX_FILE_SIZE_MB = 5;
-    const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
     const handleFileUpload = (event: ChangeEvent<HTMLInputElement> | DragEvent) => {
         const newFiles = event.type === 'change'
             ? Array.from((event.target as HTMLInputElement).files || [])
             : Array.from((event as DragEvent).dataTransfer.files);
 
-        const validFiles: File[] = [];
-        const invalidFiles: AlertMessage[] = [];
-
-        newFiles.forEach(file => {
-            if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
-                invalidFiles.push({
-                    id: uuidv4() + Math.random(),
-                    message: `<b>${file.name}</b> не PDF/Word документ`,
-                    severity: 'error'
-                });
-            } else if (file.size > MAX_FILE_SIZE) {
-                invalidFiles.push({
-                    id: uuidv4() + Math.random(),
-                    message: `<b>${file.name}</b> превышает ${MAX_FILE_SIZE_MB} MБ`,
-                    severity: 'error'
-                });
-            } else if (filesToUpload.length + validFiles.length >= MAX_FILES) {
-                invalidFiles.push({
-                    id: uuidv4() + Math.random(),
-                    message: `<b>${file.name}</b> превышает лимит в ${MAX_FILES} файлов`,
-                    severity: 'error'
-                });
-            } else {
-                validFiles.push(file);
-            }
-        });
-
-        setAlerts(invalidFiles);
-        addFiles(validFiles);
+        validateFilesThenUpload(newFiles);
     };
 
     const handleDragOver = (event: DragEvent) => {

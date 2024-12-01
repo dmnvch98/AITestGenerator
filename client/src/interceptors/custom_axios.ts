@@ -1,11 +1,8 @@
 import axios from 'axios';
 import AuthService from "../services/AuthService";
 
-const profile = process.env.REACT_APP_PROFILE;
-const host = profile === 'demo' ? 'server' : 'localhost';
-
 const customAxios = axios.create({
-    baseURL: `http://${host}:8080`,
+    baseURL: process.env.REACT_APP_SERVER_URL || "http://localhost:8080",
     withCredentials: true
 });
 

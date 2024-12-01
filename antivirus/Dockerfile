@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM debian:bullseye
 
 # Обновление и установка необходимых пакетов
 RUN apt-get update && apt-get install -y \

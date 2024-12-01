@@ -1,22 +1,22 @@
 import { CreateTestRequestDto, UserTest } from "../../../store/tests/testStore";
 import { v4 as uuidv4 } from "uuid";
 import { AlertMessage } from "../../../store/types";
+import NotificationService from "../../../services/notification/NotificationService";
 
 export const validateTest = (
     localTest: UserTest | CreateTestRequestDto,
-    addAlert: (alert: AlertMessage) => void,
     setCurrentQuestionIndex: (index: number) => void
 ): { valid: boolean, invalidQuestions: { index: number, message: string }[] } => {
     let valid = true;
     const invalidQuestions: { index: number, message: string, id?: string }[] = [];
 
     if (!localTest?.title?.trim()) {
-        addAlert(new AlertMessage('Заголовок теста не должен быть пустым', 'error'));
+        NotificationService.addAlert(new AlertMessage('Заголовок теста не должен быть пустым', 'error'));
         valid = false;
     }
 
     if (localTest.questions.length < 1) {
-        addAlert(new AlertMessage('Тест должен содержать минимум один вопрос', 'error'));
+        NotificationService.addAlert(new AlertMessage('Тест должен содержать минимум один вопрос', 'error'));
         valid = false;
     }
 

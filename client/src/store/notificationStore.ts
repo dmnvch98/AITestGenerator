@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { AlertMessage } from "./types";
 
 export interface Snackbar {
     id: string;
@@ -7,21 +8,23 @@ export interface Snackbar {
 }
 
 export interface NotificationStore {
-    snackbars: Snackbar[];
-    addNotification: (message: string, variant: string) => void;
-    removeNotification: (snackbar: Snackbar) => void;
+    alerts: AlertMessage[];
+    addAlert: (alert: AlertMessage) => void;
+    addAlerts: (alerts: AlertMessage[]) => void;
+    clearAlerts: () => void;
+    deleteAlert: (alert: AlertMessage) => void;
 }
 
-export const useNotificationStore = create<NotificationStore>((set: any, get: any) => ({
-    snackbars: [],
-    addNotification: (message: string, variant: string) => {
-        const id = new Date().getTime().toString();
-        const snackbar = {id, message, variant};
-        set({snackbars: [...get().snackbars, snackbar]});
-    },
-    removeNotification: (snackbar: Snackbar) => {
-        set({
-            snackbars: get().snackbars.filter((item: Snackbar) => item.id !== snackbar.id),
-        });
-    },
+export const useNotificationStore = create<NotificationStore>((set) => ({
+    alerts: [],
+    addAlert: (alert: AlertMessage) => set((state) => ({
+        alerts: [...state.alerts, alert]
+    })),
+    addAlerts: (alerts: AlertMessage[]) => set((state) => ({
+        alerts: [...state.alerts, ...alerts]
+    })),
+    clearAlerts: () => set({ alerts: [] }),
+    deleteAlert: (alertToDelete) => set((state) => ({
+        alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id),
+    })),
 }));
