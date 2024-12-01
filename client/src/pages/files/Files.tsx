@@ -2,10 +2,10 @@ import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
 import {FileUploadModal} from "./components/FileUploadModal";
-import {FilesTable} from "../../components/files/FilesTable";
+import {FilesTable} from "./components/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
-import useFileStore from "../../store/fileStore";
-import {FileDto} from "../../store/fileStore";
+import useFileStore from "./store/fileStore";
+import {FileDto} from "./store/fileStore";
 import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
 import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useUserStore} from "../../store/userStore";
@@ -14,7 +14,6 @@ import {AlertMessage, QueryOptions} from "../../store/types";
 import {v4 as uuidv4} from "uuid";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
-import NotificationService from "../../services/notification/NotificationService";
 
 const FilesContent = () => {
     const {
@@ -29,21 +28,18 @@ const FilesContent = () => {
         totalUserFiles
     } = useFileStore();
 
-    const {generateTestByFile} = useTestStore();
+    const {generateTestByFile, isGenerateTestByFileQueueing} = useTestStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
     const [searchValue, setSearchValue] = useState<string>('');
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'uploadTime', sort: 'desc' }]);
 
     const fetchFiles = async (options?: QueryOptions) => {
-        setLoading(true);
         await getFiles(options);
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -89,16 +85,6 @@ const FilesContent = () => {
         setGenTestModalOpen(false);
     };
 
-    const generationStartSuccessful = () => {
-        NotificationService.addAlert(new AlertMessage('Генерация теста добавлена в очередь', 'success'));
-        getTestGenCurrentActivities();
-    }
-
-    const generationStartFailed = () => {
-        NotificationService.addAlert(new AlertMessage('Произошла ошибка. Пожалуйста, обратитесь в поддержку', 'error'));
-        getTestGenCurrentActivities();
-    }
-
     const handleGenTestSubmit = (maxQuestionsCount: number, answersCount: number, correctAnswersCount: number) => {
         closeGenTestModal();
         if (selectedFile) {
@@ -106,20 +92,12 @@ const FilesContent = () => {
                 maxQuestionsCount,
                 answersCount,
                 correctAnswersCount,
-                hashedFileName: selectedFile.hashedFilename
+                hashedFileName: selectedFile.hashedFilename,
+                originalFileName: selectedFile.originalFilename
             };
-
-            generateTestByFile(request)
-                .then((r) => {
-                    if (r) {
-                        generationStartSuccessful();
-                    } else {
-                        generationStartFailed();
-                    }
-                })
-                .finally(() => {
-                    closeGenTestModal();
-                });
+            generateTestByFile(request);
+            getTestGenCurrentActivities();
+            closeGenTestModal();
         }
     };
 
@@ -173,7 +151,7 @@ const FilesContent = () => {
 
             <FilesTable
                 actions={actions}
-                loading={loading}
+                loading={isLoading}
                 rowCount={totalUserFiles}
                 paginationModel={paginationModel}
                 setPaginationModel={setPaginationModel}
@@ -184,17 +162,6 @@ const FilesContent = () => {
             <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
 
             <GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>
-
-            <Snackbar
-                open={isLoading}
-            >
-                <Box sx={{width: '400px'}}>
-                    <Alert key={uuidv4()} severity='info' sx={{mb: 0.5, textAlign: 'left'}} icon={<CircularProgress size={24}/>}>
-                       Загрузка файлов... Это может занять некоторое время
-                    </Alert>
-                </Box>
-            </Snackbar>
-
         </>
     );
 }

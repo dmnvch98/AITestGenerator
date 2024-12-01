@@ -6,11 +6,15 @@ export class AlertMessage {
     id: string;
     message: string;
     severity: 'success' | 'info' | 'warning' | 'error' | undefined;
+    icon?: 'progress';
+    closeable?: boolean;
 
-    constructor(message: string, severity: 'success' | 'info' | 'warning' | 'error' | undefined) {
+    constructor(message: string, severity: 'success' | 'info' | 'warning' | 'error' | undefined, icon?: 'progress', closeable?: boolean) {
         this.id = uuidv4();
         this.message = message;
         this.severity = severity;
+        this.icon = icon;
+        this.closeable = closeable ?? true;
     }
 }
 

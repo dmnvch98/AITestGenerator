@@ -35,7 +35,8 @@ export interface GenerateTestRequest {
     maxQuestionsCount: number,
     answersCount: number,
     correctAnswersCount: number,
-    hashedFileName: string
+    hashedFileName: string,
+    originalFileName?: string
 }
 
 export interface BulkDeleteTestsRequestDto {
@@ -67,16 +68,11 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
+    generateTestByFile: (request: GenerateTestRequest) => void,
+    isGenerateTestByFileQueueing: boolean,
     getAllUserTests: (options?: QueryOptions) => void,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
-    generateTestValidationErrorFlag: boolean;
-    setGenerateTestValidationErrorFlag: (flag: boolean) => void;
-    selectedTextId: number | undefined,
-    setSelectedTextId: (id: number) => void;
-    testGenerationStarted: boolean;
-    setTestGenerationStarted: (flag: boolean) => void;
     upsert: (test: UserTest | CreateTestRequestDto) => Promise<UserTest | null>;
     saveTest: (test: CreateTestRequestDto) => void;
     bulkDeleteTest: (request: BulkDeleteTestsRequestDto) => void;
@@ -92,16 +88,13 @@ export const useTestStore = create<TestStore>((set, get) => ({
     totalElements: 0,
     selectedTest: undefined,
     selectedTestRating: undefined,
-    generateTestValidationErrorFlag: false,
-    selectedTextId: undefined,
+    isGenerateTestByFileQueueing: false,
 
     clearState: () => {
         set({
             tests: [],
             selectedTest: undefined,
             selectedTestRating: undefined,
-            generateTestValidationErrorFlag: false,
-            selectedTextId: undefined,
         })
     },
     selectTest: (userTest: UserTest) => {
@@ -109,8 +102,22 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
 
     generateTestByFile: async (request) => {
-        const response = await TestService.generateTestByFile(request);
-        return response as boolean;
+        set({isGenerateTestByFileQueueing: false});
+        const alert: AlertMessage = new AlertMessage(
+            `Файл <b>${request.originalFileName}</b> отправлен в очередь`,
+            'info',
+            'progress',
+            false
+            );
+        NotificationService.addAlert(alert);
+        const isSuccess = await TestService.generateTestByFile(request);
+        NotificationService.deleteAlert(alert);
+        if (isSuccess) {
+            NotificationService.addAlert(new AlertMessage(`Файл <b>${request.originalFileName}</b> добавлен в очередь`, 'success'));
+        } else {
+            NotificationService.addAlert(new AlertMessage(`Ошибка при добавлении <b>${request.originalFileName}</b> в очередь. Пожалуйста, попробуйте позже.`, 'error'));
+        }
+        set({isGenerateTestByFileQueueing: true});
     },
     getAllUserTests: async (options) => {
         const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(options)
@@ -128,16 +135,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
         } else {
             NotificationService.addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
         }
-    },
-    setGenerateTestValidationErrorFlag: (flag: boolean) => {
-        set({generateTestValidationErrorFlag: flag})
-    },
-    setSelectedTextId: (id: number) => {
-        set({selectedTextId: id})
-    },
-    testGenerationStarted: false,
-    setTestGenerationStarted: (flag: boolean) => {
-        set({testGenerationStarted: flag})
     },
     deleteTestFlag: false,
     setDeleteTestFlag: (flag: boolean) => {

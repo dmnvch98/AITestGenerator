@@ -1,6 +1,6 @@
 import {getAxiosInstance} from "../interceptors/getAxiosInstance";
 import {AxiosError} from "axios";
-import {FileUploadResponseDto} from "../store/fileStore";
+import {FileUploadResponseDto} from "../pages/files/store/fileStore";
 import {QueryOptions} from "../store/types";
 
 class FileService {

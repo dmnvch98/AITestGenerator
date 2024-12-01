@@ -83,7 +83,6 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             }
         } catch (error) {
             if (isUnmounted && isUnmounted()) return;
-            console.error(error);
             setTimeout(() => {
                 getTestGenCurrentActivitiesLongPoll(isUnmounted);
             }, 5000);
