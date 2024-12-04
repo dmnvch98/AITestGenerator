@@ -27,6 +27,14 @@ jobs:
           java-version: '19'
           distribution: 'temurin'
 
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
       - name: Build with Maven
         run: mvn clean package -DskipTests
         working-directory: ./generation-service
@@ -43,4 +51,4 @@ jobs:
           environment_name: ${{ secrets.EB_ENV_NAME }}
           region: ${{ secrets.AWS_REGION }}
           version_label: ${{ github.event.inputs.version_label }}
-          zip_file: target/*.jar
+          deployment_package: ./generation-service/target/*.jar
