@@ -51,4 +51,4 @@ jobs:
           environment_name: ${{ secrets.EB_ENV_NAME }}
           region: ${{ secrets.AWS_REGION }}
           version_label: ${{ github.event.inputs.version_label }}
-          deployment_package: ./generation-service/target/*.jar
+          deployment_package: ./generation-service/target/server.jar
