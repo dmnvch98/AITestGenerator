@@ -8,7 +8,7 @@ on:
         required: true
         default: 'develop'
       version_label:
-        description: 'Deploy branch'
+        description: 'Deploy version'
         required: true
         default: 'latest'
 
@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.branch }}
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -39,6 +40,13 @@ jobs:
         run: mvn clean package -DskipTests
         working-directory: ./generation-service
 
+      - name: Generate version label (current date and time)
+        id: generate_version
+        run: |
+          VERSION=$(date +"%Y-%m-%d_%H%M")
+          echo "Generated version label: $VERSION"
+          echo "::set-output name=version_label::$VERSION"
+
       - name: List files in target directory
         run: ls -la ./generation-service/target
 
@@ -50,5 +58,5 @@ jobs:
           application_name: ${{ secrets.EB_APP_NAME }}
           environment_name: ${{ secrets.EB_ENV_NAME }}
           region: ${{ secrets.AWS_REGION }}
-          version_label: ${{ github.event.inputs.version_label }}
+          version_label: ${{ steps.generate_version.outputs.version_label }}
           deployment_package: ./generation-service/target/server.jar
