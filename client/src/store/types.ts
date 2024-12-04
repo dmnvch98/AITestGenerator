@@ -7,7 +7,7 @@ export class AlertMessage {
     message: string;
     severity: 'success' | 'info' | 'warning' | 'error' | undefined;
     icon?: 'progress';
-    closeable?: boolean;
+    closeable?: boolean = true;
 
     constructor(message: string, severity: 'success' | 'info' | 'warning' | 'error' | undefined, icon?: 'progress', closeable?: boolean) {
         this.id = uuidv4();

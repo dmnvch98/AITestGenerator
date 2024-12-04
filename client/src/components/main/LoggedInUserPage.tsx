@@ -26,7 +26,7 @@ export const LoggedInUserPage = ({ mainContent }: any) => {
                            TransitionComponent={Slide}
                            onClose={clearAlerts}
                        >
-                           <Box sx={{ maxWidth: '400px' }}>
+                           <Box sx={{ width: '400px' }}>
                                {alerts.map(alert => (
                                    <Alert key={alert.id} severity={alert.severity} sx={{ mb: 0.5, textAlign: 'left' }} icon={getAlertIcon(alert.icon)}
                                           onClose={alert.closeable ? () => deleteAlert(alert) : undefined}>
