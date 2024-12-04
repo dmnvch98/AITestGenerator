@@ -39,6 +39,9 @@ jobs:
         run: mvn clean package -DskipTests
         working-directory: ./generation-service
 
+      - name: List files in target directory
+        run: ls -la ./generation-service/target
+
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
