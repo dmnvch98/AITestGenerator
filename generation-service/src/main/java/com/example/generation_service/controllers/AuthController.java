@@ -95,7 +95,7 @@ public class AuthController {
 
     private void generateRefreshToken(User user, final String email, final HttpServletResponse response) {
         final String newRefreshToken = jwt.generateRefreshToken(email);
-        userService.updateRefreshToken(user, newRefreshToken);
+        userService.postLoginUserUpdate(user, newRefreshToken);
         addCookie(response, newRefreshToken, Duration.ofDays(30).toSeconds());
     }
 

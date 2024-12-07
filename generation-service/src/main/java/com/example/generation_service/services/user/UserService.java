@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,8 +29,8 @@ public class UserService {
             .matches(credentialsDto.getPassword(), user.getPassword());
     }
 
-    public void updateRefreshToken(final User user, final String token) {
-        userRepository.updateRefreshToken(user.getEmail(), token);
+    public void postLoginUserUpdate(final User user, final String token) {
+        userRepository.postLoginUpdate(user.getEmail(), token, LocalDateTime.now());
     }
 
     public void clearRefreshToken(final String email) {

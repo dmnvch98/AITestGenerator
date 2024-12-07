@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user_features")
 @Getter
@@ -17,11 +19,16 @@ public class UserFeature {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean antivirusEnabled = true;
+    @Enumerated(EnumType.STRING)
+    private Feature name;
 
-    @OneToOne
+    private Boolean enabled;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
