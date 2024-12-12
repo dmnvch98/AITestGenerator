@@ -15,15 +15,9 @@
             "questionText": {
               "type": "string"
             },
-            "answers": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "minItems": 2,
-              "maxItems": 4
+            "answer": {
+              "type": "boolean"
             },
-
             "textReference": {
               "type": "string"
             }

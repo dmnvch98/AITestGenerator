@@ -27,7 +27,7 @@ public class GiftExportService implements ExportService {
       giftFormat.append(questionText).append(" {\n");
 
       List<AnswerOptionDto> answers = question.getAnswerOptions();
-      long correctAnswersCount = answers.stream().filter(AnswerOptionDto::isCorrect).count();
+      long correctAnswersCount = answers.stream().filter(AnswerOptionDto::getIsCorrect).count();
 
       if (correctAnswersCount > 1) {
         appendMultipleChoiceAnswers(giftFormat, answers);
@@ -54,7 +54,7 @@ public class GiftExportService implements ExportService {
   private void appendSingleChoiceAnswers(StringBuilder giftFormat, List<AnswerOptionDto> answers) {
     for (AnswerOptionDto answer : answers) {
       String optionText = answer.getOptionText();
-      if (answer.isCorrect()) {
+      if (answer.getIsCorrect()) {
         giftFormat.append("  =").append(optionText).append("\n"); // Правильный ответ
       } else {
         giftFormat.append("  ~").append(optionText).append("\n"); // Неправильный ответ
@@ -63,7 +63,7 @@ public class GiftExportService implements ExportService {
   }
 
   private void appendMultipleChoiceAnswers(StringBuilder giftFormat, List<AnswerOptionDto> answers) {
-    long correctAnswersCount = answers.stream().filter(AnswerOptionDto::isCorrect).count();
+    long correctAnswersCount = answers.stream().filter(AnswerOptionDto::getIsCorrect).count();
     long incorrectAnswersCount = answers.size() - correctAnswersCount;
 
     // Рассчитываем процентные баллы для правильных ответов
@@ -73,7 +73,7 @@ public class GiftExportService implements ExportService {
 
     for (AnswerOptionDto answer : answers) {
       String optionText = answer.getOptionText();
-      if (answer.isCorrect()) {
+      if (answer.getIsCorrect()) {
         giftFormat.append("  ~%").append((int) scorePerCorrectAnswer).append("%").append(optionText).append("\n");
       } else {
         // Для неправильных ответов добавляем штраф

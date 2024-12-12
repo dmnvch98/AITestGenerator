@@ -1,9 +1,12 @@
 package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.generation.GenerateAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateQuestionsResponseDto;
 import com.example.generation_service.dto.tests.CreateTestRequestDto;
+import com.example.generation_service.dto.tests.QuestionDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
 import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.generation.TestQuestionsType;
 import com.example.generation_service.models.test.Test;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,13 +19,26 @@ import java.util.List;
 public interface TestConverter {
 
     @Mapping(source = "answersDto.title", target = "title")
-    @Mapping(source = "problems", target = "problems")
     @Mapping(source = "userId", target = "userId")
     @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
     @Mapping(target = "id", ignore = true)
-    Test convert(final GenerateAnswersResponseDto answersDto,
-                 final String problems, final long userId,
-                 final FileHash fileHash);
+    Test convert(final GenerateAnswersResponseDto answersDto, final long userId,
+                 final FileHash fileHash, final TestQuestionsType questionsType);
+
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "questions", target = "questions")
+    @Mapping(source = "userId", target = "userId")
+    @Mapping(source = "fileName", target = "originalFileName")
+    @Mapping(target = "id", ignore = true)
+    default Test convert(final List<QuestionDto> questions, final String title, final long userId,
+                 final String originalFileName, final TestQuestionsType questionsType) {
+        return Test.builder()
+                .title(title)
+                .questions(questions)
+                .userId(userId)
+                .fileName(originalFileName)
+                .build();
+    }
 
     TestsResponseDto.TestResponseDto convert(final Test test);
 

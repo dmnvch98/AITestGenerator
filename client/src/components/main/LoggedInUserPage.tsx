@@ -9,7 +9,7 @@ export const LoggedInUserPage = ({ mainContent }: any) => {
         if (icon && icon === 'progress') {
             return <CircularProgress size={20} color="inherit" />;
         }
-        return undefined;  // Возвращаем undefined, если иконка не требуется
+        return undefined;
     };
 
     const {alerts, deleteAlert, clearAlerts} = useNotificationStore();

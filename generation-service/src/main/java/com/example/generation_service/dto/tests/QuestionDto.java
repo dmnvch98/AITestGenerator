@@ -20,4 +20,5 @@ public class QuestionDto {
     private final UUID id = UUID.randomUUID();
     private final String questionText;
     private final List<AnswerOptionDto> answerOptions;
+    private final String textReference;
 }

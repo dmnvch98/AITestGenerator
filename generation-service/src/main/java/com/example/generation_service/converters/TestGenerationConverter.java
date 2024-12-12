@@ -5,7 +5,7 @@ import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.dto.tests.TextGenerationHistoryDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
-import com.example.generation_service.generators.models.GenerateTestRequest;
+import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
 import com.example.generation_service.models.files.FileHash;
@@ -35,7 +35,7 @@ public interface TestGenerationConverter {
   @Mapping(source = "fileHash", target = "fileHash")
   @Mapping(source = "text", target = "text")
   @Mapping(source = "message.userId", target = "userId")
-  GenerateTestRequest convert(final GenerateTestMessage message, final String text, final FileHash fileHash);
+  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileHash fileHash);
 
   @Named("convertFailReason")
   default Integer convertFailReason(final String failReason) {

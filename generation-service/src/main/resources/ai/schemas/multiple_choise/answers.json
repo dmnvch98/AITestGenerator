@@ -1,0 +1,68 @@
+{
+  "name": "answers",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "language": {
+        "type": "string",
+        "enum": [
+          "russian",
+          "english",
+          "spanish",
+          "french",
+          "german",
+          "unknown"
+        ]
+      },
+      "title": {
+        "type": "string"
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "questionText": {
+              "type": "string"
+            },
+            "textReference": {
+              "type": "string"
+            },
+            "answerOptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "optionText": {
+                    "type": "string"
+                  },
+                  "isCorrect": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "optionText",
+                  "isCorrect"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "questionText",
+            "answerOptions",
+            "textReference"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "language",
+      "title",
+      "questions"
+    ],
+    "additionalProperties": false
+  }
+}

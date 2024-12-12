@@ -7,7 +7,7 @@ import com.example.generation_service.converters.TestGenerationConverter;
 import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
-import com.example.generation_service.generators.models.GenerateTestRequest;
+import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.test.Test;
@@ -15,6 +15,7 @@ import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.*;
 import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.services.aws.StorageClient;
+import com.example.generation_service.services.generation.TestGenerationService;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +94,7 @@ public class TestFacade {
       final FileHash fileHash = fileHashService
             .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
       final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
-      final GenerateTestRequest request = testGenerationConverter.convert(message, userContent, fileHash);
+      final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash);
 
       final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
       testService.save(test);

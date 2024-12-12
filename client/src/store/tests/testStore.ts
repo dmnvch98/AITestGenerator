@@ -23,6 +23,7 @@ export interface Question {
     id?: string,
     questionText: string,
     answerOptions: AnswerOption[]
+    textReference?: string;
 }
 
 export interface AnswerOption {

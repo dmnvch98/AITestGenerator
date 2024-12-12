@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
@@ -15,7 +16,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GenerateQuestionsResponseDto {
 
-    private final String problems;
     private final String title;
     private final List<QuestionDto> questions;
 
@@ -24,6 +24,10 @@ public class GenerateQuestionsResponseDto {
     @Getter
     public static class QuestionDto {
 
+        @Builder.Default
+        private final Long id = System.nanoTime();
         private final String questionText;
+        private final Object answer;
+        private final String textReference;
     }
 }

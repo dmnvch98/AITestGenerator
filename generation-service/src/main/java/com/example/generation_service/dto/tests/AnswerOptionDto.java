@@ -18,5 +18,5 @@ public class AnswerOptionDto {
     private final UUID id = UUID.randomUUID();
     private final String optionText;
     @JsonProperty("isCorrect")
-    private final boolean isCorrect;
+    private final Boolean isCorrect;
 }

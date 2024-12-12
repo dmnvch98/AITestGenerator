@@ -15,15 +15,12 @@
             "questionText": {
               "type": "string"
             },
-            "answers": {
+            "correctAnswers": {
               "type": "array",
               "items": {
                 "type": "string"
-              },
-              "minItems": 2,
-              "maxItems": 4
+              }
             },
-
             "textReference": {
               "type": "string"
             }
@@ -31,7 +28,7 @@
           "required": [
             "questionText",
             "textReference",
-            "answer"
+            "correctAnswers"
           ],
           "additionalProperties": false
         }

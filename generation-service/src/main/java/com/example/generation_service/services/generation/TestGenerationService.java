@@ -1,11 +1,11 @@
-package com.example.generation_service.services;
+package com.example.generation_service.services.generation;
 
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.dto.generation.GenerateQuestionsResponseDto;
 import com.example.generation_service.dto.generation.GenerateAnswersResponseDto;
 import com.example.generation_service.generators.QuestionGenerator;
 import com.example.generation_service.generators.AnswerGenerator;
-import com.example.generation_service.generators.models.GenerateTestRequest;
+import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.test.Test;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,24 +27,29 @@ public class TestGenerationService {
     private final AnswerGenerator answerGenerator;
     private final RetryTemplate retryTemplate;
     private final TestConverter testConverter;
+    private final PostGenerationService postGenerationService;
 
-  public Test generateTest(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap)
+  public Test generateTest(final GenerateTestRequestParams request, final Map<String, String> retryContextParamsMap)
       throws Exception {
     final GenerateQuestionsResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
     log.info(
         "Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
         questionsResponseDto.getQuestions().size());
+
+    if (!request.getQuestionsType().isShouldGenerateIncorrectAnswers()) {
+        return postGenerationService.postGenerateTest(questionsResponseDto, request);
+    }
     final GenerateAnswersResponseDto answersResponseDto = generateAnswers(
         request, questionsResponseDto, retryContextParamsMap);
     log.info(
         "Test generation is done. User id: {}, questions count: [{}]", request.getUserId(),
         answersResponseDto.getQuestions().size());
     final Test test = testConverter.convert(
-        answersResponseDto, questionsResponseDto.getProblems(), request.getUserId(), request.getFileHash());
+        answersResponseDto, request.getUserId(), request.getFileHash(), request.getQuestionsType());
     return test;
   }
 
-    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequest request, final Map<String, String> retryContextParamsMap) throws Exception {
+    public GenerateQuestionsResponseDto generateQuestions(final GenerateTestRequestParams request, final Map<String, String> retryContextParamsMap) throws Exception {
         return retryTemplate.execute(context -> {
             setRetryContextParams(context, retryContextParamsMap);
             long timeout = calculateTimeout(context.getRetryCount());
@@ -52,7 +57,7 @@ public class TestGenerationService {
         });
     }
 
-    public GenerateAnswersResponseDto generateAnswers(final GenerateTestRequest request,
+    public GenerateAnswersResponseDto generateAnswers(final GenerateTestRequestParams request,
                                                       final GenerateQuestionsResponseDto questionsResponseDto,
                                                       final Map<String, String> retryContextParamsMap
                                                       ) throws Exception {

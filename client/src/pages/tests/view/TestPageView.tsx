@@ -43,7 +43,7 @@ export const TestPageView: React.FC = () => {
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
-                NotificationService.addAlert(new AlertMessage('Тест не найден', 'error'));
+                NotificationService.addAlert(new AlertMessage('Тест не найден: он удалён или указан неверный идентификатор.', 'error'));
             }
         });
         setTestLoading(false);
