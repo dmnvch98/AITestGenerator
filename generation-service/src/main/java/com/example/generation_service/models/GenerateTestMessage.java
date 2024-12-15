@@ -1,6 +1,6 @@
 package com.example.generation_service.models;
 
-import com.example.generation_service.models.generation.TestQuestionsType;
+import com.example.generation_service.models.generation.QuestionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,7 @@ public class GenerateTestMessage {
     private final double temperature;
     private final String hashKey;
     private final String cid;
-    private final TestQuestionsType questionsType;
+    private final QuestionType questionsType;
 
     @Override
     public String toString() {

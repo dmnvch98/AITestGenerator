@@ -3,6 +3,7 @@ package com.example.generation_service.services.export;
 import com.example.generation_service.dto.tests.AnswerOptionDto;
 import com.example.generation_service.dto.tests.QuestionDto;
 import com.example.generation_service.dto.tests.export.ExportTestRequestDto;
+import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.services.export.model.ExportedTest;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class GiftExportService implements ExportService {
   public ExportedTest export(Test test, ExportTestRequestDto requestDto) throws IOException {
     final StringBuilder giftFormat = new StringBuilder();
 
-    for (QuestionDto question : test.getQuestions()) {
+    for (Question question : test.getQuestions()) {
       final String questionText = question.getQuestionText();
       giftFormat.append(questionText).append(" {\n");
 

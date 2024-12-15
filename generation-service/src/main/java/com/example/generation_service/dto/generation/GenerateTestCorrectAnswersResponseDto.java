@@ -7,17 +7,17 @@ import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Getter
 @Jacksonized
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GenerateQuestionsResponseDto {
+public class GenerateTestCorrectAnswersResponseDto {
 
     private final String title;
     private final List<QuestionDto> questions;
+    private final String language;
 
     @Jacksonized
     @Builder
@@ -27,7 +27,7 @@ public class GenerateQuestionsResponseDto {
         @Builder.Default
         private final Long id = System.nanoTime();
         private final String questionText;
-        private final Object answer;
+        private final List<Object> correctAnswers;
         private final String textReference;
     }
 }

@@ -1,18 +1,21 @@
 package com.example.generation_service.converters;
 
-import com.example.generation_service.dto.generation.GenerateAnswersResponseDto;
-import com.example.generation_service.dto.generation.GenerateQuestionsResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
 import com.example.generation_service.dto.tests.CreateTestRequestDto;
 import com.example.generation_service.dto.tests.QuestionDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
 import com.example.generation_service.models.files.FileHash;
-import com.example.generation_service.models.generation.TestQuestionsType;
+import com.example.generation_service.models.generation.QuestionType;
+import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
+import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
+import java.util.Collections;
 import java.util.List;
 
 @Mapper
@@ -22,16 +25,29 @@ public interface TestConverter {
     @Mapping(source = "userId", target = "userId")
     @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
     @Mapping(target = "id", ignore = true)
-    Test convert(final GenerateAnswersResponseDto answersDto, final long userId,
-                 final FileHash fileHash, final TestQuestionsType questionsType);
+    Test convert(final GenerateTestCorrectAnswersResponseDto answersDto, final long userId,
+                 final FileHash fileHash, final QuestionType questionsType);
+
+//    @Mapping(source = "answersDto.title", target = "title")
+//    @Mapping(source = "userId", target = "userId")
+//    @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
+//    @Mapping(target = "id", ignore = true)
+//    @Mapping(source = "answersDto", target = "questions", qualifiedByName = "convertAllAnswersQuestions")
+//    Test convert(final GenerateTestAllAnswersResponseDto answersDto, final long userId,
+//                 final FileHash fileHash, final QuestionType questionsType);
+
+//    @Mapping(source = "answersDto.title", target = "title")
+//    @Mapping(source = "userId", target = "userId")
+//    @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
+//    @Mapping(target = "id", ignore = true)
+//    Test convert(final List<Question> questions, final String title, final long userId, final String fileName);
 
     @Mapping(source = "title", target = "title")
-    @Mapping(source = "questions", target = "questions")
     @Mapping(source = "userId", target = "userId")
     @Mapping(source = "fileName", target = "originalFileName")
     @Mapping(target = "id", ignore = true)
-    default Test convert(final List<QuestionDto> questions, final String title, final long userId,
-                 final String originalFileName, final TestQuestionsType questionsType) {
+    default Test convert(final List<Question> questions, final String title, final long userId,
+                 final String originalFileName) {
         return Test.builder()
                 .title(title)
                 .questions(questions)
@@ -59,6 +75,14 @@ public interface TestConverter {
     @Named("getOriginalFilename")
     default String getFileHashId(final FileHash fileHash) {
         return fileHash.getOriginalFilename();
+    }
+
+    Question convertAllAnswersQuestion(GenerateTestAllAnswersResponseDto.QuestionDto questionDto, QuestionType questionType);
+
+    default List<Question> convertAllAnswersQuestions(List<GenerateTestAllAnswersResponseDto.QuestionDto> questionDtos , QuestionType questionsType) {
+        return questionDtos.stream()
+                .map(questionDto -> convertAllAnswersQuestion(questionDto, questionsType))
+                .toList();
     }
 
     @Mapping(source = "userId", target = "userId")

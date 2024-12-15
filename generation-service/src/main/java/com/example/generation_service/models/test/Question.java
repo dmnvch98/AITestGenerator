@@ -1,5 +1,7 @@
-package com.example.generation_service.dto.tests;
+package com.example.generation_service.models.test;
 
+import com.example.generation_service.dto.tests.AnswerOptionDto;
+import com.example.generation_service.models.generation.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +13,12 @@ import java.util.List;
 @Getter
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class QuestionDto {
+public class Question {
 
     @Builder.Default
     private final Long id = System.nanoTime();
     private final String questionText;
     private final List<AnswerOptionDto> answerOptions;
     private final String textReference;
+    private QuestionType questionType;
 }

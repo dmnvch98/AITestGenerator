@@ -1,6 +1,6 @@
 package com.example.generation_service.dto.tests;
 
-import com.example.generation_service.models.generation.TestQuestionsType;
+import com.example.generation_service.models.generation.QuestionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -25,7 +25,6 @@ public class GenerateTestRequestDto implements Serializable {
     private final double topP = 0.9;
     @Builder.Default
     private final double temperature = 0.3;
-    @Builder.Default
-    private final TestQuestionsType questionsType = TestQuestionsType.FILL_IN_THE_BLANKS;
+    private final QuestionType questionsType;
 
 }

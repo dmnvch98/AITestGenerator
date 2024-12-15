@@ -15,8 +15,11 @@
             "questionText": {
               "type": "string"
             },
-            "answer": {
-              "type": "boolean"
+            "correctAnswers": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
             },
             "textReference": {
               "type": "string"
@@ -25,7 +28,7 @@
           "required": [
             "questionText",
             "textReference",
-            "answer"
+            "correctAnswers"
           ],
           "additionalProperties": false
         }

@@ -1,5 +1,8 @@
 package com.example.generation_service.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 @UtilityClass
 @Slf4j
 public class Utils {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     public static int countTokens(String text) {
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
 
@@ -85,6 +90,10 @@ public class Utils {
         } catch (IOException e) {
             throw new RuntimeException("Error reading resource file: " + resourcePath, e);
         }
+    }
+
+    public JsonNode loadSchema(String schemaPath) throws JsonProcessingException {
+        return MAPPER.readTree(Utils.loadResourceFile(schemaPath));
     }
 
 }

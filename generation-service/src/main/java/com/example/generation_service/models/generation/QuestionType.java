@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 
 @Getter
-public enum TestQuestionsType {
+public enum QuestionType {
 
     /**
      * Multiple Choice
@@ -53,22 +53,18 @@ public enum TestQuestionsType {
             false
     ),
 
-    /**
-     * Fill in the Blanks
-     * A sentence or text with missing words to be filled in.
-     */
     FILL_IN_THE_BLANKS(
             "Fill in the Blanks",
             "A sentence or text with missing words to be filled in.",
             "Example:\n" +
                     "Water boils at ____ degrees Celsius.",
-            false
+            true
     );
 
     private final String name;
     private final String description;
     private final String example;
-    private final boolean shouldGenerateIncorrectAnswers;
+    private final boolean shouldGenerateIncorrectOptions;
 
     /**
      * Constructor for the TestQuestionsType enum.
@@ -77,11 +73,11 @@ public enum TestQuestionsType {
      * @param description The description of the question type.
      * @param example     An example of the question type.
      */
-    TestQuestionsType(String name, String description, String example, boolean shouldGenerateIncorrectAnswers) {
+    QuestionType(String name, String description, String example, boolean shouldGenerateIncorrectAnswers) {
         this.name = name;
         this.description = description;
         this.example = example;
-        this.shouldGenerateIncorrectAnswers = shouldGenerateIncorrectAnswers;
+        this.shouldGenerateIncorrectOptions = shouldGenerateIncorrectAnswers;
     }
 
 }
