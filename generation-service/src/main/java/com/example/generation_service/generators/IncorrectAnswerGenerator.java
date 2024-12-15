@@ -1,8 +1,8 @@
 package com.example.generation_service.generators;
 
 import com.example.generation_service.converters.GenerationConverter;
-import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.services.ai.AIService;
 import com.example.generation_service.utils.Utils;
@@ -22,7 +22,7 @@ import java.util.List;
 public class IncorrectAnswerGenerator {
 
     protected final static String CONTEXT = "/ai/multiple_choise/answers_context_prompt.txt";
-    protected final static String SCHEMA = "/ai/schemas/multiple_choise/answers.json";
+    protected final static String SCHEMA = "/ai/schemas/multiple_choise/incorrect-answers.json";
 
     @Value("${generation.models.answers}")
     private String model;
@@ -30,7 +30,7 @@ public class IncorrectAnswerGenerator {
     private final GenerationConverter converter;
     private final AIService aiService;
 
-    public GenerateTestAllAnswersResponseDto generateData(
+    public GenerateTestIncorrectAnswersResponseDto generateData(
             final GenerateTestRequestParams request,
             final GenerateTestCorrectAnswersResponseDto questionsResponseDto,
             final long timeout
@@ -42,7 +42,7 @@ public class IncorrectAnswerGenerator {
 
         final String result = aiService.send(model, messages, responseSchema, timeout);
 
-        return converter.convertTestAllAnswers(result);
+        return converter.convertTestIncorrectAnswersDto(result);
     }
 
     private List<ChatMessage> prepareMessages(final GenerateTestCorrectAnswersResponseDto questionsResponseDto) throws IOException {

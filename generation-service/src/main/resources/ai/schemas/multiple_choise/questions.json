@@ -7,6 +7,17 @@
       "title": {
         "type": "string"
       },
+      "language": {
+        "type": "string",
+        "enum": [
+          "russian",
+          "english",
+          "spanish",
+          "french",
+          "german",
+          "unknown"
+        ]
+      },
       "questions": {
         "type": "array",
         "items": {
@@ -36,7 +47,8 @@
     },
     "required": [
       "title",
-      "questions"
+      "questions",
+      "language"
     ],
     "additionalProperties": false
   }

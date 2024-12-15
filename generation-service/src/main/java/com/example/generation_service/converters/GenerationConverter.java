@@ -19,8 +19,8 @@ public interface GenerationConverter {
         return MAPPER.readValue(jsonResponseDto, GenerateTestCorrectAnswersResponseDto.class);
     }
 
-    default GenerateTestAllAnswersResponseDto convertTestAllAnswers(final String jsonResponseDto) throws JsonProcessingException {
-        return MAPPER.readValue(jsonResponseDto, GenerateTestAllAnswersResponseDto.class);
+    default GenerateTestIncorrectAnswersResponseDto convertTestIncorrectAnswersDto(final String json) throws JsonProcessingException {
+        return MAPPER.readValue(json, GenerateTestIncorrectAnswersResponseDto.class);
     }
 
     default String convertTestIncorrectAnswers(final GenerateTestRequestParams questionsRequestDto) throws JsonProcessingException {
@@ -41,13 +41,4 @@ public interface GenerationConverter {
     default List<String> getQuestions(final List<GenerateTestCorrectAnswersResponseDto.QuestionDto> questions) {
         return questions.stream().map(GenerateTestCorrectAnswersResponseDto.QuestionDto::getQuestionText).toList();
     }
-
-//    @Mapping(source = "dto.questions", target = "questions")
-//    @Mapping(source = "dto.title", target = "title")
-//    @Mapping(source = "request.text", target = "text")
-//    PostGenerationRequest convertTestIncorrectAnswers(final GenerateTestAllAnswersResponseDto dto, final GenerateTestRequestParams request);
-
-//    default String convertTestIncorrectAnswers(final GenerateTestAllAnswersResponseDto dto, final GenerateTestRequestParams request) throws JsonProcessingException {
-//        return MAPPER.writeValueAsString(postGenerationRequest);
-//    }
 }

@@ -2,21 +2,22 @@ package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
+import com.example.generation_service.dto.tests.AnswerOptionDto;
 import com.example.generation_service.dto.tests.CreateTestRequestDto;
-import com.example.generation_service.dto.tests.QuestionDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
 import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
-import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface TestConverter {
@@ -83,6 +84,53 @@ public interface TestConverter {
         return questionDtos.stream()
                 .map(questionDto -> convertAllAnswersQuestion(questionDto, questionsType))
                 .toList();
+    }
+
+    default List<Question> convertAllAnswersQuestions(
+            final GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto,
+            final GenerateTestCorrectAnswersResponseDto correctAnswersDto,
+            QuestionType questionsType) {
+            List<Question> resultQuestions = new ArrayList<>();
+
+            var correctAnswersMap = correctAnswersDto.getQuestions().stream()
+                    .collect(Collectors.toMap(
+                            GenerateTestCorrectAnswersResponseDto.QuestionDto::getId,
+                            questionDto -> questionDto
+                    ));
+
+            for (var incorrectQuestion : incorrectAnswersDto.getQuestions()) {
+                var correctQuestion = correctAnswersMap.get(incorrectQuestion.getId());
+
+                if (correctQuestion != null) {
+                    List<AnswerOptionDto> answerOptions = new ArrayList<>();
+
+                    answerOptions.addAll(correctQuestion.getCorrectAnswers().stream()
+                            .map(answer -> AnswerOptionDto.builder()
+                                    .optionText(answer.toString())
+                                    .isCorrect(true)
+                                    .build())
+                            .toList());
+
+                    answerOptions.addAll(incorrectQuestion.getIncorrectAnswers().stream()
+                            .map(answer -> AnswerOptionDto.builder()
+                                    .optionText(answer)
+                                    .isCorrect(false)
+                                    .build())
+                            .toList());
+
+                    Question question = Question.builder()
+                            .id(correctQuestion.getId())
+                            .questionText(correctQuestion.getQuestionText())
+                            .answerOptions(answerOptions)
+                            .textReference(correctQuestion.getTextReference())
+                            .questionType(questionsType)
+                            .build();
+
+                    resultQuestions.add(question);
+                }
+            }
+
+            return resultQuestions;
     }
 
     @Mapping(source = "userId", target = "userId")

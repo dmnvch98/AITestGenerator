@@ -1,8 +1,8 @@
 package com.example.generation_service.generators.post;
 
 import com.example.generation_service.converters.TestConverter;
-import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.Test;
@@ -22,7 +22,7 @@ public abstract class PostGenerator {
         throw new NotImplementedException();
     }
 
-    public Test process(final GenerateTestAllAnswersResponseDto dto, final GenerateTestRequestParams request) {
+    public Test process(GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto, GenerateTestCorrectAnswersResponseDto correctAnswersDto, GenerateTestRequestParams request) {
         throw new NotImplementedException();
     }
 

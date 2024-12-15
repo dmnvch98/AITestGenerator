@@ -1,0 +1,35 @@
+{
+  "name": "answers",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number"
+            },
+            "incorrectAnswers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "id",
+            "incorrectAnswers"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "questions"
+    ],
+    "additionalProperties": false
+  }
+}

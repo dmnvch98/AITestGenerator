@@ -1,7 +1,7 @@
 package com.example.generation_service.services.generation;
 
-import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
+import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
 import com.example.generation_service.generators.IncorrectAnswerGenerator;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.generators.post.PostGenerationRegistry;
@@ -30,18 +30,19 @@ public class TestGenerationService {
 
   public Test generateTest(final GenerateTestRequestParams request, final Map<String, String> retryContextParamsMap)
       throws Exception {
-    GenerateTestCorrectAnswersResponseDto questionsResponseDto = generateQuestions(request, retryContextParamsMap);
+    GenerateTestCorrectAnswersResponseDto correctAnswersDto = generateQuestions(request, retryContextParamsMap);
     log.info(
         "Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
-        questionsResponseDto.getQuestions().size());
+            correctAnswersDto.getQuestions().size());
 
     if (request.getQuestionsType().isShouldGenerateIncorrectOptions()) {
-        GenerateTestAllAnswersResponseDto responseDto = generateIncorrectOptions(request, questionsResponseDto, retryContextParamsMap);
+        GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto = generateIncorrectOptions(request, correctAnswersDto, retryContextParamsMap);
         return postGenerationRegistry.getGenerator(request.getQuestionsType())
-                .process(responseDto, request);
+                .process(incorrectAnswersDto, correctAnswersDto, request);
     }
+
     return postGenerationRegistry.getGenerator(request.getQuestionsType())
-            .process(questionsResponseDto, request);
+            .process(correctAnswersDto, request);
   }
 
     public GenerateTestCorrectAnswersResponseDto generateQuestions(final GenerateTestRequestParams request, final Map<String, String> retryContextParamsMap) throws Exception {
@@ -53,9 +54,9 @@ public class TestGenerationService {
         });
     }
 
-    public GenerateTestAllAnswersResponseDto generateIncorrectOptions(final GenerateTestRequestParams request,
-                                                                      final GenerateTestCorrectAnswersResponseDto questionsResponseDto,
-                                                                      final Map<String, String> retryContextParamsMap
+    public GenerateTestIncorrectAnswersResponseDto generateIncorrectOptions(final GenerateTestRequestParams request,
+                                                                            final GenerateTestCorrectAnswersResponseDto questionsResponseDto,
+                                                                            final Map<String, String> retryContextParamsMap
                                                       ) throws Exception {
         return retryTemplate.execute(context -> {
             setRetryContextParams(context, retryContextParamsMap);
