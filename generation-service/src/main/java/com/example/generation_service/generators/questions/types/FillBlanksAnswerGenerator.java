@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class FillBlanksAnswerGenerator extends QuestionGenerator {
 
     private final static String SCHEMA = "/ai/schemas/multiple_choise/questions.json";
+    private final static QuestionType QUESTION_TYPE = QuestionType.FILL_IN_THE_BLANKS;
 
 
     public FillBlanksAnswerGenerator(GenerationConverter converter, AIService aiService) {
@@ -28,6 +29,6 @@ public class FillBlanksAnswerGenerator extends QuestionGenerator {
 
     @Override
     public QuestionType getTestQuestionsType() {
-        return QuestionType.FILL_IN_THE_BLANKS;
+        return QUESTION_TYPE;
     }
 }

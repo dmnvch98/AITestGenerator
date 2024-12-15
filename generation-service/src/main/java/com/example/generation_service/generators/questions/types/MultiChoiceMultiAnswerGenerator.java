@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class MultiChoiceMultiAnswerGenerator extends QuestionGenerator {
 
     private final static String SCHEMA = "/ai/schemas/multiple_choise/questions.json";
+    private final static QuestionType QUESTION_TYPE = QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
 
     public MultiChoiceMultiAnswerGenerator(GenerationConverter converter, AIService aiService) {
         super(converter, aiService);
@@ -27,6 +28,6 @@ public class MultiChoiceMultiAnswerGenerator extends QuestionGenerator {
 
     @Override
     public QuestionType getTestQuestionsType() {
-        return QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
+        return QUESTION_TYPE;
     }
 }

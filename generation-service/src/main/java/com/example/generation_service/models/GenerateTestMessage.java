@@ -1,10 +1,12 @@
 package com.example.generation_service.models;
 
-import com.example.generation_service.models.generation.QuestionType;
+import com.example.generation_service.dto.tests.QuestionTypeQuantity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
+
+import java.util.List;
 
 @Builder
 @Jacksonized
@@ -24,7 +26,7 @@ public class GenerateTestMessage {
     private final double temperature;
     private final String hashKey;
     private final String cid;
-    private final QuestionType questionsType;
+    private final List<QuestionTypeQuantity> params;
 
     @Override
     public String toString() {
@@ -39,7 +41,7 @@ public class GenerateTestMessage {
               ", temperature=" + temperature +
               ", activityKey='" + hashKey + '\'' +
               ", cid='" + cid + '\'' +
-              ", questionsType='" + questionsType.getName() + '\'' +
+              ", params='" + params.toString() + '\'' +
               '}';
     }
 }

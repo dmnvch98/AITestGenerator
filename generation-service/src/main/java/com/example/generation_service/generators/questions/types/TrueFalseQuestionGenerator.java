@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class TrueFalseQuestionGenerator extends QuestionGenerator {
 
     private final static String SCHEMA = "/ai/schemas/true_false/questions.json";
+    private final static QuestionType QUESTION_TYPE = QuestionType.TRUE_FALSE;
 
     public TrueFalseQuestionGenerator(GenerationConverter converter, AIService aiService) {
         super(converter, aiService);
@@ -27,6 +28,6 @@ public class TrueFalseQuestionGenerator extends QuestionGenerator {
 
     @Override
     public QuestionType getTestQuestionsType() {
-        return QuestionType.TRUE_FALSE;
+        return QUESTION_TYPE;
     }
 }

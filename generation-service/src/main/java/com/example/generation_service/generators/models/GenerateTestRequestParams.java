@@ -12,6 +12,6 @@ public class GenerateTestRequestParams {
     private final FileHash fileHash;
     private final String text;
     private final Long userId;
-    private final String testGenKey;
-    private final QuestionType questionsType;
+    private final QuestionType questionType;
+    private final int maxQuestions;
 }

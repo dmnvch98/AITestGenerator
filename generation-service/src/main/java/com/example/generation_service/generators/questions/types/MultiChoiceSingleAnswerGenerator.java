@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class MultiChoiceSingleAnswerGenerator extends QuestionGenerator {
 
     private final static String SCHEMA = "/ai/schemas/multiple_choise/questions.json";
-    protected final static String CONTEXT = "/ai/question_context_prompt.txt";
+    private final static QuestionType QUESTION_TYPE = QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER;
 
     public MultiChoiceSingleAnswerGenerator(GenerationConverter converter, AIService aiService) {
         super(converter, aiService);
@@ -28,6 +28,6 @@ public class MultiChoiceSingleAnswerGenerator extends QuestionGenerator {
 
     @Override
     public QuestionType getTestQuestionsType() {
-        return QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER;
+        return QUESTION_TYPE;
     }
 }

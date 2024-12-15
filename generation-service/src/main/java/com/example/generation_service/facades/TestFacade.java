@@ -10,6 +10,7 @@ import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.*;
@@ -94,15 +95,31 @@ public class TestFacade {
       final FileHash fileHash = fileHashService
             .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
       final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
-      final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash);
 
-      final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
-      testService.save(test);
+      final List<Test> tests = new ArrayList<>();
+
+      for (QuestionTypeQuantity questionTypeQuantity: message.getParams()) {
+        log.info("Starting test generation for, {}", questionTypeQuantity);
+        final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash, questionTypeQuantity);
+        final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
+        tests.add(test);
+        log.info("Test generation for {} is done", questionTypeQuantity);
+      }
+
+      final List<Question> allTypesQuestions = tests
+            .stream()
+            .flatMap(test -> test.getQuestions().stream())
+            .toList();
+
+      final Test finalTest = tests.get(0);
+      finalTest.setQuestions(allTypesQuestions);
+
+      testService.save(finalTest);
 
       final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
-      final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
+      final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, finalTest);
       historyService.save(history);
-      activityService.finishActivity(currentActivity, test.getId(), test.getTitle(), message.getUserId(), message.getCid());
+      activityService.finishActivity(currentActivity, finalTest.getId(), finalTest.getTitle(), message.getUserId(), message.getCid());
   }
 
   @TrackAction(ActionType.DELETE_TEST)

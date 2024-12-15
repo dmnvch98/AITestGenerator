@@ -35,13 +35,13 @@ public class TestGenerationService {
         "Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
             correctAnswersDto.getQuestions().size());
 
-    if (request.getQuestionsType().isShouldGenerateIncorrectOptions()) {
+    if (request.getQuestionType().isShouldGenerateIncorrectOptions()) {
         GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto = generateIncorrectOptions(request, correctAnswersDto, retryContextParamsMap);
-        return postGenerationRegistry.getGenerator(request.getQuestionsType())
+        return postGenerationRegistry.getGenerator(request.getQuestionType())
                 .process(incorrectAnswersDto, correctAnswersDto, request);
     }
 
-    return postGenerationRegistry.getGenerator(request.getQuestionsType())
+    return postGenerationRegistry.getGenerator(request.getQuestionType())
             .process(correctAnswersDto, request);
   }
 
@@ -49,7 +49,7 @@ public class TestGenerationService {
       return retryTemplate.execute(context -> {
             setRetryContextParams(context, retryContextParamsMap);
             long timeout = calculateTimeout(context.getRetryCount());
-            return questionGeneratorRegistry.getGenerator(request.getQuestionsType())
+            return questionGeneratorRegistry.getGenerator(request.getQuestionType())
                     .generateData(request, timeout);
         });
     }

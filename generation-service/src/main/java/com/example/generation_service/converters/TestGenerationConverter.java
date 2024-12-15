@@ -1,5 +1,6 @@
 package com.example.generation_service.converters;
 
+import com.example.generation_service.dto.tests.QuestionTypeQuantity;
 import com.example.generation_service.dto.tests.TestGenHistoryResponseDto;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
@@ -35,7 +36,9 @@ public interface TestGenerationConverter {
   @Mapping(source = "fileHash", target = "fileHash")
   @Mapping(source = "text", target = "text")
   @Mapping(source = "message.userId", target = "userId")
-  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileHash fileHash);
+  @Mapping(source = "questionTypeQuantity.questionType", target = "questionType")
+  @Mapping(source = "questionTypeQuantity.maxQuestions", target = "maxQuestions")
+  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileHash fileHash, final QuestionTypeQuantity questionTypeQuantity);
 
   @Named("convertFailReason")
   default Integer convertFailReason(final String failReason) {

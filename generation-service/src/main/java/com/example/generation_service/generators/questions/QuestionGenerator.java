@@ -58,8 +58,9 @@ public abstract class QuestionGenerator {
     protected List<ChatMessage> prepareMessages(final GenerateTestRequestParams request) {
         final String contextTemplate = Utils.loadResourceFile(QuestionGenerator.CONTEXT);
         final Map<String, Object> variables = Map.of(
-                "questionType", request.getQuestionsType().getName(),
-                "typeDescription", request.getQuestionsType().getDescription()
+                "questionType", request.getQuestionType().getName(),
+                "typeDescription", request.getQuestionType().getDescription(),
+                "maxQuestions", request.getMaxQuestions()
         );
 
         final StringSubstitutor substitutor = new StringSubstitutor(variables);
