@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,15 +32,6 @@ public class Utils {
         Encoding encoding = registry.getEncodingForModel(ModelType.GPT_4O_MINI);
 
         return encoding.countTokens(text);
-    }
-
-    public static String readFileContents(String filePath) {
-        try {
-            return Files.readString(Path.of(filePath));
-        } catch (IOException e) {
-            log.error("An error occurred while reading the file: {}", e.getMessage());
-        }
-        return null;
     }
 
     public static String getExportedTestName(String testName, String fileFormat) {
@@ -94,6 +83,15 @@ public class Utils {
 
     public JsonNode loadSchema(String schemaPath) throws JsonProcessingException {
         return MAPPER.readTree(Utils.loadResourceFile(schemaPath));
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 
 }

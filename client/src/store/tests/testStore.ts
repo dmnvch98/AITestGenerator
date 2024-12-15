@@ -4,6 +4,7 @@ import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
 import NotificationService from "../../services/notification/NotificationService";
+import {GenerateTestRequest} from "./types";
 
 export interface UserTest {
     id: number;
@@ -30,14 +31,6 @@ export interface AnswerOption {
     id?: string,
     optionText: string,
     isCorrect: boolean
-}
-
-export interface GenerateTestRequest {
-    maxQuestionsCount: number,
-    answersCount: number,
-    correctAnswersCount: number,
-    hashedFileName: string,
-    originalFileName?: string
 }
 
 export interface BulkDeleteTestsRequestDto {

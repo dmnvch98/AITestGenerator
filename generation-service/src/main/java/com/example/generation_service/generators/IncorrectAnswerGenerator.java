@@ -35,7 +35,7 @@ public class IncorrectAnswerGenerator {
             final GenerateTestCorrectAnswersResponseDto questionsResponseDto,
             final long timeout
             ) throws Exception {
-        log.info("Sending prompt to generation test. User id: {}, timeout: {}", request.getUserId(), timeout);
+        log.info("Sending prompt to generate incorrect answers. User id: {}, timeout: {}", request.getUserId(), timeout);
 
         final List<ChatMessage> messages = prepareMessages(questionsResponseDto);
         final JsonNode responseSchema = Utils.loadSchema(SCHEMA);

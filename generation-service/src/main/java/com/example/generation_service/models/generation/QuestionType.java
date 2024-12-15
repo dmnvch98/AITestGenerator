@@ -16,12 +16,13 @@ public enum QuestionType {
     MULTIPLE_CHOICE_SINGLE_ANSWER(
             "Multiple Choice",
             "A question with several options, where only one is correct.",
-            "Example:\n" +
-                    "Which of the following elements is a metal?\n" +
-                    "a) Carbon\n" +
-                    "b) Oxygen\n" +
-                    "c) Iron\n" +
-                    "d) Nitrogen",
+            """
+                    Example:
+                    Which of the following elements is a metal?
+                    a) Carbon
+                    b) Oxygen
+                    c) Iron
+                    d) Nitrogen""",
             true
     ),
 
@@ -32,12 +33,13 @@ public enum QuestionType {
     MULTIPLE_CHOICE_MULTIPLE_ANSWERS(
             "Multiple Choice (Multiple Answers)",
             "A question with several options, where at least two answers are correct.",
-            "Example:\n" +
-                    "Which of the following elements are metals?\n" +
-                    "a) Carbon\n" +
-                    "b) Oxygen\n" +
-                    "c) Iron\n" +
-                    "d) Copper",
+            """
+                    Example:
+                    Which of the following elements are metals?
+                    a) Carbon
+                    b) Oxygen
+                    c) Iron
+                    d) Copper""",
             true
     ),
 
@@ -55,9 +57,10 @@ public enum QuestionType {
 
     FILL_IN_THE_BLANKS(
             "Fill in the Blanks",
-            "A sentence or text with missing words to be filled in.",
-            "Example:\n" +
-                    "Water boils at ____ degrees Celsius.",
+            "A sentence or text with a single missing word or blank to be filled in. Only one blank is allowed per sentence.",
+            "Example:" +
+                    "Water boils at ____ degrees Celsius.\n" +
+                    "The capital of France is ____.",
             true
     );
 

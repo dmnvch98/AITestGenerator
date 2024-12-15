@@ -2,6 +2,7 @@ package com.example.generation_service.config.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +28,10 @@ public class AmazonS3Config {
   public AmazonS3 amazonS3() {
     BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
     return AmazonS3ClientBuilder.standard()
-        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-        .withRegion(awsRegion)
-        .build();
+            .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(s3Endpoint, awsRegion))
+            .withPathStyleAccessEnabled(true)
+            .build();
   }
 }
+

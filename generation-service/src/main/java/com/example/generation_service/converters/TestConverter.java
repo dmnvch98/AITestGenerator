@@ -10,12 +10,14 @@ import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
+import org.apache.commons.collections4.CollectionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,6 +120,10 @@ public interface TestConverter {
                                     .build())
                             .toList());
 
+                    if (CollectionUtils.isNotEmpty(answerOptions)) {
+                        Collections.shuffle(answerOptions);
+                    }
+
                     Question question = Question.builder()
                             .id(correctQuestion.getId())
                             .questionText(correctQuestion.getQuestionText())
@@ -129,7 +135,6 @@ public interface TestConverter {
                     resultQuestions.add(question);
                 }
             }
-
             return resultQuestions;
     }
 

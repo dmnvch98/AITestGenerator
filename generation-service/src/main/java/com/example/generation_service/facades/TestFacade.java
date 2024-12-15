@@ -20,6 +20,7 @@ import com.example.generation_service.services.generation.TestGenerationService;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -99,18 +100,20 @@ public class TestFacade {
       final List<Test> tests = new ArrayList<>();
 
       for (QuestionTypeQuantity questionTypeQuantity: message.getParams()) {
-        log.info("Starting test generation for, {}", questionTypeQuantity);
+        log.info("Starting test generation {}", questionTypeQuantity);
         final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash, questionTypeQuantity);
         final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
         tests.add(test);
         log.info("Test generation for {} is done", questionTypeQuantity);
       }
 
-      final List<Question> allTypesQuestions = tests
-            .stream()
-            .flatMap(test -> test.getQuestions().stream())
-            .toList();
-
+      final List<Question> allTypesQuestions = new ArrayList<>(tests
+              .stream()
+              .flatMap(test -> test.getQuestions().stream())
+              .toList());
+      if (CollectionUtils.isNotEmpty(allTypesQuestions)) {
+        Collections.shuffle(allTypesQuestions);
+      }
       final Test finalTest = tests.get(0);
       finalTest.setQuestions(allTypesQuestions);
 

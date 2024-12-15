@@ -1,19 +1,19 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Box, Snackbar, Alert, CircularProgress} from "@mui/material";
+import {Box, Alert} from "@mui/material";
 import {FileUploadModal} from "./components/FileUploadModal";
 import {FilesTable} from "./components/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import useFileStore from "./store/fileStore";
 import {FileDto} from "./store/fileStore";
-import {GenerateTestRequest, useTestStore} from "../../store/tests/testStore";
+import {useTestStore} from "../../store/tests/testStore";
 import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
-import {AlertMessage, QueryOptions} from "../../store/types";
-import {v4 as uuidv4} from "uuid";
+import { QueryOptions} from "../../store/types";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
+import {GenerateTestRequest, QuestionType} from "../../store/tests/types";
 
 const FilesContent = () => {
     const {
@@ -28,7 +28,7 @@ const FilesContent = () => {
         totalUserFiles
     } = useFileStore();
 
-    const {generateTestByFile, isGenerateTestByFileQueueing} = useTestStore();
+    const {generateTestByFile} = useTestStore();
     const {getTestGenCurrentActivities} = useUserStore();
 
     const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
@@ -85,22 +85,27 @@ const FilesContent = () => {
         setGenTestModalOpen(false);
     };
 
-    const handleGenTestSubmit = (maxQuestionsCount: number, answersCount: number, correctAnswersCount: number) => {
+    const handleGenTestSubmit = (selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>) => {
         closeGenTestModal();
         if (selectedFile) {
+            const params = Object.entries(selection)
+                .filter(([_, value]) => value.selected)
+                .map(([key, value]) => ({
+                    questionType: key as unknown as QuestionType,
+                    maxQuestions: value.maxQuestions,
+                }));
+
             const request: GenerateTestRequest = {
-                maxQuestionsCount,
-                answersCount,
-                correctAnswersCount,
                 hashedFileName: selectedFile.hashedFilename,
-                originalFileName: selectedFile.originalFilename
+                originalFileName: selectedFile.originalFilename,
+                params: params,
             };
+
             generateTestByFile(request);
             getTestGenCurrentActivities();
             closeGenTestModal();
         }
     };
-
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);

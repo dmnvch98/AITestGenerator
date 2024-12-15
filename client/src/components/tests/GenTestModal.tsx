@@ -1,140 +1,160 @@
-import React, {useEffect, useState} from 'react';
-import {TextField, Button, DialogTitle, IconButton, DialogContent} from '@mui/material';
+import React, { useEffect, useState } from "react";
+import {
+    Button,
+    DialogTitle,
+    IconButton,
+    DialogContent,
+    Checkbox,
+    Select,
+    MenuItem,
+    FormControl,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import DialogActions from "@mui/material/DialogActions";
+import {QuestionType, questionTypeTranslations} from "../../store/tests/types";
+
 interface ModalFormProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (maxQuestionsCount: number, minAnswersCount: number, correctAnswersValue: number) => void;
+    onSubmit: (
+        selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>
+    ) => void;
 }
 
 export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit }) => {
-    const MAX_QUESTIONS = 20;
-    const MIN_QUESTIONS = 1;
-    const MAX_ANSWERS = 5;
-    const MIN_ANSWERS = 2;
+    const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
+        Object.keys(QuestionType).reduce((acc, key) => {
+            acc[key as unknown as QuestionType] = { selected: false, maxQuestions: 10 };
+            return acc;
+        }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
+    );
 
-    const [questionsInput, setQuestionsInput] = useState('10');
-    const [answersInput, setAnswersInput] = useState('4');
-    const [correctAnswersInput, setCorrectAnswersInput] = useState('1');
-    const [errors, setErrors] = useState({ questions: '', answers: '', correctAnswers: '' });
+    const isGenerateDisabled = !Object.values(selection).some((item) => item.selected);
 
-    useEffect(() => {
-        if (!open) {
-            setQuestionsInput('10');
-            setAnswersInput('4');
-            setCorrectAnswersInput('1');
-        }
-    }, [open]);
-
-    const handleQuestionsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setQuestionsInput(event.target.value);
+    const toggleSelection = (type: QuestionType) => {
+        const updatedSelection = {
+            ...selection,
+            [type]: {
+                ...selection[type],
+                selected: !selection[type].selected,
+            },
+        };
+        console.log(updatedSelection)
+        setSelection(updatedSelection);
     };
 
-    const handleAnswersChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAnswersInput(event.target.value);
+    const handleSelectChange = (type: QuestionType, value: number) => {
+        const updatedSelection = {
+            ...selection,
+            [type]: {
+                ...selection[type],
+                maxQuestions: value,
+            },
+        };
+        console.log(updatedSelection)
+        setSelection(updatedSelection);
     };
 
-    const handleCorrectAnswersChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setCorrectAnswersInput(event.target.value);
-    };
-
-    const validateInputs = (): { questionsValue: number, answersValue: number, correctAnswersValue: number, valid: boolean } => {
-        let valid = true;
-        const errors = { questions: '', answers: '', correctAnswers: '' };
-
-        const questionsValue = parseInt(questionsInput, 10);
-        const answersValue = parseInt(answersInput, 10);
-        const correctAnswersValue = parseInt(correctAnswersInput, 10);
-
-        if (isNaN(questionsValue) || questionsValue < MIN_QUESTIONS || questionsValue > MAX_QUESTIONS) {
-            errors.questions = `Введите число от ${MIN_QUESTIONS} до ${MAX_QUESTIONS}`;
-            valid = false;
-        }
-
-        if (isNaN(answersValue) || answersValue < MIN_ANSWERS || answersValue > MAX_ANSWERS) {
-            errors.answers = `Введите число от ${MIN_ANSWERS} до ${MAX_ANSWERS}`;
-            valid = false;
-        }
-
-        if (isNaN(correctAnswersValue) || correctAnswersValue < 1 || correctAnswersValue >= answersValue) {
-            errors.correctAnswers = `Количество правильных ответов должно быть от 1 до ${answersValue - 1}`;
-            valid = false;
-        }
-
-        setErrors(errors);
-        return { questionsValue, answersValue, correctAnswersValue, valid };
+    const handleRowClick = (type: QuestionType) => {
+        toggleSelection(type);
     };
 
     const handleSubmit = () => {
-        const { questionsValue, answersValue, correctAnswersValue, valid } = validateInputs();
-        if (valid) {
-            onSubmit(questionsValue, answersValue, correctAnswersValue);
-        }
+        onSubmit(selection);
     };
 
-    const isSubmitDisabled = !questionsInput.trim() || !answersInput.trim() || !correctAnswersInput.trim();
+    useEffect(() => {
+        if (!open) {
+            setSelection(
+                Object.keys(QuestionType).reduce((acc, key) => {
+                    acc[key as unknown as QuestionType] = { selected: false, maxQuestions: 5 };
+                    return acc;
+                }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
+            );
+        }
+    }, [open]);
 
     return (
         <Dialog
             open={open}
             onClose={onClose}
-            sx={{ '.MuiPaper-root': { width: '400px' } }}
+            sx={{ ".MuiPaper-root": { width: "600px" } }}
         >
-            <DialogTitle>
-                Параметры генерации
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" flexGrow={1}>
+                    Параметры генерации
+                </Typography>
                 <IconButton
                     aria-label="close"
                     onClick={onClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
+                    sx={{ color: (theme) => theme.palette.grey[500] }}
                 >
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
             <DialogContent>
-                <TextField
-                    label={`Количество вопросов (${MAX_QUESTIONS} макс.)`}
-                    value={questionsInput}
-                    onChange={handleQuestionsChange}
-                    error={!!errors.questions}
-                    helperText={errors.questions}
-                    fullWidth
-                    margin="normal"
-                />
-
-                <TextField
-                    label={`Количество ответов (${MAX_ANSWERS} макс.)`}
-                    value={answersInput}
-                    onChange={handleAnswersChange}
-                    error={!!errors.answers}
-                    helperText={errors.answers}
-                    fullWidth
-                    margin="normal"
-                />
-
-                <TextField
-                    label={`Количество правильных ответов`}
-                    value={correctAnswersInput}
-                    onChange={handleCorrectAnswersChange}
-                    error={!!errors.correctAnswers}
-                    helperText={errors.correctAnswers}
-                    fullWidth
-                    margin="normal"
-                />
-
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{ cursor: 'pointer' }}>
+                                <TableCell align="center" width="10%">
+                                    <Typography fontWeight="bold">Выбрать</Typography>
+                                </TableCell>
+                                <TableCell align="left" width="60%">
+                                    <Typography fontWeight="bold">Тип вопроса</Typography>
+                                </TableCell>
+                                <TableCell align="center" width="30%">
+                                    <Typography fontWeight="bold">Кол-во ответов</Typography>
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Object.entries(questionTypeTranslations).map(([key, label]) => {
+                                const type = key as unknown as QuestionType;
+                                return (
+                                    <TableRow key={type} hover onClick={() => handleRowClick(type)} sx={{ cursor: 'pointer' }}>
+                                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                                            <Checkbox
+                                                checked={selection[type].selected}
+                                                onChange={() => toggleSelection(type)}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <Typography>{label}</Typography>
+                                        </TableCell>
+                                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                                            <FormControl fullWidth>
+                                                <Select
+                                                    size="small"
+                                                    value={selection[type].maxQuestions}
+                                                    onChange={(e) => handleSelectChange(type, Number(e.target.value))}
+                                                    disabled={!selection[type].selected}
+                                                >
+                                                    {[...Array(10)].map((_, index) => (
+                                                        <MenuItem key={index + 1} value={index + 1}>
+                                                            {index + 1}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </DialogContent>
-            <DialogActions sx={{p: 2}}>
-                <Button
-                    onClick={onClose}
-                    variant="outlined"
-                    fullWidth
-                >
+            <DialogActions sx={{ p: 2 }}>
+                <Button onClick={onClose} variant="outlined" fullWidth>
                     Отменить
                 </Button>
                 <Button
@@ -142,7 +162,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                     variant="contained"
                     color="primary"
                     fullWidth
-                    disabled={isSubmitDisabled}
+                    disabled={isGenerateDisabled}
                 >
                     Сгенерировать
                 </Button>

@@ -5,6 +5,7 @@ import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.dto.tests.print.TestPrintRequestDto;
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.test.Test;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ public class TestController {
     }
 
     @PostMapping("/generate")
-    public void generateTest(final Authentication authentication, @RequestBody final GenerateTestRequestDto dto) {
+    public void generateTest(final Authentication authentication, @RequestBody @Valid final GenerateTestRequestDto dto) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         testFacade.prepareTestGeneration(userId, dto);
     }

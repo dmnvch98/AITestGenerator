@@ -3,10 +3,11 @@ import {AxiosError} from "axios";
 import {
     BulkDeleteTestsRequestDto,
     CreateTestRequestDto,
-    GenerateTestRequest, TestPrintRequestDto,
+    TestPrintRequestDto,
     UserTest
 } from "../store/tests/testStore";
 import {QueryOptions} from "../store/types";
+import {GenerateTestRequest} from "../store/tests/types";
 
 class TestService {
 
