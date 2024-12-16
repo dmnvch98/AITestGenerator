@@ -4,7 +4,7 @@ import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
 import NotificationService from "../../services/notification/NotificationService";
-import {GenerateTestRequest} from "./types";
+import {GenerateTestRequest, QuestionType} from "./types";
 
 export interface UserTest {
     id: number;
@@ -25,6 +25,7 @@ export interface Question {
     questionText: string,
     answerOptions: AnswerOption[]
     textReference?: string;
+    questionType?: QuestionType;
 }
 
 export interface AnswerOption {
