@@ -28,7 +28,7 @@ public class GiftExportService implements ExportService {
 
       switch (question.getQuestionType()) {
         case MULTIPLE_CHOICE_MULTIPLE_ANSWERS -> appendMultipleChoiceAnswers(giftFormat, questionText, answers);
-        case MULTIPLE_CHOICE_SINGLE_ANSWER ->  appendSingleChoiceAnswers(giftFormat, questionText, answers);
+        case MULTIPLE_CHOICE_SINGLE_ANSWER, TRUE_FALSE ->  appendSingleChoiceAnswers(giftFormat, questionText, answers);
         case FILL_IN_THE_BLANKS ->  appendFillInTheBlanksAnswer(giftFormat, questionText, answers);
       }
 
@@ -81,7 +81,7 @@ public class GiftExportService implements ExportService {
   }
 
   private void appendFillInTheBlanksAnswer(StringBuilder giftFormat, String questionText, List<AnswerOptionDto> answers) {
-    if (!questionText.contains("_____")) {
+    if (!questionText.contains("_")) {
       throw new IllegalArgumentException("FILL_IN_THE_BLANKS question must contain exactly one '_____'.");
     }
 
