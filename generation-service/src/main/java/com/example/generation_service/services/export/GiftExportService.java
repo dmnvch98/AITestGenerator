@@ -51,7 +51,7 @@ public class GiftExportService implements ExportService {
     giftFormat.append(questionText).append(" {\n");
     for (AnswerOptionDto answer : answers) {
       String optionText = answer.getOptionText();
-      if (answer.getIsCorrect()) {
+      if (answer.isCorrect()) {
         giftFormat.append("  =").append(optionText).append("\n");
       } else {
         giftFormat.append("  ~").append(optionText).append("\n");
@@ -63,7 +63,7 @@ public class GiftExportService implements ExportService {
 
   private void appendMultipleChoiceAnswers(StringBuilder giftFormat, String questionText, List<AnswerOptionDto> answers) {
     giftFormat.append(questionText).append(" {\n");
-    long correctAnswersCount = answers.stream().filter(AnswerOptionDto::getIsCorrect).count();
+    long correctAnswersCount = answers.stream().filter(AnswerOptionDto::isCorrect).count();
     long incorrectAnswersCount = answers.size() - correctAnswersCount;
 
     double scorePerCorrectAnswer = Utils.round(100.0 / correctAnswersCount, 5);
@@ -71,7 +71,7 @@ public class GiftExportService implements ExportService {
 
     for (AnswerOptionDto answer : answers) {
       String optionText = answer.getOptionText();
-      if (answer.getIsCorrect()) {
+      if (answer.isCorrect()) {
         giftFormat.append("  ~%").append(scorePerCorrectAnswer).append("%").append(optionText).append("\n");
       } else {
         giftFormat.append("  ~%").append(penaltyPerIncorrectAnswer).append("%").append(optionText).append("\n");
@@ -94,7 +94,7 @@ public class GiftExportService implements ExportService {
 
     for (AnswerOptionDto answer : answers) {
       String optionText = answer.getOptionText().trim();
-      if (answer.getIsCorrect()) {
+      if (answer.isCorrect()) {
         options.append("=").append(optionText).append(" ");
         hasCorrectAnswer = true;
       } else {
