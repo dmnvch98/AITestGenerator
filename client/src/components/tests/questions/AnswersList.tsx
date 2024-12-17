@@ -2,6 +2,7 @@ import React from "react";
 import {Box, Grid, TextField, IconButton, Checkbox, Radio, Button} from "@mui/material";
 import {DeleteOutlineOutlined} from "@mui/icons-material";
 import {AnswerOption} from "../../../store/tests/testStore";
+import Typography from "@mui/material/Typography";
 
 interface AnswerListProps {
     answerOptions: AnswerOption[];
@@ -16,6 +17,20 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                                                           answerOptions, onAnswerChange, onDeleteAnswer, onAddAnswer, singleChoice , displayActions
                                                       }) => (
     <Box>
+        <Grid container spacing={3} alignItems="left" sx={{mb: 1}}>
+            <Grid item xs={1}>
+                <Typography fontWeight="bold">
+                    Верно
+                </Typography>
+            </Grid>
+            <Grid item xs={10}>
+                <Typography align="left" fontWeight="bold">
+                    Вариант ответа
+                </Typography>
+            </Grid>
+            <Grid item xs={1}>
+            </Grid>
+        </Grid>
         {answerOptions.map((answer, index) => (
             <Grid container spacing={3} key={index} alignItems="center">
                 <Grid item xs={1}>

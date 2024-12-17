@@ -1,10 +1,11 @@
 import React from "react";
 import {AnswerOption, Question} from "../../../store/tests/testStore";
 import {QuestionType} from "../../../store/tests/types";
-import {AccordionDetails, AccordionSummary, Box} from "@mui/material";
+import {AccordionDetails, AccordionSummary, Box, Stack} from "@mui/material";
 import {QuestionHeader} from "./QuestionHeader";
 import {AnswerList} from "./AnswersList";
 import {v4 as uuidv4} from "uuid";
+import {QuestionTypeSelector} from "../../../pages/tests/edit/components/QuestionTypeSelector";
 
 export interface QuestionEditProps {
     question: Question;
@@ -17,7 +18,13 @@ export interface QuestionEditProps {
 }
 
 export const QuestionEdit: React.FC<QuestionEditProps> = ({
-                                                              question, onQuestionChange, onDelete, errorMessage, questionNumber, last, viewMode,
+                                                              question,
+                                                              onQuestionChange,
+                                                              onDelete,
+                                                              errorMessage,
+                                                              questionNumber,
+                                                              last,
+                                                              viewMode,
                                                           }) => {
     const singleChoiceQuestion = question.questionType !== QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
     const displayActions = question.questionType !== QuestionType.TRUE_FALSE;
@@ -48,16 +55,29 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
 
     const handleAnswerOptionChange = singleChoiceQuestion ? handleSingleAnswerOptionChange : handleMultiAnswerOptionChange;
 
+    const handleQuestionTypeChange = (newType: QuestionType) => {
+        onQuestionChange({...question, questionType: newType});
+    };
+
     const renderQuestionType = () => {
         return (
-            <Box>
+            <Box sx={{pl: 2}}>
                 <AccordionSummary>
-                    <QuestionHeader
-                        questionNumber={questionNumber}
-                        questionText={question.questionText}
-                        onChange={(text) => onQuestionChange({...question, questionText: text})}
-                        onDelete={onDelete}
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%'}}>
+                        <Box sx={{mb: 2}}>
+                            <QuestionHeader
+                                questionNumber={questionNumber}
+                                questionText={question.questionText}
+                                onChange={(text) => onQuestionChange({...question, questionText: text})}
+                                onDelete={onDelete}
+                            />
+                        </Box>
+                        <QuestionTypeSelector
+                            value={question.questionType}
+                            onChange={handleQuestionTypeChange}
+                        />
+                    </Box>
+
                 </AccordionSummary>
                 <AccordionDetails>
                     <AnswerList

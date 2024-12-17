@@ -100,30 +100,32 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     }
 
     const Content = (
-        <Paper>
-            <Box sx={{ml: 4, mr: 4, pt: 2}}>
-                <TestTitleInput title={localTest.title || ""}
-                                isLoading={isLoading as boolean}
-                                onChange={(e) => setLocalTest({...localTest, title: e.target.value})}
-                                error={testTitleError}/>
-            </Box>
+        <Box>
+            {/*<Box>*/}
+            {/*    <TestTitleInput title={localTest.title || ""}*/}
+            {/*                    isLoading={isLoading as boolean}*/}
+            {/*                    onChange={(e) => setLocalTest({...localTest, title: e.target.value})}*/}
+            {/*                    error={testTitleError}/>*/}
+            {/*</Box>*/}
+            <Paper>
+                {isLoading ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                        <CircularProgress/>
+                    </Box>
+                ) : (
+                    <QuestionPaginatedView
+                        questions={localTest.questions}
+                        currentQuestionIndex={currentQuestionIndex}
+                        invalidQuestions={invalidQuestions}
+                        onDelete={handleDeleteQuestion}
+                        onQuestionChange={handleQuestionChange}
+                        onSelectQuestion={setCurrentQuestionIndex}
+                        editMode={true}
+                    />
+                )}
+            </Paper>
 
-            {isLoading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                    <CircularProgress/>
-                </Box>
-            ) : (
-                <QuestionPaginatedView
-                    questions={localTest.questions}
-                    currentQuestionIndex={currentQuestionIndex}
-                    invalidQuestions={invalidQuestions}
-                    onDelete={handleDeleteQuestion}
-                    onQuestionChange={handleQuestionChange}
-                    onSelectQuestion={setCurrentQuestionIndex}
-                    editMode={true}
-                />
-            )}
-        </Paper>
+        </Box>
     )
 
     const Actions = (

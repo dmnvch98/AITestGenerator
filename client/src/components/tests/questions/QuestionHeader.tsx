@@ -17,10 +17,11 @@ export const QuestionHeader: React.FC<QuestionHeaderProps> = ({
             label={`Вопрос ${questionNumber}`}
             placeholder="Введите вопрос"
             fullWidth
+            multiline
             variant="standard"
             value={questionText}
             onChange={(e) => onChange(e.target.value)}
-            sx={{ml: 2, "& .MuiInputBase-input": {fontWeight: 600}}}
+            sx={{"& .MuiInputBase-input": {fontWeight: 600}}}
         />
         <IconButton onClick={onDelete}>
             <DeleteOutlineOutlined />
