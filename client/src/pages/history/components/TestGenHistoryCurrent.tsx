@@ -52,7 +52,8 @@ export const TestGenHistoryCurrent = () => {
                 if (!item.testTitle) {
                     return {
                         ...item,
-                        testTitle: noTestTitle
+                        testTitle: noTestTitle,
+                        readyPercentage: 100 / item.queuedQuestionTypes?.length * item.processedQuestionTypes?.length
                     };
                 }
                 return item;

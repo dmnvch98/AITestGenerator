@@ -3,6 +3,7 @@ import UserService, {BulkActivityDeleteDto} from "../services/UserService";
 import {GenerationStatus, QueryOptions} from "./types";
 import TestService from "../services/TestService";
 import ActivityService from "../services/activities/ActivityService";
+import {QuestionType} from "./tests/types";
 
 export interface TestGenActivity {
     uuid: string,
@@ -15,6 +16,9 @@ export interface TestGenActivity {
     testId: number,
     failCode: number;
     cid: string;
+    readyPercentage: number;
+    queuedQuestionTypes: QuestionType[];
+    processedQuestionTypes: QuestionType[]
 }
 
 export interface ActivityDto {
@@ -27,6 +31,8 @@ export interface ActivityDto {
     testId?: number,
     failCode: number;
     cid: string;
+    queuedQuestionTypes: QuestionType[];
+    processedQuestionTypes: QuestionType[]
 }
 
 export interface UserStore {

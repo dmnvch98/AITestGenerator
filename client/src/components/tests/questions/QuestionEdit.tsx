@@ -56,21 +56,29 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
     const handleAnswerOptionChange = singleChoiceQuestion ? handleSingleAnswerOptionChange : handleMultiAnswerOptionChange;
 
     const handleQuestionTypeChange = (newType: QuestionType) => {
+        let newAnswers: AnswerOption[] = question.answerOptions;
+
         if (newType === QuestionType.TRUE_FALSE) {
-            const newAnswers: AnswerOption[] = [
-                {
-                    optionText: 'Верно',
-                    isCorrect: true
-                },
-                {
-                    optionText: 'Неверно',
-                    isCorrect: false
+            newAnswers = [
+                { optionText: 'Верно', isCorrect: true },
+                { optionText: 'Неверно', isCorrect: false }
+            ];
+        } else if ([QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER, QuestionType.FILL_IN_THE_BLANKS].includes(newType)) {
+            let firstCorrectFound = false;
+            newAnswers = (question.answerOptions || []).map((answer) => {
+                if (answer.isCorrect && !firstCorrectFound) {
+                    firstCorrectFound = true;
+                    return { ...answer, isCorrect: true };
                 }
-            ]
-            onQuestionChange({...question, questionType: newType, answerOptions: newAnswers});
-            return;
+                return { ...answer, isCorrect: false };
+            });
         }
-        onQuestionChange({...question, questionType: newType});
+
+        onQuestionChange({
+            ...question,
+            questionType: newType,
+            answerOptions: newAnswers
+        });
     };
 
     const renderQuestionType = () => {

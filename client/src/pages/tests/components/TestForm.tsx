@@ -3,16 +3,21 @@ import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../s
 import {useLocation, useNavigate} from "react-router-dom";
 import {Box, CircularProgress, Paper} from "@mui/material";
 import {QuestionPaginatedView} from "../edit/components/TestDisplayMode";
-import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
+import {validateTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
 import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
+import NotificationService from "../../../services/notification/NotificationService";
+import {AlertMessage} from "../../../store/types";
 
 interface TestFormProps {
     initialTest: UserTest | CreateTestRequestDto;
     isLoading?: boolean;
 }
+
+const MAX_QUESTIONS_COUNT = 40;
+const MAX_ANSWERS_COUNT = 10;
 
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const navigate = useNavigate();
@@ -25,6 +30,13 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
+    const [testHistory, setTestHistory] = useState<(UserTest | CreateTestRequestDto)[]>([]); // История изменений
+
+    useEffect(() => {
+        if (testHistory.length === 0) {
+            setInvalidQuestions([]);
+        }
+    }, [testHistory]);
 
     useEffect(() => {
         if (initialTest && !hasSaved) setLocalTest({...initialTest});
@@ -45,6 +57,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
                     setLocalTest(resp);
                     setLastSavedTest(resp);
                     setInvalidQuestions([]);
+                    setTestHistory([]);
                 }
             });
         } else {
@@ -57,6 +70,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     }
 
     const handleAddQuestion = () => {
+        if (localTest.questions.length >= MAX_QUESTIONS_COUNT) {
+            NotificationService.addAlert(new AlertMessage(`Максимальное число вопросов: ${MAX_QUESTIONS_COUNT}`, 'error'));
+            return;
+        }
+        saveToHistory(localTest);
         setLocalTest({
             ...localTest,
             questions: [...localTest.questions, createNewQuestion()],
@@ -65,6 +83,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     };
 
     const handleDeleteQuestion = (id: string) => {
+        saveToHistory(localTest);
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setCurrentQuestionIndex(updatedQuestions.length - 1);
         setLocalTest({...localTest, questions: updatedQuestions});
@@ -75,6 +94,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     }
 
     const handleQuestionChange = (updatedQuestion: Question) => {
+        if (updatedQuestion.answerOptions.length > MAX_ANSWERS_COUNT) {
+            NotificationService.addAlert(new AlertMessage(`Максимальное число ответов: ${MAX_ANSWERS_COUNT}`, 'error'));
+            return;
+        }
+        saveToHistory(localTest);
         setLocalTest(prevTest => ({
             ...prevTest,
             questions: prevTest.questions.map((q) =>
@@ -82,14 +106,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
             ),
         }));
     };
-
-    const handleReset = () => {
-        const resetTest = lastSavedTest ?? initialTest ?? createNewTest();
-        setLocalTest(resetTest);
-        setCurrentQuestionIndex(0);
-        setInvalidQuestions([]);
-    };
-
     const handleReturnToPrevPage = () => {
         const prevUrl = location?.state?.previousLocationPathname || '/tests';
         navigate(prevUrl);
@@ -98,6 +114,22 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const handleExit = () => {
         navigate("/tests");
     }
+
+    const saveToHistory = (newState: UserTest | CreateTestRequestDto) => {
+        setTestHistory(prev => {
+            const updatedHistory = [...prev, newState];
+            return updatedHistory.length > 10 ? updatedHistory.slice(1) : updatedHistory;
+        });
+    };
+
+    const handleUndo = () => {
+        setTestHistory(prev => {
+            if (prev.length === 0) return prev;
+            const lastState = prev[prev.length - 1];
+            setLocalTest(lastState);
+            return prev.slice(0, -1);
+        });
+    };
 
     const Content = (
         <Box>
@@ -135,10 +167,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
                 isLoading={isLoading as boolean}
                 onSave={handleSave}
                 onAddQuestion={handleAddQuestion}
-                onReset={handleReset}
+                onUndo={handleUndo}
                 onExit={handleExit}
                 onReturn={handleReturnToPrevPage}
                 isTestModified={isTestModified()}
+                undoActionsAvailable={testHistory.length > 0}
             />
             <QuestionPagination
                 loading={isLoading}

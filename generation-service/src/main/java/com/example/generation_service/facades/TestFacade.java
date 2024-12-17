@@ -10,6 +10,7 @@ import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.generation_service.utils.Utils.generateRandomCid;
 
@@ -73,7 +75,9 @@ public class TestFacade {
 
       final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
       commandService.sendCommand(message);
-      activityService.createWaitingActivity(fileHash, cid, dto, userId);
+      final Set<QuestionType> queuedQuestionTypes = dto.getParams()
+                      .stream().map(QuestionTypeQuantity::getQuestionType).collect(Collectors.toSet());
+      activityService.createWaitingActivity(fileHash, cid, dto, userId, queuedQuestionTypes);
 
     } catch (final Exception e) {
       if (e instanceof IllegalArgumentException || e instanceof ResourceNotFoundException) {
@@ -100,9 +104,14 @@ public class TestFacade {
       final List<Test> tests = new ArrayList<>();
 
       for (QuestionTypeQuantity questionTypeQuantity: message.getParams()) {
+
         log.info("Starting test generation {}", questionTypeQuantity);
         final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash, questionTypeQuantity);
         final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
+
+        final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
+        activityService.updateProcessedQuestionType(currentActivity, questionTypeQuantity.getQuestionType());
+
         tests.add(test);
         log.info("Test generation for {} is done", questionTypeQuantity);
       }

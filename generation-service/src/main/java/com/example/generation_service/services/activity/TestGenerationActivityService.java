@@ -6,6 +6,7 @@ import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
 import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.CommandService;
 import com.example.generation_service.services.FileHashService;
@@ -45,10 +46,16 @@ public class TestGenerationActivityService {
     }
 
     public void createWaitingActivity(final FileHash fileHash, final String cid,
-                                      final GenerateTestRequestDto requestDto, final Long userId) {
-        final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId);
+                                      final GenerateTestRequestDto requestDto, final Long userId, final Set<QuestionType> queuedQuestionTypes) {
+        final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId, queuedQuestionTypes);
         final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.saveObjectToHash(hashKey,cid, waitingActivity);
+    }
+
+    public void updateProcessedQuestionType(final TestGenerationActivity activity, final QuestionType questionType) {
+        final TestGenerationActivity updatedActivity = activityConverter.updateProcessedQuestionType(activity, questionType);
+        final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
+        genericRedisService.saveObjectToHash(hashKey, activity.getCid(), updatedActivity);
     }
 
     public void createInProgressActivity(final Long userId, final String cid, final String messageReceipt) {

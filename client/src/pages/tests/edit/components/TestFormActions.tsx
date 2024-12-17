@@ -16,21 +16,23 @@ import {getActionItemsList} from "../../../../components/main/data-display/helpe
 interface ActionButtonsProps {
     onSave: () => void;
     onAddQuestion: () => void;
-    onReset: () => void;
+    onUndo: () => void;
     onExit: () => void;
     isTestModified: boolean;
     isLoading: boolean;
     onReturn: () => void;
+    undoActionsAvailable: boolean;
 }
 
 export const TestFormActions: React.FC<ActionButtonsProps> = ({
                                                                   onSave,
                                                                   onAddQuestion,
-                                                                  onReset,
+                                                                  onUndo,
                                                                   onExit,
                                                                   isTestModified,
                                                                   isLoading,
-                                                                  onReturn
+                                                                  onReturn,
+                                                                  undoActionsAvailable
                                                               }) => {
     const [dialogOpen, setDialogOpen] = useState(false); // Состояние для диалога
     const [dialogConfig, setDialogConfig] = useState<{
@@ -63,14 +65,10 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
             disabled: isLoading
         },
         {
-            name: 'Сбросить',
-            icon: <RestoreIcon/>,
-            onClick: () => openDialog(
-                'Подтвердите сброс',
-                'Вы уверены, что хотите сбросить все изменения?',
-                onReset
-            ),
-            disabled: !isTestModified || isLoading
+            name: 'Отменить',
+            icon: <RestoreIcon />,
+            onClick: onUndo,
+            disabled: !isTestModified || isLoading || !undoActionsAvailable
         },
         {
             name: 'Вернуться',
