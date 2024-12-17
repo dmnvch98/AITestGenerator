@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Box, Snackbar, Alert, CircularProgress, Paper} from "@mui/material";
+import {Box, CircularProgress, Paper} from "@mui/material";
 import {QuestionPaginatedView} from "../edit/components/TestDisplayMode";
 import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
@@ -101,12 +101,13 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
 
     const Content = (
         <Box>
-            {/*<Box>*/}
-            {/*    <TestTitleInput title={localTest.title || ""}*/}
-            {/*                    isLoading={isLoading as boolean}*/}
-            {/*                    onChange={(e) => setLocalTest({...localTest, title: e.target.value})}*/}
-            {/*                    error={testTitleError}/>*/}
-            {/*</Box>*/}
+            <Box sx={{p: 2}}>
+                <TestTitleInput title={localTest.title || ""}
+                                isLoading={isLoading as boolean}
+                                onChange={(e) => setLocalTest({...localTest, title: e.target.value})}
+                                error={testTitleError}/>
+            </Box>
+
             <Paper>
                 {isLoading ? (
                     <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">

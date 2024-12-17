@@ -1,7 +1,7 @@
 import React from "react";
 import {AnswerOption, Question} from "../../../store/tests/testStore";
 import {QuestionType} from "../../../store/tests/types";
-import {AccordionDetails, AccordionSummary, Box, Stack} from "@mui/material";
+import {AccordionDetails, AccordionSummary, Box} from "@mui/material";
 import {QuestionHeader} from "./QuestionHeader";
 import {AnswerList} from "./AnswersList";
 import {v4 as uuidv4} from "uuid";
@@ -56,6 +56,20 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
     const handleAnswerOptionChange = singleChoiceQuestion ? handleSingleAnswerOptionChange : handleMultiAnswerOptionChange;
 
     const handleQuestionTypeChange = (newType: QuestionType) => {
+        if (newType === QuestionType.TRUE_FALSE) {
+            const newAnswers: AnswerOption[] = [
+                {
+                    optionText: 'Верно',
+                    isCorrect: true
+                },
+                {
+                    optionText: 'Неверно',
+                    isCorrect: false
+                }
+            ]
+            onQuestionChange({...question, questionType: newType, answerOptions: newAnswers});
+            return;
+        }
         onQuestionChange({...question, questionType: newType});
     };
 

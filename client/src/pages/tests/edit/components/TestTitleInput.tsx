@@ -29,7 +29,7 @@ export const TestTitleInput: React.FC<TestTitleInputProps> = ({ title, onChange,
                     sx={{
                         "& .MuiInputBase-input": {
                             fontWeight: 600,
-                            fontSize: "14px",
+                            fontSize: "18px",
                         }
                     }}
                     error={!!error}
