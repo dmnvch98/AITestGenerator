@@ -1,13 +1,13 @@
 import React from "react";
-import {Box, Grid, TextField, IconButton, Checkbox, Radio, Button} from "@mui/material";
-import {DeleteOutlineOutlined} from "@mui/icons-material";
-import {AnswerOption} from "../../../store/tests/testStore";
+import { Box, Grid, TextField, IconButton, Checkbox, Radio, Button } from "@mui/material";
+import { DeleteOutlineOutlined } from "@mui/icons-material";
+import { AnswerOption } from "../../../store/tests/testStore";
 import Typography from "@mui/material/Typography";
 
 interface AnswerListProps {
     answerOptions: AnswerOption[];
     onAnswerChange: (updatedOption: AnswerOption) => void;
-    onDeleteAnswer: (id?: string) => void;
+    onDeleteAnswer: (id: string) => void;
     onAddAnswer?: () => void;
     correctAnswerChanged?: (updatedOption: AnswerOption) => void;
     singleChoice?: boolean;
@@ -15,35 +15,36 @@ interface AnswerListProps {
 }
 
 export const AnswerList: React.FC<AnswerListProps> = ({
-                                                          answerOptions, onAnswerChange, onDeleteAnswer, onAddAnswer, singleChoice , displayActions, correctAnswerChanged
+                                                          answerOptions,
+                                                          onAnswerChange,
+                                                          onDeleteAnswer,
+                                                          onAddAnswer,
+                                                          singleChoice,
+                                                          displayActions,
+                                                          correctAnswerChanged
                                                       }) => (
     <Box>
-        <Grid container spacing={3} alignItems="left" sx={{mb: 1}}>
+        <Grid container spacing={3} alignItems="center" sx={{ mb: 1 }}>
             <Grid item xs={1}>
-                <Typography fontWeight="bold">
-                    Верно
-                </Typography>
+                <Typography fontWeight="bold">Верно</Typography>
             </Grid>
             <Grid item xs={10}>
-                <Typography align="left" fontWeight="bold">
-                    Вариант ответа
-                </Typography>
+                <Typography align="left" fontWeight="bold">Вариант ответа</Typography>
             </Grid>
-            <Grid item xs={1}>
-            </Grid>
+            {displayActions && <Grid item xs={1} />}
         </Grid>
-        {answerOptions.map((answer, index) => (
-            <Grid container spacing={3} key={index} alignItems="center">
+        {answerOptions.map((answer) => (
+            <Grid container spacing={3} key={answer.id} alignItems="center">
                 <Grid item xs={1}>
                     {singleChoice ? (
                         <Radio
                             checked={answer.isCorrect}
-                            onChange={(e) => correctAnswerChanged && correctAnswerChanged({...answer, isCorrect: e.target.checked})}
+                            onChange={(e) => correctAnswerChanged && correctAnswerChanged({ ...answer, isCorrect: e.target.checked })}
                         />
                     ) : (
                         <Checkbox
                             checked={answer.isCorrect}
-                            onChange={(e) => onAnswerChange({...answer, isCorrect: e.target.checked})}
+                            onChange={(e) => onAnswerChange({ ...answer, isCorrect: e.target.checked })}
                         />
                     )}
                 </Grid>
@@ -53,19 +54,20 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                         fullWidth
                         variant="standard"
                         value={answer.optionText}
-                        onChange={(e) => onAnswerChange({...answer, optionText: e.target.value})}
+                        onChange={(e) => onAnswerChange({ ...answer, optionText: e.target.value })}
                     />
                 </Grid>
-                {displayActions &&
+                {displayActions && (
                     <Grid item xs={1}>
                         <IconButton onClick={() => onDeleteAnswer(answer.id)}>
-                            <DeleteOutlineOutlined/>
+                            <DeleteOutlineOutlined />
                         </IconButton>
-                    </Grid>}
+                    </Grid>
+                )}
             </Grid>
         ))}
         {displayActions && onAddAnswer && (
-            <Button variant="outlined" sx={{mt: 2}} onClick={onAddAnswer}>
+            <Button variant="outlined" sx={{ mt: 2 }} onClick={onAddAnswer}>
                 Добавить ответ
             </Button>
         )}

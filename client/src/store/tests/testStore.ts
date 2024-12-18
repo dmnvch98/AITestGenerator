@@ -29,7 +29,7 @@ export interface Question {
 }
 
 export interface AnswerOption {
-    id?: string,
+    id: string,
     optionText: string,
     isCorrect: boolean
 }
