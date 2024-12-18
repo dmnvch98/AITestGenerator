@@ -1,0 +1,104 @@
+[
+  {
+    "id": "q1",
+    "questionText": "Какой из следующих элементов является металлом?",
+    "description": "Вопрос с единственным правильным ответом.",
+    "answerOptions": [
+      {
+        "id": "a1",
+        "optionText": "Сера",
+        "isCorrect": false
+      },
+      {
+        "id": "a2",
+        "optionText": "Кислород",
+        "isCorrect": false
+      },
+      {
+        "id": "a3",
+        "optionText": "Алюминий",
+        "isCorrect": true
+      },
+      {
+        "id": "a4",
+        "optionText": "Водород",
+        "isCorrect": false
+      }
+    ],
+    "questionType": "MULTIPLE_CHOICE_SINGLE_ANSWER"
+  },
+  {
+    "id": "q4",
+    "questionText": "Какие из следующих городов являются столицами?",
+    "description": " Вопрос с несколькими правильными ответами.",
+    "answerOptions": [
+      {
+        "id": "a1",
+        "optionText": "Минск",
+        "isCorrect": true
+      },
+      {
+        "id": "a2",
+        "optionText": "Шанхай",
+        "isCorrect": false
+      },
+      {
+        "id": "a3",
+        "optionText": "Москва",
+        "isCorrect": true
+      },
+      {
+        "id": "a4",
+        "optionText": "Батуми",
+        "isCorrect": false
+      }
+    ],
+    "questionType": "MULTIPLE_CHOICE_MULTIPLE_ANSWERS"
+  },
+  {
+    "id": "q3",
+    "questionText": "Солнце вращается вокруг Земли.",
+    "description": "Вопрос с выбором 'верно' или 'неверно'.",
+    "answerOptions": [
+      {
+        "id": "a1",
+        "optionText": "Верно",
+        "isCorrect": true
+      },
+      {
+        "id": "a2",
+        "optionText": "Неверно",
+        "isCorrect": false
+      }
+    ],
+    "questionType": "TRUE_FALSE"
+  },
+  {
+    "id": "q4",
+    "questionText": "Вода закипает при ____ градусах Цельсия.",
+    "description": "Вопрос с заполнением пропуска. Для указания пропуска необходимо использовать нижнее подчеркивание произвольное количество раз (от одного).",
+    "answerOptions": [
+      {
+        "id": "a1",
+        "optionText": 90,
+        "isCorrect": false
+      },
+      {
+        "id": "a2",
+        "optionText": 100,
+        "isCorrect": true
+      },
+      {
+        "id": "a3",
+        "optionText": 120,
+        "isCorrect": false
+      },
+      {
+        "id": "a4",
+        "optionText": 500,
+        "isCorrect": false
+      }
+    ],
+    "questionType": "FILL_IN_THE_BLANKS"
+  }
+]

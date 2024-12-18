@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, TextField, IconButton, Checkbox, Radio, Button } from "@mui/material";
+import {Box, Grid, TextField, IconButton, Checkbox, Radio, Button} from "@mui/material";
 import { DeleteOutlineOutlined } from "@mui/icons-material";
 import { AnswerOption } from "../../../store/tests/testStore";
 import Typography from "@mui/material/Typography";
@@ -12,6 +12,7 @@ interface AnswerListProps {
     correctAnswerChanged?: (updatedOption: AnswerOption) => void;
     singleChoice?: boolean;
     displayActions: boolean;
+    errorMessage?: string;
 }
 
 export const AnswerList: React.FC<AnswerListProps> = ({
@@ -21,7 +22,8 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                                                           onAddAnswer,
                                                           singleChoice,
                                                           displayActions,
-                                                          correctAnswerChanged
+                                                          correctAnswerChanged,
+                                                          errorMessage
                                                       }) => (
     <Box>
         <Grid container spacing={3} alignItems="center" sx={{ mb: 1 }}>
@@ -66,6 +68,9 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                 )}
             </Grid>
         ))}
+        <Typography align={"left"} variant="body2" sx={{mt: 2}} color="error">
+            {errorMessage}
+        </Typography>
         {displayActions && onAddAnswer && (
             <Button variant="outlined" sx={{ mt: 2 }} onClick={onAddAnswer}>
                 Добавить ответ

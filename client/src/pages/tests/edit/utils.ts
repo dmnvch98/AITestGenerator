@@ -1,7 +1,8 @@
-import { CreateTestRequestDto, UserTest } from "../../../store/tests/testStore";
-import { v4 as uuidv4 } from "uuid";
-import { AlertMessage } from "../../../store/types";
+import {CreateTestRequestDto, UserTest} from "../../../store/tests/testStore";
+import {v4 as uuidv4} from "uuid";
+import {AlertMessage} from "../../../store/types";
 import NotificationService from "../../../services/notification/NotificationService";
+import {QuestionType} from "../../../store/tests/types";
 
 export const validateTest = (
     localTest: UserTest | CreateTestRequestDto,
@@ -36,6 +37,21 @@ export const validateTest = (
         if (q.answerOptions.some(a => a.optionText === "")) {
             invalidQuestions.push({ index, message: "Ответ не должен быть пустым", id: q.id });
             valid = false;
+        }
+        switch (q.questionType) {
+            case QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS: {
+                if (q.answerOptions.filter(a => a.isCorrect).length < 2) {
+                    invalidQuestions.push({ index, message: "Данный тип вопроса должен иметь минимум 2 правильных ответа", id: q.id });
+                    valid = false;
+                }
+                return;
+            }
+            case QuestionType.FILL_IN_THE_BLANKS: {
+                if (!q.questionText.includes('_')) {
+                    invalidQuestions.push({ index, message: "Данный тип вопроса должен иметь минимум одно нижнее подчеркивание (_) для вставки пропуска", id: q.id });
+                    valid = false;
+                }
+            }
         }
     });
 

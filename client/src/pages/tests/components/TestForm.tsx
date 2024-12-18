@@ -31,12 +31,15 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
     const [testHistory, setTestHistory] = useState<(UserTest | CreateTestRequestDto)[]>([]); // История изменений
+    const isTestModified = () => {
+        return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
+    }
 
     useEffect(() => {
-        if (testHistory.length === 0) {
+        if (!isTestModified()) {
             setInvalidQuestions([]);
         }
-    }, [testHistory]);
+    }, [isTestModified]);
 
     useEffect(() => {
         if (initialTest && !hasSaved) setLocalTest({...initialTest});
@@ -64,10 +67,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
             setInvalidQuestions(invalidQuestions);
         }
     };
-
-    const isTestModified = () => {
-        return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
-    }
 
     const handleAddQuestion = () => {
         if (localTest.questions.length >= MAX_QUESTIONS_COUNT) {

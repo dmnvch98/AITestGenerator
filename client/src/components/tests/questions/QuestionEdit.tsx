@@ -13,8 +13,6 @@ export interface QuestionEditProps {
     onDelete: () => void;
     errorMessage: string;
     questionNumber?: number;
-    viewMode?: 'list' | 'paginated';
-    last?: boolean;
 }
 
 export const QuestionEdit: React.FC<QuestionEditProps> = ({
@@ -23,8 +21,6 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                                                               onDelete,
                                                               errorMessage,
                                                               questionNumber,
-                                                              last,
-                                                              viewMode,
                                                           }) => {
     const isSingleChoice = question.questionType !== QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
     const showActions = question.questionType !== QuestionType.TRUE_FALSE;
@@ -111,6 +107,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                     singleChoice={isSingleChoice}
                     displayActions={showActions}
                     correctAnswerChanged={toggleCorrectAnswer}
+                    errorMessage={errorMessage}
                 />
             </AccordionDetails>
         </Box>
