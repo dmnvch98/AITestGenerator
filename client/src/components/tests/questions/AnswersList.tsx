@@ -9,12 +9,13 @@ interface AnswerListProps {
     onAnswerChange: (updatedOption: AnswerOption) => void;
     onDeleteAnswer: (id?: string) => void;
     onAddAnswer?: () => void;
+    correctAnswerChanged?: (updatedOption: AnswerOption) => void;
     singleChoice?: boolean;
     displayActions: boolean;
 }
 
 export const AnswerList: React.FC<AnswerListProps> = ({
-                                                          answerOptions, onAnswerChange, onDeleteAnswer, onAddAnswer, singleChoice , displayActions
+                                                          answerOptions, onAnswerChange, onDeleteAnswer, onAddAnswer, singleChoice , displayActions, correctAnswerChanged
                                                       }) => (
     <Box>
         <Grid container spacing={3} alignItems="left" sx={{mb: 1}}>
@@ -37,7 +38,7 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                     {singleChoice ? (
                         <Radio
                             checked={answer.isCorrect}
-                            onChange={() => onAnswerChange(answer)}
+                            onChange={(e) => correctAnswerChanged && correctAnswerChanged({...answer, isCorrect: e.target.checked})}
                         />
                     ) : (
                         <Checkbox

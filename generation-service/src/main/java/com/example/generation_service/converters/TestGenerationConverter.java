@@ -66,7 +66,6 @@ public interface TestGenerationConverter {
        .fileName(activity.getFileName())
        .userId(test.getUserId())
        .status(ActivityStatus.SUCCESS)
-       .requestDto(activity.getRequestDto())
        .build();
   }
 
@@ -80,7 +79,6 @@ public interface TestGenerationConverter {
        .fileName(activity.getFileName())
        .status(ActivityStatus.FAILED)
        .userId(activity.getUserId())
-       .requestDto(activity.getRequestDto())
        .build();
   }
 
@@ -91,7 +89,6 @@ public interface TestGenerationConverter {
           .endDate(LocalDateTime.now())
           .cid(cid)
           .failReason(failReason.name())
-          .requestDto(dto)
           .status(ActivityStatus.FAILED)
           .fileName(fileName)
           .userId(userId)

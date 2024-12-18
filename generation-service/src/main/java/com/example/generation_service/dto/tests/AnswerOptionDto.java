@@ -18,6 +18,6 @@ public class AnswerOptionDto {
     @Builder.Default
     private final UUID id = UUID.randomUUID();
     private final String optionText;
-    @JsonProperty("isCorrect")
+    @Getter(onMethod_ = {@JsonProperty("isCorrect")})
     private final boolean isCorrect;
 }

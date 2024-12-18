@@ -46,12 +46,19 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
     };
 
     const handleSingleAnswerOptionChange = (updatedOption: AnswerOption) => {
+        const updatedOptions = question.answerOptions.map(option =>
+            option.id === updatedOption.id ? updatedOption : option
+        );
+        onQuestionChange({...question, answerOptions: updatedOptions});
+    };
+
+    const correctAnswerChanged = (updatedOption: AnswerOption) => {
         const updatedOptions = question.answerOptions.map(option => ({
             ...option,
             isCorrect: option.id === updatedOption.id,
         }));
         onQuestionChange({...question, answerOptions: updatedOptions});
-    };
+    }
 
     const handleAnswerOptionChange = singleChoiceQuestion ? handleSingleAnswerOptionChange : handleMultiAnswerOptionChange;
 
@@ -114,6 +121,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                         onAddAnswer={handleAddAnswerOption}
                         singleChoice={singleChoiceQuestion}
                         displayActions={displayActions}
+                        correctAnswerChanged={correctAnswerChanged}
                     />
                 </AccordionDetails>
             </Box>

@@ -1,11 +1,8 @@
 package com.example.generation_service.models.test;
 
-import com.example.generation_service.converters.ormConverter.GenerateTestRequestConverter;
-import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.models.enums.ActivityStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
 
@@ -29,10 +26,5 @@ public class TestGeneratingHistory {
     private String failReason;
     private String cid;
     private String fileName;
-
-    @Convert(converter = GenerateTestRequestConverter.class)
-    @Column(name = "requestDto", columnDefinition = "jsonb")
-    @ColumnTransformer(write = "?::jsonb")
-    private GenerateTestRequestDto requestDto;
 
 }
