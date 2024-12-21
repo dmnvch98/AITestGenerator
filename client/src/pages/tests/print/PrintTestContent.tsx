@@ -1,10 +1,11 @@
-import React, {useEffect} from 'react';
-import {Box, Typography, List, ListItem, Checkbox, Grid, Divider} from '@mui/material';
+import React, { useEffect } from 'react';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import '../styles/oneColumn.css';
-import useTextSettingsStore from "../../../store/tests/testPrintStore";
-import {useTestStore} from "../../../store/tests/testStore";
-import {useParams} from "react-router-dom";
-import {useUserStore} from "../../../store/userStore";
+import useTextSettingsStore from '../../../store/tests/testPrintStore';
+import { useTestStore } from '../../../store/tests/testStore';
+import { useParams } from 'react-router-dom';
+import { useUserStore } from '../../../store/userStore';
+import {questionTypeFlags} from "../../../store/tests/types";
 
 interface TestHeaderProps {
     testTitle: string;
@@ -14,7 +15,7 @@ interface TestHeaderProps {
 
 const TestHeader: React.FC<TestHeaderProps> = ({ testTitle, titleFontWeight, titleFontSize }) => {
     return (
-        <Grid container alignItems="start" textAlign="left" borderBottom="1px solid #999" sx={{mb: 2, pb: '0.5cm'}}>
+        <Grid container alignItems="start" textAlign="left" borderBottom="1px solid #999" sx={{ mb: 2, pb: '0.5cm' }}>
             <Grid item xs={6}>
                 <Typography style={{ fontSize: `${titleFontSize}px`, fontWeight: titleFontWeight }}>
                     {testTitle}
@@ -32,9 +33,9 @@ const TestHeader: React.FC<TestHeaderProps> = ({ testTitle, titleFontWeight, tit
                         ______________________________
                     </Grid>
                 </Grid>
-                <Grid container sx={{mt: 1}} spacing={1}>
+                <Grid container sx={{ mt: 1 }} spacing={1}>
                     <Grid item xs={3}>
-                        <Typography style={{ fontSize: `${titleFontSize - 2 }px`, textAlign: 'right' }}>
+                        <Typography style={{ fontSize: `${titleFontSize - 2}px`, textAlign: 'right' }}>
                             Группа
                         </Typography>
                     </Grid>
@@ -47,6 +48,22 @@ const TestHeader: React.FC<TestHeaderProps> = ({ testTitle, titleFontWeight, tit
     );
 };
 
+const getAnswerWord = (count: number): string => {
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+        return 'ответов';
+    }
+    if (lastDigit === 1) {
+        return 'ответ';
+    }
+    if (lastDigit >= 2 && lastDigit <= 4) {
+        return 'ответа';
+    }
+    return 'ответов';
+};
+
 export const PrintTestContent = () => {
     const { id } = useParams();
     const { setLoading } = useUserStore();
@@ -57,16 +74,16 @@ export const PrintTestContent = () => {
         titleFontWeight,
         questionFontWeight,
         lineHeight,
-        showAnswers,
-        showHeader
+        showHeader,
+        showAnswers
     } = useTextSettingsStore();
-    const {selectedTest, getUserTestById, clearState} = useTestStore();
+    const { selectedTest, getUserTestById, clearState } = useTestStore();
 
     const fetchTest = async () => {
         setLoading(true);
         await getUserTestById(Number(id));
         setLoading(false);
-    }
+    };
 
     useEffect(() => {
         fetchTest();
@@ -75,13 +92,13 @@ export const PrintTestContent = () => {
     useEffect(() => {
         return () => {
             clearState();
-        }
+        };
     }, []);
 
     return (
         <>
             <Box className="center-mode">
-                {showHeader && <TestHeader testTitle={selectedTest?.title as string} titleFontSize={titleFontSize} titleFontWeight={titleFontWeight}/>}
+                {showHeader && <TestHeader testTitle={selectedTest?.title as string} titleFontSize={titleFontSize} titleFontWeight={titleFontWeight} />}
 
                 {selectedTest?.questions.map((question, index) => (
                     <Box key={question.id} className="question">
@@ -94,37 +111,27 @@ export const PrintTestContent = () => {
                                 mb: `${lineHeight + 1}px`
                             }}
                         >
-                            {index + 1}. {question.questionText}
+                            {`${index + 1}. ${question.questionText}`} {questionTypeFlags[question.questionType]?.singleAnswer
+                            ? ''
+                            : `(${question.answerOptions.filter(option => option.correct).length} ${getAnswerWord(question.answerOptions.filter(option => option.correct).length)})`}
                         </Typography>
-                        <List disablePadding>
-                            {question.answerOptions.map(option => (
-                                <ListItem key={option.id}
-                                          sx={{alignItems: 'flex-start', pl: 2, pr: 1, mt: `${lineHeight}px`}}
-                                          disablePadding>
-                                    <Checkbox
-                                        edge="start"
-                                        checked={showAnswers && option.correct}
-                                        disabled={true}
-                                        sx={{
-                                            '& .MuiSvgIcon-root': {
-                                                color: '#333',
-                                                fontSize: `${answerFontSize}px`
-                                            },
-                                            marginTop: -0.7
-                                        }}
-                                    />
-                                    <Typography
-                                        style={{fontSize: `${answerFontSize}px`, textAlign: 'justify'}}
-                                    >
-                                        {option.optionText}
-                                    </Typography>
-                                </ListItem>
+                        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1} sx={{ mt: `${lineHeight}px` }}>
+                            {question.answerOptions.map((option, optionIndex) => (
+                                <Typography
+                                    key={option.id}
+                                    style={{ fontSize: `${answerFontSize}px`, textAlign: 'justify' }}
+                                >
+                                    {showAnswers && option.correct ? (
+                                        <><strong>{`${String.fromCharCode(97 + optionIndex)}) `}</strong>{option.optionText}</>
+                                    ) : (
+                                        <>{`${String.fromCharCode(97 + optionIndex)}) `}{option.optionText}</>
+                                    )}
+                                </Typography>
                             ))}
-                        </List>
+                        </Box>
                     </Box>
                 ))}
-
             </Box>
         </>
-    )
-}
+    );
+};

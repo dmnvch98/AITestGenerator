@@ -153,7 +153,7 @@ export const SidebarHeader = ({children}: any) => {
                                 </Typography>
                                 <Box display="flex" alignItems="center">
                                     <Box sx={{mr: 6}}>
-                                        {/*<ActiveJobBadge/>*/}
+                                        <ActiveJobBadge/>
                                     </Box>
 
                                     <Button

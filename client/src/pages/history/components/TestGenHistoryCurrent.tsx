@@ -1,7 +1,7 @@
 import {GridColDef, GridEventListener} from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import React, {useEffect, useState} from "react";
-import {TestGenActivity, useUserStore} from "../../../store/userStore";
+import {ActivityDto, useUserStore} from "../../../store/userStore";
 import {GenericTableActions} from "../../../components/main/GenericTableActions";
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
 import {SxProps} from "@mui/system";
@@ -46,14 +46,13 @@ export const TestGenHistoryCurrent = () => {
 
     const columns: GridColDef[] = createColumns(handleOpenModal);
 
-    const prepareData = (): TestGenActivity[] => {
+    const prepareData = (): ActivityDto[] => {
         if (currentActivities.length > 0) {
             return currentActivities.map(item => {
                 if (!item.testTitle) {
                     return {
                         ...item,
-                        testTitle: noTestTitle,
-                        readyPercentage: 100 / item.queuedQuestionTypes?.length * item.processedQuestionTypes?.length
+                        testTitle: noTestTitle
                     };
                 }
                 return item;
@@ -77,10 +76,10 @@ export const TestGenHistoryCurrent = () => {
     return (
         <>
             <Box>
-                <GenericTableActions<TestGenActivity>
+                <GenericTableActions<ActivityDto>
                     data={prepareData()}
                     columns={columns}
-                    rowIdGetter={(row) => row.id}
+                    rowIdGetter={(row) => row.cid}
                     checkboxSelection={false}
                     handleEvent={handleEvent}
                     rowCount={currentActivities.length}

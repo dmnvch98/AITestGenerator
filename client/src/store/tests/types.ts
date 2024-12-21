@@ -22,3 +22,16 @@ export const questionTypeTranslations: Record<QuestionType, string> = {
     [QuestionType.TRUE_FALSE]: "Верно/Неверно",
     [QuestionType.FILL_IN_THE_BLANKS]: "Заполнение пропусков",
 };
+
+export interface QuestionTypeFlags {
+    [key: string]: {
+        singleAnswer: boolean;
+    };
+}
+
+export const questionTypeFlags: QuestionTypeFlags = {
+    [QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER]: { singleAnswer: true },
+    [QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS]: { singleAnswer: false },
+    [QuestionType.TRUE_FALSE]: { singleAnswer: true },
+    [QuestionType.FILL_IN_THE_BLANKS]: { singleAnswer: true },
+};

@@ -79,7 +79,7 @@ interface GenericTableProps<T> {
     columns: GridColDef[];
     actions?: (item: T) => Action<T>[];
     checkboxSelection?: boolean;
-    rowIdGetter: (row: T) => number;
+    rowIdGetter: (row: T) => number | string;
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
     handleEvent?: GridEventListener<any>;

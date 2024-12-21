@@ -86,7 +86,7 @@ export const PrintTestSettings: React.FC<TestPrintActionsProps> = ({printRef, ha
                 <FormGroup>
                     <FormControlLabel
                         control={<Switch checked={showAnswers} onChange={handleShowAnswers}/>}
-                        label="Показать ответы"
+                        label="Выделить ответы"
                     />
                 </FormGroup>
                 <FormGroup>
