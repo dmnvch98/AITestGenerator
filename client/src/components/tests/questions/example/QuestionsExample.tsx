@@ -141,7 +141,7 @@ const AnswersDisplay: React.FC<{ answerOptions: AnswerOption[] }> = ({ answerOpt
             {answerOptions.map((option) => (
                 <Grid item xs={12} key={option.id}>
                     <Box display="flex" alignItems="flex-start">
-                        {option.isCorrect ? (
+                        {option.correct ? (
                             <StatusIndicator status={GenerationStatus.SUCCESS} />
                         ) : (
                             <StatusIndicator status={GenerationStatus.FAILED} />

@@ -9,7 +9,7 @@ export const convertTest = (test: UserTest | CreateTestRequestDto): UpsertTestRe
             questionType: question.questionType,
             answerOptions: question.answerOptions.map((answerOption) => ({
                 optionText: answerOption.optionText,
-                isCorrect: answerOption.isCorrect,
+                correct: answerOption.correct,
             })),
         })),
     };

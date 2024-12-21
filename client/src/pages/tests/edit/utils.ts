@@ -35,7 +35,7 @@ export const validateTest = (
             invalidQuestions.push({ index, message: "Вопрос должен иметь минимум 2 ответа", id: q.id });
             valid = false;
         }
-        if (!q.answerOptions.some(a => a.isCorrect)) {
+        if (!q.answerOptions.some(a => a.correct)) {
             invalidQuestions.push({ index, message: "Вопрос должен иметь минимум один правильный ответ", id: q.id });
             valid = false;
         }
@@ -45,7 +45,7 @@ export const validateTest = (
         }
         switch (q.questionType) {
             case QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS: {
-                if (q.answerOptions.filter(a => a.isCorrect).length < 2) {
+                if (q.answerOptions.filter(a => a.correct).length < 2) {
                     invalidQuestions.push({ index, message: "Данный тип вопроса должен иметь минимум 2 правильных ответа", id: q.id });
                     valid = false;
                 }
@@ -78,7 +78,7 @@ export const createNewTest = () => ({
                 {
                     id: getNanoTime(),
                     optionText: '',
-                    isCorrect: false
+                    correct: false
                 }
             ]
         }
@@ -93,10 +93,9 @@ export const createNewQuestion = () => ({
         {
             id: getNanoTime(),
             optionText: "",
-            isCorrect: false
+            correct: false
         }
-    ],
-    isCorrect: false,
+    ]
 });
 
 export const getNanoTime = (): number => {

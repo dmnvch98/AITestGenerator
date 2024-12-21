@@ -46,9 +46,9 @@ export const QuestionAnswersPage = ({
         }
 
         if (answered) {
-            if (option.isCorrect) {
+            if (option.correct) {
                 return appColors.primary.main;
-            } else if (isSelected && !option.isCorrect) {
+            } else if (isSelected && !option.correct) {
                 return appColors.error.main;
             }
         }
@@ -81,7 +81,7 @@ export const QuestionAnswersPage = ({
 
     const isAnswerCorrect = (): boolean => {
         const correctOptionIds = question.answerOptions
-            .filter((op) => op.isCorrect)
+            .filter((op) => op.correct)
             .map((op) => op.id);
 
         return (

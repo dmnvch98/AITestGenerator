@@ -1,4 +1,4 @@
-package com.example.generation_service.dto.tests;
+package com.example.generation_service.dto.tests.upsert;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +13,6 @@ public class UpsertTestRequestDto {
 
   private final Long id;
   private final String title;
-  private final List<QuestionDto> questions;
+  private final List<UpsertTestQuestionRequestDto> questions;
 
 }

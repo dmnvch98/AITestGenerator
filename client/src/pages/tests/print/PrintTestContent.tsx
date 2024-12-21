@@ -103,7 +103,7 @@ export const PrintTestContent = () => {
                                           disablePadding>
                                     <Checkbox
                                         edge="start"
-                                        checked={showAnswers && option.isCorrect}
+                                        checked={showAnswers && option.correct}
                                         disabled={true}
                                         sx={{
                                             '& .MuiSvgIcon-root': {

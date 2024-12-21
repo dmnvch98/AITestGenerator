@@ -40,13 +40,13 @@ export const AnswerList: React.FC<AnswerListProps> = ({
                 <Grid item xs={1}>
                     {singleChoice ? (
                         <Radio
-                            checked={answer.isCorrect}
-                            onChange={(e) => correctAnswerChanged && correctAnswerChanged({ ...answer, isCorrect: e.target.checked })}
+                            checked={answer.correct}
+                            onChange={(e) => correctAnswerChanged && correctAnswerChanged({ ...answer, correct: e.target.checked })}
                         />
                     ) : (
                         <Checkbox
-                            checked={answer.isCorrect}
-                            onChange={(e) => onAnswerChange({ ...answer, isCorrect: e.target.checked })}
+                            checked={answer.correct}
+                            onChange={(e) => onAnswerChange({ ...answer, correct: e.target.checked })}
                         />
                     )}
                 </Grid>

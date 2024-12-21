@@ -22,7 +22,6 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                                                               errorMessage,
                                                               questionNumber,
                                                           }) => {
-    console.log('nanoTime: ', getNanoTime())
     const isSingleChoice = question.questionType !== QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
     const showActions = question.questionType !== QuestionType.TRUE_FALSE;
 
@@ -30,7 +29,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
         const newOption: AnswerOption = {
             id: getNanoTime(),
             optionText: '',
-            isCorrect: false,
+            correct: false,
         };
         onQuestionChange({ ...question, answerOptions: [...question.answerOptions, newOption] });
     }, [onQuestionChange, question]);
@@ -43,10 +42,20 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
     }, [onQuestionChange, question.answerOptions]);
 
     const toggleCorrectAnswer = useCallback((updatedOption: AnswerOption) => {
-        const updatedOptions = question.answerOptions.map(option => ({
-            ...option,
-            isCorrect: isSingleChoice ? option.id === updatedOption.id : option.isCorrect,
-        }));
+        let updatedOptions: AnswerOption[];
+
+        if (isSingleChoice) {
+            updatedOptions = question.answerOptions.map(option => ({
+                ...option,
+                correct: option.id === updatedOption.id
+            }));
+        } else {
+            updatedOptions = question.answerOptions.map(option => ({
+                ...option,
+                correct: option.id === updatedOption.id ? !option.correct : option.correct
+            }));
+        }
+
         onQuestionChange({ ...question, answerOptions: updatedOptions });
     }, [onQuestionChange, question.answerOptions, isSingleChoice]);
 
@@ -55,17 +64,17 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
 
         if (newType === QuestionType.TRUE_FALSE) {
             newAnswers = [
-                { id: getNanoTime(), optionText: 'Верно', isCorrect: true },
-                { id: getNanoTime(), optionText: 'Неверно', isCorrect: false }
+                { id: getNanoTime(), optionText: 'Верно', correct: true },
+                { id: getNanoTime(), optionText: 'Неверно', correct: false }
             ];
         } else if ([QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER, QuestionType.FILL_IN_THE_BLANKS].includes(newType)) {
             let firstCorrect = false;
             newAnswers = newAnswers.map(answer => {
-                if (answer.isCorrect && !firstCorrect) {
+                if (answer.correct && !firstCorrect) {
                     firstCorrect = true;
-                    return { ...answer, isCorrect: true };
+                    return { ...answer, correct: true };
                 }
-                return { ...answer, isCorrect: false };
+                return { ...answer, correct: false };
             });
         }
 

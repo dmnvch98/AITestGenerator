@@ -2,12 +2,14 @@ package com.example.generation_service.converters;
 
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
-import com.example.generation_service.dto.tests.AnswerOptionDto;
-import com.example.generation_service.dto.tests.QuestionDto;
-import com.example.generation_service.dto.tests.UpsertTestRequestDto;
+import com.example.generation_service.dto.tests.upsert.GetTestResponseDto;
+import com.example.generation_service.dto.tests.upsert.UpsertTestAnswerOptionRequestDto;
+import com.example.generation_service.dto.tests.upsert.UpsertTestQuestionRequestDto;
+import com.example.generation_service.dto.tests.upsert.UpsertTestRequestDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
 import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.generation.QuestionType;
+import com.example.generation_service.models.test.AnswerOption;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import org.apache.commons.collections4.CollectionUtils;
@@ -82,19 +84,19 @@ public interface TestConverter {
                 var correctQuestion = correctAnswersMap.get(incorrectQuestion.getId());
 
                 if (correctQuestion != null) {
-                    List<AnswerOptionDto> answerOptions = new ArrayList<>();
+                    List<AnswerOption> answerOptions = new ArrayList<>();
 
                     answerOptions.addAll(correctQuestion.getCorrectAnswers().stream()
-                            .map(answer -> AnswerOptionDto.builder()
+                            .map(answer -> AnswerOption.builder()
                                     .optionText(answer.toString())
-                                    .isCorrect(true)
+                                    .correct(true)
                                     .build())
                             .toList());
 
                     answerOptions.addAll(incorrectQuestion.getIncorrectAnswers().stream()
-                            .map(answer -> AnswerOptionDto.builder()
+                            .map(answer -> AnswerOption.builder()
                                     .optionText(answer)
-                                    .isCorrect(false)
+                                    .correct(false)
                                     .build())
                             .toList());
 
@@ -103,7 +105,6 @@ public interface TestConverter {
                     }
 
                     Question question = Question.builder()
-                            .id(correctQuestion.getId())
                             .questionText(correctQuestion.getQuestionText())
                             .answerOptions(answerOptions)
                             .textReference(correctQuestion.getTextReference())
@@ -120,15 +121,27 @@ public interface TestConverter {
     Test convert(final UpsertTestRequestDto dto, final Long userId);
 
     @Named("convertQuestions")
-    default List<Question> convertQuestions(final List<QuestionDto> questionDtos) {
+    default List<Question> convertQuestions(final List<UpsertTestQuestionRequestDto> questionDtos) {
         return questionDtos.stream()
                 .map(this::convertQuestion)
                 .toList();
     }
 
-    Question convertQuestion(final QuestionDto questionDto);
+    @Mapping(source = "questionDto.answerOptions", target = "answerOptions", qualifiedByName = "convertAnswerOptions")
+    Question convertQuestion(final UpsertTestQuestionRequestDto questionDto);
+
+    @Named("convertAnswerOptions")
+    default List<AnswerOption> convertAnswerOptions(final List<UpsertTestAnswerOptionRequestDto> questionDtos) {
+        return questionDtos.stream()
+                .map(this::convertAnswerOption)
+                .toList();
+    }
+
+    AnswerOption convertAnswerOption(final UpsertTestAnswerOptionRequestDto answerOption);
 
     @Mapping(source = "userId", target = "userId")
     Test convert(final Test test, final Long userId);
+
+    GetTestResponseDto convertTest(final Test test);
 
 }

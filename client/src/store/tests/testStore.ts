@@ -30,7 +30,7 @@ export interface QuestionDto {
 
 export interface AnswerOptionDto {
     optionText: string;
-    isCorrect: boolean;
+    correct: boolean;
 }
 
 export interface CreateTestRequestDto {
@@ -49,7 +49,7 @@ export interface Question {
 export interface AnswerOption {
     id: number,
     optionText: string,
-    isCorrect: boolean
+    correct: boolean
 }
 
 export interface BulkDeleteTestsRequestDto {

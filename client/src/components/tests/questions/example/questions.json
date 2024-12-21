@@ -7,22 +7,22 @@
       {
         "id": "11",
         "optionText": "Сера",
-        "isCorrect": false
+        "correct": false
       },
       {
         "id": "12",
         "optionText": "Кислород",
-        "isCorrect": false
+        "correct": false
       },
       {
         "id": "13",
         "optionText": "Алюминий",
-        "isCorrect": true
+        "correct": true
       },
       {
         "id": "14",
         "optionText": "Водород",
-        "isCorrect": false
+        "correct": false
       }
     ],
     "questionType": "MULTIPLE_CHOICE_SINGLE_ANSWER"
@@ -35,68 +35,68 @@
       {
         "id": "21",
         "optionText": "Минск",
-        "isCorrect": true
+        "correct": true
       },
       {
         "id": "22",
         "optionText": "Шанхай",
-        "isCorrect": false
+        "correct": false
       },
       {
         "id": "23",
         "optionText": "Москва",
-        "isCorrect": true
+        "correct": true
       },
       {
         "id": "24",
         "optionText": "Батуми",
-        "isCorrect": false
+        "correct": false
       }
     ],
     "questionType": "MULTIPLE_CHOICE_MULTIPLE_ANSWERS"
   },
   {
     "id": "3",
-    "questionText": "Солнце вращается вокруг Земли.",
+    "questionText": "Земля вращается вокруг Солнца",
     "description": "Вопрос с выбором 'верно' или 'неверно'.",
     "answerOptions": [
       {
         "id": "31",
         "optionText": "Верно",
-        "isCorrect": true
+        "correct": true
       },
       {
         "id": "32",
         "optionText": "Неверно",
-        "isCorrect": false
+        "correct": false
       }
     ],
     "questionType": "TRUE_FALSE"
   },
   {
     "id": "4",
-    "questionText": "Вода закипает при ____ градусах Цельсия.",
+    "questionText": "Вода закипает при ____  градусах Цельсия.",
     "description": "Вопрос с заполнением пропуска. Для указания пропуска необходимо использовать нижнее подчеркивание произвольное количество раз (от одного).",
     "answerOptions": [
       {
         "id": "41",
         "optionText": 90,
-        "isCorrect": false
+        "correct": false
       },
       {
         "id": "42",
         "optionText": 100,
-        "isCorrect": true
+        "correct": true
       },
       {
         "id": "43",
         "optionText": 120,
-        "isCorrect": false
+        "correct": false
       },
       {
         "id": "44",
         "optionText": 500,
-        "isCorrect": false
+        "correct": false
       }
     ],
     "questionType": "FILL_IN_THE_BLANKS"

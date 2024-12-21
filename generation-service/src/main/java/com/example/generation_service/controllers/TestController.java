@@ -3,6 +3,8 @@ package com.example.generation_service.controllers;
 import com.example.generation_service.config.security.service.PrincipalUser;
 import com.example.generation_service.dto.tests.*;
 import com.example.generation_service.dto.tests.print.TestPrintRequestDto;
+import com.example.generation_service.dto.tests.upsert.UpsertTestRequestDto;
+import com.example.generation_service.dto.tests.upsert.GetTestResponseDto;
 import com.example.generation_service.facades.TestFacade;
 import com.example.generation_service.models.test.Test;
 import jakarta.validation.Valid;
@@ -32,7 +34,7 @@ public class TestController {
     }
 
     @GetMapping("/{id}")
-    public Test findAllById(Authentication authentication, @PathVariable Long id) {
+    public GetTestResponseDto findAllById(Authentication authentication, @PathVariable Long id) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.findTestById(id, userId);
     }
@@ -53,7 +55,7 @@ public class TestController {
     }
 
     @PutMapping
-    public Test upsert(final Authentication authentication, @RequestBody final UpsertTestRequestDto test) {
+    public GetTestResponseDto upsert(final Authentication authentication, @RequestBody final UpsertTestRequestDto test) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.upsert(test, userId);
     }
@@ -71,7 +73,7 @@ public class TestController {
     }
 
     @GetMapping
-    public TestsResponseDto getProducts(
+    public TestsResponseDto getTests(
             final Authentication authentication,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,

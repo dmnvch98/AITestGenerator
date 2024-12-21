@@ -5,6 +5,8 @@ import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
 import com.example.generation_service.dto.tests.*;
+import com.example.generation_service.dto.tests.upsert.UpsertTestRequestDto;
+import com.example.generation_service.dto.tests.upsert.GetTestResponseDto;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
@@ -146,18 +148,18 @@ public class TestFacade {
     return testConverter.convert(tests);
   }
 
-  public Test findTestById(Long testId, Long userId) {
-    return testService.findAllByIdAndUserIdOrThrow(testId, userId);
+  public GetTestResponseDto findTestById(Long testId, Long userId) {
+    return testConverter.convertTest(testService.findAllByIdAndUserIdOrThrow(testId, userId));
   }
 
-  public Test upsert(final UpsertTestRequestDto test, final Long userId) {
+  public GetTestResponseDto upsert(final UpsertTestRequestDto test, final Long userId) {
     final Optional<Test> existingTest = testService.findAllByIdAndUserId(test.getId(), userId);
 
     if (existingTest.isPresent()) {
       final Test updatedTest = updateTestFields(existingTest.get(), test);
-      return testService.updateTest(updatedTest, userId);
+      return testConverter.convertTest(testService.updateTest(updatedTest, userId));
     } else {
-      return testService.insertTest(testConverter.convert(test, userId), userId);
+      return testConverter.convertTest(testService.insertTest(testConverter.convert(test, userId), userId));
     }
   }
 

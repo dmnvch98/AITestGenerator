@@ -2,10 +2,10 @@ package com.example.generation_service.generators.post.types;
 
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
-import com.example.generation_service.dto.tests.AnswerOptionDto;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.generators.post.PostGenerator;
 import com.example.generation_service.models.generation.QuestionType;
+import com.example.generation_service.models.test.AnswerOption;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import org.springframework.stereotype.Component;
@@ -42,14 +42,14 @@ public class TrueFalsePostGenerator extends PostGenerator {
 
         boolean originalAnswer = (Boolean) source.getCorrectAnswers().get(0);
 
-        final AnswerOptionDto correctOption = AnswerOptionDto.builder()
+        final AnswerOption correctOption = AnswerOption.builder()
                 .optionText("Верно")
-                .isCorrect(originalAnswer)
+                .correct(originalAnswer)
                 .build();
 
-        final AnswerOptionDto incorrectOption = AnswerOptionDto.builder()
+        final AnswerOption incorrectOption = AnswerOption.builder()
                 .optionText("Неверно")
-                .isCorrect(!originalAnswer)
+                .correct(!originalAnswer)
                 .build();
 
         return Question.builder()

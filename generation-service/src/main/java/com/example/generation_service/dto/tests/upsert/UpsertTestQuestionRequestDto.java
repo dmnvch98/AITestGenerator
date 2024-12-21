@@ -1,4 +1,4 @@
-package com.example.generation_service.models.test;
+package com.example.generation_service.dto.tests.upsert;
 
 import com.example.generation_service.models.generation.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,10 +12,10 @@ import java.util.List;
 @Getter
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Question {
+public class UpsertTestQuestionRequestDto {
 
     private final String questionText;
-    private final List<AnswerOption> answerOptions;
+    private final List<UpsertTestAnswerOptionRequestDto> answerOptions;
     private final String textReference;
     private final QuestionType questionType;
 }
