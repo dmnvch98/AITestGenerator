@@ -5,6 +5,7 @@ import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
 import NotificationService from "../../services/notification/NotificationService";
 import {GenerateTestRequest, QuestionType} from "./types";
+import {convertTest} from "./converter/testConverter";
 
 export interface UserTest {
     id: number;
@@ -13,6 +14,23 @@ export interface UserTest {
     rating?: number;
     fileName: string;
     createdAt: Date;
+}
+
+export interface UpsertTestRequestDto {
+    id?: number;
+    title: string,
+    questions: QuestionDto[]
+}
+
+export interface QuestionDto {
+    questionText: string;
+    answerOptions: AnswerOptionDto[]
+    questionType: QuestionType;
+}
+
+export interface AnswerOptionDto {
+    optionText: string;
+    isCorrect: boolean;
 }
 
 export interface CreateTestRequestDto {
@@ -25,7 +43,7 @@ export interface Question {
     questionText: string,
     answerOptions: AnswerOption[]
     textReference?: string;
-    questionType?: QuestionType;
+    questionType: QuestionType;
 }
 
 export interface AnswerOption {
@@ -136,10 +154,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({deleteTestFlag: flag});
     },
     upsert: async (test): Promise<UserTest | null> => {
-        const { getAllUserTests} = get();
-        const response = await TestService.upsert(test);
+        const dto: UpsertTestRequestDto = convertTest(test);
+        const response = await TestService.upsert(dto);
         if (response) {
-            getAllUserTests();
             NotificationService.addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
             return response as UserTest;
         } else {
