@@ -68,7 +68,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
             name: 'Отменить',
             icon: <RestoreIcon />,
             onClick: onUndo,
-            disabled: !isTestModified || isLoading || !undoActionsAvailable
+            disabled: isLoading || !undoActionsAvailable
         },
         {
             name: 'Вернуться',

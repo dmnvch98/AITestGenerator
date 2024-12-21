@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Box, CircularProgress, Paper} from "@mui/material";
@@ -31,9 +31,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
     const [testHistory, setTestHistory] = useState<(UserTest | CreateTestRequestDto)[]>([]); // История изменений
-    const isTestModified = () => {
+
+    const isTestModified = useCallback(() => {
         return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
-    }
+    }, [localTest, lastSavedTest, initialTest]);
+
 
     useEffect(() => {
         if (!isTestModified()) {
@@ -50,6 +52,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
             clearState();
         }
     }, []);
+
+    useEffect(() => {
+        if (currentQuestionIndex !== 0 && currentQuestionIndex  >= localTest.questions.length) {
+            setCurrentQuestionIndex(localTest.questions.length - 1);
+        }
+    }, [localTest.questions.length]);
 
     const handleSave = () => {
         const {valid, invalidQuestions} = validateTest(localTest, setCurrentQuestionIndex);

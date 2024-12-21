@@ -29,7 +29,6 @@ export const Tests = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchValue(searchValue);

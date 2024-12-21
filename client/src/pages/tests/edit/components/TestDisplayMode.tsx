@@ -51,14 +51,14 @@ export const QuestionListView: React.FC<QuestionListViewProps> = ({
     </Box>
 );
 
-export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = ({
-                                                                                questions,
-                                                                                currentQuestionIndex,
-                                                                                onQuestionChange,
-                                                                                onDelete,
-                                                                                invalidQuestions,
-                                                                                editMode
-                                                                            }) => (
+export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = React.memo(({
+                                                                                           questions,
+                                                                                           currentQuestionIndex,
+                                                                                           onQuestionChange,
+                                                                                           onDelete,
+                                                                                           invalidQuestions,
+                                                                                           editMode
+                                                                                       }) => (
     <Box>
         {questions[currentQuestionIndex] && (
             <Box display="flex" alignItems="center" my={2}>
@@ -81,4 +81,4 @@ export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = ({
             </Box>
         )}
     </Box>
-);
+));

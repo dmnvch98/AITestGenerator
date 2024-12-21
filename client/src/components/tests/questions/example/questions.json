@@ -29,35 +29,40 @@
   },
   {
     "id": "2",
-    "questionText": "Какие из следующих городов являются столицами?",
+    "questionText": "Какие из следующих цветов присутствуют в светофоре?",
     "description": " Вопрос с несколькими правильными ответами.",
     "answerOptions": [
       {
         "id": "21",
-        "optionText": "Минск",
+        "optionText": "Красный",
         "correct": true
       },
       {
         "id": "22",
-        "optionText": "Шанхай",
+        "optionText": "Синий",
         "correct": false
       },
       {
         "id": "23",
-        "optionText": "Москва",
+        "optionText": "Желтый",
         "correct": true
       },
       {
         "id": "24",
-        "optionText": "Батуми",
+        "optionText": "Белый",
         "correct": false
+      },
+      {
+        "id": "25",
+        "optionText": "Зеленый",
+        "correct": true
       }
     ],
     "questionType": "MULTIPLE_CHOICE_MULTIPLE_ANSWERS"
   },
   {
     "id": "3",
-    "questionText": "Земля вращается вокруг Солнца",
+    "questionText": "Земля вращается вокруг Солнца.",
     "description": "Вопрос с выбором 'верно' или 'неверно'.",
     "answerOptions": [
       {
