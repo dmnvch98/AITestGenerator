@@ -20,7 +20,7 @@ public class TestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Test save(@RequestBody CreateTestRequestDto test, Authentication authentication) {
+    public Test save(@RequestBody UpsertTestRequestDto test, Authentication authentication) {
         Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.save(test, userId);
     }
@@ -53,7 +53,7 @@ public class TestController {
     }
 
     @PutMapping
-    public Test upsert(final Authentication authentication, @RequestBody final Test test) {
+    public Test upsert(final Authentication authentication, @RequestBody final UpsertTestRequestDto test) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         return testFacade.upsert(test, userId);
     }

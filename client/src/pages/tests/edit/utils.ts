@@ -1,15 +1,20 @@
 import {CreateTestRequestDto, UserTest} from "../../../store/tests/testStore";
-import {v4 as uuidv4} from "uuid";
 import {AlertMessage} from "../../../store/types";
 import NotificationService from "../../../services/notification/NotificationService";
 import {QuestionType} from "../../../store/tests/types";
 
+interface InvalidQuestion {
+    index: number,
+    message: string,
+    id: number
+}
+
 export const validateTest = (
     localTest: UserTest | CreateTestRequestDto,
     setCurrentQuestionIndex: (index: number) => void
-): { valid: boolean, invalidQuestions: { index: number, message: string }[] } => {
+): { valid: boolean, invalidQuestions: InvalidQuestion[] } => {
     let valid = true;
-    const invalidQuestions: { index: number, message: string, id?: string }[] = [];
+    const invalidQuestions: InvalidQuestion[] = [];
 
     if (!localTest?.title?.trim()) {
         NotificationService.addAlert(new AlertMessage('Заголовок теста не должен быть пустым', 'error'));
@@ -66,11 +71,12 @@ export const createNewTest = () => ({
     title: '',
     questions: [
         {
-            id: uuidv4(),
+            id: getNanoTime(),
             questionText: '',
+            questionType: QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER,
             answerOptions: [
                 {
-                    id: uuidv4(),
+                    id: getNanoTime(),
                     optionText: '',
                     isCorrect: false
                 }
@@ -80,14 +86,20 @@ export const createNewTest = () => ({
 });
 
 export const createNewQuestion = () => ({
-    id: uuidv4(),
+    id: getNanoTime(),
     questionText: "",
+    questionType: QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER,
     answerOptions: [
         {
-            id: uuidv4(),
+            id: getNanoTime(),
             optionText: "",
             isCorrect: false
         }
     ],
     isCorrect: false,
 });
+
+export const getNanoTime = (): number => {
+    const timeInMillis = performance.now();
+    return Math.round(timeInMillis * 1_000_000);
+}

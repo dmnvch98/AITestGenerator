@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 interface AnswerListProps {
     answerOptions: AnswerOption[];
     onAnswerChange: (updatedOption: AnswerOption) => void;
-    onDeleteAnswer: (id: string) => void;
+    onDeleteAnswer: (id: number) => void;
     onAddAnswer?: () => void;
     correctAnswerChanged?: (updatedOption: AnswerOption) => void;
     singleChoice?: boolean;

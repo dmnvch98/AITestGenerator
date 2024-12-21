@@ -26,7 +26,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
-    const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id?: string }[]>([]);
+    const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id: number }[]>([]);
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
@@ -81,7 +81,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
         setCurrentQuestionIndex(localTest.questions.length);
     };
 
-    const handleDeleteQuestion = (id: string) => {
+    const handleDeleteQuestion = (id: number) => {
         saveToHistory(localTest);
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setCurrentQuestionIndex(updatedQuestions.length - 1);

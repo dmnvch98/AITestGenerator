@@ -1,10 +1,10 @@
 package com.example.generation_service.converters;
 
-import com.example.generation_service.dto.generation.GenerateTestAllAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestCorrectAnswersResponseDto;
 import com.example.generation_service.dto.generation.GenerateTestIncorrectAnswersResponseDto;
 import com.example.generation_service.dto.tests.AnswerOptionDto;
-import com.example.generation_service.dto.tests.CreateTestRequestDto;
+import com.example.generation_service.dto.tests.QuestionDto;
+import com.example.generation_service.dto.tests.UpsertTestRequestDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
 import com.example.generation_service.models.files.FileHash;
 import com.example.generation_service.models.generation.QuestionType;
@@ -30,20 +30,6 @@ public interface TestConverter {
     @Mapping(target = "id", ignore = true)
     Test convert(final GenerateTestCorrectAnswersResponseDto answersDto, final long userId,
                  final FileHash fileHash, final QuestionType questionsType);
-
-//    @Mapping(source = "answersDto.title", target = "title")
-//    @Mapping(source = "userId", target = "userId")
-//    @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
-//    @Mapping(target = "id", ignore = true)
-//    @Mapping(source = "answersDto", target = "questions", qualifiedByName = "convertAllAnswersQuestions")
-//    Test convert(final GenerateTestAllAnswersResponseDto answersDto, final long userId,
-//                 final FileHash fileHash, final QuestionType questionsType);
-
-//    @Mapping(source = "answersDto.title", target = "title")
-//    @Mapping(source = "userId", target = "userId")
-//    @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
-//    @Mapping(target = "id", ignore = true)
-//    Test convert(final List<Question> questions, final String title, final long userId, final String fileName);
 
     @Mapping(source = "title", target = "title")
     @Mapping(source = "userId", target = "userId")
@@ -78,14 +64,6 @@ public interface TestConverter {
     @Named("getOriginalFilename")
     default String getFileHashId(final FileHash fileHash) {
         return fileHash.getOriginalFilename();
-    }
-
-    Question convertAllAnswersQuestion(GenerateTestAllAnswersResponseDto.QuestionDto questionDto, QuestionType questionType);
-
-    default List<Question> convertAllAnswersQuestions(List<GenerateTestAllAnswersResponseDto.QuestionDto> questionDtos , QuestionType questionsType) {
-        return questionDtos.stream()
-                .map(questionDto -> convertAllAnswersQuestion(questionDto, questionsType))
-                .toList();
     }
 
     default List<Question> convertAllAnswersQuestions(
@@ -138,8 +116,17 @@ public interface TestConverter {
             return resultQuestions;
     }
 
-    @Mapping(source = "userId", target = "userId")
-    Test convert(final CreateTestRequestDto dto, final Long userId);
+    @Mapping(source = "dto.questions", target = "questions", qualifiedByName = "convertQuestions")
+    Test convert(final UpsertTestRequestDto dto, final Long userId);
+
+    @Named("convertQuestions")
+    default List<Question> convertQuestions(final List<QuestionDto> questionDtos) {
+        return questionDtos.stream()
+                .map(this::convertQuestion)
+                .toList();
+    }
+
+    Question convertQuestion(final QuestionDto questionDto);
 
     @Mapping(source = "userId", target = "userId")
     Test convert(final Test test, final Long userId);

@@ -4,8 +4,8 @@ import { QuestionType } from "../../../store/tests/types";
 import { AccordionDetails, AccordionSummary, Box } from "@mui/material";
 import { QuestionHeader } from "./QuestionHeader";
 import { AnswerList } from "./AnswersList";
-import { v4 as uuidv4 } from "uuid";
 import { QuestionTypeSelector } from "../../../pages/tests/edit/components/QuestionTypeSelector";
+import {getNanoTime} from "../../../pages/tests/edit/utils";
 
 export interface QuestionEditProps {
     question: Question;
@@ -22,12 +22,13 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                                                               errorMessage,
                                                               questionNumber,
                                                           }) => {
+    console.log('nanoTime: ', getNanoTime())
     const isSingleChoice = question.questionType !== QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
     const showActions = question.questionType !== QuestionType.TRUE_FALSE;
 
     const addAnswerOption = useCallback(() => {
         const newOption: AnswerOption = {
-            id: uuidv4(),
+            id: getNanoTime(),
             optionText: '',
             isCorrect: false,
         };
@@ -54,8 +55,8 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
 
         if (newType === QuestionType.TRUE_FALSE) {
             newAnswers = [
-                { id: uuidv4(), optionText: 'Верно', isCorrect: true },
-                { id: uuidv4(), optionText: 'Неверно', isCorrect: false }
+                { id: getNanoTime(), optionText: 'Верно', isCorrect: true },
+                { id: getNanoTime(), optionText: 'Неверно', isCorrect: false }
             ];
         } else if ([QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER, QuestionType.FILL_IN_THE_BLANKS].includes(newType)) {
             let firstCorrect = false;

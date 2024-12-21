@@ -1,26 +1,26 @@
 [
   {
-    "id": "q1",
+    "id": "1",
     "questionText": "Какой из следующих элементов является металлом?",
     "description": "Вопрос с единственным правильным ответом.",
     "answerOptions": [
       {
-        "id": "a1",
+        "id": "11",
         "optionText": "Сера",
         "isCorrect": false
       },
       {
-        "id": "a2",
+        "id": "12",
         "optionText": "Кислород",
         "isCorrect": false
       },
       {
-        "id": "a3",
+        "id": "13",
         "optionText": "Алюминий",
         "isCorrect": true
       },
       {
-        "id": "a4",
+        "id": "14",
         "optionText": "Водород",
         "isCorrect": false
       }
@@ -28,27 +28,27 @@
     "questionType": "MULTIPLE_CHOICE_SINGLE_ANSWER"
   },
   {
-    "id": "q4",
+    "id": "2",
     "questionText": "Какие из следующих городов являются столицами?",
     "description": " Вопрос с несколькими правильными ответами.",
     "answerOptions": [
       {
-        "id": "a1",
+        "id": "21",
         "optionText": "Минск",
         "isCorrect": true
       },
       {
-        "id": "a2",
+        "id": "22",
         "optionText": "Шанхай",
         "isCorrect": false
       },
       {
-        "id": "a3",
+        "id": "23",
         "optionText": "Москва",
         "isCorrect": true
       },
       {
-        "id": "a4",
+        "id": "24",
         "optionText": "Батуми",
         "isCorrect": false
       }
@@ -56,17 +56,17 @@
     "questionType": "MULTIPLE_CHOICE_MULTIPLE_ANSWERS"
   },
   {
-    "id": "q3",
+    "id": "3",
     "questionText": "Солнце вращается вокруг Земли.",
     "description": "Вопрос с выбором 'верно' или 'неверно'.",
     "answerOptions": [
       {
-        "id": "a1",
+        "id": "31",
         "optionText": "Верно",
         "isCorrect": true
       },
       {
-        "id": "a2",
+        "id": "32",
         "optionText": "Неверно",
         "isCorrect": false
       }
@@ -74,27 +74,27 @@
     "questionType": "TRUE_FALSE"
   },
   {
-    "id": "q4",
+    "id": "4",
     "questionText": "Вода закипает при ____ градусах Цельсия.",
     "description": "Вопрос с заполнением пропуска. Для указания пропуска необходимо использовать нижнее подчеркивание произвольное количество раз (от одного).",
     "answerOptions": [
       {
-        "id": "a1",
+        "id": "41",
         "optionText": 90,
         "isCorrect": false
       },
       {
-        "id": "a2",
+        "id": "42",
         "optionText": 100,
         "isCorrect": true
       },
       {
-        "id": "a3",
+        "id": "43",
         "optionText": 120,
         "isCorrect": false
       },
       {
-        "id": "a4",
+        "id": "44",
         "optionText": 500,
         "isCorrect": false
       }

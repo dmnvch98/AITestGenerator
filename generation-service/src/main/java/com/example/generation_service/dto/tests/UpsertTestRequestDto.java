@@ -9,10 +9,10 @@ import java.util.List;
 @Jacksonized
 @Getter
 @Builder
-public class CreateTestRequestDto {
+public class UpsertTestRequestDto {
 
+  private final Long id;
   private final String title;
   private final List<QuestionDto> questions;
-  private final String language;
 
 }

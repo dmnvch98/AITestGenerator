@@ -7,7 +7,7 @@ import {QuestionEdit} from "../../../../components/tests/questions/QuestionEdit"
 interface QuestionListViewProps {
     questions: Question[];
     onQuestionChange: (question: Question) => void;
-    onDelete: (id: string) => void;
+    onDelete: (id: number) => void;
     invalidQuestions: { index: number; message: string }[];
     editMode: boolean;
 }
@@ -33,7 +33,7 @@ export const QuestionListView: React.FC<QuestionListViewProps> = ({
                             question={question}
                             questionNumber={index + 1}
                             onQuestionChange={onQuestionChange}
-                            onDelete={() => onDelete(question.id as string)}
+                            onDelete={() => onDelete(question.id)}
                             errorMessage={invalidQuestions.find((item) => item.index === index)?.message || ""}
                         />
                     ) : (
@@ -68,7 +68,7 @@ export const QuestionPaginatedView: React.FC<QuestionPaginatedViewProps> = ({
                             questionNumber={currentQuestionIndex + 1}
                             question={questions[currentQuestionIndex]}
                             onQuestionChange={onQuestionChange}
-                            onDelete={() => onDelete(questions[currentQuestionIndex].id as string)}
+                            onDelete={() => onDelete(questions[currentQuestionIndex].id)}
                             errorMessage={invalidQuestions.find((item) => item.index === currentQuestionIndex)?.message || ""}
                         />
                     ) : (

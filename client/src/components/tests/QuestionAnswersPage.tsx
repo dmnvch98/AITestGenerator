@@ -21,7 +21,7 @@ export const QuestionAnswersPage = ({
     currentTestNumber: number;
     allTestsNumber: number;
 }) => {
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
     const [answered, setAnswered] = useState(false);
     const [acceptCalled, setAcceptCalled] = useState(false);
     const addAnswer = usePassTestStore((state) => state.addAnswer);
@@ -39,7 +39,7 @@ export const QuestionAnswersPage = ({
     };
 
     const getOptionColor = (option: AnswerOption) => {
-        const isSelected = isOptionSelected(option.id as string);
+        const isSelected = isOptionSelected(option.id);
 
         if (!answered && isSelected) {
             return appColors.primary.default;
@@ -56,9 +56,9 @@ export const QuestionAnswersPage = ({
         return "transparent";
     };
 
-    const isOptionSelected = (optionId: string) => selectedOptions.includes(optionId);
+    const isOptionSelected = (optionId: number) => selectedOptions.includes(optionId);
 
-    const handleOptionSelect = (optionId: string) => {
+    const handleOptionSelect = (optionId: number) => {
         if (!answered) {
             setSelectedOptions((prevSelectedOptions) =>
                 prevSelectedOptions.includes(optionId)
@@ -82,7 +82,7 @@ export const QuestionAnswersPage = ({
     const isAnswerCorrect = (): boolean => {
         const correctOptionIds = question.answerOptions
             .filter((op) => op.isCorrect)
-            .map((op) => op.id as string); // Приводим к типу string для соответствия с selectedOptions
+            .map((op) => op.id);
 
         return (
             correctOptionIds.length === selectedOptions.length &&
@@ -120,7 +120,7 @@ export const QuestionAnswersPage = ({
                         }}
                     >
                         <Paper
-                            onClick={() => handleOptionSelect(option.id as string)}
+                            onClick={() => handleOptionSelect(option.id)}
                             sx={{
                                 p: 3,
                                 cursor: "pointer",

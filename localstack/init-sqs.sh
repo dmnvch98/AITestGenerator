@@ -3,7 +3,7 @@
 set -ex
 
 awslocal --endpoint-url=http://localhost:4566 sqs create-queue \
-  --queue-name test-queue.fifo \
+  --queue-name test-generation.fifo \
   --attributes FifoQueue=true,ContentBasedDeduplication=true
 
 echo "SQS SETUP FINISHED"

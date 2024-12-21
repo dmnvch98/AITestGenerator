@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
-import java.util.UUID;
-
 
 @Builder
 @Getter
@@ -16,7 +14,7 @@ import java.util.UUID;
 public class AnswerOptionDto {
 
     @Builder.Default
-    private final UUID id = UUID.randomUUID();
+    private final Long id = System.nanoTime();
     private final String optionText;
     @Getter(onMethod_ = {@JsonProperty("isCorrect")})
     private final boolean isCorrect;

@@ -21,7 +21,7 @@ export interface CreateTestRequestDto {
 }
 
 export interface Question {
-    id?: string,
+    id: number,
     questionText: string,
     answerOptions: AnswerOption[]
     textReference?: string;
@@ -29,7 +29,7 @@ export interface Question {
 }
 
 export interface AnswerOption {
-    id: string,
+    id: number,
     optionText: string,
     isCorrect: boolean
 }

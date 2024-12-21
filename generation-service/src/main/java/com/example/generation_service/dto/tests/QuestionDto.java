@@ -1,5 +1,6 @@
 package com.example.generation_service.dto.tests;
 
+import com.example.generation_service.models.generation.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +19,5 @@ public class QuestionDto {
     private final String questionText;
     private final List<AnswerOptionDto> answerOptions;
     private final String textReference;
+    private final QuestionType questionType;
 }

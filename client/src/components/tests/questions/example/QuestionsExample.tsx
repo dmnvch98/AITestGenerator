@@ -25,14 +25,13 @@ export default function EnhancedMenuBasedLayout() {
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
     const [questions, setQuestions] = useState<QuestionDescription[]>([]);
     const theme = useTheme();
-
-    useEffect(() => {
-        setQuestions(questionsData as QuestionDescription[]);
-    }, []);
-
     const entries = Object.entries(questionTypeTranslations);
     const selectedLabel = entries[selectedIndex][1];
     const selectedQuestion = questions.find(q => q.questionType === entries[selectedIndex][0]);
+
+    useEffect(() => {
+        setQuestions(questionsData as unknown as QuestionDescription[]);
+    }, []);
 
     const handleListItemClick = (index: number) => {
         setSelectedIndex(index);

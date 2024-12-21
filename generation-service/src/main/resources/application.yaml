@@ -60,6 +60,8 @@ retry:
 logging:
   pattern:
     console: ${LOGGING_PATTERN_CONSOLE}
+  level:
+    root: debug
 
 clamav:
   host: ${CLAMAV_HOST}

@@ -48,7 +48,7 @@ public class TestFacade {
   private final TestGenerationConverter testGenerationConverter;
   private final TestGenerationActivityService activityService;
 
-  public Test save(final CreateTestRequestDto request, final Long userId) {
+  public Test save(final UpsertTestRequestDto request, final Long userId) {
     final Test test = testConverter.convert(request, userId);
     return testService.save(test);
   }
@@ -150,7 +150,7 @@ public class TestFacade {
     return testService.findAllByIdAndUserIdOrThrow(testId, userId);
   }
 
-  public Test upsert(final Test test, final Long userId) {
+  public Test upsert(final UpsertTestRequestDto test, final Long userId) {
     final Optional<Test> existingTest = testService.findAllByIdAndUserId(test.getId(), userId);
 
     if (existingTest.isPresent()) {
@@ -176,8 +176,8 @@ public class TestFacade {
     return retryContextParams;
   }
 
-  private Test updateTestFields(final Test existingTest, final Test updateTest) {
-    existingTest.setQuestions(updateTest.getQuestions());
+  private Test updateTestFields(final Test existingTest, final UpsertTestRequestDto updateTest) {
+    existingTest.setQuestions(testConverter.convertQuestions(updateTest.getQuestions()));
     if (!existingTest.getTitle().equals(updateTest.getTitle())) {
       existingTest.setTitle(updateTest.getTitle());
     }
