@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IncorrectAnswerGenerator {
 
-    protected final static String CONTEXT = "/ai/multiple_choise/answers_context_prompt.txt";
+    protected final static String CONTEXT = "/ai/answers_context_prompt.txt";
     protected final static String SCHEMA = "/ai/schemas/multiple_choise/incorrect-answers.json";
 
     @Value("${generation.models.answers}")
@@ -47,7 +47,7 @@ public class IncorrectAnswerGenerator {
 
     private List<ChatMessage> prepareMessages(final GenerateTestCorrectAnswersResponseDto questionsResponseDto) throws IOException {
         final String testGenerationRequest = converter.convertTestIncorrectAnswers(questionsResponseDto);
-        final String contextPrompt = Utils.loadResourceFile(IncorrectAnswerGenerator.CONTEXT);
+        final String contextPrompt = Utils.loadResourceFile(CONTEXT);
 
         final ChatMessage context = new ChatMessage(ChatMessageRole.SYSTEM.value(), contextPrompt);
         final ChatMessage userText = new ChatMessage(ChatMessageRole.USER.value(), testGenerationRequest);

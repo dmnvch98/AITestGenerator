@@ -16,6 +16,7 @@ interface AuthStore {
 }
 
 const useAuthStore = create<AuthStore>((set, get) => ({
+
     authenticated: localStorage.getItem('JWT') !== null,
     alerts: [],
 

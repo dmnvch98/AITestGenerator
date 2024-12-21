@@ -30,13 +30,12 @@ public class TestGenerationService {
 
   public Test generateTest(final GenerateTestRequestParams request, final Map<String, String> retryContextParamsMap)
       throws Exception {
-    GenerateTestCorrectAnswersResponseDto correctAnswersDto = generateQuestions(request, retryContextParamsMap);
-    log.info(
-        "Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
+    final GenerateTestCorrectAnswersResponseDto correctAnswersDto = generateQuestions(request, retryContextParamsMap);
+    log.info("Question generation is done. User id: [{}], questions count: [{}]", request.getUserId(),
             correctAnswersDto.getQuestions().size());
 
     if (request.getQuestionType().isShouldGenerateIncorrectOptions()) {
-        GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto = generateIncorrectOptions(request, correctAnswersDto, retryContextParamsMap);
+        final GenerateTestIncorrectAnswersResponseDto incorrectAnswersDto = generateIncorrectOptions(request, correctAnswersDto, retryContextParamsMap);
         return postGenerationRegistry.getGenerator(request.getQuestionType())
                 .process(incorrectAnswersDto, correctAnswersDto, request);
     }
