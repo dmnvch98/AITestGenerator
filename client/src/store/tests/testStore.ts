@@ -3,7 +3,7 @@ import TestService from "../../services/TestService";
 import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
-import NotificationService from "../../services/notification/NotificationService";
+import NotificationService from "../../services/notification/AlertService";
 import {GenerateTestRequest, QuestionType} from "./types";
 import {convertTest} from "./converter/testConverter";
 

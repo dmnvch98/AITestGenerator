@@ -1,7 +1,7 @@
 import {useNotificationStore} from "../../store/notificationStore";
 import {AlertMessage} from "../../store/types";
 
-class NotificationService {
+class AlertService {
 
     public addAlert(alert: AlertMessage) {
         useNotificationStore.getState().addAlert(alert);
@@ -20,4 +20,4 @@ class NotificationService {
     }
 }
 
-export default new NotificationService();
+export default new AlertService();

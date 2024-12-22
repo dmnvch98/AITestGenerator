@@ -15,6 +15,7 @@ import {TestPageCreate} from "./pages/tests/create/TestPageCreate";
 import useAuthStore from "./pages/auth/authStore";
 import ServerErrorPage from "./pages/errors/ServerErrorPage";
 import {useUserStore} from "./store/userStore";
+import SseService from "./services/sse/SseService";
 
 const MainRoutes = () => {
     const {getTestGenCurrentActivities} = useUserStore();
@@ -31,6 +32,33 @@ const MainRoutes = () => {
             getTestGenCurrentActivities();
         }
     }, [location.pathname]);
+
+    useEffect(() => {
+        const sseService = new SseService();
+
+        const initializeSse = async () => {
+            const handshakeData = await sseService.sseHandshake();
+
+            if (handshakeData) {
+                const { sessionId } = handshakeData;
+
+                const eventSource = sseService.subscribe(sessionId);
+
+                return () => {
+                    sseService.closeConnection(eventSource);
+                };
+            }
+        };
+
+        initializeSse().catch((err) => {
+            console.error("Failed to initialize SSE", err);
+        });
+
+        return () => {
+            console.log("Cleaning up SSE connection");
+        };
+    }, []);
+
 
     return (
         <>

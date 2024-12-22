@@ -8,7 +8,7 @@ import {TestTitleInput} from "../edit/components/TestTitleInput";
 import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 import {AlertMessage} from "../../../store/types";
 
 interface TestFormProps {

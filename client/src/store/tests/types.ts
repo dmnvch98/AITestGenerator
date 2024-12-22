@@ -35,3 +35,8 @@ export const questionTypeFlags: QuestionTypeFlags = {
     [QuestionType.TRUE_FALSE]: { singleAnswer: true },
     [QuestionType.FILL_IN_THE_BLANKS]: { singleAnswer: true },
 };
+
+export enum NotificationType {
+
+    ACTIVITY= 'ACTIVITY'
+}

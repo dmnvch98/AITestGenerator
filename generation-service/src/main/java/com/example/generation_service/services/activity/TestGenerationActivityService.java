@@ -2,6 +2,7 @@ package com.example.generation_service.services.activity;
 
 import com.example.generation_service.converters.ActivityConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
+import com.example.generation_service.dto.sse.NotificationType;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
@@ -11,6 +12,7 @@ import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.CommandService;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.TestGeneratingHistoryService;
+import com.example.generation_service.services.notification.NotificationService;
 import com.example.generation_service.services.redis.RedisService;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +32,12 @@ public class TestGenerationActivityService {
     private final RedisService genericRedisService;
     private final TestGeneratingHistoryService historyService;
     private final FileHashService fileHashService;
+    private final NotificationService notificationService;
 
     public void saveActivity(final TestGenerationActivity activity) {
         final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
         genericRedisService.saveObjectToHash(hashKey, activity.getCid(), activity);
+        notificationService.sendNotificationToUser(activity.getUserId(), NotificationType.ACTIVITY);
     }
 
     public TestGenerationActivity getActivity(final String hashKey, final String cid) {
@@ -56,6 +60,7 @@ public class TestGenerationActivityService {
         final TestGenerationActivity updatedActivity = activityConverter.updateProcessedQuestionType(activity, questionType);
         final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
         genericRedisService.saveObjectToHash(hashKey, activity.getCid(), updatedActivity);
+        notificationService.sendNotificationToUser(activity.getUserId(), NotificationType.ACTIVITY);
     }
 
     public void createInProgressActivity(final Long userId, final String cid, final String messageReceipt) {
@@ -71,6 +76,7 @@ public class TestGenerationActivityService {
         final TestGenerationActivity inProcessActivity = activityConverter
               .getInProgressActivity(currentActivity, messageReceipt);
         genericRedisService.saveObjectToHash(hashKey,cid, inProcessActivity);
+        notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     private void createFinishedActivity(final TestGenerationActivity activity, final Long testId,
@@ -80,16 +86,19 @@ public class TestGenerationActivityService {
         if (finishedActivity != null) {
             genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity);
         }
+        notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void deleteUserActivity(final Long userId, final String cid) {
         final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.deleteObjectFromHash(hashKey, cid);
+        notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void deleteUserActivities(final Long userId, final List<String> cids) {
         final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.deleteObjectsFromHash(hashKey, cids);
+        notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void finishActivity(final TestGenerationActivity activity, final Long testId, final String testTitle,
@@ -110,6 +119,7 @@ public class TestGenerationActivityService {
         log.info("Saved failed activity=[{}]", failedActivity);
         final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
         historyService.save(failedHistory);
+        notificationService.sendNotificationToUser(activity.getUserId(), NotificationType.ACTIVITY);
     }
 
     public void failActivity(final String hashKey, final String cid, final Throwable cause) {
@@ -136,6 +146,7 @@ public class TestGenerationActivityService {
                   .getFailedWaitingActivity(cid, originalFileName, failReason);
             genericRedisService.saveObjectToHash(hashKey, cid, failedActivity);
             historyService.save(failedHistory);
+            notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
         }
     }
 

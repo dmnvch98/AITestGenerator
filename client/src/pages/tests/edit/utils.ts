@@ -1,6 +1,6 @@
 import {CreateTestRequestDto, UserTest} from "../../../store/tests/testStore";
 import {AlertMessage} from "../../../store/types";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 import {QuestionType} from "../../../store/tests/types";
 
 interface InvalidQuestion {

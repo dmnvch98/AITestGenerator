@@ -18,22 +18,12 @@ export const TestGenHistoryCurrent = () => {
 
     const {
         currentActivities,
-        initState,
         deleteFinishedUserActivitiesFromServer
     } = useUserStore();
 
     useEffect(() => {
-        let unmounted = false;
-        const isUnmounted = () => unmounted;
-
-        const fetchActivity = async () => {
-            await initState(isUnmounted);
-        };
-
-        fetchActivity();
-
         return () => {
-            unmounted = true;
+            // unmounted = true;
             deleteFinishedUserActivitiesFromServer();
         };
     }, []);

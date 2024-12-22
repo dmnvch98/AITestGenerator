@@ -3,7 +3,7 @@ import FileService from '../../../services/FileService';
 import { AxiosError } from 'axios';
 import {AlertMessage, QueryOptions} from "../../../store/types";
 import {v4 as uuidv4} from "uuid";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 import {validateFiles} from "../helper";
 
 export interface FileDto {

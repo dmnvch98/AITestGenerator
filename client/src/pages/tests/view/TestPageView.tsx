@@ -11,7 +11,7 @@ import { AlertMessage } from "../../../store/types";
 import { TestViewActions } from "./components/TestViewActions";
 import { useExportStore } from "../../../store/tests/exportStore";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 
 export const TestPageView: React.FC = () => {
     const { id } = useParams();
