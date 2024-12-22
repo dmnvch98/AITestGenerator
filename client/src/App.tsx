@@ -33,33 +33,6 @@ const MainRoutes = () => {
         }
     }, [location.pathname]);
 
-    useEffect(() => {
-        const sseService = new SseService();
-
-        const initializeSse = async () => {
-            const handshakeData = await sseService.sseHandshake();
-
-            if (handshakeData) {
-                const { sessionId } = handshakeData;
-
-                const eventSource = sseService.subscribe(sessionId);
-
-                return () => {
-                    sseService.closeConnection(eventSource);
-                };
-            }
-        };
-
-        initializeSse().catch((err) => {
-            console.error("Failed to initialize SSE", err);
-        });
-
-        return () => {
-            console.log("Cleaning up SSE connection");
-        };
-    }, []);
-
-
     return (
         <>
             <div className="App">
@@ -113,6 +86,14 @@ function App() {
             }
         },
     });
+
+    useEffect(() => {
+        SseService.initializeSse();
+
+        return () => {
+            SseService.closeConnection();
+        };
+    }, []);
 
     return (
 

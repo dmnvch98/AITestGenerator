@@ -1,6 +1,7 @@
 package com.example.generation_service.services.notification;
 
 import com.example.generation_service.dto.sse.NotificationType;
+import com.example.generation_service.dto.sse.SseSendNotificationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -28,10 +29,11 @@ public class NotificationService {
     }
 
     public void sendNotificationToUser(final Long userId, final NotificationType notificationType) {
+        final SseSendNotificationDto dto = SseSendNotificationDto.builder().type(notificationType).build();
         final SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {
-                emitter.send(SseEmitter.event().name("message").data(notificationType));
+                emitter.send(SseEmitter.event().name("message").data(dto));
             } catch (IOException e) {
                 emitters.remove(userId);
             }

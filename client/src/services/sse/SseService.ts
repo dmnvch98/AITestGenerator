@@ -1,6 +1,7 @@
+// src/services/sse/SseService.ts
 import getAxiosInstance from "../../interceptors/getAxiosInstance";
-import {NotificationType} from "../../store/tests/types";
-import {useUserStore} from "../../store/userStore";
+import { NotificationType } from "../../store/tests/types";
+import { useUserStore } from "../../store/userStore";
 
 type HandshakeResponse = {
     sessionId: string;
@@ -8,14 +9,41 @@ type HandshakeResponse = {
 };
 
 class SseService {
+    private static instance: SseService;
+    private axiosInstance;
+    private eventSource: EventSource | null = null;
+    private reconnectInterval: number = 1000; // Начальный интервал переподключения
+    private maxReconnectInterval: number = 30000; // Максимальный интервал переподключения
 
-    private readonly axiosInstance;
-
-    constructor() {
+    private constructor() {
         this.axiosInstance = getAxiosInstance();
     }
 
-    public async sseHandshake(): Promise<{ sessionId: string; subscriptionId: string } | null> {
+    public static getInstance(): SseService {
+        if (!SseService.instance) {
+            SseService.instance = new SseService();
+        }
+        return SseService.instance;
+    }
+
+    public async initializeSse(): Promise<void> {
+        try {
+            if (this.eventSource) {
+                console.error("SSE already stebleshed");
+                return;
+            }
+            const handshakeData = await this.sseHandshake();
+            if (handshakeData) {
+                const { subscriptionId } = handshakeData;
+                this.connect(subscriptionId);
+            }
+        } catch (error) {
+            console.error("Failed to initialize SSE", error);
+            this.scheduleReconnect();
+        }
+    }
+
+    private async sseHandshake(): Promise<HandshakeResponse | null> {
         try {
             const { data } = await this.axiosInstance.post<HandshakeResponse>('/api/v1/sse', {});
             return { sessionId: data.sessionId, subscriptionId: data.subscriptionId };
@@ -25,33 +53,45 @@ class SseService {
         }
     }
 
-    public subscribe(subId: string): EventSource {
+    private connect(subscriptionId: string): void {
         const backendUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:8080";
-        const eventSource = new EventSource(`${backendUrl}/api/v1/sse/subscribe?subId=${subId}`);
+        this.eventSource = new EventSource(`${backendUrl}/api/v1/sse/subscribe?subId=${subscriptionId}`);
 
-        eventSource.addEventListener('open', () => {
+        this.eventSource.addEventListener('open', () => {
             console.log("SSE connection established");
+            // Сбросить интервал переподключения при успешном подключении
+            this.reconnectInterval = 1000;
         });
 
-        eventSource.addEventListener('message', (event) => {
+        this.eventSource.addEventListener('message', (event) => {
             const parsedMessage = JSON.parse(event.data);
-
-            if (parsedMessage === NotificationType.ACTIVITY) {
+            console.log('parsedMessage: ', parsedMessage);
+            if (parsedMessage.type === NotificationType.ACTIVITY) {
                 this.handleActivityNotification();
             }
         });
 
-        eventSource.addEventListener('error', () => {
-            eventSource.close();
+        this.eventSource.addEventListener('error', (event) => {
+            console.error("SSE connection error", event);
+            this.closeConnection();
+            this.scheduleReconnect();
         });
-
-        return eventSource;
     }
 
-    public closeConnection(eventSource: EventSource): void {
-        if (eventSource) {
-            eventSource.close();
+    private scheduleReconnect(): void {
+        setTimeout(() => {
+            console.log("Attempting to reconnect SSE...");
+            this.initializeSse();
+            // Увеличиваем интервал для следующей попытки
+            this.reconnectInterval = Math.min(this.reconnectInterval * 2, this.maxReconnectInterval);
+        }, this.reconnectInterval);
+    }
+
+    public closeConnection(): void {
+        if (this.eventSource) {
+            this.eventSource.close();
             console.log("SSE connection closed");
+            this.eventSource = null;
         }
     }
 
@@ -64,4 +104,4 @@ class SseService {
     }
 }
 
-export default SseService;
+export default SseService.getInstance();

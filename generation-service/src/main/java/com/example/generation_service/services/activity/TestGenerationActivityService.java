@@ -54,6 +54,7 @@ public class TestGenerationActivityService {
         final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId, queuedQuestionTypes);
         final String hashKey = Utils.getGenerationHashKey(userId);
         genericRedisService.saveObjectToHash(hashKey,cid, waitingActivity);
+        notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void updateProcessedQuestionType(final TestGenerationActivity activity, final QuestionType questionType) {

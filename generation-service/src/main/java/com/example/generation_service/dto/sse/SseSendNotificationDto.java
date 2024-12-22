@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SseHandshakeResponseDto {
+public class SseSendNotificationDto {
 
-    private final String subscriptionId;
+    final NotificationType type;
 }

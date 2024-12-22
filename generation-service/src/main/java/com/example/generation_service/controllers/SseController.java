@@ -27,7 +27,7 @@ public class SseController {
         log.info("Get sse handshake request for user {}", userId);
 
         return SseHandshakeResponseDto.builder()
-                .sessionId(sseFacade.generateAndSaveUserSubscriptionId(userId))
+                .subscriptionId(sseFacade.generateAndSaveUserSubscriptionId(userId))
                 .build();
 
     }
