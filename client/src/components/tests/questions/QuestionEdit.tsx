@@ -115,6 +115,7 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
                     }
                     onAddAnswer={addAnswerOption}
                     singleChoice={isSingleChoice}
+                    questionType={question.questionType}
                     displayActions={showActions}
                     correctAnswerChanged={toggleCorrectAnswer}
                     errorMessage={errorMessage}

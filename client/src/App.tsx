@@ -87,14 +87,16 @@ function App() {
         },
     });
 
+    const { authenticated } = useAuthStore();
+
     useEffect(() => {
-        SseService.initializeSse();
-
-        return () => {
-            SseService.closeConnection();
-        };
-    }, []);
-
+        if (authenticated) {
+            SseService.initializeSse();
+            return () => {
+                SseService.closeConnection();
+            };
+        }
+    }, [authenticated]);
     return (
 
         <ThemeProvider theme={theme}>

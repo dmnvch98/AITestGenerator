@@ -11,7 +11,7 @@ import {
     Typography,
     useTheme,
 } from '@mui/material';
-import { questionTypeTranslations} from "../../../../store/tests/types";
+import {QuestionType, questionTypeTranslations} from "../../../../store/tests/types";
 import questionsData from './questions.json';
 import {AnswerOption, Question} from "../../../../store/tests/testStore";
 import StatusIndicator from "../../../status/StatusIndicator";
@@ -21,28 +21,50 @@ interface QuestionDescription extends Question {
     description: string;
 }
 
-export default function EnhancedMenuBasedLayout() {
+interface EnhancedMenuBasedLayoutProps {
+    defaultQuestionType?: QuestionType;
+}
+
+export default function EnhancedMenuBasedLayout({
+                                                    defaultQuestionType,
+                                                }: EnhancedMenuBasedLayoutProps) {
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
     const [questions, setQuestions] = useState<QuestionDescription[]>([]);
     const theme = useTheme();
+
     const entries = Object.entries(questionTypeTranslations);
+
     const selectedLabel = entries[selectedIndex][1];
-    const selectedQuestion = questions.find(q => q.questionType === entries[selectedIndex][0]);
+
+    const selectedQuestion = questions.find(
+        (q) => q.questionType === entries[selectedIndex][0]
+    );
 
     useEffect(() => {
         setQuestions(questionsData as unknown as QuestionDescription[]);
     }, []);
+
+    useEffect(() => {
+        if (defaultQuestionType) {
+            const foundIndex = entries.findIndex(
+                ([key]) => key === defaultQuestionType
+            );
+            if (foundIndex !== -1) {
+                setSelectedIndex(foundIndex);
+            }
+        }
+    }, [defaultQuestionType, entries]);
 
     const handleListItemClick = (index: number) => {
         setSelectedIndex(index);
     };
 
     const renderAnswerOptions = (question: Question) => {
-        return <AnswersDisplay answerOptions={question.answerOptions}/>;
+        return <AnswersDisplay answerOptions={question.answerOptions} />;
     };
 
     return (
-        <Box sx={{display: 'flex', height: '55vh'}}>
+        <Box sx={{display: 'flex', height: '70vh'}}>
             <Box
                 sx={{
                     width: '250px',
