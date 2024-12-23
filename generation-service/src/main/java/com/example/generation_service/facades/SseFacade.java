@@ -1,7 +1,9 @@
 package com.example.generation_service.facades;
 
+import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.services.redis.RedisService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SseFacade {
 
     private static final int TTL = 60;
@@ -43,7 +46,8 @@ public class SseFacade {
         if (userId.isPresent()) {
             return Long.parseLong(userId.get());
         }
-        throw new IllegalArgumentException("User subscription id not found");
+        log.warn("User subscription id=[{}] not found for SSE subscription", subscriptionId);
+        throw new ResourceNotFoundException("User subscription id not found");
     }
 
     private String buildKey(final Object id, final String keyPrefix) {

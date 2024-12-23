@@ -64,8 +64,8 @@ export const QuestionEdit: React.FC<QuestionEditProps> = ({
 
         if (newType === QuestionType.TRUE_FALSE) {
             newAnswers = [
-                { id: getNanoTime(), optionText: 'Верно', correct: true },
-                { id: getNanoTime(), optionText: 'Неверно', correct: false }
+                { id: getNanoTime() + 1, optionText: 'Верно', correct: true },
+                { id: getNanoTime() + 2, optionText: 'Неверно', correct: false }
             ];
         } else if ([QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER, QuestionType.FILL_IN_THE_BLANKS].includes(newType)) {
             let firstCorrect = false;
