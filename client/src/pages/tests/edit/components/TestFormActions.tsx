@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {ActionIcon} from "../../../../store/types";
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Dialog from '@mui/material/Dialog';
@@ -12,6 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import {getActionItemsList} from "../../../../components/main/data-display/helper";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
 interface ActionButtonsProps {
     onSave: () => void;
@@ -54,7 +54,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
     const actions: ActionIcon[] = [
         {
             name: 'Сохранить',
-            icon: <SaveAltIcon/>,
+            icon: <SaveOutlinedIcon/>,
             onClick: onSave,
             disabled: !isTestModified || isLoading
         },

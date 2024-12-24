@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, DragEvent } from 'react';
+import React, {useState, ChangeEvent, DragEvent} from 'react';
 import {
     Box,
     Button,
@@ -28,7 +28,7 @@ interface FileUploadModalProps {
     onClose: () => void;
 }
 
-export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose }) => {
+export const FileUploadModal: React.FC<FileUploadModalProps> = ({open, onClose}) => {
     const {
         filesToUpload,
         removeFile,
@@ -67,9 +67,9 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
     };
 
     const getIcon = (type: string) => {
-        if (type === 'application/pdf') return <PictureAsPdfIcon sx={{ color: '#FF0000' }} />;
+        if (type === 'application/pdf') return <PictureAsPdfIcon sx={{color: '#FF0000'}}/>;
         if (type === 'application/msword' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return <DescriptionIcon
-            sx={{ color: '#2B579A' }} />;
+            sx={{color: '#2B579A'}}/>;
         return null;
     };
 
@@ -94,18 +94,20 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         color: (theme) => theme.palette.grey[500],
                     }}
                 >
-                    <CloseIcon />
+                    <CloseIcon/>
                 </IconButton>
             </DialogTitle>
             <DialogContent
-                sx={{ overflow: 'auto' }}
+                sx={{overflow: 'auto'}}
             >
-                <Alert severity="info" icon={false} sx={{ mb: 2 }}>
+                <Alert severity="info" icon={false} sx={{mb: 2}}>
                     <Typography variant="body2" gutterBottom>
-                        <b>Требования к файлу:</b> до 5 страниц формата А4 с шрифтом Time New Roman и размером текста
-                        14.
-                        <br />
-                        Добавьте сюда свои документы. Вы можете загрузить максимум 5 документов.
+                        <b>Требования к файлам:</b>
+                        <ul>
+                            <li><b>Объём текста:</b> до 3500 слов (примерно 5-7 страниц текста).</li>
+                            <li><b>Формат файла:</b> PDF, DOC, DOCX.</li>
+                            <li><b>Количество документов:</b> до 5 файлов одновременно.</li>
+                        </ul>
                     </Typography>
                 </Alert>
 
@@ -130,7 +132,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                                 zIndex: 1,
                             }}
                         >
-                            <CircularProgress color="inherit" />
+                            <CircularProgress color="inherit"/>
                         </Box>
                     )}
 
@@ -154,7 +156,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
-                        <CloudUploadIcon sx={{ fontSize: 48, color: 'grey.500' }} />
+                        <CloudUploadIcon sx={{fontSize: 48, color: 'grey.500'}}/>
                         <Typography variant="body1">Перетащите файл сюда</Typography>
                         <Typography variant="body2">5 МБ максимум на каждый файл</Typography>
                     </Box>
@@ -163,7 +165,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                         id="fileInput"
                         type="file"
                         multiple
-                        style={{ display: 'none' }}
+                        style={{display: 'none'}}
                         onChange={handleFileUpload}
                         accept=".pdf,.doc,.docx"
                     />
@@ -175,22 +177,23 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ open, onClose 
                                           secondaryAction={
                                               <IconButton edge="end" aria-label="delete" disabled={upload}
                                                           onClick={() => handleDeleteFile(index)}>
-                                                  <DeleteIcon />
+                                                  <DeleteIcon/>
                                               </IconButton>
                                           }
                                 >
                                     <ListItemIcon>{getIcon(file.type)}</ListItemIcon>
-                                    <ListItemText primary={file.name} />
+                                    <ListItemText primary={file.name}/>
                                 </ListItem>
-                                {index < filesToUpload.length - 1 && <Divider />}
+                                {index < filesToUpload.length - 1 && <Divider/>}
                             </>
                         ))}
                     </List>
                 </Box>
             </DialogContent>
-            <Divider />
-            <DialogActions sx={{ p: 2 }}>
-                <Button disabled={upload} onClick={handleSend} variant="contained" sx={{ width: '150px' }}>Отправить</Button>
+            <Divider/>
+            <DialogActions sx={{p: 2}}>
+                <Button disabled={upload} onClick={handleSend} variant="contained"
+                        sx={{width: '150px'}}>Отправить</Button>
             </DialogActions>
         </Dialog>
     );
