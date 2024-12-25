@@ -122,7 +122,7 @@ export const UploadAndGenerateModal: React.FC<UploadAndGenerateModalProps> = ({ 
                 <Box sx={{ mt: 4 }}>
                     {activeStep === 0 && (
                         <FileUploadModal
-                            upload={upload}
+                            isUploading={upload}
                         />
                     )}
                     {activeStep === 1 && (
@@ -131,6 +131,7 @@ export const UploadAndGenerateModal: React.FC<UploadAndGenerateModalProps> = ({ 
                             setSelection={setSelection}
                             open={true}
                             onClose={handleClose}
+                            isQueueing={false}
                         />
                     )}
                 </Box>

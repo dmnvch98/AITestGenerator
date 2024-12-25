@@ -10,49 +10,44 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow, Alert,
+    TableRow,
+    Alert, CircularProgress,
 } from "@mui/material";
-
-import {QuestionType, questionTypeTranslations} from "../../store/tests/types";
 import Box from "@mui/material/Box";
+import { QuestionType, questionTypeTranslations } from "../../store/tests/types";
 
 interface ModalFormProps {
-    selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>,
+    selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>;
     setSelection: (selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>) => void;
     open: boolean;
     onClose: () => void;
+    isQueueing: boolean;
 }
 
-export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection }) => {
+export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection, isQueueing }) => {
     const toggleSelection = (type: QuestionType) => {
-        const updatedSelection = {
+        setSelection({
             ...selection,
             [type]: {
                 ...selection[type],
                 selected: !selection[type].selected,
             },
-        };
-        setSelection(updatedSelection);
+        });
     };
 
     const handleSelectChange = (type: QuestionType, value: number) => {
-        const updatedSelection = {
+        setSelection({
             ...selection,
             [type]: {
                 ...selection[type],
                 maxQuestions: value,
             },
-        };
-        setSelection(updatedSelection);
+        });
     };
 
     const handleRowClick = (type: QuestionType) => {
         toggleSelection(type);
     };
-
-    // const handleSubmit = () => {
-    //     onSubmit(selection);
-    // };
 
     useEffect(() => {
         if (!open) {
@@ -63,109 +58,96 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSel
                 }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
             );
         }
-    }, [open]);
+    }, [open, setSelection]);
 
     return (
-            <Box>
-                <Alert severity="info" icon={false} sx={{mb: 2}}>
-                    <Typography variant="body2" gutterBottom>
-                        Если в тексте мало информации, число вопросов может уменьшиться.
-                    </Typography>
-                </Alert>
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow sx={{ cursor: 'pointer', height: '50px' }}>
-                                <TableCell align="center" width="10%" sx={{ padding: '4px' }}>
-                                    <Typography fontWeight="bold" fontSize="0.875rem">Выбрать</Typography>
-                                </TableCell>
-                                <TableCell align="left" width="60%" sx={{ padding: '4px' }}>
-                                    <Typography fontWeight="bold" fontSize="0.875rem">Тип вопроса</Typography>
-                                </TableCell>
-                                <TableCell align="center" width="30%" sx={{ padding: '4px' }}>
-                                    <Typography fontWeight="bold" fontSize="0.875rem">Кол-во вопросов</Typography>
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {Object.entries(questionTypeTranslations).map(([key, label]) => {
-                                const type = key as unknown as QuestionType;
-                                return (
-                                    <TableRow
-                                        key={type}
-                                        hover
-                                        onClick={() => handleRowClick(type)}
-                                        sx={{ cursor: 'pointer', height: '60px' }}
-                                    >
-                                        <TableCell
-                                            align="center"
-                                            onClick={(e) => e.stopPropagation()}
-                                            sx={{ padding: '4px' }}
-                                        >
-                                            <Checkbox
-                                                checked={selection[type].selected}
-                                                onChange={() => toggleSelection(type)}
-                                                sx={{ padding: '4px' }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="left" sx={{ padding: '4px' }}>
-                                            <Typography fontSize="0.875rem">{label}</Typography>
-                                        </TableCell>
-                                        <TableCell
-                                            size="small"
-                                            align="center"
-                                            onClick={(e) => e.stopPropagation()}
-                                            sx={{ padding: '4px' }}
-                                        >
-                                            <FormControl sx={{width: '70%'}}>
-                                                <Select
-                                                    size="small"
-                                                    value={selection[type].maxQuestions}
-                                                    onChange={(e) => handleSelectChange(type, Number(e.target.value))}
-                                                    disabled={!selection[type].selected}
-                                                    sx={{
-                                                        fontSize: '0.875rem',
-                                                        height: '36px',
-                                                    }}
-                                                >
-                                                    {[5, 10].map((value) => (
-                                                        <MenuItem
-                                                            key={value}
-                                                            value={value}
-                                                            sx={{
-                                                                fontSize: '0.875rem',
-                                                                padding: '4px',
-                                                            }}
-                                                        >
-                                                            <Typography sx={{ textAlign: 'center', width: '100%' }}>
-                                                                {value}
-                                                            </Typography>
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-            // <DialogActions sx={{ p: 2 }}>
-            //     <Button onClick={onClose} variant="outlined" fullWidth>
-            //         Отменить
-            //     </Button>
-            //     <Button
-            //         onClick={handleSubmit}
-            //         variant="contained"
-            //         color="primary"
-            //         fullWidth
-            //         disabled={isGenerateDisabled}
-            //     >
-            //         Сгенерировать
-            //     </Button>
-            // </DialogActions>
-        // </Box>
+        <Box>
+            <Alert severity="info" icon={false}>
+                <Typography variant="body2" gutterBottom>
+                    Если в тексте мало информации, число вопросов может уменьшиться.
+                </Typography>
+            </Alert>
+
+            {isQueueing && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: '50%',
+                        backgroundColor: '#fff',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1,
+                    }}
+                >
+                    <CircularProgress color="inherit"/>
+                </Box>
+            )}
+
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow sx={{ cursor: "pointer" }}>
+                            <TableCell align="center" width="10%">
+                                <Typography fontWeight="bold">Выбрать</Typography>
+                            </TableCell>
+                            <TableCell align="left" width="60%">
+                                <Typography fontWeight="bold">Тип вопроса</Typography>
+                            </TableCell>
+                            <TableCell align="center" width="30%">
+                                <Typography fontWeight="bold">Кол-во вопросов</Typography>
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {Object.entries(questionTypeTranslations).map(([key, label]) => {
+                            const type = key as unknown as QuestionType;
+                            return (
+                                <TableRow
+                                    key={type}
+                                    hover
+                                    onClick={() => handleRowClick(type)}
+                                    sx={{ cursor: "pointer" }}
+                                >
+                                    <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                                        <Checkbox
+                                            checked={selection[type].selected}
+                                            onChange={() => toggleSelection(type)}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="left">
+                                        <Typography>{label}</Typography>
+                                    </TableCell>
+                                    <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                                        <FormControl sx={{width: '100px'}} >
+                                            <Select
+                                                size="small"
+                                                value={selection[type].maxQuestions}
+                                                onChange={(e) =>
+                                                    handleSelectChange(type, Number(e.target.value))
+                                                }
+                                                disabled={!selection[type].selected}
+                                            >
+                                                {[5, 10].map((value) => (
+                                                    <MenuItem key={value} value={value}>
+                                                        <Typography align="center">
+                                                            {value}
+                                                        </Typography>
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     );
 };

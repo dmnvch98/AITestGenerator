@@ -76,7 +76,7 @@ public class TestFacade {
       }
 
       final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
-      commandService.sendCommand(message);
+//      commandService.sendCommand(message);
       final Set<QuestionType> queuedQuestionTypes = dto.getParams()
                       .stream().map(QuestionTypeQuantity::getQuestionType).collect(Collectors.toSet());
       activityService.createWaitingActivity(fileHash, cid, dto, userId, queuedQuestionTypes);

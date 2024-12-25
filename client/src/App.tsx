@@ -16,6 +16,7 @@ import useAuthStore from "./pages/auth/authStore";
 import ServerErrorPage from "./pages/errors/ServerErrorPage";
 import {useUserStore} from "./store/userStore";
 import SseService from "./services/sse/SseService";
+import {UploadAndGenerateTest} from "./pages/files/components/UploadAndGenerateTest";
 
 const MainRoutes = () => {
     const {getTestGenCurrentActivities} = useUserStore();
@@ -46,6 +47,7 @@ const MainRoutes = () => {
                         <Route path="/tests/:id/print" element={<PrintTestPage/>}/>
                         <Route path="/tests/:testId/results/:id" element={<TestResultSingle/>}/>
                         <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
+                        <Route path="/generate" element={<UploadAndGenerateTest/>}/>
                         <Route path="/files" element={<Files/>}/>
                         <Route path="/500" element={<ServerErrorPage/>}/>
                         <Route path="*" element={<Navigate to="/files" replace/>}/>

@@ -45,6 +45,7 @@ export interface FileUploadResponseDto {
 
 interface FileStore {
     filesToUpload: File[];
+    uploaded: boolean;
     fileDtos: FileDto[];
     isLoading: boolean;
     error: string | null;
@@ -67,13 +68,16 @@ const useFileStore = create<FileStore>((set, get) => ({
     filesToUpload: [],
     fileDtos: [],
     isLoading: false,
+    uploaded: false,
     error: null,
     uploadModalOpen: false,
     selectedFileHashes: [],
     totalUserFiles: 0,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
-    removeFile: (index) => set((state) => ({filesToUpload: state.filesToUpload.filter((_, i) => i !== index)})),
+    removeFile: (index) => set((state) => (
+        {filesToUpload: state.filesToUpload.filter((_, i) => i !== index), uploaded: false}
+    )),
     clearFiles: () => set({filesToUpload: []}),
     validateFilesThenUpload: (newFiles: File[]) => {
         const { addFiles} = get();
@@ -87,7 +91,7 @@ const useFileStore = create<FileStore>((set, get) => ({
         }
     },
     uploadFiles: async (): Promise<{success: boolean, fileHash?: string}> => {
-        const { filesToUpload, clearFiles } = get();
+        const { filesToUpload } = get();
         set({ isLoading: true, error: null });
 
         try {
@@ -103,6 +107,7 @@ const useFileStore = create<FileStore>((set, get) => ({
                     }
                     if (status === UploadStatus.SUCCESS) {
                         hasSuccess = true;
+                        set({uploaded: true});
                     }
                 });
                 return {
@@ -117,7 +122,6 @@ const useFileStore = create<FileStore>((set, get) => ({
             set({ error: axiosError.message });
             return { success: false };
         } finally {
-            clearFiles();
             set({ isLoading: false });
         }
     },

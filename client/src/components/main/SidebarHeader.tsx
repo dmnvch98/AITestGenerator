@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import DeveloperBoardOutlinedIcon from '@mui/icons-material/DeveloperBoardOutlined';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
 import {useLocation} from 'react-router-dom';
@@ -107,6 +108,11 @@ export const SidebarHeader = ({children}: any) => {
     const location = useLocation();
 
     const tabs: TabIcon[] = [
+        {
+            name: 'Генерация теста',
+            icon: <DeveloperBoardOutlinedIcon/>,
+            redirect: '/generate',
+        },
         {
             name: 'Тесты',
             icon: <ArticleOutlinedIcon/>,

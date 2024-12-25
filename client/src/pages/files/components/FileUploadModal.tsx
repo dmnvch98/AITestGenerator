@@ -15,10 +15,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import useFileStore from "../store/fileStore";
 
 interface FileUploadModalProps {
-    upload: boolean,
+    isUploading: boolean;
 }
 
-export const FileUploadModal: React.FC<FileUploadModalProps> = ({upload}) => {
+export const FileUploadModal: React.FC<FileUploadModalProps> = ({isUploading}) => {
     const {
         filesToUpload,
         removeFile,
@@ -90,7 +90,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({upload}) => {
                     flexGrow: 1,
                 }}
             >
-                {upload && (
+                {isUploading && (
                     <Box
                         sx={{
                             position: 'absolute',
@@ -207,18 +207,6 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({upload}) => {
                     accept=".pdf,.doc,.docx"
                 />
             </Box>
-
-            {/*<Box sx={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2}}>*/}
-            {/*    <Button*/}
-            {/*        sx={{width: 'auto'}}*/}
-            {/*        variant="contained"*/}
-            {/*        color="primary"*/}
-            {/*        onClick={handleNext}*/}
-            {/*        disabled={filesToUpload.length === 0 || upload}*/}
-            {/*    >*/}
-            {/*        Дальше*/}
-            {/*    </Button>*/}
-            {/*</Box>*/}
         </Box>
     );
 };

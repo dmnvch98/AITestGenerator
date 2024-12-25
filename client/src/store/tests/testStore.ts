@@ -81,8 +81,7 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    generateTestByFile: (request: GenerateTestRequest) => void,
-    isGenerateTestByFileQueueing: boolean,
+    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: (options?: QueryOptions) => void,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
@@ -101,7 +100,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     totalElements: 0,
     selectedTest: undefined,
     selectedTestRating: undefined,
-    isGenerateTestByFileQueueing: false,
 
     clearState: () => {
         set({
@@ -114,24 +112,10 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({selectedTest: userTest});
     },
 
-    generateTestByFile: async (request) => {
-        set({isGenerateTestByFileQueueing: false});
-        const alert: AlertMessage = new AlertMessage(
-            `Файл <b>${request.originalFileName}</b> отправлен в очередь`,
-            'info',
-            'progress',
-            false
-            );
-        NotificationService.addAlert(alert);
-        const isSuccess = await TestService.generateTestByFile(request);
-        NotificationService.deleteAlert(alert);
-        if (isSuccess) {
-            NotificationService.addAlert(new AlertMessage(`Файл <b>${request.originalFileName}</b> добавлен в очередь`, 'success'));
-        } else {
-            NotificationService.addAlert(new AlertMessage(`Ошибка при добавлении <b>${request.originalFileName}</b> в очередь. Пожалуйста, попробуйте позже.`, 'error'));
-        }
-        set({isGenerateTestByFileQueueing: true});
+    generateTestByFile: async (request): Promise<boolean> => {
+        return await TestService.generateTestByFile(request);
     },
+
     getAllUserTests: async (options) => {
         const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(options)
         set({ tests, totalPages, totalElements })
