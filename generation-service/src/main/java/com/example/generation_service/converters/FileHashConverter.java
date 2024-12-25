@@ -31,8 +31,13 @@ public interface FileHashConverter {
             .build();
   }
 
-  default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId) {
-    return FileValidationDto.builder().file(file).userId(userId).build();
+  default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId, final boolean overwrite, final boolean createCopy) {
+    return FileValidationDto.builder()
+            .file(file)
+            .userId(userId)
+            .overwrite(overwrite)
+            .createCopy(createCopy)
+            .build();
   }
 
   default String convertToFileDataJson(final Map<String, String> fileData) throws JsonProcessingException {

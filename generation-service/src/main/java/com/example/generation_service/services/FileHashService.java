@@ -86,4 +86,12 @@ public class FileHashService {
     return repository.findByHashedFilenameAndUserId(hashedFileName, userId);
   }
 
+  public FileHash getByOriginalFilenameAndUserId(final Long userId, final String originalFilename) {
+    return repository.findByOriginalFilenameAndUserId(originalFilename, userId);
+  }
+
+  public void delete(final FileHash fileHash) {
+    repository.delete(fileHash);
+  }
+
 }

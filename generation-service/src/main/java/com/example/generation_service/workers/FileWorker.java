@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -30,11 +31,13 @@ public class FileWorker {
     private final FileHashService fileHashService;
 
     @Transactional
-    public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file) {
+    public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file,
+                                                           final boolean overwrite, final boolean createCopy) {
         FileValidationDto validationDto;
         try {
-            validationDto = validateFile(file, userId);
+            validationDto = validateFile(file, userId, overwrite, createCopy);
         } catch (final Exception e) {
+            log.error("Validation failed for file: {} by user id: {}", file.getOriginalFilename(), userId, e);
             return buildResponse(UploadStatus.FAILED, file, null);
         }
 
@@ -42,17 +45,26 @@ public class FileWorker {
             return buildResponse(validationDto.getUploadStatus(), file, null);
         }
 
-        final String originalFileName = file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename();
+        String fileNameHash;
 
-        final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
+        if (overwrite) {
+            final FileHash existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            if (existingFile != null) {
+                storageClient.deleteFile(userId, existingFile.getHashedFilename());
+                fileHashService.delete(existingFile);
+            }
+            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
+        } else if (createCopy) {
+            originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + LocalDate.now());
+            fileNameHash = DigestUtils.md5Hex(originalFileName);
+        } else {
+            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
+        }
 
         try {
-//            final String originalFileName = file.getOriginalFilename();
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
-
-//            final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
-
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
             final FileHash fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
@@ -77,9 +89,9 @@ public class FileWorker {
         }
     }
 
-    private FileValidationDto validateFile(final MultipartFile file, final Long userId) {
+    private FileValidationDto validateFile(final MultipartFile file, final Long userId, final boolean overwrite, final boolean createCopy) {
         log.info("Starting file validation before uploading: [{}]", file.getOriginalFilename());
-        final FileValidationDto dto = converter.convertToValidateDto(file, userId);
+        final FileValidationDto dto = converter.convertToValidateDto(file, userId, overwrite, createCopy);
         for (final FileValidator validator : fileValidators) {
             final UploadStatus validationStatus = validator.validate(dto).getUploadStatus();
             if (validationStatus != UploadStatus.SUCCESS) {
@@ -98,5 +110,19 @@ public class FileWorker {
                 .fileHash(hashedFileName)
                 .status(status)
                 .build();
+    }
+
+    private String appendPostfixBeforeExtension(String fileName, String postfix) {
+        if (fileName == null || fileName.isEmpty()) {
+            return fileName;
+        }
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return fileName + postfix;
+        } else {
+            String name = fileName.substring(0, dotIndex);
+            String extension = fileName.substring(dotIndex);
+            return name + postfix + extension;
+        }
     }
 }

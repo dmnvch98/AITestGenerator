@@ -1,14 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import {Box, Stepper, Step, StepLabel, Button, Typography, Container} from '@mui/material';
+import React, { useMemo, useState } from 'react';
+import { Box, Button, Container, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import { FileUploadModal } from './FileUploadModal';
 import { GenTestModal } from '../../../components/tests/GenTestModal';
-import useFileStore from '../store/fileStore';
+import useFileStore, { UploadStatus } from '../store/fileStore';
 import { GenerateTestRequest, QuestionType } from '../../../store/tests/types';
 import { useTestStore } from '../../../store/tests/testStore';
-import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
-import {useNavigate} from "react-router-dom";
+import { LoggedInUserPage } from "../../../components/main/LoggedInUserPage";
+import { useNavigate } from "react-router-dom";
 import NotificationService from "../../../services/notification/AlertService";
-import {AlertMessage} from "../../../store/types";
+import { AlertMessage } from "../../../store/types";
+import {FileAlreadyUploadedModal} from "./upload/components/FileAlreadyUploadedModal";
 
 const steps = ['Загрузка файла', 'Параметры генерации'];
 
@@ -20,6 +21,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
     const [fileHash, setFileHash] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
         Object.keys(QuestionType).reduce((acc, key) => {
             acc[key as unknown as QuestionType] = { selected: false, maxQuestions: 10 };
@@ -31,18 +33,43 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         return !Object.values(selection).some(item => item.selected);
     }, [selection]);
 
-    const handleNext = async () => {
+    const handleFileUpload = async () => {
         setIsFileUploading(true);
         try {
             if (!uploaded) {
-                const { success, fileHash } = await uploadFiles();
-                if (success) {
+                const { status, fileHash } = await uploadFiles();
+                console.log('status:', status)
+                if (status === UploadStatus.SUCCESS) {
                     fileHash && setFileHash(fileHash);
+                    setActiveStep((prev) => prev + 1);
+                } else if (status === UploadStatus.ALREADY_UPLOADED) {
+                    setIsModalOpen(true);
                 }
+            } else {
+                setActiveStep((prev) => prev + 1);
             }
-            setActiveStep((prev) => prev + 1);
         } finally {
             setIsFileUploading(false);
+        }
+    };
+
+    const handleOverride = async () => {
+        setIsFileUploading(true);
+        setIsModalOpen(false);
+        const { status, fileHash } = await uploadFiles(true, false);
+        if (status === UploadStatus.SUCCESS) {
+            fileHash && setFileHash(fileHash);
+            setActiveStep((prev) => prev + 1);
+        }
+    };
+
+    const handleCreateCopy = async () => {
+        setIsFileUploading(true);
+        setIsModalOpen(false);
+        const { status, fileHash } = await uploadFiles(false, true);
+        if (status === UploadStatus.SUCCESS) {
+            fileHash && setFileHash(fileHash);
+            setActiveStep((prev) => prev + 1);
         }
     };
 
@@ -75,7 +102,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
 
     return (
         <Box>
-            <Typography variant="h5" align="left" sx={{mb: 1}}>
+            <Typography variant="h5" align="left" sx={{ mb: 1 }}>
                 Генерация теста
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -88,8 +115,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 </Stepper>
             </Box>
             <Container maxWidth="md">
-                <Box sx={{mt: 4, height: '60vh'}}>
-                    {activeStep === 0 && <FileUploadModal isUploading={isFileUploading}/>}
+                <Box sx={{ mt: 4, height: '60vh' }}>
+                    {activeStep === 0 && <FileUploadModal isUploading={isFileUploading} />}
                     {activeStep === 1 && (
                         <GenTestModal
                             selection={selection}
@@ -100,13 +127,13 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                         />
                     )}
                 </Box>
-                <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 4}}>
-                    <Box sx={{display: 'flex', gap: 2}}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
                         {activeStep > 0 && (
                             <Button
                                 onClick={() => setActiveStep((prev) => prev - 1)}
                                 variant="outlined"
-                                sx={{minWidth: '150px'}}
+                                sx={{ minWidth: '150px' }}
                             >
                                 Назад
                             </Button>
@@ -114,9 +141,9 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                         {activeStep === 0 && (
                             <Button
                                 variant="contained"
-                                onClick={handleNext}
+                                onClick={handleFileUpload}
                                 disabled={(filesToUpload.length === 0 || isFileUploading)}
-                                sx={{minWidth: '150px'}}
+                                sx={{ minWidth: '150px' }}
                             >
                                 Дальше
                             </Button>
@@ -126,7 +153,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                                 variant="contained"
                                 onClick={handleGenerationSubmit}
                                 disabled={isGenerateButtonDisabled}
-                                sx={{minWidth: '150px'}}
+                                sx={{ minWidth: '150px' }}
                             >
                                 Сгенерировать
                             </Button>
@@ -135,10 +162,16 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 </Box>
             </Container>
 
+            <FileAlreadyUploadedModal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onOverride={handleOverride}
+                onCreateCopy={handleCreateCopy}
+            />
         </Box>
     );
 };
 
 export const UploadAndGenerateTest = () => {
-    return <LoggedInUserPage mainContent={<UploadAndGenerateTestContent/>}/>;
+    return <LoggedInUserPage mainContent={<UploadAndGenerateTestContent />} />;
 };

@@ -26,11 +26,15 @@ public class FileController {
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<FileUploadResponseDto> uploadFile(
           @RequestParam("file") final List<MultipartFile> files,
+          @RequestParam(value = "overwrite", required = false, defaultValue = "false") final boolean overwrite,
+          @RequestParam(value = "createCopy", required = false, defaultValue = "false") final boolean createCopy,
           final Authentication authentication) {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-    final FileUploadResponseDto result = fileFacade.saveFiles(userId, files);
+
+    final FileUploadResponseDto result = fileFacade.saveFiles(userId, files, overwrite, createCopy);
     return ResponseEntity.of(Optional.of(result));
   }
+
 
   @GetMapping("/{fileHash}")
   public Resource getFileByHash(@PathVariable final String fileHash, final Authentication authentication) {

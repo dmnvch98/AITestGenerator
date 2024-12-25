@@ -52,7 +52,7 @@ interface FileStore {
     addFiles: (files: File[]) => void;
     removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: () => Promise<{success: boolean, fileHash?: string}>;
+    uploadFiles: (override?: boolean, createCopy?: boolean) => Promise<{status: UploadStatus, fileHash?: string}>;
     getFiles: (options?: QueryOptions) => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
@@ -90,37 +90,41 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async (): Promise<{success: boolean, fileHash?: string}> => {
+    uploadFiles: async (override?: boolean, createCopy?: boolean): Promise<{ fileHash?: string; status: UploadStatus }> => {
         const { filesToUpload } = get();
-        set({ isLoading: true, error: null });
+        set({ isLoading: true});
 
         try {
-            const response = await FileService.uploadFiles(filesToUpload);
-            if (response?.uploadResults.length) {
-                let hasSuccess = false;
-                response.uploadResults.forEach(({ status, description, fileName }) => {
-                    const severity = severityMap[status];
-                    if (severity !== 'success') {
+            const response = await FileService.uploadFiles(filesToUpload, override, createCopy) as FileUploadResponseDto;
+            console.log('resp: ', response);
+            if (response?.uploadResults?.length) {
+                const result = response.uploadResults[0];
+                const { status, description, fileName, fileHash } = result;
+                if (status != UploadStatus.SUCCESS) {
+                    if (status !== UploadStatus.ALREADY_UPLOADED) {
                         const message = `${description} - <b>${fileName}</b>`;
-                        const alert = new AlertMessage(message, severity);
+                        const alert = new AlertMessage(message, 'error');
                         NotificationService.addAlert(alert);
                     }
-                    if (status === UploadStatus.SUCCESS) {
-                        hasSuccess = true;
-                        set({uploaded: true});
-                    }
-                });
-                return {
-                    success: hasSuccess,
-                    fileHash: response.uploadResults[0].fileHash
-                };
+                } else {
+                    set({ uploaded: true });
+                    return {
+                        status,
+                        fileHash,
+                    };
+                }
+
+                return { status };
             }
-            return { success: false };
+
+            return { status: UploadStatus.FAILED };
         } catch (error) {
-            const axiosError = error as AxiosError;
-            NotificationService.addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов', severity: 'error' });
-            set({ error: axiosError.message });
-            return { success: false };
+            NotificationService.addAlert({
+                id: uuidv4(),
+                message: 'Ошибка при загрузке файлов',
+                severity: 'error',
+            });
+            return { status: UploadStatus.FAILED };
         } finally {
             set({ isLoading: false });
         }

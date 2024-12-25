@@ -12,7 +12,6 @@ import { QueryOptions} from "../../store/types";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
 import {GenerateTestRequest, QuestionType} from "../../store/tests/types";
-import {UploadAndGenerateModal} from "./components/UploadAndGenerateModal";
 
 const FilesContent = () => {
     const {
@@ -164,7 +163,7 @@ const FilesContent = () => {
             />
 
             {/*<FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>*/}
-            <UploadAndGenerateModal open={uploadModalOpen} onClose={handleModalClose}/>
+            {/*<UploadAndGenerateModal open={uploadModalOpen} onClose={handleModalClose}/>*/}
             {/*<GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>*/}
         </>
     );

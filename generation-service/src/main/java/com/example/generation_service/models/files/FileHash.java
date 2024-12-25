@@ -12,7 +12,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "file_hashes")
+@Table(
+        name = "file_hashes",
+        indexes = {
+                @Index(name = "idx_hashed_filename_user_id", columnList = "hashed_filename, user_id"),
+                @Index(name = "idx_original_filename_user_id", columnList = "original_filename, user_id")
+        }
+)
 @Builder
 @Getter
 @NoArgsConstructor

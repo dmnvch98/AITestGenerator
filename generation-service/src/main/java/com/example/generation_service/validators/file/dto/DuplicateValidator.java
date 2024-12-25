@@ -16,10 +16,14 @@ public class DuplicateValidator implements FileValidator {
 
     @Override
     public FileValidationDto validate(final FileValidationDto dto) {
-        final boolean isExists = fileHashService
-                .isExistsByOriginalFilenameAndUserId(dto.getUserId(), dto.getFile().getOriginalFilename());
-        final UploadStatus uploadStatus = isExists ? UploadStatus.ALREADY_UPLOADED : UploadStatus.SUCCESS;
-        dto.setUploadStatus(uploadStatus);
+        if (dto.isCreateCopy() || dto.isOverwrite()) {
+            dto.setUploadStatus(UploadStatus.SUCCESS);
+        } else {
+            boolean isExists = fileHashService.isExistsByOriginalFilenameAndUserId(
+                    dto.getUserId(), dto.getFile().getOriginalFilename());
+            dto.setUploadStatus(isExists ? UploadStatus.ALREADY_UPLOADED : UploadStatus.SUCCESS);
+        }
         return dto;
     }
+
 }

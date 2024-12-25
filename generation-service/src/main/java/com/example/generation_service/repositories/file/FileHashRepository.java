@@ -15,6 +15,10 @@ public interface FileHashRepository extends CrudRepository<FileHash, Long>, JpaS
 
     FileHash findByHashedFilenameAndUserId(final String hashedFilename, final Long userId);
 
+    FileHash findByOriginalFilenameAndUserId(final String originalFilename, final Long userId);
+
+    void deleteByOriginalFilenameAndUserId(final String originalFilename, final Long userId);
+
     Boolean existsByOriginalFilenameAndUserId(final String originalFileName, final Long userId);
 
     List<FileHash> findAllByUserId(final long userId, Sort sort);

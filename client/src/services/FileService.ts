@@ -11,16 +11,21 @@ class FileService {
         this.axiosInstance = getAxiosInstance();
     }
 
-    uploadFiles = async (files: File[]): Promise<FileUploadResponseDto | void> => {
+    uploadFiles = async (files: File[], overwrite?: boolean, createCopy?: boolean): Promise<FileUploadResponseDto | void> => {
         const formData = new FormData();
         files.forEach(file => {
             formData.append('file', file);
         });
+
         try {
-            const response =  await this.axiosInstance.post('/api/v1/files/', formData, {
+            const response = await this.axiosInstance.post('/api/v1/files/', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                    'Content-Type': 'multipart/form-data',
+                },
+                params: {
+                    overwrite,
+                    createCopy,
+                },
             });
             return response.data;
         } catch (error) {

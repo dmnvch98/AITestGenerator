@@ -1,5 +1,6 @@
 package com.example.generation_service.facades;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,10 @@ public class FileFacade {
 
   @TrackAction(ActionType.UPLOAD_FILES)
   @GenerateCid(CidType.RANDOM)
-  public FileUploadResponseDto saveFiles(final Long userId, final List<MultipartFile> files) {
+  public FileUploadResponseDto saveFiles(final Long userId, final List<MultipartFile> files, final boolean overwrite, final boolean createCopy) {
     final List<FileUploadResponseDto.FileUploadResult> uploadResults = new ArrayList<>();
     for (MultipartFile file : files) {
-        final FileUploadResponseDto.FileUploadResult result = fileWorker.saveFile(userId, file);
+        final FileUploadResponseDto.FileUploadResult result = fileWorker.saveFile(userId, file, overwrite, createCopy);
         uploadResults.add(result);
     }
 
