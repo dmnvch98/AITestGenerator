@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-    Button,
-    DialogTitle,
-    IconButton,
-    DialogContent,
     Checkbox,
     Select,
     MenuItem,
@@ -16,10 +12,9 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import CloseIcon from "@mui/icons-material/Close";
-import DialogActions from "@mui/material/DialogActions";
+
 import {QuestionType, questionTypeTranslations} from "../../store/tests/types";
+import Box from "@mui/material/Box";
 
 interface ModalFormProps {
     open: boolean;
@@ -37,8 +32,6 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
         }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
     );
 
-    const isGenerateDisabled = !Object.values(selection).some((item) => item.selected);
-
     const toggleSelection = (type: QuestionType) => {
         const updatedSelection = {
             ...selection,
@@ -47,7 +40,6 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 selected: !selection[type].selected,
             },
         };
-        console.log(updatedSelection)
         setSelection(updatedSelection);
     };
 
@@ -59,7 +51,6 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                 maxQuestions: value,
             },
         };
-        console.log(updatedSelection)
         setSelection(updatedSelection);
     };
 
@@ -83,24 +74,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
     }, [open]);
 
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            sx={{ ".MuiPaper-root": { width: "600px" } }}
-        >
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="h6" flexGrow={1}>
-                    Параметры генерации
-                </Typography>
-                <IconButton
-                    aria-label="close"
-                    onClick={onClose}
-                    sx={{ color: (theme) => theme.palette.grey[500] }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent>
+            <Box>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -130,7 +104,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                                         <TableCell align="left">
                                             <Typography>{label}</Typography>
                                         </TableCell>
-                                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                                        <TableCell size="small" align="center" onClick={(e) => e.stopPropagation()}>
                                             <FormControl fullWidth>
                                                 <Select
                                                     size="small"
@@ -152,21 +126,21 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, onClose, onSubmit
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </DialogContent>
-            <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} variant="outlined" fullWidth>
-                    Отменить
-                </Button>
-                <Button
-                    onClick={handleSubmit}
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    disabled={isGenerateDisabled}
-                >
-                    Сгенерировать
-                </Button>
-            </DialogActions>
-        </Dialog>
+            </Box>
+            // <DialogActions sx={{ p: 2 }}>
+            //     <Button onClick={onClose} variant="outlined" fullWidth>
+            //         Отменить
+            //     </Button>
+            //     <Button
+            //         onClick={handleSubmit}
+            //         variant="contained"
+            //         color="primary"
+            //         fullWidth
+            //         disabled={isGenerateDisabled}
+            //     >
+            //         Сгенерировать
+            //     </Button>
+            // </DialogActions>
+        // </Box>
     );
 };

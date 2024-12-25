@@ -50,7 +50,7 @@ interface FileStore {
     addFiles: (files: File[]) => void;
     removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: () => Promise<void>;
+    uploadFiles: () => Promise<boolean>;
     getFiles: (options?: QueryOptions) => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
@@ -85,30 +85,36 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async () => {
-        const { filesToUpload, clearFiles, getFiles } = get();
+    uploadFiles: async (): Promise<boolean> => {
+        const { filesToUpload, clearFiles } = get();
         set({ isLoading: true, error: null });
 
         try {
             const response = await FileService.uploadFiles(filesToUpload);
             if (response?.uploadResults.length) {
+                let hasSuccess = false;
                 response.uploadResults.forEach(({ status, description, fileName }) => {
                     const severity = severityMap[status];
-                    if (severity) {
+                    if (severity !== 'success') {
                         const message = `${description} - <b>${fileName}</b>`;
                         const alert = new AlertMessage(message, severity);
                         NotificationService.addAlert(alert);
                     }
+                    if (status === UploadStatus.SUCCESS) {
+                        hasSuccess = true;
+                    }
                 });
+                return hasSuccess;
             }
+            return false;
         } catch (error) {
             const axiosError = error as AxiosError;
             NotificationService.addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов', severity: 'error' });
             set({ error: axiosError.message });
+            return false;
         } finally {
             clearFiles();
             set({ isLoading: false });
-            await getFiles();
         }
     },
 

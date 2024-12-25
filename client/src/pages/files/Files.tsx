@@ -1,19 +1,18 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import {Box, Alert} from "@mui/material";
-import {FileUploadModal} from "./components/FileUploadModal";
 import {FilesTable} from "./components/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import useFileStore from "./store/fileStore";
 import {FileDto} from "./store/fileStore";
 import {useTestStore} from "../../store/tests/testStore";
-import {GenTestModal} from "../../components/tests/GenTestModal";
 import {useUserStore} from "../../store/userStore";
 import Link from "@mui/material/Link";
 import { QueryOptions} from "../../store/types";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
 import {GenerateTestRequest, QuestionType} from "../../store/tests/types";
+import {UploadAndGenerateModal} from "./components/UploadAndGenerateModal";
 
 const FilesContent = () => {
     const {
@@ -70,6 +69,7 @@ const FilesContent = () => {
     const handleModalClose = () => {
         setUploadModalOpen(false);
         clearFiles();
+        fetchFiles();
     };
 
     const isDeleteButtonDisabled = () => {
@@ -164,9 +164,9 @@ const FilesContent = () => {
                 setSortModel={setSortModel}
             />
 
-            <FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>
-
-            <GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>
+            {/*<FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>*/}
+            <UploadAndGenerateModal open={uploadModalOpen} onClose={handleModalClose}/>
+            {/*<GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>*/}
         </>
     );
 }
