@@ -33,6 +33,7 @@ const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'
 };
 
 interface FileResult {
+    fileHash: string;
     fileName: string;
     status: UploadStatus;
     description: string;
@@ -50,7 +51,7 @@ interface FileStore {
     addFiles: (files: File[]) => void;
     removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: () => Promise<boolean>;
+    uploadFiles: () => Promise<{success: boolean, fileHash?: string}>;
     getFiles: (options?: QueryOptions) => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
@@ -85,7 +86,7 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async (): Promise<boolean> => {
+    uploadFiles: async (): Promise<{success: boolean, fileHash?: string}> => {
         const { filesToUpload, clearFiles } = get();
         set({ isLoading: true, error: null });
 
@@ -104,14 +105,17 @@ const useFileStore = create<FileStore>((set, get) => ({
                         hasSuccess = true;
                     }
                 });
-                return hasSuccess;
+                return {
+                    success: hasSuccess,
+                    fileHash: response.uploadResults[0].fileHash
+                };
             }
-            return false;
+            return { success: false };
         } catch (error) {
             const axiosError = error as AxiosError;
             NotificationService.addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов', severity: 'error' });
             set({ error: axiosError.message });
-            return false;
+            return { success: false };
         } finally {
             clearFiles();
             set({ isLoading: false });

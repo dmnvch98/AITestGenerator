@@ -97,7 +97,6 @@ const FilesContent = () => {
 
             const request: GenerateTestRequest = {
                 hashedFileName: selectedFile.hashedFilename,
-                originalFileName: selectedFile.originalFilename,
                 params: params,
             };
 

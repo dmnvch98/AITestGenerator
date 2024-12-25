@@ -7,7 +7,6 @@ import {
     Alert,
     CircularProgress,
     Grid,
-    Button,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -16,18 +15,16 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import useFileStore from "../store/fileStore";
 
 interface FileUploadModalProps {
-    onUploadSuccess: () => void;
+    upload: boolean,
 }
 
-export const FileUploadModal: React.FC<FileUploadModalProps> = ({onUploadSuccess}) => {
+export const FileUploadModal: React.FC<FileUploadModalProps> = ({upload}) => {
     const {
         filesToUpload,
         removeFile,
-        uploadFiles,
         validateFilesThenUpload
     } = useFileStore();
     const [dragOver, setDragOver] = useState(false);
-    const [upload, setUpload] = useState(false);
     const [hoveredFileIndex, setHoveredFileIndex] = useState<number | null>(null);
 
     const handleFileUpload = (event: ChangeEvent<HTMLInputElement> | DragEvent) => {
@@ -72,24 +69,10 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({onUploadSuccess
         return null;
     };
 
-    const handleNext = async () => {
-        setUpload(true);
-        try {
-            const success = await uploadFiles();
-            if (success) {
-                onUploadSuccess();
-            }
-        } catch (error) {
-            console.error("Ошибка загрузки файлов:", error);
-        } finally {
-            setUpload(false);
-        }
-    };
-
     return (
         <Box
             sx={{
-                height: '60vh',
+                height: '50vh',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -225,17 +208,17 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({onUploadSuccess
                 />
             </Box>
 
-            <Box sx={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2}}>
-                <Button
-                    sx={{width: 'auto'}}
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    disabled={filesToUpload.length === 0 || upload}
-                >
-                    Дальше
-                </Button>
-            </Box>
+            {/*<Box sx={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2}}>*/}
+            {/*    <Button*/}
+            {/*        sx={{width: 'auto'}}*/}
+            {/*        variant="contained"*/}
+            {/*        color="primary"*/}
+            {/*        onClick={handleNext}*/}
+            {/*        disabled={filesToUpload.length === 0 || upload}*/}
+            {/*    >*/}
+            {/*        Дальше*/}
+            {/*    </Button>*/}
+            {/*</Box>*/}
         </Box>
     );
 };

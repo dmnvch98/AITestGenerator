@@ -35,19 +35,23 @@ public class FileWorker {
         try {
             validationDto = validateFile(file, userId);
         } catch (final Exception e) {
-            return buildResponse(UploadStatus.FAILED, file);
+            return buildResponse(UploadStatus.FAILED, file, null);
         }
 
         if (!validationDto.getUploadStatus().equals(UploadStatus.SUCCESS)) {
-            return buildResponse(validationDto.getUploadStatus(), file);
+            return buildResponse(validationDto.getUploadStatus(), file, null);
         }
 
+        final String originalFileName = file.getOriginalFilename();
+
+        final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
+
         try {
-            final String originalFileName = file.getOriginalFilename();
+//            final String originalFileName = file.getOriginalFilename();
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
 
-            final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
+//            final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
 
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
@@ -57,9 +61,9 @@ public class FileWorker {
             fileHashService.save(fileHash);
         } catch (IOException e) {
             log.error("Error when saving file: {} for user id: {}", file.getOriginalFilename(), userId, e);
-            return buildResponse(UploadStatus.FAILED, file);
+            return buildResponse(UploadStatus.FAILED, file, null);
         }
-        return buildResponse(UploadStatus.SUCCESS, file);
+        return buildResponse(UploadStatus.SUCCESS, file, fileNameHash);
     }
 
     @Transactional
@@ -86,11 +90,12 @@ public class FileWorker {
         return dto;
     }
 
-    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file) {
+    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file, final String hashedFileName) {
         return FileUploadResponseDto
                 .FileUploadResult
                 .builder()
                 .fileName(file.getOriginalFilename())
+                .fileHash(hashedFileName)
                 .status(status)
                 .build();
     }

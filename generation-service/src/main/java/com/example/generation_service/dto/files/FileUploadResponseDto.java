@@ -19,12 +19,14 @@ public class FileUploadResponseDto {
     public static class FileUploadResult {
 
         private final String fileName;
+        private final String fileHash;
         private final UploadStatus status;
         private final String description;
 
         @Builder
-        public FileUploadResult(String fileName, UploadStatus status) {
+        public FileUploadResult(String fileName, String fileHash, UploadStatus status) {
             this.fileName = fileName;
+            this.fileHash = fileHash;
             this.status = status;
             this.description = status.getDescription();
         }

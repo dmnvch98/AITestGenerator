@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Box,
+    Button,
     Dialog,
     DialogContent,
     DialogTitle,
     IconButton,
-    Typography,
-    Stepper,
     Step,
     StepLabel,
+    Stepper,
+    Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { FileUploadModal } from './FileUploadModal';
-import { GenTestModal } from "../../../components/tests/GenTestModal"; // Убедитесь, что путь верный
+import {FileUploadModal} from './FileUploadModal';
+import {GenTestModal} from "../../../components/tests/GenTestModal";
+import DialogActions from "@mui/material/DialogActions";
+import useFileStore from "../store/fileStore";
+import {GenerateTestRequest, QuestionType} from "../../../store/tests/types";
+import {useTestStore} from "../../../store/tests/testStore";
+import {useUserStore} from "../../../store/userStore";
 
 interface UploadAndGenerateModalProps {
     open: boolean;
@@ -22,22 +28,68 @@ interface UploadAndGenerateModalProps {
 const steps = ['Загрузка файла', 'Параметры генерации'];
 
 export const UploadAndGenerateModal: React.FC<UploadAndGenerateModalProps> = ({ open, onClose }) => {
+
+    const { filesToUpload, uploadFiles } = useFileStore();
+    const { generateTestByFile } = useTestStore();
+    const { getTestGenCurrentActivities } = useUserStore();
+    const [upload, setUpload] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
-    const [generationParams, setGenerationParams] = useState<Record<string, any> | null>(null);
+    const [fileHash, setFileHash] = useState<string>('');
+
+    const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
+        Object.keys(QuestionType).reduce((acc, key) => {
+            acc[key as unknown as QuestionType] = { selected: false, maxQuestions: 10 };
+            return acc;
+        }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
+    );
+
+    const isGenerateButtonDisabled = useMemo(() => {
+        console.log('isGenerateButtonDisabled');
+        return !Object.values(selection).some(item => item.selected);
+    }, [selection]);
 
     const handleUploadSuccess = () => {
         setActiveStep((prev) => prev + 1);
     };
 
-    const handleGenerationSubmit = (params: Record<string, any>) => {
-        setGenerationParams(params);
-        console.log('Параметры генерации:', params);
-        onClose();
+    const handleNext = async () => {
+        setUpload(true);
+        try {
+            const { success, fileHash } = await uploadFiles();
+            if (success) {
+                fileHash && setFileHash(fileHash);
+                handleUploadSuccess();
+            }
+        } finally {
+            setUpload(false);
+        }
+    };
+
+    const handleGenerationSubmit = () => {
+        console.log('fileHash: ', fileHash)
+        if (fileHash) {
+            const params = Object.entries(selection)
+                .filter(([_, value]) => value.selected)
+                .map(([key, value]) => ({
+                    questionType: key as unknown as QuestionType,
+                    maxQuestions: value.maxQuestions,
+                }));
+
+            const request: GenerateTestRequest = {
+                hashedFileName: fileHash,
+                params: params,
+            };
+
+            console.log('request: ', request);
+
+            generateTestByFile(request);
+            getTestGenCurrentActivities();
+            onClose();
+        }
     };
 
     const handleClose = () => {
         setActiveStep(0);
-        setGenerationParams(null);
         onClose();
     };
 
@@ -70,23 +122,43 @@ export const UploadAndGenerateModal: React.FC<UploadAndGenerateModalProps> = ({ 
                 <Box sx={{ mt: 4 }}>
                     {activeStep === 0 && (
                         <FileUploadModal
-                            onUploadSuccess={handleUploadSuccess}
+                            upload={upload}
                         />
                     )}
                     {activeStep === 1 && (
                         <GenTestModal
+                            selection={selection}
+                            setSelection={setSelection}
                             open={true}
                             onClose={handleClose}
-                            onSubmit={handleGenerationSubmit}
                         />
                     )}
                 </Box>
             </DialogContent>
-            {/*<DialogActions sx={{ p: 2 }}>*/}
-            {/*    <Button onClick={() => {}} variant="outlined">*/}
-            {/*        Далее*/}
-            {/*    </Button>*/}
-            {/*</DialogActions>*/}
+            <DialogActions sx={{ p: 2 }}>
+                {activeStep === 0 &&
+                    <Button
+                        sx={{width: '30%'}}
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        disabled={filesToUpload.length === 0 || upload}
+                    >
+                        Дальше
+                    </Button>
+                }
+                {activeStep === 1 &&
+                    <Button
+                        sx={{width: '30%'}}
+                        onClick={handleGenerationSubmit}
+                        variant="contained"
+                        color="primary"
+                        disabled={isGenerateButtonDisabled}
+                    >
+                        Сгенерировать
+                    </Button>
+                }
+            </DialogActions>
         </Dialog>
     );
 };
