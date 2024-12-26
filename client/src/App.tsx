@@ -17,11 +17,14 @@ import ServerErrorPage from "./pages/errors/ServerErrorPage";
 import {useUserStore} from "./store/userStore";
 import SseService from "./services/sse/SseService";
 import {UploadAndGenerateTest} from "./pages/files/components/UploadAndGenerateTest";
+import {InfinityScrollGrid} from "./pages/files/components/FilesAutocomplete";
+import useFileStore from "./pages/files/store/fileStore";
 
 const MainRoutes = () => {
     const {getTestGenCurrentActivities} = useUserStore();
     const {authenticated} = useAuthStore();
     const location = useLocation();
+    const { getFiles, fileDtos, totalPages, totalUserFiles } = useFileStore();
 
     const noActivitiesPaths = [
         '/sign-in',
@@ -33,6 +36,10 @@ const MainRoutes = () => {
             getTestGenCurrentActivities();
         }
     }, [location.pathname]);
+
+    useEffect(() => {
+        getFiles();
+    }, []);
 
     return (
         <>
@@ -49,7 +56,18 @@ const MainRoutes = () => {
                         <Route path="/test-gen-history" element={<TestGenerationHistory/>}/>
                         <Route path="/generate" element={<UploadAndGenerateTest/>}/>
                         <Route path="/files" element={<Files/>}/>
-                        <Route path="/500" element={<ServerErrorPage/>}/>
+                        <Route
+                            path="/sandbox"
+                            element={
+                                <InfinityScrollGrid
+                                    onSelect={() => console.log("File selected")}
+                                    fetchData={getFiles}
+                                    data={fileDtos || []}
+                                    totalPages={totalPages}
+                                    totalElements={totalUserFiles}
+                                />
+                            }
+                        />                        <Route path="/500" element={<ServerErrorPage/>}/>
                         <Route path="*" element={<Navigate to="/files" replace/>}/>
                     </Routes>
                     : (

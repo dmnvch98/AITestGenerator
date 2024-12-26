@@ -11,7 +11,7 @@ import NotificationService from "../../../services/notification/AlertService";
 import {AlertMessage} from "../../../store/types";
 import {FileAlreadyUploadedModal} from "./upload/components/FileAlreadyUploadedModal";
 import {TabItem, TabsPanel} from "../../../components/main/tabsPanel/TabsPanel";
-import {ServerDataGridWithRadio} from "./FilesAutocomplete";
+import {InfinityScrollGrid} from "./FilesAutocomplete";
 
 const steps = ['Загрузка файла', 'Параметры генерации'];
 
@@ -19,7 +19,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const navigate = useNavigate();
     const {filesToUpload, uploadFiles, uploaded, addFiles} = useFileStore();
     const {generateTestByFile} = useTestStore();
-    const { getFiles, fileDtos } = useFileStore();
+    const { getFiles, fileDtos, totalPages, totalUserFiles } = useFileStore();
     const [isFileUploading, setIsFileUploading] = useState(false);
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
@@ -127,7 +127,13 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         {
             index: 1,
             value: 1,
-            children: <Box> <ServerDataGridWithRadio onFileSelect={handleFileSelect} fetchFiles={getFiles} files={fileDtos}/>
+            children: <Box> <InfinityScrollGrid
+                onSelect={handleFileSelect}
+                fetchData={getFiles}
+                data={fileDtos}
+                totalPages={totalPages}
+                totalElements={totalUserFiles}
+            />
             </Box>,
             title: 'Выбрать существиющий'
         },
@@ -150,9 +156,10 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                     </Stepper>
                 </Box>
                 <Container maxWidth="md">
-                    <Box sx={{mt: 4, height: '60vh'}}>
+                   <Box sx={{ mt: 4, height: '60vh', overflowY: 'auto' }}>
                         {activeStep === 0
-                            && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab} onTabChange={setFileUploadActiveTab}/>
+                            && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab}
+                                          onTabChange={setFileUploadActiveTab}/>
                         }
                         {activeStep === 1 && (
                             <GenTestModal

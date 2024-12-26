@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import FileService from '../../../services/FileService';
-import { AxiosError } from 'axios';
 import {AlertMessage, QueryOptions} from "../../../store/types";
 import {v4 as uuidv4} from "uuid";
 import NotificationService from "../../../services/notification/AlertService";
@@ -22,16 +21,6 @@ export enum UploadStatus {
     TOO_LARGE = 'TOO_LARGE',
     MALWARE = 'MALWARE'
 }
-
-const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'> = {
-    [UploadStatus.SUCCESS]: 'success',
-    [UploadStatus.FAILED]: 'error',
-    [UploadStatus.ALREADY_UPLOADED]: 'error',
-    [UploadStatus.INVALID_EXTENSION]: 'error',
-    [UploadStatus.TOO_LARGE]: 'error',
-    [UploadStatus.MALWARE]: 'error'
-};
-
 interface FileResult {
     fileHash: string;
     fileName: string;
@@ -61,6 +50,7 @@ interface FileStore {
     setSelectedFileHashes: (fileIds: number[]) => void;
     deleteFilesInBatch: () => void;
     totalUserFiles: number;
+    totalPages: number;
     validateFilesThenUpload: (newFiles: File[]) => void;
 }
 
@@ -73,6 +63,7 @@ const useFileStore = create<FileStore>((set, get) => ({
     uploadModalOpen: false,
     selectedFileHashes: [],
     totalUserFiles: 0,
+    totalPages: 0,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
     removeFile: (index) => set((state) => (
@@ -132,8 +123,8 @@ const useFileStore = create<FileStore>((set, get) => ({
 
     getFiles: async (options?: QueryOptions) => {
         set({isLoading: true});
-        const { fileHashes, totalElements } = await FileService.getFiles(options);
-        set({fileDtos: fileHashes, totalUserFiles: totalElements, isLoading: false})
+        const { fileHashes, totalElements, totalPages } = await FileService.getFiles(options);
+        set({fileDtos: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
     },
 
     deleteFile: async (fileDto: FileDto) => {
