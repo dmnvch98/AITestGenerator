@@ -45,7 +45,15 @@ public class FileHash {
     @JsonIgnore
     private String data;
 
+    @Column(name = "copies_num")
+    @Builder.Default
+    private Integer copiesNum = 0;
+
     @OneToMany(mappedBy = "fileHash", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<FileSearchVector> fileSearchVectors;
+
+    public void incrementCopiesNum() {
+        copiesNum++;
+    }
 }

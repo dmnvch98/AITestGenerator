@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import {Box, Alert} from "@mui/material";
-import {FilesTable} from "./components/FilesTable";
+import {FilesTable} from "./components/table/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import useFileStore from "./store/fileStore";
 import {FileDto} from "./store/fileStore";
@@ -162,9 +162,6 @@ const FilesContent = () => {
                 setSortModel={setSortModel}
             />
 
-            {/*<FileUploadModal open={uploadModalOpen} onClose={handleModalClose}/>*/}
-            {/*<UploadAndGenerateModal open={uploadModalOpen} onClose={handleModalClose}/>*/}
-            {/*<GenTestModal open={isGenTestModalOpen} onClose={closeGenTestModal} onSubmit={handleGenTestSubmit}/>*/}
         </>
     );
 }

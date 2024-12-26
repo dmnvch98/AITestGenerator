@@ -1,5 +1,5 @@
 import { SidebarHeader } from "./SidebarHeader";
-import {Alert, Box, CircularProgress, Container, Slide, Snackbar} from "@mui/material";
+import {Alert, Box, CircularProgress, Container, Fade, Slide, Snackbar} from "@mui/material";
 import {useNotificationStore} from "../../store/notificationStore";
 import React from "react";
 
@@ -18,7 +18,11 @@ export const LoggedInUserPage = ({ mainContent }: any) => {
            <SidebarHeader>
                <Container maxWidth="lg" sx={{mb: 4}}>
                    <>
-                       {mainContent}
+                       <Fade in={true} timeout={200}>
+                           <Box>
+                               {mainContent}
+                           </Box>
+                       </Fade>
                        <Snackbar
                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                            open={alerts.length > 0}

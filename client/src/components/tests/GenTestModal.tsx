@@ -21,10 +21,9 @@ interface ModalFormProps {
     setSelection: (selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>) => void;
     open: boolean;
     onClose: () => void;
-    isQueueing: boolean;
 }
 
-export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection, isQueueing }) => {
+export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection }) => {
     const toggleSelection = (type: QuestionType) => {
         setSelection({
             ...selection,
@@ -67,26 +66,6 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSel
                     Если в тексте мало информации, число вопросов может уменьшиться.
                 </Typography>
             </Alert>
-
-            {isQueueing && (
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: '50%',
-                        backgroundColor: '#fff',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        zIndex: 1,
-                    }}
-                >
-                    <CircularProgress color="inherit"/>
-                </Box>
-            )}
 
             <TableContainer>
                 <Table>

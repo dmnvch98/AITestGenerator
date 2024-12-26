@@ -35,7 +35,6 @@ public class SseController {
     @GetMapping("/subscribe")
     public SseEmitter subscribe(@RequestParam("subId") String subId) {
         final Long userId = sseFacade.getUserIdBySubId(subId);
-        log.info("Get sse subscribe request for user {}", userId);
 
         SseEmitter emitter = notificationService.createEmitter(userId);
 

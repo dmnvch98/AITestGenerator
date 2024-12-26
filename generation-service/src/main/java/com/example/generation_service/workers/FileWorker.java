@@ -56,7 +56,11 @@ public class FileWorker {
             }
             fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
         } else if (createCopy) {
-            originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + LocalDate.now());
+            final FileHash existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            if (existingFile != null) {
+                existingFile.incrementCopiesNum();
+                originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + existingFile.getCopiesNum());
+            }
             fileNameHash = DigestUtils.md5Hex(originalFileName);
         } else {
             fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
