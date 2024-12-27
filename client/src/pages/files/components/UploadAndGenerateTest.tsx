@@ -1,4 +1,4 @@
-import React, { useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Box, Button, Container, Divider, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
 import {FileUploadModal} from './FileUploadModal';
 import {GenTestModal} from '../../../components/tests/GenTestModal';
@@ -35,6 +35,9 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
 
+    // useEffect(() => {
+    //     getFiles({size: 20, sortBy: "id"});
+    // }, []);
     const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
         Object.keys(QuestionType).reduce((acc, key) => {
             acc[key as unknown as QuestionType] = {selected: false, maxQuestions: 10};
@@ -136,7 +139,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 <InfinityScrollGrid
                     onSelect={handleFileSelect}
                     fetchData={getFiles}
-                    data={fileDtos}
+                    // data={fileDtos}
                     totalPages={totalPages}
                     totalElements={totalUserFiles}
                     selectedItemId={selectedFile?.id}

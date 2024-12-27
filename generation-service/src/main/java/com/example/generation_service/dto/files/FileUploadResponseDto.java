@@ -17,6 +17,7 @@ public class FileUploadResponseDto {
 
     @AllArgsConstructor
     @Getter
+    @Builder
     public static class FileUploadResult {
 
         private final FileMetadata fileMetadata;

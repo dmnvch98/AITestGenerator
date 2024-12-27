@@ -42,7 +42,7 @@ interface FileStore {
     removeFile: (index: number) => void;
     clearFiles: () => void;
     uploadFiles: (override?: boolean, createCopy?: boolean) => Promise<{status: UploadStatus}>;
-    getFiles: (options?: QueryOptions) => Promise<void>;
+    getFiles: (options?: QueryOptions) => Promise<FileDto[]>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
     setUploadModalOpen: (flag: boolean) => void;
@@ -123,6 +123,7 @@ const useFileStore = create<FileStore>((set, get) => ({
         set({isLoading: true});
         const { fileHashes, totalElements, totalPages } = await FileService.getFiles(options);
         set({fileDtos: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
+        return fileHashes;
     },
 
     deleteFile: async (fileDto: FileDto) => {
