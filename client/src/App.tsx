@@ -17,14 +17,11 @@ import ServerErrorPage from "./pages/errors/ServerErrorPage";
 import {useUserStore} from "./store/userStore";
 import SseService from "./services/sse/SseService";
 import {UploadAndGenerateTest} from "./pages/files/components/UploadAndGenerateTest";
-import {InfinityScrollGrid} from "./pages/files/components/DataSearchGrid";
-import useFileStore from "./pages/files/store/fileStore";
 
 const MainRoutes = () => {
     const {getTestGenCurrentActivities} = useUserStore();
     const {authenticated} = useAuthStore();
     const location = useLocation();
-    const { getFiles, fileDtos, totalPages, totalUserFiles } = useFileStore();
 
     const noActivitiesPaths = [
         '/sign-in',

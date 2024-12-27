@@ -24,12 +24,5 @@ public class FileUploadResponseDto {
         private final String description;
         private final String fileName;
 
-        @Builder
-        public FileUploadResult(String fileName, FileMetadata fileMetadata, UploadStatus status) {
-            this.fileMetadata = fileMetadata;
-            this.status = status;
-            this.description = status.getDescription();
-            this.fileName = fileName;
-        }
     }
 }
