@@ -11,7 +11,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Alert, CircularProgress,
+    Alert
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import { QuestionType, questionTypeTranslations } from "../../store/tests/types";
@@ -21,9 +21,10 @@ interface ModalFormProps {
     setSelection: (selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>) => void;
     open: boolean;
     onClose: () => void;
+    selectedFileName?: string;
 }
 
-export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection }) => {
+export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection, selectedFileName }) => {
     const toggleSelection = (type: QuestionType) => {
         setSelection({
             ...selection,
@@ -66,7 +67,9 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSel
                     Если в тексте мало информации, число вопросов может уменьшиться.
                 </Typography>
             </Alert>
-
+            <Typography align="left" variant="subtitle1" sx={{mt: 1}}>
+                <strong>Файл: </strong> {selectedFileName}
+            </Typography>
             <TableContainer>
                 <Table>
                     <TableHead>

@@ -2,8 +2,10 @@ package com.example.generation_service.models.files;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
+import com.example.generation_service.converters.ormConverter.AtomicIntegerConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-        name = "file_hashes",
+        name = "file_metadata",
         indexes = {
                 @Index(name = "idx_hashed_filename_user_id", columnList = "hashed_filename, user_id"),
                 @Index(name = "idx_original_filename_user_id", columnList = "original_filename, user_id")
@@ -23,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileHash {
+public class FileMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,14 +48,15 @@ public class FileHash {
     private String data;
 
     @Column(name = "copies_num")
+    @Convert(converter = AtomicIntegerConverter.class)
     @Builder.Default
-    private Integer copiesNum = 0;
+    private AtomicInteger copiesNum = new AtomicInteger(0);
 
-    @OneToMany(mappedBy = "fileHash", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fileMetadata", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<FileSearchVector> fileSearchVectors;
 
     public void incrementCopiesNum() {
-        copiesNum++;
+        copiesNum.incrementAndGet();
     }
 }

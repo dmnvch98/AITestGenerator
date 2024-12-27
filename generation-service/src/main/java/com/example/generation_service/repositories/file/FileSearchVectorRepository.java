@@ -11,7 +11,7 @@ public interface FileSearchVectorRepository extends CrudRepository<FileSearchVec
     @Transactional
     @Modifying
     @Query(value = """
-            INSERT INTO file_search_vectors (file_hash_id, search_vector, language)
+            INSERT INTO file_search_vectors (file_metadata_id, search_vector, language)
             VALUES (:fileHashId, to_tsvector(COALESCE(NULLIF(:fileName, ''), '')), :language)
             """,
             nativeQuery = true)

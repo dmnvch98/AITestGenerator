@@ -3,7 +3,7 @@ package com.example.generation_service.workers;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.enums.UploadStatus;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -49,14 +48,14 @@ public class FileWorker {
         String fileNameHash;
 
         if (overwrite) {
-            final FileHash existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            final FileMetadata existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
             if (existingFile != null) {
                 storageClient.deleteFile(userId, existingFile.getHashedFilename());
                 fileHashService.delete(existingFile);
             }
             fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
         } else if (createCopy) {
-            final FileHash existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            final FileMetadata existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
             if (existingFile != null) {
                 existingFile.incrementCopiesNum();
                 originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + existingFile.getCopiesNum());
@@ -71,15 +70,15 @@ public class FileWorker {
             metadata.setContentLength(file.getSize());
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
-            final FileHash fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
+            final FileMetadata fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
                     validationDto.getFileData());
 
-            fileHashService.save(fileHash);
+            final FileMetadata fileMetadata = fileHashService.save(fileHash);
+            return buildResponse(UploadStatus.SUCCESS, file, fileMetadata);
         } catch (IOException e) {
             log.error("Error when saving file: {} for user id: {}", file.getOriginalFilename(), userId, e);
             return buildResponse(UploadStatus.FAILED, file, null);
         }
-        return buildResponse(UploadStatus.SUCCESS, file, fileNameHash);
     }
 
     @Transactional
@@ -106,12 +105,12 @@ public class FileWorker {
         return dto;
     }
 
-    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file, final String hashedFileName) {
+    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file, final FileMetadata fileMetadata) {
         return FileUploadResponseDto
                 .FileUploadResult
                 .builder()
                 .fileName(file.getOriginalFilename())
-                .fileHash(hashedFileName)
+                .fileMetadata(fileMetadata)
                 .status(status)
                 .build();
     }

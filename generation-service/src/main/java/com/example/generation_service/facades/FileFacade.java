@@ -1,6 +1,5 @@
 package com.example.generation_service.facades;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.workers.FileWorker;
@@ -66,7 +65,7 @@ public class FileFacade {
 
   public FileHashesResponseDto getUserFileHashes(final Long userId, final String search, final int page, final int size,
                                                  final String sortBy, final String sortDirection) {
-    Page<FileHash> fileHashPage = fileHashService.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
+    Page<FileMetadata> fileHashPage = fileHashService.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
     return converter.convert(fileHashPage);
   }
 }

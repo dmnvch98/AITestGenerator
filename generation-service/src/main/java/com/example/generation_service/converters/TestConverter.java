@@ -7,7 +7,7 @@ import com.example.generation_service.dto.tests.upsert.UpsertTestAnswerOptionReq
 import com.example.generation_service.dto.tests.upsert.UpsertTestQuestionRequestDto;
 import com.example.generation_service.dto.tests.upsert.UpsertTestRequestDto;
 import com.example.generation_service.dto.tests.TestsResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.AnswerOption;
 import com.example.generation_service.models.test.Question;
@@ -31,7 +31,7 @@ public interface TestConverter {
     @Mapping(source = "fileHash", target = "fileName", qualifiedByName = "getOriginalFilename")
     @Mapping(target = "id", ignore = true)
     Test convert(final GenerateTestCorrectAnswersResponseDto answersDto, final long userId,
-                 final FileHash fileHash, final QuestionType questionsType);
+                 final FileMetadata fileHash, final QuestionType questionsType);
 
     @Mapping(source = "title", target = "title")
     @Mapping(source = "userId", target = "userId")
@@ -64,7 +64,7 @@ public interface TestConverter {
     }
 
     @Named("getOriginalFilename")
-    default String getFileHashId(final FileHash fileHash) {
+    default String getFileHashId(final FileMetadata fileHash) {
         return fileHash.getOriginalFilename();
     }
 

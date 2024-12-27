@@ -3,20 +3,8 @@ import {GridColDef, GridSortModel} from '@mui/x-data-grid';
 import {GenericTableActions} from "../../../../components/main/GenericTableActions";
 import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../../../utils/DateTimeUtils";
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import DescriptionIcon from '@mui/icons-material/Description';
 import {Box, Typography} from '@mui/material';
-
-const getFileIcon = (filename: string) => {
-    const extension = filename.split('.').pop()?.toLowerCase();
-    if (extension === 'pdf') {
-        return <PictureAsPdfIcon sx={{color: '#FF0000'}}/>;
-    }
-    if (extension === 'doc' || extension === 'docx') {
-        return <DescriptionIcon sx={{color: '#2B579A'}}/>;
-    }
-    return null;
-};
+import {getFileIcon} from "../helper";
 
 interface FilesTableProps {
     actions: (file: FileDto) => any[];

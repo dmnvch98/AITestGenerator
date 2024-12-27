@@ -4,7 +4,7 @@ import java.util.List;
 
 
 import com.example.generation_service.exceptions.ResourceNotFoundException;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.files.FileSearchVector;
 import com.example.generation_service.repositories.file.FileHashRepository;
 import com.example.generation_service.repositories.file.FileSearchVectorRepository;
@@ -28,9 +28,10 @@ public class FileHashService {
   private final FileHashRepository repository;
   private final FileSearchVectorRepository vectorRepository;
 
-  public void save(final FileHash fileHash) {
+  public FileMetadata save(final FileMetadata fileHash) {
     repository.save(fileHash);
     vectorRepository.insertSearchVector(fileHash.getId(), fileHash.getOriginalFilename(), "russian");
+    return fileHash;
   }
 
   public void delete(final long id, final String hashedFileName) {
@@ -38,22 +39,22 @@ public class FileHashService {
     log.info("[{}/{}] deleted from repository", id, hashedFileName);
   }
 
-  public List<FileHash> getAllByUserId(final long userId) {
+  public List<FileMetadata> getAllByUserId(final long userId) {
     return repository.findAllByUserId(userId, Sort.by("uploadTime").descending());
   }
 
-  public Page<FileHash> getUserFileHashes(final Long userId, final String search, final int page, final int size,
-                                          final String sortBy, final String sortDirection) {
+  public Page<FileMetadata> getUserFileHashes(final Long userId, final String search, final int page, final int size,
+                                              final String sortBy, final String sortDirection) {
     try {
       final Sort.Direction direction = Sort.Direction.fromString(sortDirection);
       final Pageable pageable = PageRequest.of(page, size, direction, sortBy);
-      final Specification<FileHash> spec = Specification.where((root, query, criteriaBuilder) -> {
+      final Specification<FileMetadata> spec = Specification.where((root, query, criteriaBuilder) -> {
         final Predicate userIdPredicate = criteriaBuilder.equal(root.get("userId"), userId);
 
         if (search == null || search.trim().isEmpty()) {
           return userIdPredicate;
         }
-        final Join<FileHash, FileSearchVector> searchVectorJoin = root.join("fileSearchVectors");
+        final Join<FileMetadata, FileSearchVector> searchVectorJoin = root.join("fileSearchVectors");
         final String formattedSearch = search.trim().replaceAll("\\s+", " | ");
         final Predicate ftsPredicate = criteriaBuilder.equal(
                 criteriaBuilder.function("fts_search", Boolean.class,
@@ -82,15 +83,15 @@ public class FileHashService {
     return repository.existsByOriginalFilenameAndUserId(hashedFileName, userId);
   }
 
-  public FileHash getByHashedFilenameAndUserId(final Long userId, final String hashedFileName) {
+  public FileMetadata getByHashedFilenameAndUserId(final Long userId, final String hashedFileName) {
     return repository.findByHashedFilenameAndUserId(hashedFileName, userId);
   }
 
-  public FileHash getByOriginalFilenameAndUserId(final Long userId, final String originalFilename) {
+  public FileMetadata getByOriginalFilenameAndUserId(final Long userId, final String originalFilename) {
     return repository.findByOriginalFilenameAndUserId(originalFilename, userId);
   }
 
-  public void delete(final FileHash fileHash) {
+  public void delete(final FileMetadata fileHash) {
     repository.delete(fileHash);
   }
 

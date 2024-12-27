@@ -22,7 +22,7 @@ export enum UploadStatus {
     MALWARE = 'MALWARE'
 }
 interface FileResult {
-    fileHash: string;
+    fileMetadata: FileDto;
     fileName: string;
     status: UploadStatus;
     description: string;
@@ -34,18 +34,20 @@ export interface FileUploadResponseDto {
 
 interface FileStore {
     filesToUpload: File[];
-    uploaded: boolean;
     fileDtos: FileDto[];
     isLoading: boolean;
+    setIsLoading: (flag: boolean) => void;
     error: string | null;
     addFiles: (files: File[]) => void;
     removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: (override?: boolean, createCopy?: boolean) => Promise<{status: UploadStatus, fileHash?: string}>;
+    uploadFiles: (override?: boolean, createCopy?: boolean) => Promise<{status: UploadStatus}>;
     getFiles: (options?: QueryOptions) => Promise<void>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
     setUploadModalOpen: (flag: boolean) => void;
+    selectedFile: FileDto | null;
+    setSelectedFile: (file: FileDto | null) => void;
     selectedFileHashes: string[];
     setSelectedFileHashes: (fileIds: number[]) => void;
     deleteFilesInBatch: () => void;
@@ -64,10 +66,11 @@ const useFileStore = create<FileStore>((set, get) => ({
     selectedFileHashes: [],
     totalUserFiles: 0,
     totalPages: 0,
+    selectedFile: null,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
     removeFile: (index) => set((state) => (
-        {filesToUpload: state.filesToUpload.filter((_, i) => i !== index), uploaded: false}
+        {filesToUpload: state.filesToUpload.filter((_, i) => i !== index), selectedFile: null}
     )),
     clearFiles: () => set({filesToUpload: []}),
     validateFilesThenUpload: (newFiles: File[]) => {
@@ -81,16 +84,15 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async (override?: boolean, createCopy?: boolean): Promise<{ fileHash?: string; status: UploadStatus }> => {
-        const { filesToUpload } = get();
+    uploadFiles: async (override?: boolean, createCopy?: boolean): Promise<{ status: UploadStatus }> => {
+        const { filesToUpload, clearFiles } = get();
         set({ isLoading: true});
 
         try {
             const response = await FileService.uploadFiles(filesToUpload, override, createCopy) as FileUploadResponseDto;
-            console.log('resp: ', response);
             if (response?.uploadResults?.length) {
                 const result = response.uploadResults[0];
-                const { status, description, fileName, fileHash } = result;
+                const { status, description, fileName, fileMetadata } = result;
                 if (status != UploadStatus.SUCCESS) {
                     if (status !== UploadStatus.ALREADY_UPLOADED) {
                         const message = `${description} - <b>${fileName}</b>`;
@@ -98,13 +100,10 @@ const useFileStore = create<FileStore>((set, get) => ({
                         NotificationService.addAlert(alert);
                     }
                 } else {
-                    set({ uploaded: true });
-                    return {
-                        status,
-                        fileHash,
-                    };
+                    clearFiles();
+                    set({ selectedFile: fileMetadata, filesToUpload: [] });
                 }
-
+                set({ isLoading: false });
                 return { status };
             }
 
@@ -115,9 +114,8 @@ const useFileStore = create<FileStore>((set, get) => ({
                 message: 'Ошибка при загрузке файлов',
                 severity: 'error',
             });
-            return { status: UploadStatus.FAILED };
-        } finally {
             set({ isLoading: false });
+            return { status: UploadStatus.FAILED };
         }
     },
 
@@ -166,6 +164,12 @@ const useFileStore = create<FileStore>((set, get) => ({
         getFiles();
         set({isLoading: false})
     },
+    setSelectedFile: async (file) => {
+        set({selectedFile: file});
+    },
+    setIsLoading: (flag) => {
+        set({isLoading: flag})
+    }
 }));
 
 export default useFileStore;

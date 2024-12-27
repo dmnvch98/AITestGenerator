@@ -6,7 +6,7 @@ import com.example.generation_service.dto.sse.NotificationType;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.CommandService;
@@ -49,7 +49,7 @@ public class TestGenerationActivityService {
         return genericRedisService.getAllObjectsFromHash(hashKey, TestGenerationActivity.class);
     }
 
-    public void createWaitingActivity(final FileHash fileHash, final String cid,
+    public void createWaitingActivity(final FileMetadata fileHash, final String cid,
                                       final GenerateTestRequestDto requestDto, final Long userId, final Set<QuestionType> queuedQuestionTypes) {
         final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId, queuedQuestionTypes);
         final String hashKey = Utils.getGenerationHashKey(userId);
@@ -138,7 +138,7 @@ public class TestGenerationActivityService {
             final String originalFileName = Optional.ofNullable(dto)
                   .map(GenerateTestRequestDto::getHashedFileName)
                   .map(h -> fileHashService.getByHashedFilenameAndUserId(userId, h))
-                  .map(FileHash::getOriginalFilename)
+                  .map(FileMetadata::getOriginalFilename)
                   .orElse(null);
 
             final TestGeneratingHistory failedHistory = historyConverter.getFailedHistoryWhenNoActivity(dto, userId,

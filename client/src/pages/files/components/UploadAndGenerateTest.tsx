@@ -1,5 +1,5 @@
-import React, {useMemo, useState} from 'react';
-import {Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Box, Button, Container, Divider, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
 import {FileUploadModal} from './FileUploadModal';
 import {GenTestModal} from '../../../components/tests/GenTestModal';
 import useFileStore, {FileDto, UploadStatus} from '../store/fileStore';
@@ -11,19 +11,26 @@ import NotificationService from "../../../services/notification/AlertService";
 import {AlertMessage} from "../../../store/types";
 import {FileAlreadyUploadedModal} from "./upload/components/FileAlreadyUploadedModal";
 import {TabItem, TabsPanel} from "../../../components/main/tabsPanel/TabsPanel";
-import {InfinityScrollGrid} from "./FilesAutocomplete";
+import {InfinityScrollGrid} from "./DataSearchGrid";
 
-const steps = ['Загрузка файла', 'Параметры генерации'];
+const steps = ['Выбор файла', 'Параметры генерации'];
 
 export const UploadAndGenerateTestContent: React.FC = () => {
     const navigate = useNavigate();
-    const {filesToUpload, uploadFiles, uploaded, addFiles} = useFileStore();
+    const {filesToUpload, uploadFiles} = useFileStore();
     const {generateTestByFile} = useTestStore();
-    const { getFiles, fileDtos, totalPages, totalUserFiles } = useFileStore();
-    const [isFileUploading, setIsFileUploading] = useState(false);
+    const {
+        getFiles,
+        fileDtos,
+        totalPages,
+        totalUserFiles,
+        selectedFile,
+        setSelectedFile,
+        isLoading,
+        setIsLoading
+    } = useFileStore();
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
-    const [fileHash, setFileHash] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
     const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
@@ -36,58 +43,51 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     );
 
     const isUploadButtonDisabled = useMemo(() => {
-        return filesToUpload.length === 0 && (isFileUploading || fileHash === '');
-    }, [filesToUpload, isFileUploading, fileHash]);
+        return filesToUpload.length === 0 && (isLoading || !selectedFile);
+    }, [filesToUpload, isLoading, selectedFile]);
 
     const isGenerateButtonDisabled = useMemo(() => {
         return !Object.values(selection).some(item => item.selected) || isGenerationQueueing;
     }, [selection]);
 
     const handleFileUpload = async () => {
-        setIsFileUploading(true);
+        setIsLoading(true);
         try {
-            if (!uploaded) {
-                if (filesToUpload.length > 1) {
-                    const {status, fileHash} = await uploadFiles();
-                    if (status === UploadStatus.SUCCESS) {
-                        fileHash && setFileHash(fileHash);
-                        setActiveStep((prev) => prev + 1);
-                    } else if (status === UploadStatus.ALREADY_UPLOADED) {
-                        setIsModalOpen(true);
-                    }
-                } else if (Boolean(fileHash)) {
+            if (filesToUpload.length > 0) {
+                const {status} = await uploadFiles();
+                if (status === UploadStatus.SUCCESS) {
                     setActiveStep((prev) => prev + 1);
+                } else if (status === UploadStatus.ALREADY_UPLOADED) {
+                    setIsModalOpen(true);
                 }
-            } else {
+            } else if (selectedFile) {
                 setActiveStep((prev) => prev + 1);
             }
         } finally {
-            setIsFileUploading(false);
+            setIsLoading(false);
         }
     };
 
     const handleOverride = async () => {
-        setIsFileUploading(true);
+        setIsLoading(true);
         setIsModalOpen(false);
-        const {status, fileHash} = await uploadFiles(true, false);
+        const {status} = await uploadFiles(true, false);
         if (status === UploadStatus.SUCCESS) {
-            fileHash && setFileHash(fileHash);
             setActiveStep((prev) => prev + 1);
         }
     };
 
     const handleCreateCopy = async () => {
-        setIsFileUploading(true);
+        setIsLoading(true);
         setIsModalOpen(false);
-        const {status, fileHash} = await uploadFiles(false, true);
+        const {status} = await uploadFiles(false, true);
         if (status === UploadStatus.SUCCESS) {
-            fileHash && setFileHash(fileHash);
             setActiveStep((prev) => prev + 1);
         }
     };
 
     const handleGenerationSubmit = async () => {
-        if (fileHash) {
+        if (selectedFile) {
             setIsGenerationQueueing(true);
             const params = Object.entries(selection)
                 .filter(([_, value]) => value.selected)
@@ -97,7 +97,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 }));
 
             const request: GenerateTestRequest = {
-                hashedFileName: fileHash,
+                hashedFileName: selectedFile.hashedFilename,
                 params: params,
             };
 
@@ -119,23 +119,30 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     };
 
     const handleFileSelect = (file: FileDto) => {
-        setFileHash(file.hashedFilename);
+        setSelectedFile(file);
     };
 
     const tabs: TabItem[] = [
-        {index: 0, value: 0, children: <Box><FileUploadModal isUploading={isFileUploading}/></Box>, title: 'Загрузить файл'},
+        {
+            index: 0,
+            value: 0,
+            children: <Box><FileUploadModal isUploading={isLoading}/></Box>,
+            title: 'Загрузить файл'
+        },
         {
             index: 1,
             value: 1,
-            children: <Box> <InfinityScrollGrid
-                onSelect={handleFileSelect}
-                fetchData={getFiles}
-                data={fileDtos}
-                totalPages={totalPages}
-                totalElements={totalUserFiles}
-            />
+            children: <Box>
+                <InfinityScrollGrid
+                    onSelect={handleFileSelect}
+                    fetchData={getFiles}
+                    data={fileDtos}
+                    totalPages={totalPages}
+                    totalElements={totalUserFiles}
+                    selectedItemId={selectedFile?.id}
+                />
             </Box>,
-            title: 'Выбрать существиющий'
+            title: 'Выбрать существующий'
         },
     ];
 
@@ -156,7 +163,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                     </Stepper>
                 </Box>
                 <Container maxWidth="md">
-                   <Box sx={{ mt: 4, height: '60vh', overflowY: 'auto' }}>
+                    <Box sx={{mt: 4, height: '60vh', overflowY: 'auto'}}>
                         {activeStep === 0
                             && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab}
                                           onTabChange={setFileUploadActiveTab}/>
@@ -166,10 +173,12 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                                 selection={selection}
                                 setSelection={setSelection}
                                 open={true}
+                                selectedFileName={selectedFile?.originalFilename}
                                 onClose={() => setActiveStep(0)}
                             />
                         )}
                     </Box>
+                    <Divider/>
                     <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 4}}>
                         <Box sx={{display: 'flex', gap: 2}}>
                             {activeStep > 0 && (

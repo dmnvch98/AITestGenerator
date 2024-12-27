@@ -1,6 +1,7 @@
 package com.example.generation_service.dto.files;
 
 import com.example.generation_service.models.enums.UploadStatus;
+import com.example.generation_service.models.files.FileMetadata;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,17 +19,17 @@ public class FileUploadResponseDto {
     @Getter
     public static class FileUploadResult {
 
-        private final String fileName;
-        private final String fileHash;
+        private final FileMetadata fileMetadata;
         private final UploadStatus status;
         private final String description;
+        private final String fileName;
 
         @Builder
-        public FileUploadResult(String fileName, String fileHash, UploadStatus status) {
-            this.fileName = fileName;
-            this.fileHash = fileHash;
+        public FileUploadResult(String fileName, FileMetadata fileMetadata, UploadStatus status) {
+            this.fileMetadata = fileMetadata;
             this.status = status;
             this.description = status.getDescription();
+            this.fileName = fileName;
         }
     }
 }

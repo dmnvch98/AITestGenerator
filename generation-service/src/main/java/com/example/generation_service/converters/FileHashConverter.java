@@ -6,7 +6,7 @@ import java.util.Map;
 
 
 import com.example.generation_service.dto.texts.FileHashesResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +19,11 @@ public interface FileHashConverter {
 
   ObjectMapper MAPPER = new ObjectMapper();
 
-  default FileHashesResponseDto convert(final List<FileHash> fileHashes) {
+  default FileHashesResponseDto convert(final List<FileMetadata> fileHashes) {
     return FileHashesResponseDto.builder().fileHashes(fileHashes).build();
   }
 
-  default FileHashesResponseDto convert(final Page<FileHash> fileHashes) {
+  default FileHashesResponseDto convert(final Page<FileMetadata> fileHashes) {
     return FileHashesResponseDto.builder()
             .fileHashes(fileHashes.getContent())
             .totalElements(fileHashes.getTotalElements())
@@ -47,12 +47,12 @@ public interface FileHashConverter {
     return MAPPER.writeValueAsString(fileData);
   }
 
-  default FileHash convertToFileHash(
+  default FileMetadata convertToFileHash(
           final String fileNameHash,
           final String originalFileName,
           final Long userId,
           final Map<String, String> fileData) throws JsonProcessingException {
-    return FileHash.builder()
+    return FileMetadata.builder()
             .hashedFilename(fileNameHash)
             .originalFilename(originalFileName)
             .uploadTime(LocalDateTime.now())

@@ -18,8 +18,8 @@ public class FileSearchVector {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_hash_id", insertable = false, updatable = false)
-    private FileHash fileHash;
+    @JoinColumn(name = "file_metadata_id", insertable = false, updatable = false)
+    private FileMetadata fileMetadata;
 
     @Column(name = "search_vector", columnDefinition = "tsvector")
     private Object searchVector;

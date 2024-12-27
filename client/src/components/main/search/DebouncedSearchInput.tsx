@@ -1,20 +1,18 @@
 // DebouncedSearchInput.tsx
-import React, { useState, useEffect, ChangeEvent } from "react";
-import { TextField, IconButton, InputAdornment } from "@mui/material";
+import React, {useState, useEffect, ChangeEvent} from "react";
+import {TextField, IconButton, InputAdornment} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 
 interface DebouncedSearchInputProps {
     onSearch: (value: string) => void;
     delay?: number;
-    initialValue?: string;
 }
 
 export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
                                                                               onSearch,
                                                                               delay = 500,
-                                                                              initialValue = "",
                                                                           }) => {
-    const [searchValue, setSearchValue] = useState<string>(initialValue);
+    const [searchValue, setSearchValue] = useState<string>('');
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -24,7 +22,7 @@ export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
         return () => {
             clearTimeout(handler);
         };
-    }, [searchValue, onSearch, delay]);
+    }, [searchValue]);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -46,7 +44,7 @@ export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
                     <InputAdornment position="end">
                         {searchValue && (
                             <IconButton onClick={handleClear} edge="end">
-                                <ClearIcon />
+                                <ClearIcon/>
                             </IconButton>
                         )}
                     </InputAdornment>

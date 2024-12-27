@@ -9,7 +9,7 @@ import com.example.generation_service.exceptionHandler.enumaration.GenerationFai
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import org.mapstruct.Mapper;
@@ -38,7 +38,7 @@ public interface TestGenerationConverter {
   @Mapping(source = "message.userId", target = "userId")
   @Mapping(source = "questionTypeQuantity.questionType", target = "questionType")
   @Mapping(source = "questionTypeQuantity.maxQuestions", target = "maxQuestions")
-  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileHash fileHash, final QuestionTypeQuantity questionTypeQuantity);
+  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileMetadata fileHash, final QuestionTypeQuantity questionTypeQuantity);
 
   @Named("convertFailReason")
   default Integer convertFailReason(final String failReason) {

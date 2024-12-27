@@ -1,7 +1,7 @@
 package com.example.generation_service.services;
 
 import com.example.generation_service.extractors.FileExtractorFabric;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class FileExtractorService {
   private final StorageClient storageClient;
   private final FileExtractorFabric fileExtractorFabric;
 
-  public String getContentFromFile(final FileHash fileHash, final Long userId) throws IOException {
+  public String getContentFromFile(final FileMetadata fileHash, final Long userId) throws IOException {
     final String fileExtension = Utils.getFileExtension(fileHash.getOriginalFilename());
     final Resource resource = storageClient.downloadFile(userId, fileHash.getHashedFilename());
     return fileExtractorFabric.getFileExtractor(fileExtension)

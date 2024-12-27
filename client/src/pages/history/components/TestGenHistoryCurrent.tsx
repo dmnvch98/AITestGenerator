@@ -9,7 +9,7 @@ import {Theme} from "@mui/material/styles";
 import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
 
-const noTestTitle = '-- Недоступно --'
+const noTestTitle = 'Не установлено'
 
 export const TestGenHistoryCurrent = () => {
     const [modalOpen, setModalOpen] = useState(false);

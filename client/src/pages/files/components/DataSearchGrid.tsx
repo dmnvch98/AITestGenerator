@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Box, CircularProgress, Grid, Radio, Typography } from "@mui/material";
-import { FileDto } from "../store/fileStore";
-import { QueryOptions } from "../../../store/types";
-import { DebouncedSearchInput } from "../../../components/main/search/DebouncedSearchInput";
+import React, {useEffect, useRef, useState, useCallback} from "react";
+import {Box, CircularProgress, Grid, Radio, Typography} from "@mui/material";
+import {FileDto} from "../store/fileStore";
+import {QueryOptions} from "../../../store/types";
+import {DebouncedSearchInput} from "../../../components/main/search/DebouncedSearchInput";
 import DateTimeUtils from "../../../utils/DateTimeUtils";
+import {NotFoundIcon} from "./NotFoundIcon";
+import {getFileIcon} from "./helper";
 
 interface InfinityScrollGridProps {
     data: FileDto[];
@@ -11,6 +13,7 @@ interface InfinityScrollGridProps {
     fetchData: (options?: QueryOptions) => Promise<void>;
     totalPages: number;
     totalElements: number;
+    selectedItemId?: number;
 }
 
 export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
@@ -19,23 +22,18 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                                                                           fetchData,
                                                                           totalPages,
                                                                           totalElements,
+                                                                          selectedItemId
                                                                       }) => {
-    const [filesDtos, setFilesDtos] = useState<FileDto[]>([]);
+    const [items, setItems] = useState<FileDto[]>([]);
     const [loading, setLoading] = useState(false);
-    const [selectedFileId, setSelectedFileId] = useState<number | null>(null);
+    const [selectedFileId, setSelectedFileId] = useState<number | undefined>(selectedItemId);
     const [page, setPage] = useState(0);
     const observerRef = useRef<HTMLDivElement | null>(null);
     const [searchValue, setSearchValue] = useState("");
     const isSearchRef = useRef(false);
 
     useEffect(() => {
-        setFilesDtos([]);
-        setPage(0);
-        isSearchRef.current = true;
-    }, [searchValue]);
-
-    useEffect(() => {
-        const loadFiles = async () => {
+        const loadItems = async () => {
             setLoading(true);
             try {
                 await fetchData({
@@ -49,11 +47,14 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                 setLoading(false);
             }
         };
-        loadFiles();
-    }, [page, searchValue, fetchData]);
+        setItems([]);
+        setPage(0);
+        isSearchRef.current = true;
+        loadItems();
+    }, [searchValue]);
 
     useEffect(() => {
-        setFilesDtos((prev) => [...prev, ...data]);
+        setItems((prev) => [...prev, ...data]);
     }, [data]);
 
     const handleSearch = (value: string) => {
@@ -96,45 +97,52 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
         <Box>
             <Box display="flex" justifyContent="flex-end" width="100%" mb={2}>
                 <Box width="50%">
-                    <DebouncedSearchInput onSearch={handleSearch} />
+                    <DebouncedSearchInput onSearch={handleSearch}/>
                 </Box>
             </Box>
-            <Grid container sx={{ mt: 2 }}>
-                {filesDtos.map((file) => (
-                    <Grid
-                        container
-                        spacing={2}
-                        key={file.id}
-                        alignItems="center"
-                        sx={{
-                            cursor: "pointer",
-                            borderBottom: "1px solid #e0e0e0",
-                            padding: 0.5
-                        }}
-                        onClick={() => handleSelectionChange(file)}
-                    >
-                        <Grid item xs={1} textAlign="center">
-                            <Radio
-                                checked={selectedFileId === file.id}
-                                onChange={() => handleSelectionChange(file)}
-                                value={file.id}
-                            />
-                        </Grid>
-                        <Grid item xs={8} textAlign="left">
-                            <Typography>{file.originalFilename}</Typography>
-                        </Grid>
-                        <Grid item xs={3} textAlign="left">
-                            <Typography>{DateTimeUtils.formatDate(file.uploadTime)}</Typography>
-                        </Grid>
+            {
+                items.length === 0
+                    ? <NotFoundIcon/>
+                    : <Grid container sx={{mt: 2}}>
+                        {items.map((file) => (
+                            <Grid
+                                container
+                                spacing={2}
+                                key={file.id}
+                                alignItems="center"
+                                sx={{
+                                    cursor: "pointer",
+                                    borderBottom: "1px solid #e0e0e0",
+                                    padding: 0.5
+                                }}
+                                onClick={() => handleSelectionChange(file)}
+                            >
+                                <Grid item xs={1} textAlign="center">
+                                    <Radio
+                                        checked={selectedFileId === file.id}
+                                        onChange={() => handleSelectionChange(file)}
+                                        value={file.id}
+                                    />
+                                </Grid>
+                                <Grid item xs={9} textAlign="left">
+                                    <Box display="flex" alignItems="center">
+                                        {getFileIcon(file.originalFilename)}
+                                        <Typography sx={{ml: 1}}>{file.originalFilename}</Typography>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={2} textAlign="left">
+                                    <Typography>{DateTimeUtils.formatDate(file.uploadTime)}</Typography>
+                                </Grid>
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
-            </Grid>
+            }
 
-            <div ref={observerRef} style={{ height: 20, width: "100%" }} />
+            <div ref={observerRef} style={{height: 20, width: "100%"}}/>
 
             {loading && (
                 <Box display="flex" justifyContent="center" mt={2}>
-                    <CircularProgress />
+                    <CircularProgress/>
                 </Box>
             )}
         </Box>

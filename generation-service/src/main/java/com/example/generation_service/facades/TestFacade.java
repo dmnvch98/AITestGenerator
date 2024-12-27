@@ -11,7 +11,7 @@ import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
@@ -63,7 +63,7 @@ public class TestFacade {
     log.info("Received command to generation test, command=[{}]", dto);
 
     try {
-      final FileHash fileHash = Optional.ofNullable(dto)
+      final FileMetadata fileHash = Optional.ofNullable(dto)
             .map(GenerateTestRequestDto::getHashedFileName)
             .filter(StringUtils::isNotBlank)
             .map(hash -> fileHashService.getByHashedFilenameAndUserId(userId, hash))
@@ -99,7 +99,7 @@ public class TestFacade {
       log.info("Received message to generate test. Message=[{}]", message);
       activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getMessageId());
 
-      final FileHash fileHash = fileHashService
+      final FileMetadata fileHash = fileHashService
             .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
       final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
 

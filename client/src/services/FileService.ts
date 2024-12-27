@@ -30,6 +30,7 @@ class FileService {
             return response.data;
         } catch (error) {
             console.error('Ошибка при загрузке файлов:', error);
+            throw error;
         }
     };
 
