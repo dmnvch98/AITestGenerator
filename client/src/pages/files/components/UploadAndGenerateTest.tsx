@@ -26,7 +26,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         selectedFile,
         setSelectedFile,
         isLoading,
-        setIsLoading
+        setIsLoading,
+        isFileExists
     } = useFileStore();
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
@@ -54,11 +55,14 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         setIsLoading(true);
         try {
             if (filesToUpload.length > 0) {
+                const { exists } = await isFileExists(filesToUpload[0].name);
+                if (exists) {
+                    setIsModalOpen(true);
+                    return;
+                }
                 const {status} = await uploadFiles();
                 if (status === UploadStatus.SUCCESS) {
                     setActiveStep((prev) => prev + 1);
-                } else if (status === UploadStatus.ALREADY_UPLOADED) {
-                    setIsModalOpen(true);
                 }
             } else if (selectedFile) {
                 setActiveStep((prev) => prev + 1);
@@ -71,7 +75,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const handleOverride = async () => {
         setIsLoading(true);
         setIsModalOpen(false);
-        const {status} = await uploadFiles(true, false);
+        const {status} = await uploadFiles({ override: true });
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
@@ -80,7 +84,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const handleCreateCopy = async () => {
         setIsLoading(true);
         setIsModalOpen(false);
-        const {status} = await uploadFiles(false, true);
+        const {status} = await uploadFiles({createCopy: true });
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }

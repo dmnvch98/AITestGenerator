@@ -9,8 +9,9 @@ import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.enumeration.CidType;
 import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.FileHashConverter;
+import com.example.generation_service.dto.files.FileExistsResponseDto;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
-import com.example.generation_service.dto.texts.FileHashesResponseDto;
+import com.example.generation_service.dto.files.FilesMetadataResponseDto;
 import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
@@ -35,6 +36,9 @@ public class FileFacade {
   @TrackAction(ActionType.UPLOAD_FILES)
   @GenerateCid(CidType.RANDOM)
   public FileUploadResponseDto saveFiles(final Long userId, final List<MultipartFile> files, final boolean overwrite, final boolean createCopy) {
+    if (overwrite && createCopy) {
+      throw new IllegalArgumentException("Both overwrite and createCopy params cannot be true");
+    }
     final List<FileUploadResponseDto.FileUploadResult> uploadResults = new ArrayList<>();
     for (MultipartFile file : files) {
         final FileUploadResponseDto.FileUploadResult result = fileWorker.saveFile(userId, file, overwrite, createCopy);
@@ -59,13 +63,18 @@ public class FileFacade {
     fileWorker.deleteFileByHash(userId, hash);
   }
 
-  public FileHashesResponseDto getAllUserFileDescriptions(final long userId) {
+  public FilesMetadataResponseDto getAllUserFileDescriptions(final long userId) {
     return converter.convert(fileHashService.getAllByUserId(userId));
   }
 
-  public FileHashesResponseDto getUserFileHashes(final Long userId, final String search, final int page, final int size,
-                                                 final String sortBy, final String sortDirection) {
+  public FilesMetadataResponseDto getUserFileHashes(final Long userId, final String search, final int page, final int size,
+                                                    final String sortBy, final String sortDirection) {
     Page<FileMetadata> fileHashPage = fileHashService.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
     return converter.convert(fileHashPage);
+  }
+
+  public FileExistsResponseDto isFileExists(final Long userId, final String originalFileName) {
+    final boolean exists = fileHashService.isExistsByOriginalFilenameAndUserId(userId, originalFileName);
+    return FileExistsResponseDto.builder().exists(exists).originalFileName(originalFileName).build();
   }
 }

@@ -1,6 +1,6 @@
 import {getAxiosInstance} from "../interceptors/getAxiosInstance";
 import {AxiosError} from "axios";
-import {FileUploadResponseDto} from "../pages/files/store/fileStore";
+import {FileUploadResponseDto, UploadOptions} from "../pages/files/store/fileStore";
 import {QueryOptions} from "../store/types";
 
 class FileService {
@@ -11,7 +11,7 @@ class FileService {
         this.axiosInstance = getAxiosInstance();
     }
 
-    uploadFiles = async (files: File[], overwrite?: boolean, createCopy?: boolean): Promise<FileUploadResponseDto | void> => {
+    uploadFiles = async (files: File[], uploadOptions?: UploadOptions): Promise<FileUploadResponseDto | void> => {
         const formData = new FormData();
         files.forEach(file => {
             formData.append('file', file);
@@ -22,10 +22,7 @@ class FileService {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                params: {
-                    overwrite,
-                    createCopy,
-                },
+                params: uploadOptions
             });
             return response.data;
         } catch (error) {
@@ -58,6 +55,16 @@ class FileService {
         try {
             const response = await this.axiosInstance.post('/api/v1/files/delete', hashesFileNames);
             return response.status;
+        } catch (e: unknown) {
+            const error = e as AxiosError;
+            console.log(error.message);
+        }
+    }
+
+    isFileExists = async (filename: string) => {
+        try {
+            const response = await this.axiosInstance.get(`/api/v1/files/${filename}/exists`);
+            return response.data;
         } catch (e: unknown) {
             const error = e as AxiosError;
             console.log(error.message);

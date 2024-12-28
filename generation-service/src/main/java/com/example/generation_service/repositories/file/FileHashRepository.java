@@ -17,8 +17,6 @@ public interface FileHashRepository extends CrudRepository<FileMetadata, Long>, 
 
     FileMetadata findByOriginalFilenameAndUserId(final String originalFilename, final Long userId);
 
-    void deleteByOriginalFilenameAndUserId(final String originalFilename, final Long userId);
-
     Boolean existsByOriginalFilenameAndUserId(final String originalFileName, final Long userId);
 
     List<FileMetadata> findAllByUserId(final long userId, Sort sort);

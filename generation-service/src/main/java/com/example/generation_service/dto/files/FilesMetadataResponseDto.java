@@ -1,4 +1,4 @@
-package com.example.generation_service.dto.texts;
+package com.example.generation_service.dto.files;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class FileHashesResponseDto {
+public class FilesMetadataResponseDto {
 
   private final List<FileMetadata> fileHashes;
   private final long totalPages;

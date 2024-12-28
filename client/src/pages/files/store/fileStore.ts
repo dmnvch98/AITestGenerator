@@ -13,6 +13,11 @@ export interface FileDto {
     uploadTime: Date;
 }
 
+export interface FileExistsResponseDto {
+    fileName: string,
+    exists: boolean;
+}
+
 export enum UploadStatus {
     SUCCESS = 'SUCCESS',
     FAILED = 'FAILED',
@@ -32,6 +37,11 @@ export interface FileUploadResponseDto {
     uploadResults: FileResult[];
 }
 
+export interface UploadOptions {
+    override?: boolean;
+    createCopy?: boolean;
+}
+
 interface FileStore {
     filesToUpload: File[];
     fileDtos: FileDto[];
@@ -41,7 +51,7 @@ interface FileStore {
     addFiles: (files: File[]) => void;
     removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: (override?: boolean, createCopy?: boolean) => Promise<{status: UploadStatus}>;
+    uploadFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>;
     getFiles: (options?: QueryOptions) => Promise<FileDto[]>;
     deleteFile: (fileDto: FileDto) => Promise<void>;
     uploadModalOpen: boolean,
@@ -54,6 +64,7 @@ interface FileStore {
     totalUserFiles: number;
     totalPages: number;
     validateFilesThenUpload: (newFiles: File[]) => void;
+    isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
@@ -84,27 +95,28 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async (override?: boolean, createCopy?: boolean): Promise<{ status: UploadStatus }> => {
+    isFileExists: async (fileName: string): Promise<FileExistsResponseDto> => {
+        return await FileService.isFileExists(fileName);
+    },
+    uploadFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus }> => {
         const { filesToUpload, clearFiles } = get();
         set({ isLoading: true});
 
         try {
-            const response = await FileService.uploadFiles(filesToUpload, override, createCopy) as FileUploadResponseDto;
+            const response = await FileService.uploadFiles(filesToUpload, uploadOptions) as FileUploadResponseDto;
             if (response?.uploadResults?.length) {
                 const result = response.uploadResults[0];
-                const { status, description, fileName, fileMetadata } = result;
+                const {status, description, fileName, fileMetadata} = result;
                 if (status != UploadStatus.SUCCESS) {
-                    if (status !== UploadStatus.ALREADY_UPLOADED) {
-                        const message = `${description} - <b>${fileName}</b>`;
-                        const alert = new AlertMessage(message, 'error');
-                        NotificationService.addAlert(alert);
-                    }
+                    const message = `${description} - <b>${fileName}</b>`;
+                    const alert = new AlertMessage(message, 'error');
+                    NotificationService.addAlert(alert);
                 } else {
                     clearFiles();
-                    set({ selectedFile: fileMetadata, filesToUpload: [] });
+                    set({selectedFile: fileMetadata, filesToUpload: []});
                 }
-                set({ isLoading: false });
-                return { status };
+                set({isLoading: false});
+                return {status};
             }
 
             return { status: UploadStatus.FAILED };

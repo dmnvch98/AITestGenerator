@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "file_metadata",
         indexes = {
-                @Index(name = "idx_hashed_filename_user_id", columnList = "hashed_filename, user_id"),
-                @Index(name = "idx_original_filename_user_id", columnList = "original_filename, user_id")
+                @Index(name = "idx_hashed_filename_user_id", columnList = "user_id, hashed_filename"),
+                @Index(name = "idx_original_filename_user_id", columnList = "user_id, original_filename")
         },
         uniqueConstraints = {
                 @UniqueConstraint(name = "unique_hashed_filename_user_id", columnNames = {"hashed_filename", "user_id"})

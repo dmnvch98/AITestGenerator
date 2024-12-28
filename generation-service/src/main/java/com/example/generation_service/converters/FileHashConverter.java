@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.example.generation_service.dto.texts.FileHashesResponseDto;
+import com.example.generation_service.dto.files.FilesMetadataResponseDto;
 import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,12 +19,12 @@ public interface FileHashConverter {
 
   ObjectMapper MAPPER = new ObjectMapper();
 
-  default FileHashesResponseDto convert(final List<FileMetadata> fileHashes) {
-    return FileHashesResponseDto.builder().fileHashes(fileHashes).build();
+  default FilesMetadataResponseDto convert(final List<FileMetadata> fileHashes) {
+    return FilesMetadataResponseDto.builder().fileHashes(fileHashes).build();
   }
 
-  default FileHashesResponseDto convert(final Page<FileMetadata> fileHashes) {
-    return FileHashesResponseDto.builder()
+  default FilesMetadataResponseDto convert(final Page<FileMetadata> fileHashes) {
+    return FilesMetadataResponseDto.builder()
             .fileHashes(fileHashes.getContent())
             .totalElements(fileHashes.getTotalElements())
             .totalPages(fileHashes.getTotalPages())

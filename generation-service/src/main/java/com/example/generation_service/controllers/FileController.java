@@ -1,8 +1,9 @@
 package com.example.generation_service.controllers;
 
 import com.example.generation_service.config.security.service.PrincipalUser;
+import com.example.generation_service.dto.files.FileExistsResponseDto;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
-import com.example.generation_service.dto.texts.FileHashesResponseDto;
+import com.example.generation_service.dto.files.FilesMetadataResponseDto;
 import com.example.generation_service.facades.FileFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -50,13 +51,13 @@ public class FileController {
   }
 
   @GetMapping("/")
-  public FileHashesResponseDto getAllByUserId(final Authentication authentication) {
+  public FilesMetadataResponseDto getAllByUserId(final Authentication authentication) {
     final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
     return fileFacade.getAllUserFileDescriptions(userId);
   }
 
   @GetMapping("/filter")
-  public FileHashesResponseDto getUserFileHashes(
+  public FilesMetadataResponseDto getUserFileHashes(
           final Authentication authentication,
           @RequestParam(required = false) String search,
           @RequestParam(defaultValue = "0") int page,
@@ -75,5 +76,10 @@ public class FileController {
     fileFacade.deleteFiles(userId, hashes);
   }
 
+  @GetMapping("/{originalFileName}/exists")
+  public FileExistsResponseDto isFileExists(final Authentication authentication, @PathVariable String originalFileName) {
+    final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+    return fileFacade.isFileExists(userId, originalFileName);
+  }
 
 }
