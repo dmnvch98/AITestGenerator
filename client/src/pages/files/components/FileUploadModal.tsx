@@ -69,7 +69,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ isUploading })
         >
             <Alert severity="info" icon={false} sx={{ mb: 2 }}>
                 <Typography variant="body2" gutterBottom>
-                    Загрузите текстовый файл для генерации теста. Изображения не учитываются.
+                    Изображения в файлах не учитываются при генерации.
                 </Typography>
             </Alert>
 

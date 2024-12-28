@@ -19,6 +19,9 @@ import lombok.NoArgsConstructor;
         indexes = {
                 @Index(name = "idx_hashed_filename_user_id", columnList = "hashed_filename, user_id"),
                 @Index(name = "idx_original_filename_user_id", columnList = "original_filename, user_id")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_hashed_filename_user_id", columnNames = {"hashed_filename", "user_id"})
         }
 )
 @Builder

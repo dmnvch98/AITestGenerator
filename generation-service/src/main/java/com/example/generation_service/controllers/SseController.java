@@ -24,7 +24,6 @@ public class SseController {
     @PostMapping
     public SseHandshakeResponseDto handShake(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
-        log.info("Get sse handshake request for user {}", userId);
 
         return SseHandshakeResponseDto.builder()
                 .subscriptionId(sseFacade.generateAndSaveUserSubscriptionId(userId))

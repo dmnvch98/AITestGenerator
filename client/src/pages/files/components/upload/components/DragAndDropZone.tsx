@@ -1,5 +1,5 @@
 import React, { DragEvent } from 'react';
-import { Box, Typography, Grid, IconButton } from '@mui/material';
+import {Box, Typography, Grid, IconButton, Stack} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ClearIcon from '@mui/icons-material/Clear';
 
@@ -50,13 +50,24 @@ export const DragAndDropZone: React.FC<DragAndDropZoneProps> = ({
         onDrop={onDrop}
     >
         {filesToUpload.length === 0 ? (
-            <>
+            <Box textAlign="center" p={2}>
                 <CloudUploadIcon sx={{ fontSize: 48, color: 'grey.500' }} />
-                <Typography variant="body1">
+                <Typography variant="body1" gutterBottom>
                     Перетащите файл сюда или нажмите для выбора
                 </Typography>
-                <Typography variant="body2">5 МБ максимум на файл</Typography>
-            </>
+                <Stack component="ul" spacing={1} sx={{ listStyleType: 'disc', pl: 2, textAlign: 'left', margin: '0 auto', maxWidth: 350 }}>
+                    <Typography component="li" variant="body2">
+                        Максимальный размер файла: <strong>5 МБ</strong>
+                    </Typography>
+                    <Typography component="li" variant="body2">
+                        Поддерживаемые форматы: <strong>PDF или Word</strong>
+                    </Typography>
+                    <Typography component="li" variant="body2">
+                        Объем: <strong>До 5-7 страниц текста</strong>
+                    </Typography>
+                </Stack>
+            </Box>
+
         ) : (
             <Grid container spacing={2} justifyContent="center">
                 {filesToUpload.map((file, index) => (

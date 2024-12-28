@@ -53,19 +53,15 @@ public class FileWorker {
                 storageClient.deleteFile(userId, existingFile.getHashedFilename());
                 fileHashService.delete(existingFile);
             }
-            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
         } else if (createCopy) {
             final FileMetadata existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
             if (existingFile != null) {
                 existingFile.incrementCopiesNum();
                 originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + existingFile.getCopiesNum());
             }
-            fileNameHash = DigestUtils.md5Hex(originalFileName);
-        } else {
-            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
         }
-
         try {
+            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);

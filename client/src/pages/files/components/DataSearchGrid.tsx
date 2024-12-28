@@ -109,14 +109,11 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                                     value={file.id}
                                 />
                             </Grid>
-                            <Grid item xs={9} textAlign="left">
+                            <Grid item xs={11} textAlign="left">
                                 <Box display="flex" alignItems="center">
                                     {getFileIcon(file.originalFilename)}
                                     <Typography sx={{ ml: 1 }}>{file.originalFilename}</Typography>
                                 </Box>
-                            </Grid>
-                            <Grid item xs={2} textAlign="left">
-                                <Typography>{DateTimeUtils.formatDate(file.uploadTime)}</Typography>
                             </Grid>
                         </Grid>
                     ))}
