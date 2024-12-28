@@ -21,7 +21,6 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const {generateTestByFile} = useTestStore();
     const {
         getFiles,
-        fileDtos,
         totalPages,
         totalUserFiles,
         selectedFile,
@@ -35,9 +34,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
 
-    // useEffect(() => {
-    //     getFiles({size: 20, sortBy: "id"});
-    // }, []);
+
     const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
         Object.keys(QuestionType).reduce((acc, key) => {
             acc[key as unknown as QuestionType] = {selected: false, maxQuestions: 10};
@@ -152,7 +149,11 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     return (
         <Fade in={!isExiting} timeout={300}>
 
-            <Box>
+            <Box sx={{
+                height: '80vh',
+                display: 'flex',
+                flexDirection: 'column',
+            }} >
                 <Typography variant="h5" align="left" sx={{mb: 1}}>
                     Генерация теста
                 </Typography>
@@ -181,7 +182,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                             />
                         )}
                     </Box>
-                    <Divider/>
+                    {/*<Divider/>*/}
                     <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 4}}>
                         <Box sx={{display: 'flex', gap: 2}}>
                             {activeStep > 0 && (

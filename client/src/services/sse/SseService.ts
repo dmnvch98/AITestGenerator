@@ -58,21 +58,17 @@ class SseService {
         this.eventSource = new EventSource(`${backendUrl}/api/v1/sse/subscribe?subId=${subscriptionId}`);
 
         this.eventSource.addEventListener('open', () => {
-            console.log("SSE connection established");
-            // Сбросить интервал переподключения при успешном подключении
             this.reconnectInterval = 1000;
         });
 
         this.eventSource.addEventListener('message', (event) => {
             const parsedMessage = JSON.parse(event.data);
-            console.log('parsedMessage: ', parsedMessage);
             if (parsedMessage.type === NotificationType.ACTIVITY) {
                 this.handleActivityNotification();
             }
         });
 
         this.eventSource.addEventListener('error', (event) => {
-            console.error("SSE connection error", event);
             this.closeConnection();
             this.scheduleReconnect();
         });
@@ -80,9 +76,7 @@ class SseService {
 
     private scheduleReconnect(): void {
         setTimeout(() => {
-            console.log("Attempting to reconnect SSE...");
             this.initializeSse();
-            // Увеличиваем интервал для следующей попытки
             this.reconnectInterval = Math.min(this.reconnectInterval * 2, this.maxReconnectInterval);
         }, this.reconnectInterval);
     }
@@ -90,7 +84,6 @@ class SseService {
     public closeConnection(): void {
         if (this.eventSource) {
             this.eventSource.close();
-            console.log("SSE connection closed");
             this.eventSource = null;
         }
     }

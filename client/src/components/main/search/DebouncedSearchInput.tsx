@@ -2,6 +2,7 @@
 import React, {useState, useEffect, ChangeEvent} from "react";
 import {TextField, IconButton, InputAdornment} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
+import Box from "@mui/material/Box";
 
 interface DebouncedSearchInputProps {
     onSearch: (value: string) => void;
@@ -43,9 +44,9 @@ export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
                 endAdornment: (
                     <InputAdornment position="end">
                         {searchValue && (
-                            <IconButton onClick={handleClear} edge="end">
+                            <Box onClick={handleClear} sx={{cursor: 'pointer'}}>
                                 <ClearIcon/>
-                            </IconButton>
+                            </Box>
                         )}
                     </InputAdornment>
                 ),
