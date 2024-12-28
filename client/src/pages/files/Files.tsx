@@ -17,7 +17,6 @@ const FilesContent = () => {
     const {
         getFiles,
         clearFiles,
-        uploadModalOpen,
         setUploadModalOpen,
         isLoading,
         deleteFilesInBatch,
@@ -33,7 +32,7 @@ const FilesContent = () => {
     const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
-    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'uploadTime', sort: 'desc' }]);
 
     const fetchFiles = async (options?: QueryOptions) => {

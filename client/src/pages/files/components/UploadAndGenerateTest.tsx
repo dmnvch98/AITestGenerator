@@ -1,4 +1,4 @@
-import React, { useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
 import {FileUploadModal} from './FileUploadModal';
 import {GenTestModal} from '../../../components/tests/GenTestModal';
@@ -152,7 +152,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 height: '80vh',
                 display: 'flex',
                 flexDirection: 'column',
-            }} >
+            }}>
                 <Typography variant="h5" align="left" sx={{mb: 1}}>
                     Генерация теста
                 </Typography>
@@ -166,7 +166,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                     </Stepper>
                 </Box>
                 <Container maxWidth="md">
-                    <Box sx={{mt: 4, height: '60vh', overflowY: 'auto'}}>
+                    <Box sx={{mt: 4, height: '60vh'}}>
                         {activeStep === 0
                             && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab}
                                           onTabChange={setFileUploadActiveTab}/>
