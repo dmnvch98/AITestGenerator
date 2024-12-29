@@ -16,6 +16,7 @@ import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.services.FileHashService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.workers.FileWorker;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -69,7 +70,11 @@ public class FileFacade {
 
   public FilesMetadataResponseDto getUserFileHashes(final Long userId, final String search, final int page, final int size,
                                                     final String sortBy, final String sortDirection) {
-    Page<FileMetadata> fileHashPage = fileHashService.getUserFileHashes(userId, search, page, size, sortBy, sortDirection);
+     Page<FileMetadata> fileHashPage;
+     fileHashPage = fileHashService.getUserFileMetadataBySearchParams(userId, search, page, size, sortBy, sortDirection);
+     if (fileHashPage.getContent().isEmpty() && StringUtils.isNotEmpty(search)) {
+       fileHashPage = fileHashService.getUserFileMetadataByOriginalFilename(userId, search, page, size, sortBy, sortDirection);
+     }
     return converter.convert(fileHashPage);
   }
 

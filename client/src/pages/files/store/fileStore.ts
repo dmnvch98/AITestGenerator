@@ -38,7 +38,7 @@ export interface FileUploadResponseDto {
 }
 
 export interface UploadOptions {
-    override?: boolean;
+    overwrite?: boolean;
     createCopy?: boolean;
 }
 

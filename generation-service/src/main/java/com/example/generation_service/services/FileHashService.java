@@ -43,8 +43,8 @@ public class FileHashService {
     return repository.findAllByUserId(userId, Sort.by("uploadTime").descending());
   }
 
-  public Page<FileMetadata> getUserFileHashes(final Long userId, final String search, final int page, final int size,
-                                              final String sortBy, final String sortDirection) {
+  public Page<FileMetadata> getUserFileMetadataBySearchParams(final Long userId, final String search, final int page, final int size,
+                                                              final String sortBy, final String sortDirection) {
     try {
       final Sort.Direction direction = Sort.Direction.fromString(sortDirection);
       final Pageable pageable = PageRequest.of(page, size, direction, sortBy);
@@ -72,6 +72,21 @@ public class FileHashService {
       log.error("Cannot get user file hashes", e);
       throw new IllegalArgumentException("Cannot get user file hashes");
     }
+  }
+
+  public Page<FileMetadata> getUserFileMetadataByOriginalFilename(final Long userId, final String search, final int page, final int size,
+                                                                  final String sortBy, final String sortDirection) {
+    final Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    final Pageable pageable = PageRequest.of(page, size, direction, sortBy);
+    Specification<FileMetadata> spec = (root, query, criteriaBuilder) -> {
+      Predicate userIdPredicate = criteriaBuilder.equal(root.get("userId"), userId);
+      Predicate fileNamePredicate = criteriaBuilder.like(
+              criteriaBuilder.lower(root.get("originalFilename")),
+              "%" + search.trim().toLowerCase() + "%"
+      );
+      return criteriaBuilder.and(userIdPredicate, fileNamePredicate);
+    };
+    return repository.findAll(spec, pageable);
   }
 
   public void isExistsByHashedFilenameAndUserOrThrow(final Long userId, final String hashedFileName) {

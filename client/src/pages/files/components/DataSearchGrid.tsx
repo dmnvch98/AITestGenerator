@@ -58,7 +58,7 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                     page,
                     size: 20,
                     sortBy: "id",
-                    sortDirection: "asc",
+                    sortDirection: "desc",
                     search: searchValue,
                 });
                 setItems((prev) => (page === 0 ? newData : [...prev, ...newData]));
@@ -141,7 +141,14 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                 }}
             >
                 {items.length === 0 ? (
-                    <NotFoundIcon />
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{ flex: 1, height: '95%' }}
+                    >
+                        <NotFoundIcon />
+                    </Box>
                 ) : (
                     <Grid container sx={{ mt: 2 }}>
                         {items.map((file) => (
@@ -162,6 +169,7 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                                         checked={selectedFileId === file.id}
                                         onChange={() => handleSelectionChange(file)}
                                         value={file.id}
+                                        name="select"
                                     />
                                 </Grid>
                                 <Grid item xs={11}>

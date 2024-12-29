@@ -1,8 +1,9 @@
 // DebouncedSearchInput.tsx
 import React, {useState, useEffect, ChangeEvent} from "react";
-import {TextField, IconButton, InputAdornment} from "@mui/material";
+import {TextField, InputAdornment} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface DebouncedSearchInputProps {
     onSearch: (value: string) => void;
@@ -37,10 +38,15 @@ export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
         <TextField
             fullWidth
             variant="standard"
-            placeholder="Поиск по названию..."
+            placeholder="Поиск"
             value={searchValue}
             onChange={handleChange}
             InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                    </InputAdornment>
+                ),
                 endAdornment: (
                     <InputAdornment position="end">
                         {searchValue && (

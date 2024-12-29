@@ -35,7 +35,6 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
 
-
     const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
         Object.keys(QuestionType).reduce((acc, key) => {
             acc[key as unknown as QuestionType] = {selected: false, maxQuestions: 10};
@@ -75,7 +74,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     const handleOverride = async () => {
         setIsLoading(true);
         setIsModalOpen(false);
-        const {status} = await uploadFiles({ override: true });
+        const {status} = await uploadFiles({ overwrite: true });
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
@@ -185,7 +184,6 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                             />
                         )}
                     </Box>
-                    {/*<Divider/>*/}
                     <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 4}}>
                         <Box sx={{display: 'flex', gap: 2}}>
                             {activeStep > 0 && (

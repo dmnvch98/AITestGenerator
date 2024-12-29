@@ -18,7 +18,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (authenticated) {
-            navigate('/files');
+            navigate('/generate');
         }
     }, []);
 
@@ -38,7 +38,7 @@ function LoginPage() {
   const handleLogin = async () => {
       const loginResult = await login(email, password);
       if (loginResult) {
-        navigate('/files');
+        navigate('/generate');
       }
   };
 

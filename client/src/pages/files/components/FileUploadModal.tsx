@@ -27,6 +27,9 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ isUploading })
         } else if (newFiles.length > 1) {
             validateFilesThenUpload([newFiles[0]]);
         }
+        if (event.type === 'change') {
+            (event.target as HTMLInputElement).value = '';
+        }
     };
 
     const handleDragOver = (event: DragEvent) => {

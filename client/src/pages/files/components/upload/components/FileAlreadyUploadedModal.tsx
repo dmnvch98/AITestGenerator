@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface FileAlreadyUploadedModalProps {
     open: boolean;
@@ -15,21 +16,30 @@ export const FileAlreadyUploadedModal: React.FC<FileAlreadyUploadedModalProps> =
                                                                                       onCreateCopy,
                                                                                   }) => (
     <Dialog open={open} onClose={onClose}>
-        <DialogTitle>Файл уже загружен</DialogTitle>
-        <DialogContent>
+        <DialogTitle>
+            Файл уже загружен
+            <IconButton
+                aria-label="close"
+                onClick={onClose}
+                sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                }}
+            >
+                <CloseIcon />
+            </IconButton>
+        </DialogTitle>        <DialogContent>
             <Typography>
                 Этот файл уже был загружен ранее. Вы можете перезаписать его или создать копию.
             </Typography>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} color="secondary">
-                Отмена
-            </Button>
-            <Button onClick={onOverride} color="primary">
-                Перезаписать
-            </Button>
-            <Button onClick={onCreateCopy} color="primary">
+            <Button onClick={onCreateCopy} color="primary" sx={{mr: 4}}>
                 Создать копию
+            </Button>
+            <Button onClick={onOverride} color="primary" variant="contained">
+                Перезаписать
             </Button>
         </DialogActions>
     </Dialog>
