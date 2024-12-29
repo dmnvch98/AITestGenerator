@@ -11,8 +11,8 @@ interface FileUploadModalProps {
     isUploading: boolean;
 }
 
-export const FileUploadModal: React.FC<FileUploadModalProps> = ({ isUploading }) => {
-    const { filesToUpload, removeFile, validateFilesThenUpload } = useFileStore();
+export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) => {
+    const { filesToUpload, clearFiles, validateFilesThenUpload } = useFileStore();
     const [dragOver, setDragOver] = useState(false);
     const [hoveredFileIndex, setHoveredFileIndex] = useState<number | null>(null);
 
@@ -48,8 +48,6 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ isUploading })
             handleFileUpload(event);
         }
     };
-
-    const handleDeleteFile = (index: number) => removeFile(index);
 
     const getIcon = (type: string) => {
         if (type === 'application/pdf') return <PictureAsPdfIcon sx={{ color: '#FF0000' }} />;
@@ -92,7 +90,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({ isUploading })
                     }}
                     hoveredFileIndex={hoveredFileIndex}
                     onFileHover={setHoveredFileIndex}
-                    onDeleteFile={handleDeleteFile}
+                    onDeleteFile={clearFiles}
                     getIcon={getIcon}
                 />
 

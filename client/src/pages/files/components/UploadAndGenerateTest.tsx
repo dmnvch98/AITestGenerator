@@ -1,8 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
-import {FileUploadModal} from './FileUploadModal';
+import {FileUploader} from './FileUploader';
 import {GenTestModal} from '../../../components/tests/GenTestModal';
-import useFileStore, {FileDto, UploadStatus} from '../store/fileStore';
 import {GenerateTestRequest, QuestionType} from '../../../store/tests/types';
 import {useTestStore} from '../../../store/tests/testStore';
 import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
@@ -12,22 +11,24 @@ import {AlertMessage} from "../../../store/types";
 import {FileAlreadyUploadedModal} from "./upload/components/FileAlreadyUploadedModal";
 import {TabItem, TabsPanel} from "../../../components/main/tabsPanel/TabsPanel";
 import {InfinityScrollGrid} from "./DataSearchGrid";
+import useFileStore from "../store/fileStore";
+import {FileDto, UploadStatus} from "../types";
 
 const steps = ['Выбор файла', 'Параметры генерации'];
 
 export const UploadAndGenerateTestContent: React.FC = () => {
     const navigate = useNavigate();
-    const {filesToUpload, uploadFiles} = useFileStore();
     const {generateTestByFile} = useTestStore();
     const {
-        getFiles,
+        getUserFiles,
         totalPages,
         totalUserFiles,
         selectedFile,
         setSelectedFile,
         isLoading,
-        setIsLoading,
-        isFileExists
+        isFileExists,
+        filesToUpload,
+        uploadUserFiles
     } = useFileStore();
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
@@ -51,39 +52,32 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     }, [selection]);
 
     const handleFileUpload = async () => {
-        setIsLoading(true);
-        try {
-            if (filesToUpload.length > 0) {
-                const { exists } = await isFileExists(filesToUpload[0].name);
-                if (exists) {
-                    setIsModalOpen(true);
-                    return;
-                }
-                const {status} = await uploadFiles();
-                if (status === UploadStatus.SUCCESS) {
-                    setActiveStep((prev) => prev + 1);
-                }
-            } else if (selectedFile) {
+        if (filesToUpload.length > 0) {
+            const {exists} = await isFileExists(filesToUpload[0].name);
+            if (exists) {
+                setIsModalOpen(true);
+                return;
+            }
+            const {status} = await uploadUserFiles();
+            if (status === UploadStatus.SUCCESS) {
                 setActiveStep((prev) => prev + 1);
             }
-        } finally {
-            setIsLoading(false);
+        } else if (selectedFile) {
+            setActiveStep((prev) => prev + 1);
         }
     };
 
     const handleOverride = async () => {
-        setIsLoading(true);
         setIsModalOpen(false);
-        const {status} = await uploadFiles({ overwrite: true });
+        const {status} = await uploadUserFiles({ overwrite: true });
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
     };
 
     const handleCreateCopy = async () => {
-        setIsLoading(true);
         setIsModalOpen(false);
-        const {status} = await uploadFiles({createCopy: true });
+        const {status} = await uploadUserFiles({createCopy: true });
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
@@ -129,7 +123,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         {
             index: 0,
             value: 0,
-            children: <Box><FileUploadModal isUploading={isLoading}/></Box>,
+            children: <Box><FileUploader isUploading={isLoading}/></Box>,
             title: 'Загрузить файл'
         },
         {
@@ -138,7 +132,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
             children: <Box>
                 <InfinityScrollGrid
                     onSelect={handleFileSelect}
-                    fetchData={getFiles}
+                    fetchData={getUserFiles}
                     totalPages={totalPages}
                     totalElements={totalUserFiles}
                     selectedItemId={selectedFile?.id}

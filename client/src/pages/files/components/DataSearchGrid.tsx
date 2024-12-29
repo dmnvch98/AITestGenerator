@@ -11,11 +11,11 @@ import {
     Radio,
     Typography,
 } from "@mui/material";
-import { FileDto } from "../store/fileStore";
 import { QueryOptions } from "../../../store/types";
 import { DebouncedSearchInput } from "../../../components/main/search/DebouncedSearchInput";
 import { NotFoundIcon } from "./NotFoundIcon";
 import { getFileIcon } from "./helper";
+import {FileDto} from "../types";
 
 interface InfinityScrollGridProps {
     fetchData: (options: QueryOptions) => Promise<FileDto[]>;

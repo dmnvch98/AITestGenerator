@@ -1,10 +1,9 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import {ConfirmationButton} from "../../../components/main/ConfirmationButton";
 import {SearchInput} from "../../../components/main/search/SearchInput";
 
 interface ActionToolbarProps {
-    onAdd: () => void;
     onDelete: () => void;
     onSearchClear: () => void;
     deleteDisabled: boolean;
@@ -15,7 +14,6 @@ interface ActionToolbarProps {
 }
 
 export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
-                                                                     onAdd,
                                                                      onDelete,
                                                                      deleteDisabled,
                                                                      searchValue,
@@ -25,13 +23,6 @@ export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
     return (
         <Box display="flex" alignItems="center" sx={{ mb: 2 }} justifyContent="space-between">
             <Box display="flex" alignItems="center">
-                <Button
-                    sx={{ mr: 2 }}
-                    variant="outlined"
-                    onClick={onAdd}
-                >
-                    Загрузить файл
-                </Button>
                 <ConfirmationButton
                     config={{
                         buttonTitle: 'Удалить выбранное',

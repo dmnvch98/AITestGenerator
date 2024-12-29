@@ -4,85 +4,43 @@ import {AlertMessage, QueryOptions} from "../../../store/types";
 import {v4 as uuidv4} from "uuid";
 import NotificationService from "../../../services/notification/AlertService";
 import {validateFiles} from "../helper";
-
-export interface FileDto {
-    id: number;
-    originalFilename: string;
-    hashedFilename: string;
-    userId: number;
-    uploadTime: Date;
-}
-
-export interface FileExistsResponseDto {
-    fileName: string,
-    exists: boolean;
-}
-
-export enum UploadStatus {
-    SUCCESS = 'SUCCESS',
-    FAILED = 'FAILED',
-    ALREADY_UPLOADED = 'ALREADY_UPLOADED',
-    INVALID_EXTENSION = 'INVALID_EXTENSION',
-    TOO_LARGE = 'TOO_LARGE',
-    MALWARE = 'MALWARE'
-}
-interface FileResult {
-    fileMetadata: FileDto;
-    fileName: string;
-    status: UploadStatus;
-    description: string;
-}
-
-export interface FileUploadResponseDto {
-    uploadResults: FileResult[];
-}
-
-export interface UploadOptions {
-    overwrite?: boolean;
-    createCopy?: boolean;
-}
+import {FileDto, FileExistsResponseDto, FileUploadResponseDto, UploadOptions, UploadStatus} from "../types";
 
 interface FileStore {
     filesToUpload: File[];
-    fileDtos: FileDto[];
+    userFiles: FileDto[];
     isLoading: boolean;
-    setIsLoading: (flag: boolean) => void;
-    error: string | null;
     addFiles: (files: File[]) => void;
-    removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>;
-    getFiles: (options?: QueryOptions) => Promise<FileDto[]>;
-    deleteFile: (fileDto: FileDto) => Promise<void>;
-    uploadModalOpen: boolean,
-    setUploadModalOpen: (flag: boolean) => void;
+
+    /*Server calls*/
+    uploadUserFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>;
+    getUserFiles: (options?: QueryOptions) => Promise<FileDto[]>;
+    deleteUserFile: (fileDto: FileDto) => Promise<void>;
+    deleteFilesInBatch: () => void;
+    isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
+
     selectedFile: FileDto | null;
     setSelectedFile: (file: FileDto | null) => void;
     selectedFileHashes: string[];
     setSelectedFileHashes: (fileIds: number[]) => void;
-    deleteFilesInBatch: () => void;
+
     totalUserFiles: number;
     totalPages: number;
     validateFilesThenUpload: (newFiles: File[]) => void;
-    isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
     filesToUpload: [],
-    fileDtos: [],
+    userFiles: [],
     isLoading: false,
     uploaded: false,
-    error: null,
-    uploadModalOpen: false,
     selectedFileHashes: [],
     totalUserFiles: 0,
     totalPages: 0,
     selectedFile: null,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
-    removeFile: (index) => set((state) => (
-        {filesToUpload: state.filesToUpload.filter((_, i) => i !== index), selectedFile: null}
-    )),
     clearFiles: () => set({filesToUpload: []}),
     validateFilesThenUpload: (newFiles: File[]) => {
         const { addFiles} = get();
@@ -96,9 +54,13 @@ const useFileStore = create<FileStore>((set, get) => ({
         }
     },
     isFileExists: async (fileName: string): Promise<FileExistsResponseDto> => {
-        return await FileService.isFileExists(fileName);
+        set({isLoading: true});
+        const result = await FileService.isFileExists(fileName);
+        set({isLoading: false});
+
+        return result;
     },
-    uploadFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus }> => {
+    uploadUserFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus }> => {
         const { filesToUpload, clearFiles } = get();
         set({ isLoading: true});
 
@@ -131,29 +93,26 @@ const useFileStore = create<FileStore>((set, get) => ({
         }
     },
 
-    getFiles: async (options?: QueryOptions) => {
+    getUserFiles: async (options?: QueryOptions) => {
         set({isLoading: true});
         const { fileHashes, totalElements, totalPages } = await FileService.getFiles(options);
-        set({fileDtos: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
+        set({userFiles: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
         return fileHashes;
     },
 
-    deleteFile: async (fileDto: FileDto) => {
-        const { getFiles } = get();
+    deleteUserFile: async (fileDto: FileDto) => {
+        const { getUserFiles } = get();
         const response = await FileService.deleteFile(fileDto.hashedFilename);
 
         response === 204
             ? NotificationService.addAlert({ id: uuidv4(), message: `Файл <b>${fileDto.originalFilename}</b> успешно удален`, severity: 'success' })
             : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении <b>${fileDto.originalFilename}</b>`, severity: 'error' });
 
-        getFiles();
-    },
-    setUploadModalOpen: (flag) => {
-        set({uploadModalOpen: flag})
+        getUserFiles();
     },
     setSelectedFileHashes: (fileIds) => {
-        const { fileDtos } = get();
-        const hashedFileNames: string[] = fileDtos
+        const { userFiles } = get();
+        const hashedFileNames: string[] = userFiles
             .filter(dto => fileIds.includes(dto.id))
             .map(dto => dto.hashedFilename);
         set({selectedFileHashes: hashedFileNames});
@@ -167,21 +126,18 @@ const useFileStore = create<FileStore>((set, get) => ({
             false
         );
         NotificationService.addAlert(alert);
-        const { selectedFileHashes, getFiles} = get();
+        const { selectedFileHashes, getUserFiles} = get();
         const response = await FileService.deleteFilesInBatch(selectedFileHashes);
         NotificationService.deleteAlert(alert);
         response === 204
             ? NotificationService.addAlert({ id: uuidv4(), message: `Файлы успешно удалены`, severity: 'success' })
             : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении файлов`, severity: 'error' });
         set({selectedFileHashes: []});
-        getFiles();
+        getUserFiles();
         set({isLoading: false})
     },
     setSelectedFile: async (file) => {
         set({selectedFile: file});
-    },
-    setIsLoading: (flag) => {
-        set({isLoading: flag})
     }
 }));
 

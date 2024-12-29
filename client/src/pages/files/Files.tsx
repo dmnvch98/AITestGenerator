@@ -1,42 +1,30 @@
 import React, {useState, useEffect} from "react";
 import Typography from "@mui/material/Typography";
-import {Box, Alert} from "@mui/material";
 import {FilesTable} from "./components/table/FilesTable";
 import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import useFileStore from "./store/fileStore";
-import {FileDto} from "./store/fileStore";
-import {useTestStore} from "../../store/tests/testStore";
-import {useUserStore} from "../../store/userStore";
-import Link from "@mui/material/Link";
 import { QueryOptions} from "../../store/types";
 import {FilesActionToolbar} from "./components/FilesActionToolbar";
 import {GridSortModel} from "@mui/x-data-grid";
-import {GenerateTestRequest, QuestionType} from "../../store/tests/types";
+import {FileDto} from "./types";
 
 const FilesContent = () => {
     const {
-        getFiles,
-        clearFiles,
-        setUploadModalOpen,
+        getUserFiles,
         isLoading,
         deleteFilesInBatch,
         selectedFileHashes,
-        deleteFile,
+        deleteUserFile,
         totalUserFiles
     } = useFileStore();
 
-    const {generateTestByFile} = useTestStore();
-    const {getTestGenCurrentActivities} = useUserStore();
-
-    const [isGenTestModalOpen, setGenTestModalOpen] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'uploadTime', sort: 'desc' }]);
 
     const fetchFiles = async (options?: QueryOptions) => {
-        await getFiles(options);
+        await getUserFiles(options);
     };
 
     useEffect(() => {
@@ -60,48 +48,8 @@ const FilesContent = () => {
         };
     }, [searchValue]);
 
-    const handleAdd = () => {
-        setUploadModalOpen(true);
-    };
-
-    const handleModalClose = () => {
-        setUploadModalOpen(false);
-        clearFiles();
-        fetchFiles();
-    };
-
     const isDeleteButtonDisabled = () => {
         return selectedFileHashes.length === 0;
-    };
-
-    const openGenTestModal = (file: FileDto) => {
-        setSelectedFile(file);
-        setGenTestModalOpen(true);
-    };
-
-    const closeGenTestModal = () => {
-        setGenTestModalOpen(false);
-    };
-
-    const handleGenTestSubmit = (selection: Record<QuestionType, { selected: boolean; maxQuestions: number }>) => {
-        closeGenTestModal();
-        if (selectedFile) {
-            const params = Object.entries(selection)
-                .filter(([_, value]) => value.selected)
-                .map(([key, value]) => ({
-                    questionType: key as unknown as QuestionType,
-                    maxQuestions: value.maxQuestions,
-                }));
-
-            const request: GenerateTestRequest = {
-                hashedFileName: selectedFile.hashedFilename,
-                params: params,
-            };
-
-            generateTestByFile(request);
-            getTestGenCurrentActivities();
-            closeGenTestModal();
-        }
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +62,7 @@ const FilesContent = () => {
 
     const actions = (file: FileDto) => [
         {
-            onClick: () => deleteFile(file),
+            onClick: () => deleteUserFile(file),
             confirmProps: {
                 buttonTitle: 'Удалить',
                 dialogTitle: 'Подтверждение удаления',
@@ -123,8 +71,8 @@ const FilesContent = () => {
             }
         },
         {
-            label: 'Сгенерировать тест',
-            onClick: () => openGenTestModal(file)
+            label: 'Предпросмотр',
+            onClick: () => {}
         }
     ];
 
@@ -133,17 +81,8 @@ const FilesContent = () => {
             <Typography variant="h5" align="left" sx={{mb: 1}}>
                 Файлы
             </Typography>
-            <Alert severity="info" icon={false} sx={{ mb: 2 }}>
-                <Box textAlign="left">
-                    Загрузите файл для генерации теста. После загрузки выберите: Действия → Сгенерировать тест.
-                    <br/>
-                    Статус активных генераций можно посмотреть <Link href="/tests?activeTab=history" underline="hover"
-                                                                     color="inherit"><b>здесь</b></Link>.
-                </Box>
-            </Alert>
 
             <FilesActionToolbar
-                onAdd={handleAdd}
                 onDelete={deleteFilesInBatch}
                 deleteDisabled={isDeleteButtonDisabled()}
                 searchValue={searchValue}

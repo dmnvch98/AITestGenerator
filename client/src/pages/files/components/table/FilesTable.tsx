@@ -1,10 +1,11 @@
 import React from 'react';
 import {GridColDef, GridSortModel} from '@mui/x-data-grid';
 import {GenericTableActions} from "../../../../components/main/GenericTableActions";
-import useFileStore, {FileDto} from "../../store/fileStore";
 import DateTimeUtils from "../../../../utils/DateTimeUtils";
 import {Box, Typography} from '@mui/material';
 import {getFileIcon} from "../helper";
+import useFileStore from "../../store/fileStore";
+import {FileDto} from "../../types";
 
 interface FilesTableProps {
     actions: (file: FileDto) => any[];
@@ -17,7 +18,7 @@ interface FilesTableProps {
 }
 
 export const FilesTable = ({actions, loading, rowCount, paginationModel, sortModel, setSortModel, setPaginationModel}: FilesTableProps) => {
-    const {fileDtos, setSelectedFileHashes} = useFileStore();
+    const {userFiles, setSelectedFileHashes} = useFileStore();
 
     const columns: GridColDef[] = [
         {
@@ -49,7 +50,7 @@ export const FilesTable = ({actions, loading, rowCount, paginationModel, sortMod
 
     return (
         <GenericTableActions<FileDto>
-            data={fileDtos}
+            data={userFiles}
             columns={columns}
             actions={actions}
             rowIdGetter={(row) => row.id as number}
