@@ -8,6 +8,7 @@ import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
 import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
+import {Alert, Typography} from "@mui/material";
 
 const noTestTitle = 'Не установлено'
 
@@ -66,6 +67,13 @@ export const TestGenHistoryCurrent = () => {
     return (
         <>
             <Box>
+
+                <Alert severity="info" icon={false} sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom align="left">
+                        Здесь отображаются текущие задачи по генерации тестов. Процесс выполняется в фоновом режиме, поэтому вы можете закрыть эту страницу.
+                    </Typography>
+                </Alert>
+
                 <GenericTableActions<ActivityDto>
                     data={prepareData()}
                     columns={columns}

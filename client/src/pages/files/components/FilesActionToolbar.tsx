@@ -30,8 +30,9 @@ export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
                     onSubmit={onDelete}
                 />
             </Box>
-
-            <DebouncedSearchInput onSearch={onSearchChange} />
+            <Box sx={{ flex: 1, ml: 'auto', maxWidth: 300 }}>
+                <DebouncedSearchInput onSearch={onSearchChange} />
+            </Box>
         </Box>
     );
 };

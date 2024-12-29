@@ -24,7 +24,9 @@ const FilesContent = () => {
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'desc' }]);
 
     const fetchFiles = async (options?: QueryOptions) => {
-        await getUserFiles(options);
+        if (!isLoading) {
+            await getUserFiles(options);
+        }
     };
 
     useEffect(() => {
