@@ -20,48 +20,42 @@ const FilesContent = () => {
     } = useFileStore();
 
     const [searchValue, setSearchValue] = useState<string>('');
-    const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
-    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'uploadTime', sort: 'desc' }]);
+    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'desc' }]);
 
     const fetchFiles = async (options?: QueryOptions) => {
         await getUserFiles(options);
     };
 
     useEffect(() => {
+        console.log('useEffect сработал с параметрами:', {
+            searchValue,
+            paginationModel,
+            sortModel,
+        });
         const searchOptions: QueryOptions = {
             page: paginationModel.page,
             size: paginationModel.pageSize,
             sortBy: sortModel[0]?.field,
             sortDirection: sortModel[0]?.sort ?? 'asc',
-            search: debouncedSearchValue
+            search: searchValue
         };
         fetchFiles(searchOptions);
-    }, [debouncedSearchValue, paginationModel, sortModel]);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchValue(searchValue);
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [searchValue]);
+    }, [searchValue, paginationModel, sortModel]);
 
     const isDeleteButtonDisabled = () => {
         return selectedFileHashes.length === 0;
     };
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
+    const handleSearchChange = (value: string) => {
+        setSearchValue(value);
     };
 
-    const handleClearSearch = () => {
-        setSearchValue('');
-    }
-
     const actions = (file: FileDto) => [
+        {
+            label: 'Скачать',
+            onClick: () => downloadFile(file.hashedFilename)
+        },
         {
             onClick: () => deleteUserFile(file),
             confirmProps: {
@@ -70,10 +64,6 @@ const FilesContent = () => {
                 dialogContent: `Вы уверены что хотите удалить <b>${file.originalFilename}</b> ?`,
                 variant: 'menuItem'
             }
-        },
-        {
-            label: 'Скачать',
-            onClick: () => downloadFile(file.hashedFilename)
         }
     ];
 
@@ -86,9 +76,7 @@ const FilesContent = () => {
             <FilesActionToolbar
                 onDelete={deleteFilesInBatch}
                 deleteDisabled={isDeleteButtonDisabled()}
-                searchValue={searchValue}
                 onSearchChange={handleSearchChange}
-                onSearchClear={handleClearSearch}
             />
 
             <FilesTable

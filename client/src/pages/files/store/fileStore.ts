@@ -4,7 +4,14 @@ import {AlertMessage, QueryOptions} from "../../../store/types";
 import {v4 as uuidv4} from "uuid";
 import NotificationService from "../../../services/notification/AlertService";
 import {validateFiles} from "../helper";
-import {FileDto, FileExistsResponseDto, FileUploadResponseDto, UploadOptions, UploadStatus} from "../types";
+import {
+    FileDto,
+    FileExistsResponseDto,
+    FileUploadResponseDto,
+    UploadOptions,
+    UploadStatus,
+    UploadStatusDescriptions
+} from "../types";
 
 interface FileStore {
     filesToUpload: File[];
@@ -69,8 +76,9 @@ const useFileStore = create<FileStore>((set, get) => ({
             const response = await FileService.uploadFiles(filesToUpload, uploadOptions) as FileUploadResponseDto;
             if (response?.uploadResults?.length) {
                 const result = response.uploadResults[0];
-                const {status, description, fileName, fileMetadata} = result;
+                const {status, fileName, fileMetadata} = result;
                 if (status != UploadStatus.SUCCESS) {
+                    const description = UploadStatusDescriptions[status];
                     const message = `${description} - <b>${fileName}</b>`;
                     const alert = new AlertMessage(message, 'error');
                     NotificationService.addAlert(alert);

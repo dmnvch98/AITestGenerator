@@ -95,6 +95,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
 
             const request: GenerateTestRequest = {
                 hashedFileName: selectedFile.hashedFilename,
+                originalFileName: selectedFile.originalFilename,
                 params: params,
             };
 

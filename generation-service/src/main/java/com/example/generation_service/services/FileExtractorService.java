@@ -24,11 +24,9 @@ public class FileExtractorService {
 
   public String getContentFromFile(final FileMetadata fileHash, final Long userId) throws IOException {
     final String fileExtension = Utils.getFileExtension(fileHash.getOriginalFilename());
-      final Resource resource;
-      try (S3Object s3Object = storageClient.downloadFile(userId, fileHash.getHashedFilename())) {
-          resource = new InputStreamResource(s3Object.getObjectContent());
-      }
-      return fileExtractorFabric.getFileExtractor(fileExtension)
+    final S3Object s3Object = storageClient.downloadFile(userId, fileHash.getHashedFilename());
+    final Resource resource = new InputStreamResource(s3Object.getObjectContent());
+    return fileExtractorFabric.getFileExtractor(fileExtension)
           .extract(resource.getInputStream());
   }
 

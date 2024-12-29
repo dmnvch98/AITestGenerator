@@ -19,6 +19,16 @@ export enum UploadStatus {
     TOO_LARGE = 'TOO_LARGE',
     MALWARE = 'MALWARE'
 }
+
+export const UploadStatusDescriptions: Record<UploadStatus, string> = {
+    [UploadStatus.SUCCESS]: 'Загрузка завершена успешно',
+    [UploadStatus.FAILED]: 'Загрузка не удалась из-за ошибки',
+    [UploadStatus.ALREADY_UPLOADED]: 'Файл уже был загружен',
+    [UploadStatus.INVALID_EXTENSION]: 'Файл имеет недопустимое расширение',
+    [UploadStatus.TOO_LARGE]: 'Длина текста слишком большая. Попробуйте уменьшить текст',
+    [UploadStatus.MALWARE]: 'Подозрительный файл. Попробуйте загрузить в другом формате'
+};
+
 interface FileResult {
     fileMetadata: FileDto;
     fileName: string;

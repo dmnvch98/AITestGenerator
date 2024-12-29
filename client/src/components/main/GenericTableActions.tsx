@@ -57,16 +57,19 @@ export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
                             onClose={handleClose}
                         />
                     ) : (
-                        <MenuItem
-                            key={index}
-                            onClick={() => {
-                                action.onClick && action.onClick(item);
-                                handleClose();
-                            }}
-                            disabled={action.disabled}
-                        >
-                            {action.label}
-                        </MenuItem>
+                        <>
+                            <MenuItem
+                                key={index}
+                                onClick={() => {
+                                    action.onClick && action.onClick(item);
+                                    handleClose();
+                                }}
+                                disabled={action.disabled}
+                                sx={{minWidth: '150px'}}
+                            >
+                                {action.label}
+                            </MenuItem>
+                        </>
                     )
                 )}
             </Menu>

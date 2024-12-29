@@ -1,14 +1,12 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import {ConfirmationButton} from "../../../components/main/ConfirmationButton";
-import {SearchInput} from "../../../components/main/search/SearchInput";
+import {DebouncedSearchInput} from "../../../components/main/search/DebouncedSearchInput";
 
 interface ActionToolbarProps {
     onDelete: () => void;
-    onSearchClear: () => void;
     deleteDisabled: boolean;
-    searchValue?: string;
-    onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSearchChange: (value: string) => void;
     deleteButtonTitle?: string;
     addButtonTitle?: string;
 }
@@ -16,9 +14,7 @@ interface ActionToolbarProps {
 export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
                                                                      onDelete,
                                                                      deleteDisabled,
-                                                                     searchValue,
-                                                                     onSearchChange,
-                                                                     onSearchClear
+                                                                     onSearchChange
                                                                  }) => {
     return (
         <Box display="flex" alignItems="center" sx={{ mb: 2 }} justifyContent="space-between">
@@ -35,7 +31,7 @@ export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
                 />
             </Box>
 
-            <SearchInput searchValue={searchValue} onSearchChange={onSearchChange} onSearchClear={onSearchClear}/>
+            <DebouncedSearchInput onSearch={onSearchChange} />
         </Box>
     );
 };
