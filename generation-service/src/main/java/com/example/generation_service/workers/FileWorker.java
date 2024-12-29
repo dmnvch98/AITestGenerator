@@ -5,7 +5,7 @@ import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.enums.UploadStatus;
-import com.example.generation_service.services.FileHashService;
+import com.example.generation_service.services.FileMetadataService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.validators.file.FileValidator;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class FileWorker {
     private final StorageClient storageClient;
     private final List<FileValidator> fileValidators;
     private final FileHashConverter converter;
-    private final FileHashService fileHashService;
+    private final FileMetadataService fileHashService;
 
     @Transactional
     public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file,
@@ -64,6 +66,10 @@ public class FileWorker {
             fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
+            metadata.setContentType(file.getContentType());
+            final Map<String, String> userMetadata = new HashMap<>();
+            userMetadata.put("originalFileName", originalFileName);
+            metadata.setUserMetadata(userMetadata);
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
             final FileMetadata fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,

@@ -19,6 +19,7 @@ interface FileStore {
     deleteUserFile: (fileDto: FileDto) => Promise<void>;
     deleteFilesInBatch: () => void;
     isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
+    downloadFile: (fileHash: string) => Promise<void>
 
     selectedFile: FileDto | null;
     setSelectedFile: (file: FileDto | null) => void;
@@ -138,6 +139,9 @@ const useFileStore = create<FileStore>((set, get) => ({
     },
     setSelectedFile: async (file) => {
         set({selectedFile: file});
+    },
+    downloadFile: async (fileHash) => {
+        await FileService.getFileByHash(fileHash);
     }
 }));
 

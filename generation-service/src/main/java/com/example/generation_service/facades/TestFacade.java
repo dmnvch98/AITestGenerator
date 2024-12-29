@@ -44,7 +44,7 @@ public class TestFacade {
   private final TestGenerationService testGenerationService;
   private final TestGeneratingHistoryService historyService;
   private final CommandService commandService;
-  private final FileHashService fileHashService;
+  private final FileMetadataService fileHashService;
   private final StorageClient storageClient;
   private final FileExtractorService extractorService;
   private final TestGenerationConverter testGenerationConverter;

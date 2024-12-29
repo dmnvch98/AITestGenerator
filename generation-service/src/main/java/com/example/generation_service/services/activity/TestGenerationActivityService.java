@@ -10,7 +10,7 @@ import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.generation.QuestionType;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.CommandService;
-import com.example.generation_service.services.FileHashService;
+import com.example.generation_service.services.FileMetadataService;
 import com.example.generation_service.services.TestGeneratingHistoryService;
 import com.example.generation_service.services.notification.NotificationService;
 import com.example.generation_service.services.redis.RedisService;
@@ -31,7 +31,7 @@ public class TestGenerationActivityService {
     private final TestGenerationConverter historyConverter;
     private final RedisService genericRedisService;
     private final TestGeneratingHistoryService historyService;
-    private final FileHashService fileHashService;
+    private final FileMetadataService fileHashService;
     private final NotificationService notificationService;
 
     public void saveActivity(final TestGenerationActivity activity) {

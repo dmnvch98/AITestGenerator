@@ -11,8 +11,7 @@ import com.example.generation_service.repositories.file.FileSearchVectorReposito
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +21,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FileHashService {
+@Slf4j
+public class FileMetadataService {
 
-  private static final Logger log = LoggerFactory.getLogger(FileHashService.class);
   private final FileHashRepository repository;
   private final FileSearchVectorRepository vectorRepository;
 

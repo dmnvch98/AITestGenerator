@@ -15,7 +15,8 @@ const FilesContent = () => {
         deleteFilesInBatch,
         selectedFileHashes,
         deleteUserFile,
-        totalUserFiles
+        totalUserFiles,
+        downloadFile
     } = useFileStore();
 
     const [searchValue, setSearchValue] = useState<string>('');
@@ -71,8 +72,8 @@ const FilesContent = () => {
             }
         },
         {
-            label: 'Предпросмотр',
-            onClick: () => {}
+            label: 'Скачать',
+            onClick: () => downloadFile(file.hashedFilename)
         }
     ];
 

@@ -4,22 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import com.amazonaws.services.s3.model.S3Object;
 import com.example.generation_service.annotations.cid.GenerateCid;
 import com.example.generation_service.annotations.enumeration.ActionType;
 import com.example.generation_service.annotations.enumeration.CidType;
 import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.FileHashConverter;
+import com.example.generation_service.dto.files.DownloadFileResponseDto;
 import com.example.generation_service.dto.files.FileExistsResponseDto;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
 import com.example.generation_service.dto.files.FilesMetadataResponseDto;
 import com.example.generation_service.models.files.FileMetadata;
-import com.example.generation_service.services.FileHashService;
+import com.example.generation_service.services.FileMetadataService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.workers.FileWorker;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class FileFacade {
 
-  private final FileHashService fileHashService;
+  private final FileMetadataService fileHashService;
   private final StorageClient storageClient;
   private final FileHashConverter converter;
   private final FileWorker fileWorker;
@@ -49,9 +50,11 @@ public class FileFacade {
     return FileUploadResponseDto.builder().uploadResults(uploadResults).build();
   }
 
-  public Resource getFileByHash(final long userId, final String hash) {
+  public DownloadFileResponseDto getFileByHash(final long userId, final String hash) {
     fileHashService.isExistsByHashedFilenameAndUserOrThrow(userId, hash);
-    return storageClient.downloadFile(userId, hash);
+    final FileMetadata fileMetadata = fileHashService.getByHashedFilenameAndUserId(userId, hash);
+    final S3Object s3Object = storageClient.downloadFile(userId, hash);
+    return DownloadFileResponseDto.builder().metadata(fileMetadata).s3Object(s3Object).build();
   }
 
   @TrackAction(ActionType.DELETE_FILES)
