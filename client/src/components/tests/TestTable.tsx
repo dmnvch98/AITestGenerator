@@ -4,11 +4,9 @@ import {Box} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {UserTest, useTestStore} from "../../store/tests/testStore";
 import {useExportStore} from "../../store/tests/exportStore";
-import {GenericTableActions} from "../main/GenericTableActions";
+import {GenericTableActions} from "../main/data-display/GenericTableActions";
 import {ConfirmationButtonProps} from "../main/ConfirmationButton";
 import DateTimeUtils from "../../utils/DateTimeUtils";
-import {SxProps} from "@mui/system";
-import {Theme} from "@mui/material/styles";
 
 const noTestTitle = '-- Создан пользователем --';
 
@@ -86,12 +84,6 @@ export const TestTable: React.FC<Props> = ({
         }
     }
 
-    const style: SxProps<Theme> = {
-        '& .MuiDataGrid-cell:hover': {
-            cursor: 'pointer'
-        },
-    }
-
     const columns: GridColDef[] = [
         {
             field: 'fileName',
@@ -150,7 +142,6 @@ export const TestTable: React.FC<Props> = ({
                 onSelectionModelChange={onSelectionModelChange}
                 loading={loading}
                 handleEvent={handleEvent}
-                sx={style}
                 rowCount={rowCount}
                 paginationModel={paginationModel}
                 setPaginationModel={setPaginationModel}

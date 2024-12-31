@@ -1,6 +1,6 @@
 import React from 'react';
-import {GridColDef, GridSortModel} from '@mui/x-data-grid';
-import {GenericTableActions} from "../../../../components/main/GenericTableActions";
+import {GridColDef, GridEventListener, GridSortModel} from '@mui/x-data-grid';
+import {GenericTableActions} from "../../../../components/main/data-display/GenericTableActions";
 import DateTimeUtils from "../../../../utils/DateTimeUtils";
 import {Box, Typography} from '@mui/material';
 import {getFileIcon} from "../helper";
@@ -18,7 +18,13 @@ interface FilesTableProps {
 }
 
 export const FilesTable = ({actions, loading, rowCount, paginationModel, sortModel, setSortModel, setPaginationModel}: FilesTableProps) => {
-    const {userFiles, setSelectedFileHashes} = useFileStore();
+    const {userFiles, selectedFileIds,  setSelectedFileIds, addSelectedFileId} = useFileStore();
+
+    const handleEvent: GridEventListener<'cellClick'> = (params) => {
+        if (params.field === 'originalFilename' || params.field === 'uploadTime') {
+            addSelectedFileId(params.row.id);
+        }
+    }
 
     const columns: GridColDef[] = [
         {
@@ -54,13 +60,15 @@ export const FilesTable = ({actions, loading, rowCount, paginationModel, sortMod
             columns={columns}
             actions={actions}
             rowIdGetter={(row) => row.id as number}
-            onSelectionModelChange={setSelectedFileHashes}
+            onSelectionModelChange={setSelectedFileIds}
             loading={loading}
             rowCount={rowCount}
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
             sortModel={sortModel}
             setSortModel={setSortModel}
+            handleEvent={handleEvent}
+            selectionModel={selectedFileIds}
         />
     );
 };

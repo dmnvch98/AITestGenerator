@@ -13,7 +13,7 @@ const FilesContent = () => {
         getUserFiles,
         isLoading,
         deleteFilesInBatch,
-        selectedFileHashes,
+        selectedFileIds,
         deleteUserFile,
         totalUserFiles,
         downloadFile
@@ -30,23 +30,18 @@ const FilesContent = () => {
     };
 
     useEffect(() => {
-        console.log('useEffect сработал с параметрами:', {
-            searchValue,
-            paginationModel,
-            sortModel,
-        });
         const searchOptions: QueryOptions = {
             page: paginationModel.page,
             size: paginationModel.pageSize,
-            sortBy: sortModel[0]?.field,
-            sortDirection: sortModel[0]?.sort ?? 'asc',
+            sortBy: sortModel[0]?.field || 'id',
+            sortDirection: sortModel[0]?.sort || 'desc',
             search: searchValue
         };
         fetchFiles(searchOptions);
     }, [searchValue, paginationModel, sortModel]);
 
     const isDeleteButtonDisabled = () => {
-        return selectedFileHashes.length === 0;
+        return selectedFileIds.length === 0;
     };
 
     const handleSearchChange = (value: string) => {

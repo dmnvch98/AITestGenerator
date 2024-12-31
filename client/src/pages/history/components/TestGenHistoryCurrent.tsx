@@ -2,10 +2,8 @@ import {GridColDef, GridEventListener} from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import React, {useEffect, useState} from "react";
 import {ActivityDto, useUserStore} from "../../../store/userStore";
-import {GenericTableActions} from "../../../components/main/GenericTableActions";
+import {GenericTableActions} from "../../../components/main/data-display/GenericTableActions";
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
-import {SxProps} from "@mui/system";
-import {Theme} from "@mui/material/styles";
 import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
 import {Alert, Typography} from "@mui/material";
@@ -58,12 +56,6 @@ export const TestGenHistoryCurrent = () => {
         }
     }
 
-    const style: SxProps<Theme> = {
-        '& .MuiDataGrid-cell:hover': {
-            cursor: 'pointer'
-        },
-    }
-
     return (
         <>
             <Box>
@@ -81,7 +73,6 @@ export const TestGenHistoryCurrent = () => {
                     checkboxSelection={false}
                     handleEvent={handleEvent}
                     rowCount={currentActivities.length}
-                    sx={style}
                 />
             </Box>
             <GenerationErrorModal

@@ -30,8 +30,9 @@ interface FileStore {
 
     selectedFile: FileDto | null;
     setSelectedFile: (file: FileDto | null) => void;
-    selectedFileHashes: string[];
-    setSelectedFileHashes: (fileIds: number[]) => void;
+    selectedFileIds: number[];
+    setSelectedFileIds: (fileIds: number[]) => void;
+    addSelectedFileId: (fileId: number) => void;
 
     totalUserFiles: number;
     totalPages: number;
@@ -43,7 +44,7 @@ const useFileStore = create<FileStore>((set, get) => ({
     userFiles: [],
     isLoading: false,
     uploaded: false,
-    selectedFileHashes: [],
+    selectedFileIds: [],
     totalUserFiles: 0,
     totalPages: 0,
     selectedFile: null,
@@ -119,12 +120,18 @@ const useFileStore = create<FileStore>((set, get) => ({
 
         getUserFiles();
     },
-    setSelectedFileHashes: (fileIds) => {
-        const { userFiles } = get();
-        const hashedFileNames: string[] = userFiles
-            .filter(dto => fileIds.includes(dto.id))
-            .map(dto => dto.hashedFilename);
-        set({selectedFileHashes: hashedFileNames});
+    addSelectedFileId: (fileId: number): void => {
+        const currentFileIds = get().selectedFileIds;
+
+        const newFileIds = currentFileIds.includes(fileId)
+            ? currentFileIds.filter(id => id !== fileId)
+            : [...currentFileIds, fileId];
+
+        set({ selectedFileIds: newFileIds });
+    },
+
+    setSelectedFileIds: (fileIds) => {
+        set({selectedFileIds: fileIds});
     },
     deleteFilesInBatch: async () => {
         set({isLoading: true})
@@ -135,13 +142,13 @@ const useFileStore = create<FileStore>((set, get) => ({
             false
         );
         NotificationService.addAlert(alert);
-        const { selectedFileHashes, getUserFiles} = get();
-        const response = await FileService.deleteFilesInBatch(selectedFileHashes);
+        const { selectedFileIds, getUserFiles} = get();
+        const response = await FileService.deleteFilesInBatch(selectedFileIds);
         NotificationService.deleteAlert(alert);
         response === 204
             ? NotificationService.addAlert({ id: uuidv4(), message: `Файлы успешно удалены`, severity: 'success' })
             : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении файлов`, severity: 'error' });
-        set({selectedFileHashes: []});
+        set({selectedFileIds: []});
         getUserFiles();
         set({isLoading: false})
     },

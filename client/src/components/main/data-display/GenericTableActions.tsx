@@ -1,81 +1,14 @@
 import React, {useCallback} from 'react';
 import {
     DataGrid,
-    GridColDef, GridEventListener,
+    GridColDef, GridEventListener, GridRowId,
     GridRowIdGetter, GridSortModel,
 } from '@mui/x-data-grid';
-import {Box, IconButton, Menu, MenuItem} from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import {tableLables} from './dataGridLabels';
-import {ConfirmationButton, ConfirmationButtonProps} from './ConfirmationButton';
+import {Box} from '@mui/material';
+import {tableLables} from '../dataGridLabels';
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
-
-interface Action<T> {
-    label?: string;
-    onClick?: (item: T) => void;
-    disabled?: boolean;
-    confirmProps?: ConfirmationButtonProps;
-}
-
-interface ActionsProps<T> {
-    item: T;
-    actions: Action<T>[];
-}
-
-export const Actions = <T, >({item, actions}: ActionsProps<T>) => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    return (
-        <Box>
-            <IconButton onClick={handleClick}>
-                <SettingsIcon/>
-            </IconButton>
-
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                {actions.map((action, index) =>
-                    action.confirmProps ? (
-                        <ConfirmationButton
-                            key={index}
-                            config={{
-                                buttonTitle: action.confirmProps.buttonTitle,
-                                dialogTitle: action.confirmProps.dialogTitle,
-                                dialogContent: action.confirmProps.dialogContent,
-                                variant: 'menuItem',
-                            }}
-                            onSubmit={() => {
-                                action.onClick && action.onClick(item);
-                            }}
-                            onClose={handleClose}
-                        />
-                    ) : (
-                        <>
-                            <MenuItem
-                                key={index}
-                                onClick={() => {
-                                    action.onClick && action.onClick(item);
-                                    handleClose();
-                                }}
-                                disabled={action.disabled}
-                                sx={{minWidth: '150px'}}
-                            >
-                                {action.label}
-                            </MenuItem>
-                        </>
-                    )
-                )}
-            </Menu>
-        </Box>
-    );
-};
+import {Action, Actions} from "./Actions";
 
 interface GenericTableProps<T> {
     data: T[];
@@ -86,12 +19,12 @@ interface GenericTableProps<T> {
     onSelectionModelChange?: (ids: number[]) => void;
     loading?: boolean;
     handleEvent?: GridEventListener<any>;
-    sx?: SxProps<Theme>;
     rowCount?: number,
     paginationModel?: { page: number, pageSize: number },
     setPaginationModel?: (params: { page: number, pageSize: number }) => void;
     sortModel?: GridSortModel;
     setSortModel?: (params: GridSortModel) => void;
+    selectionModel?: GridRowId[];
 }
 
 export const GenericTableActions = <T extends Record<string, any>>({
@@ -100,16 +33,28 @@ export const GenericTableActions = <T extends Record<string, any>>({
                                                                        actions,
                                                                        rowIdGetter,
                                                                        checkboxSelection = true,
+                                                                       selectionModel,
                                                                        onSelectionModelChange,
                                                                        loading,
                                                                        handleEvent,
-                                                                       sx,
                                                                        rowCount,
                                                                        paginationModel,
                                                                        setPaginationModel,
                                                                        sortModel,
-                                                                       setSortModel
+                                                                       setSortModel,
                                                                    }: GenericTableProps<T>) => {
+
+    const style: SxProps<Theme> = {
+        '& .MuiDataGrid-cell:hover': {
+            cursor: 'pointer'
+        },
+        '& .MuiDataGrid-cell:focus': {
+            outline: 'none'
+        },
+        '& .MuiDataGrid-row:focus-within': {
+            outline: 'none'
+        },
+    }
 
     const handlePaginationModelChange = useCallback((newPaginationModel: { page: number, pageSize: number }) => {
         setPaginationModel && setPaginationModel(newPaginationModel);
@@ -156,12 +101,13 @@ export const GenericTableActions = <T extends Record<string, any>>({
                 sortModel={sortModel}
                 onSortModelChange={handleSortModelChange}
                 getRowId={rowIdGetter as GridRowIdGetter<any>}
+                rowSelectionModel={selectionModel}
                 onRowSelectionModelChange={(ids) => {
                     onSelectionModelChange && onSelectionModelChange(ids as number[]);
                 }}
                 localeText={tableLables}
                 onCellClick={handleEvent}
-                sx={sx}
+                sx={style}
             />
         </Box>
     );

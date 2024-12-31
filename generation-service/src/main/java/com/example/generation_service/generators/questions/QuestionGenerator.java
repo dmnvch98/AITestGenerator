@@ -60,7 +60,9 @@ public abstract class QuestionGenerator {
         final Map<String, Object> variables = Map.of(
                 "questionType", request.getQuestionType().getName(),
                 "typeDescription", request.getQuestionType().getDescription(),
-                "maxQuestions", request.getMaxQuestions()
+                "maxQuestions", request.getMaxQuestions(),
+                "maxCorrectAnswers", request.getQuestionType().getMaxCorrectAnswers(),
+                "minCorrectAnswers", request.getQuestionType().getMinCorrectAnswers()
         );
 
         final StringSubstitutor substitutor = new StringSubstitutor(variables);
