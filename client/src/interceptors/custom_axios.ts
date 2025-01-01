@@ -2,7 +2,7 @@ import axios from 'axios';
 import AuthService from "../services/AuthService";
 
 const customAxios = axios.create({
-    baseURL: process.env.REACT_APP_SERVER_URL || "http://localhost:8080",
+    baseURL: process.env.REACT_APP_SERVER_URL || "https://localhost:8080",
     withCredentials: true
 });
 
