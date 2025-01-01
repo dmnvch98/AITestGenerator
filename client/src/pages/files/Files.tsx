@@ -23,13 +23,13 @@ const FilesContent = () => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
     const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'desc' }]);
 
-    const fetchFiles = async (options?: QueryOptions) => {
-        if (!isLoading) {
-            await getUserFiles(options);
-        }
-    };
-
     useEffect(() => {
+        const fetchFiles = async (options?: QueryOptions) => {
+            if (!isLoading) {
+                await getUserFiles(options);
+            }
+        };
+
         const searchOptions: QueryOptions = {
             page: paginationModel.page,
             size: paginationModel.pageSize,

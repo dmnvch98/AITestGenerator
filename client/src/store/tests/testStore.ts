@@ -92,6 +92,7 @@ export interface TestStore {
     getRating: (id: number) => void;
     clearState: () => void;
     printTest: () => void;
+    isLoading: boolean;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -100,6 +101,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
     totalElements: 0,
     selectedTest: undefined,
     selectedTestRating: undefined,
+    isLoading: false,
 
     clearState: () => {
         set({
@@ -123,8 +125,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
             size: options?.size || 5,
             ...options
         }
+        set({isLoading: true});
         const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(opt)
-        set({ tests, totalPages, totalElements })
+        set({ tests, totalPages, totalElements, isLoading: false })
     },
     addAlert: (alert: AlertMessage) => {
         useNotificationStore.getState().addAlert(alert);
