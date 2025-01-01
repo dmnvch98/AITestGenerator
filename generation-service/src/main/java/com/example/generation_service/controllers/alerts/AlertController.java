@@ -20,6 +20,11 @@ public class AlertController {
         alertFacade.resolveIncident(alertDto);
     }
 
+    @DeleteMapping("/webhook/delete/{incidentId}")
+    public void deleteIncident(@PathVariable String incidentId) {
+        alertFacade.delete(incidentId);
+    }
+
     @GetMapping
     public AlertExistsResponseDto isIncidentExists() {
         return alertFacade.isIncidentExists();

@@ -22,4 +22,8 @@ public class AlertService {
     public boolean isIncidentExists() {
         return alertRepository.count() > 0;
     }
+
+    public void delete(final String incidentId) {
+        alertRepository.deleteByIncidentId(incidentId);
+    }
 }

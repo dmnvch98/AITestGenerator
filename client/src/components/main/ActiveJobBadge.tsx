@@ -53,9 +53,9 @@ export const ActiveJobBadge = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {currentActivities.map((item) => (
+                            {currentActivities.map((item, index) => (
                                 <TableRow
-                                    key={item.uuid}
+                                    key={index}
                                     hover
                                     // При клике на строку переходим на нужную страницу
                                     onClick={() => navigate("/tests?activeTab=history")}
