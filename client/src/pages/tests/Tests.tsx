@@ -21,7 +21,7 @@ export const Tests = () => {
     const [searchValue, setSearchValue] = useState<string>('');
     const [debouncedSearchValue, setDebouncedSearchValue] = useState<string>(searchValue);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
-    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'createdAt', sort: 'desc' }]);
+    const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'desc' }]);
 
     const fetchTest = async (options?: QueryOptions) => {
         if (!loading) {

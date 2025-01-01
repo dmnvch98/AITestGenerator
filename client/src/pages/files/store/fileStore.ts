@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import FileService from '../../../services/FileService';
 import {AlertMessage, QueryOptions} from "../../../store/types";
-import {v4 as uuidv4} from "uuid";
 import NotificationService from "../../../services/notification/AlertService";
 import {validateFiles} from "../helper";
 import {
@@ -93,19 +92,21 @@ const useFileStore = create<FileStore>((set, get) => ({
 
             return { status: UploadStatus.FAILED };
         } catch (error) {
-            NotificationService.addAlert({
-                id: uuidv4(),
-                message: 'Ошибка при загрузке файлов',
-                severity: 'error',
-            });
+            NotificationService.addAlert(new AlertMessage('Ошибка при загрузке файлов', 'error'));
             set({ isLoading: false });
             return { status: UploadStatus.FAILED };
         }
     },
 
     getUserFiles: async (options?: QueryOptions) => {
+        const opt: QueryOptions = {
+            sortBy: options?.sortBy || 'id',
+            sortDirection: options?.sortDirection || 'desc',
+            size: options?.size || 5,
+            ...options
+        }
         set({isLoading: true});
-        const { fileHashes, totalElements, totalPages } = await FileService.getFiles(options);
+        const { fileHashes, totalElements, totalPages } = await FileService.getFiles(opt);
         set({userFiles: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
         return fileHashes;
     },
@@ -115,8 +116,8 @@ const useFileStore = create<FileStore>((set, get) => ({
         const response = await FileService.deleteFile(fileDto.hashedFilename);
 
         response === 204
-            ? NotificationService.addAlert({ id: uuidv4(), message: `Файл <b>${fileDto.originalFilename}</b> успешно удален`, severity: 'success' })
-            : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении <b>${fileDto.originalFilename}</b>`, severity: 'error' });
+            ? NotificationService.addAlert(new AlertMessage(`Файл <b>${fileDto.originalFilename}</b> успешно удален`, 'success'))
+            : NotificationService.addAlert(new AlertMessage(`Ошибка при удалении <b>${fileDto.originalFilename}</b>`, 'error'));
 
         getUserFiles();
     },
@@ -142,12 +143,22 @@ const useFileStore = create<FileStore>((set, get) => ({
             false
         );
         NotificationService.addAlert(alert);
-        const { selectedFileIds, getUserFiles} = get();
-        const response = await FileService.deleteFilesInBatch(selectedFileIds);
+        const { selectedFileIds, getUserFiles, userFiles} = get();
+
+        const fileHashes = userFiles
+            .map(file => ({
+                id: file.id,
+                hash: file.hashedFilename
+            }))
+            .filter(fileDto => selectedFileIds.includes(fileDto.id))
+            .map(fileDto => fileDto.hash);
+
+        const response = await FileService.deleteFilesInBatch(fileHashes);
         NotificationService.deleteAlert(alert);
         response === 204
-            ? NotificationService.addAlert({ id: uuidv4(), message: `Файлы успешно удалены`, severity: 'success' })
-            : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении файлов`, severity: 'error' });
+            ? NotificationService.addAlert(new AlertMessage('Файлы успешно удалены', 'success'))
+            : NotificationService.addAlert(new AlertMessage('Ошибка при удалении файлов', 'error'));
+
         set({selectedFileIds: []});
         getUserFiles();
         set({isLoading: false})

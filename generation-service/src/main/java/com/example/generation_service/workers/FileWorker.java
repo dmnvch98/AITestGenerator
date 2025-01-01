@@ -88,7 +88,6 @@ public class FileWorker {
         fileHashService.isExistsByHashedFilenameAndUserOrThrow(userId, hash);
         try {
             storageClient.deleteFile(userId, hash);
-            fileHashService.delete(userId, hash);
         } catch (final Exception e) {
             log.error("An error occurred when deleting file by hash [{}]", hash);
         }

@@ -24,7 +24,7 @@ interface ModalFormProps {
     selectedFileName?: string;
 }
 
-export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSelection, selectedFileName }) => {
+export const GenTestParams: React.FC<ModalFormProps> = ({ open, selection, setSelection, selectedFileName }) => {
     const toggleSelection = (type: QuestionType) => {
         setSelection({
             ...selection,
@@ -119,7 +119,7 @@ export const GenTestModal: React.FC<ModalFormProps> = ({ open, selection, setSel
                                                 size="small"
                                                 value={selection[type].maxQuestions}
                                                 onChange={(e) => handleSelectChange(type, Number(e.target.value))}
-                                                disabled={!selection[type].selected}
+                                                // disabled={!selection[type].selected}
                                                 sx={{
                                                     fontSize: "0.875rem",
                                                     height: "36px",

@@ -51,7 +51,7 @@ class FileService {
         }
     }
 
-    deleteFilesInBatch = async (fileIds: number[]) => {
+    deleteFilesInBatch = async (fileIds: string[]) => {
         try {
             const response = await this.axiosInstance.post('/api/v1/files/delete', fileIds);
             return response.status;

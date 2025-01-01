@@ -117,7 +117,13 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
 
     getAllUserTests: async (options) => {
-        const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(options)
+        const opt: QueryOptions = {
+            sortBy: options?.sortBy || 'id',
+            sortDirection: options?.sortDirection || 'desc',
+            size: options?.size || 5,
+            ...options
+        }
+        const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(opt)
         set({ tests, totalPages, totalElements })
     },
     addAlert: (alert: AlertMessage) => {

@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
 import {FileUploader} from './FileUploader';
-import {GenTestModal} from '../../../components/tests/GenTestModal';
+import {GenTestParams} from '../../../components/tests/GenTestParams';
 import {GenerateTestRequest, QuestionType} from '../../../store/tests/types';
 import {useTestStore} from '../../../store/tests/testStore';
 import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
@@ -108,10 +108,10 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                     navigate('/tests?activeTab=history');
                 }, 300);
                 setTimeout(() => {
-                    NotificationService.addAlert(new AlertMessage('Генерация теста начата', 'success'));
+                    NotificationService.addAlert(new AlertMessage('Генерация скоро начнется', 'success'));
                 }, 500);
             } else {
-                NotificationService.addAlert(new AlertMessage(`Ошибка при добавлении <b>${request.originalFileName}</b> в очередь. Пожалуйста, попробуйте позже.`, 'error'));
+                NotificationService.addAlert(new AlertMessage(`Ошибка генерации для <b>${request.originalFileName}</b>.<br/>Пожалуйста, попробуйте позже.`, 'error'));
             }
         }
     };
@@ -170,7 +170,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                                           onTabChange={setFileUploadActiveTab}/>
                         }
                         {activeStep === 1 && (
-                            <GenTestModal
+                            <GenTestParams
                                 selection={selection}
                                 setSelection={setSelection}
                                 open={true}
