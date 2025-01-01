@@ -33,6 +33,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/users/sign-up").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/incidents/webhook/resolve").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/sse/subscribe").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/activities/all").hasAuthority("ADMIN")
             .anyRequest()

@@ -1,4 +1,4 @@
-package com.example.generation_service.converters;
+package com.example.generation_service.converters.ormConverter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

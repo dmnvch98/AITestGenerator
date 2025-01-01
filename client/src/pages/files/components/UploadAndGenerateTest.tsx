@@ -1,5 +1,5 @@
-import React, {useMemo, useState} from 'react';
-import {Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Alert, Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
 import {FileUploader} from './FileUploader';
 import {GenTestParams} from '../../../components/tests/GenTestParams';
 import {GenerateTestRequest, QuestionType} from '../../../store/tests/types';
@@ -13,6 +13,7 @@ import {TabItem, TabsPanel} from "../../../components/main/tabsPanel/TabsPanel";
 import {InfinityScrollGrid} from "./DataSearchGrid";
 import useFileStore from "../store/fileStore";
 import {FileDto, UploadStatus} from "../types";
+import {useIncidentStore} from "../../../store/alerts/alertStore";
 
 const steps = ['Выбор файла', 'Параметры генерации'];
 
@@ -30,18 +31,24 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         filesToUpload,
         uploadUserFiles
     } = useFileStore();
+
+    const { getIsIncidentExists, isIncidentExists } = useIncidentStore();
+
     const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
     const [activeStep, setActiveStep] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
     const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
-
     const [selection, setSelection] = useState<Record<QuestionType, { selected: boolean; maxQuestions: number }>>(
         Object.keys(QuestionType).reduce((acc, key) => {
             acc[key as unknown as QuestionType] = {selected: false, maxQuestions: 10};
             return acc;
         }, {} as Record<QuestionType, { selected: boolean; maxQuestions: number }>)
     );
+
+    useEffect(() => {
+        getIsIncidentExists();
+    }, []);
 
     const isUploadButtonDisabled = useMemo(() => {
         return filesToUpload.length === 0 && (isLoading || !selectedFile);
@@ -154,8 +161,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 <Typography variant="h5" align="left" sx={{mb: 1}}>
                     Генерация теста
                 </Typography>
-                <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                    <Stepper activeStep={activeStep} sx={{width: '50%'}}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Stepper activeStep={activeStep} sx={{ width: '50%' }}>
                         {steps.map((label) => (
                             <Step key={label}>
                                 <StepLabel>{label}</StepLabel>
@@ -164,6 +171,15 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                     </Stepper>
                 </Box>
                 <Container maxWidth="md">
+                    {isIncidentExists &&
+                        <Box sx={{mt: 2}}>
+                            <Alert severity="error" icon={false}>
+                                <Typography variant="body2" gutterBottom>
+                                    Возможны временные проблемы с генерацией теста из-за неполадок в работе ИИ.
+                                </Typography>
+                            </Alert>
+                        </Box>
+                    }
                     <Box sx={{mt: 4, height: '60vh'}}>
                         {activeStep === 0
                             && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab}
