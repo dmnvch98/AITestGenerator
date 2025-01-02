@@ -1,0 +1,50 @@
+name: PROD - Deploy to S3
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_label:
+        description: 'Version label for Elastic Beanstalk'
+        required: true
+        default: 'latest'
+
+jobs:
+  deploy-stage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+        working-directory: ./client
+
+      - name: Build client
+        run: |
+          CI=false npm run build
+        working-directory: ./client
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          SOURCE_DIR: client/build/
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_STAGE }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
