@@ -62,6 +62,8 @@ retry:
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level cid:%X{cid:-} - %msg%n"
+  level:
+    web: debug
 
 clamav:
   host: ${CLAMAV_HOST}

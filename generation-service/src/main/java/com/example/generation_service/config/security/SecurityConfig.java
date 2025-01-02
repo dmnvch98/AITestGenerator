@@ -36,6 +36,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/v1/users/sign-up").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/incidents/webhook/resolve").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/sse/subscribe").permitAll()
+            .requestMatchers(HttpMethod.GET, "/").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/v1/activities/all").hasAuthority("ADMIN")
             .anyRequest()
             .authenticated()
