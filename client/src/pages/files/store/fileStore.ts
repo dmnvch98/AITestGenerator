@@ -1,78 +1,54 @@
 import { create } from 'zustand';
 import FileService from '../../../services/FileService';
-import { AxiosError } from 'axios';
 import {AlertMessage, QueryOptions} from "../../../store/types";
-import {v4 as uuidv4} from "uuid";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 import {validateFiles} from "../helper";
-
-export interface FileDto {
-    id: number;
-    originalFilename: string;
-    hashedFilename: string;
-    userId: number;
-    uploadTime: Date;
-}
-
-export enum UploadStatus {
-    SUCCESS = 'SUCCESS',
-    FAILED = 'FAILED',
-    ALREADY_UPLOADED = 'ALREADY_UPLOADED',
-    INVALID_EXTENSION = 'INVALID_EXTENSION',
-    TOO_LARGE = 'TOO_LARGE',
-    MALWARE = 'MALWARE'
-}
-
-const severityMap: Record<UploadStatus, 'success' | 'info' | 'warning' | 'error'> = {
-    [UploadStatus.SUCCESS]: 'success',
-    [UploadStatus.FAILED]: 'error',
-    [UploadStatus.ALREADY_UPLOADED]: 'error',
-    [UploadStatus.INVALID_EXTENSION]: 'error',
-    [UploadStatus.TOO_LARGE]: 'error',
-    [UploadStatus.MALWARE]: 'error'
-};
-
-interface FileResult {
-    fileName: string;
-    status: UploadStatus;
-    description: string;
-}
-
-export interface FileUploadResponseDto {
-    uploadResults: FileResult[];
-}
+import {
+    FileDto,
+    FileExistsResponseDto,
+    FileUploadResponseDto,
+    UploadOptions,
+    UploadStatus,
+    UploadStatusDescriptions
+} from "../types";
 
 interface FileStore {
     filesToUpload: File[];
-    fileDtos: FileDto[];
+    userFiles: FileDto[];
     isLoading: boolean;
-    error: string | null;
     addFiles: (files: File[]) => void;
-    removeFile: (index: number) => void;
     clearFiles: () => void;
-    uploadFiles: () => Promise<void>;
-    getFiles: (options?: QueryOptions) => Promise<void>;
-    deleteFile: (fileDto: FileDto) => Promise<void>;
-    uploadModalOpen: boolean,
-    setUploadModalOpen: (flag: boolean) => void;
-    selectedFileHashes: string[];
-    setSelectedFileHashes: (fileIds: number[]) => void;
+
+    /*Server calls*/
+    uploadUserFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>;
+    getUserFiles: (options?: QueryOptions) => Promise<FileDto[]>;
+    deleteUserFile: (fileDto: FileDto) => Promise<void>;
     deleteFilesInBatch: () => void;
+    isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
+    downloadFile: (fileHash: string) => Promise<void>
+
+    selectedFile: FileDto | null;
+    setSelectedFile: (file: FileDto | null) => void;
+    selectedFileIds: number[];
+    setSelectedFileIds: (fileIds: number[]) => void;
+    addSelectedFileId: (fileId: number) => void;
+
     totalUserFiles: number;
+    totalPages: number;
     validateFilesThenUpload: (newFiles: File[]) => void;
 }
 
 const useFileStore = create<FileStore>((set, get) => ({
     filesToUpload: [],
-    fileDtos: [],
+    userFiles: [],
     isLoading: false,
-    error: null,
-    uploadModalOpen: false,
-    selectedFileHashes: [],
+    uploaded: false,
+    selectedFileIds: [],
     totalUserFiles: 0,
+    totalPages: 0,
+    selectedFile: null,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
-    removeFile: (index) => set((state) => ({filesToUpload: state.filesToUpload.filter((_, i) => i !== index)})),
     clearFiles: () => set({filesToUpload: []}),
     validateFilesThenUpload: (newFiles: File[]) => {
         const { addFiles} = get();
@@ -85,58 +61,78 @@ const useFileStore = create<FileStore>((set, get) => ({
             addFiles(validFiles);
         }
     },
-    uploadFiles: async () => {
-        const { filesToUpload, clearFiles, getFiles } = get();
-        set({ isLoading: true, error: null });
+    isFileExists: async (fileName: string): Promise<FileExistsResponseDto> => {
+        set({isLoading: true});
+        const result = await FileService.isFileExists(fileName);
+        set({isLoading: false});
+
+        return result;
+    },
+    uploadUserFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus }> => {
+        const { filesToUpload, clearFiles } = get();
+        set({ isLoading: true});
 
         try {
-            const response = await FileService.uploadFiles(filesToUpload);
-            if (response?.uploadResults.length) {
-                response.uploadResults.forEach(({ status, description, fileName }) => {
-                    const severity = severityMap[status];
-                    if (severity) {
-                        const message = `${description} - <b>${fileName}</b>`;
-                        const alert = new AlertMessage(message, severity);
-                        NotificationService.addAlert(alert);
-                    }
-                });
+            const response = await FileService.uploadFiles(filesToUpload, uploadOptions) as FileUploadResponseDto;
+            if (response?.uploadResults?.length) {
+                const result = response.uploadResults[0];
+                const {status, fileName, fileMetadata} = result;
+                if (status != UploadStatus.SUCCESS) {
+                    const description = UploadStatusDescriptions[status];
+                    const message = `${description} - <b>${fileName}</b>`;
+                    const alert = new AlertMessage(message, 'error');
+                    NotificationService.addAlert(alert);
+                } else {
+                    clearFiles();
+                    set({selectedFile: fileMetadata, filesToUpload: []});
+                }
+                set({isLoading: false});
+                return {status};
             }
+
+            return { status: UploadStatus.FAILED };
         } catch (error) {
-            const axiosError = error as AxiosError;
-            NotificationService.addAlert({ id: uuidv4(), message: 'Ошибка при загрузке файлов', severity: 'error' });
-            set({ error: axiosError.message });
-        } finally {
-            clearFiles();
+            NotificationService.addAlert(new AlertMessage('Ошибка при загрузке файлов', 'error'));
             set({ isLoading: false });
-            await getFiles();
+            return { status: UploadStatus.FAILED };
         }
     },
 
-    getFiles: async (options?: QueryOptions) => {
+    getUserFiles: async (options?: QueryOptions) => {
+        const opt: QueryOptions = {
+            sortBy: options?.sortBy || 'id',
+            sortDirection: options?.sortDirection || 'desc',
+            size: options?.size || 5,
+            ...options
+        }
         set({isLoading: true});
-        const { fileHashes, totalElements } = await FileService.getFiles(options);
-        set({fileDtos: fileHashes, totalUserFiles: totalElements, isLoading: false})
+        const { fileHashes, totalElements, totalPages } = await FileService.getFiles(opt);
+        set({userFiles: fileHashes, totalUserFiles: totalElements, isLoading: false, totalPages: totalPages})
+        return fileHashes;
     },
 
-    deleteFile: async (fileDto: FileDto) => {
-        const { getFiles } = get();
+    deleteUserFile: async (fileDto: FileDto) => {
+        const { getUserFiles } = get();
         const response = await FileService.deleteFile(fileDto.hashedFilename);
 
         response === 204
-            ? NotificationService.addAlert({ id: uuidv4(), message: `Файл <b>${fileDto.originalFilename}</b> успешно удален`, severity: 'success' })
-            : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении <b>${fileDto.originalFilename}</b>`, severity: 'error' });
+            ? NotificationService.addAlert(new AlertMessage(`Файл <b>${fileDto.originalFilename}</b> успешно удален`, 'success'))
+            : NotificationService.addAlert(new AlertMessage(`Ошибка при удалении <b>${fileDto.originalFilename}</b>`, 'error'));
 
-        getFiles();
+        getUserFiles();
     },
-    setUploadModalOpen: (flag) => {
-        set({uploadModalOpen: flag})
+    addSelectedFileId: (fileId: number): void => {
+        const currentFileIds = get().selectedFileIds;
+
+        const newFileIds = currentFileIds.includes(fileId)
+            ? currentFileIds.filter(id => id !== fileId)
+            : [...currentFileIds, fileId];
+
+        set({ selectedFileIds: newFileIds });
     },
-    setSelectedFileHashes: (fileIds) => {
-        const { fileDtos } = get();
-        const hashedFileNames: string[] = fileDtos
-            .filter(dto => fileIds.includes(dto.id))
-            .map(dto => dto.hashedFilename);
-        set({selectedFileHashes: hashedFileNames});
+
+    setSelectedFileIds: (fileIds) => {
+        set({selectedFileIds: fileIds});
     },
     deleteFilesInBatch: async () => {
         set({isLoading: true})
@@ -147,16 +143,32 @@ const useFileStore = create<FileStore>((set, get) => ({
             false
         );
         NotificationService.addAlert(alert);
-        const { selectedFileHashes, getFiles} = get();
-        const response = await FileService.deleteFilesInBatch(selectedFileHashes);
+        const { selectedFileIds, getUserFiles, userFiles} = get();
+
+        const fileHashes = userFiles
+            .map(file => ({
+                id: file.id,
+                hash: file.hashedFilename
+            }))
+            .filter(fileDto => selectedFileIds.includes(fileDto.id))
+            .map(fileDto => fileDto.hash);
+
+        const response = await FileService.deleteFilesInBatch(fileHashes);
         NotificationService.deleteAlert(alert);
         response === 204
-            ? NotificationService.addAlert({ id: uuidv4(), message: `Файлы успешно удалены`, severity: 'success' })
-            : NotificationService.addAlert({ id: uuidv4(), message: `Ошибка при удалении файлов`, severity: 'error' });
-        set({selectedFileHashes: []});
-        getFiles();
+            ? NotificationService.addAlert(new AlertMessage('Файлы успешно удалены', 'success'))
+            : NotificationService.addAlert(new AlertMessage('Ошибка при удалении файлов', 'error'));
+
+        set({selectedFileIds: []});
+        getUserFiles();
         set({isLoading: false})
     },
+    setSelectedFile: async (file) => {
+        set({selectedFile: file});
+    },
+    downloadFile: async (fileHash) => {
+        await FileService.getFileByHash(fileHash);
+    }
 }));
 
 export default useFileStore;

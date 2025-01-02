@@ -1,7 +1,7 @@
 import AuthService from "../../services/AuthService";
 import {create} from "zustand";
 import { AlertMessage } from '../../store/types';
-import NotificationService from "../../services/notification/NotificationService";
+import NotificationService from "../../services/notification/AlertService";
 
 interface AuthStore {
     authenticated: boolean;
@@ -16,6 +16,7 @@ interface AuthStore {
 }
 
 const useAuthStore = create<AuthStore>((set, get) => ({
+
     authenticated: localStorage.getItem('JWT') !== null,
     alerts: [],
 

@@ -1,5 +1,8 @@
 package com.example.generation_service.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -7,33 +10,28 @@ import com.knuddels.jtokkit.api.ModelType;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @UtilityClass
 @Slf4j
 public class Utils {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     public static int countTokens(String text) {
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
 
         Encoding encoding = registry.getEncodingForModel(ModelType.GPT_4O_MINI);
 
         return encoding.countTokens(text);
-    }
-
-    public static String readFileContents(String filePath) {
-        try {
-            return Files.readString(Path.of(filePath));
-        } catch (IOException e) {
-            log.error("An error occurred while reading the file: {}", e.getMessage());
-        }
-        return null;
     }
 
     public static String getExportedTestName(String testName, String fileFormat) {
@@ -72,6 +70,28 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static String loadResourceFile(String resourcePath) {
+        try (InputStream in = Utils.class.getResourceAsStream(resourcePath);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading resource file: " + resourcePath, e);
+        }
+    }
+
+    public JsonNode loadSchema(String schemaPath) throws JsonProcessingException {
+        return MAPPER.readTree(Utils.loadResourceFile(schemaPath));
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 
 }

@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import {Button, Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
 import {useLocation} from 'react-router-dom';
@@ -108,6 +109,11 @@ export const SidebarHeader = ({children}: any) => {
 
     const tabs: TabIcon[] = [
         {
+            name: 'Генерация',
+            icon: <PrecisionManufacturingIcon/>,
+            redirect: '/generate',
+        },
+        {
             name: 'Тесты',
             icon: <ArticleOutlinedIcon/>,
             redirect: '/tests',
@@ -153,7 +159,7 @@ export const SidebarHeader = ({children}: any) => {
                                 </Typography>
                                 <Box display="flex" alignItems="center">
                                     <Box sx={{mr: 6}}>
-                                        {/*<ActiveJobBadge/>*/}
+                                        <ActiveJobBadge/>
                                     </Box>
 
                                     <Button
@@ -168,7 +174,7 @@ export const SidebarHeader = ({children}: any) => {
                     </Grid>
                 </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" open={open}>
+            <Drawer variant="permanent" open={open} >
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
                         {theme.direction === 'rtl' ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
@@ -181,17 +187,10 @@ export const SidebarHeader = ({children}: any) => {
                             <ListItem disablePadding sx={{display: 'block'}}>
                                 <ListItemButton
                                     sx={{
-                                        minHeight: 58,
-                                        justifyContent: 'center',
                                         backgroundColor: location.pathname === t.redirect ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
                                     }}
                                 >
-                                    <ListItemIcon
-                                        sx={{
-                                            mr: 'auto',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
+                                    <ListItemIcon>
                                         {t.icon}
                                     </ListItemIcon>
                                     <ListItemText primary={t.name} sx={{opacity: open ? 1 : 0}}/>

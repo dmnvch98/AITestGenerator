@@ -4,7 +4,7 @@ import {UserTest, useTestStore} from "../../../store/tests/testStore";
 import {TestForm} from "../components/TestForm";
 import {AlertMessage} from "../../../store/types";
 import {createNewTest} from "./utils";
-import NotificationService from "../../../services/notification/NotificationService";
+import NotificationService from "../../../services/notification/AlertService";
 
 export const TestPageEdit = () => {
     const {id} = useParams();

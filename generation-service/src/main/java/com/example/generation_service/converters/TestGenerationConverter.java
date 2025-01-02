@@ -1,14 +1,15 @@
 package com.example.generation_service.converters;
 
+import com.example.generation_service.dto.tests.QuestionTypeQuantity;
 import com.example.generation_service.dto.tests.TestGenHistoryResponseDto;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.dto.tests.TextGenerationHistoryDto;
 import com.example.generation_service.exceptionHandler.enumaration.GenerationFailReason;
-import com.example.generation_service.generators.models.GenerateTestRequest;
+import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
 import com.example.generation_service.models.enums.ActivityStatus;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import org.mapstruct.Mapper;
@@ -35,7 +36,9 @@ public interface TestGenerationConverter {
   @Mapping(source = "fileHash", target = "fileHash")
   @Mapping(source = "text", target = "text")
   @Mapping(source = "message.userId", target = "userId")
-  GenerateTestRequest convert(final GenerateTestMessage message, final String text, final FileHash fileHash);
+  @Mapping(source = "questionTypeQuantity.questionType", target = "questionType")
+  @Mapping(source = "questionTypeQuantity.maxQuestions", target = "maxQuestions")
+  GenerateTestRequestParams convert(final GenerateTestMessage message, final String text, final FileMetadata fileHash, final QuestionTypeQuantity questionTypeQuantity);
 
   @Named("convertFailReason")
   default Integer convertFailReason(final String failReason) {
@@ -63,7 +66,6 @@ public interface TestGenerationConverter {
        .fileName(activity.getFileName())
        .userId(test.getUserId())
        .status(ActivityStatus.SUCCESS)
-       .requestDto(activity.getRequestDto())
        .build();
   }
 
@@ -77,7 +79,6 @@ public interface TestGenerationConverter {
        .fileName(activity.getFileName())
        .status(ActivityStatus.FAILED)
        .userId(activity.getUserId())
-       .requestDto(activity.getRequestDto())
        .build();
   }
 
@@ -88,7 +89,6 @@ public interface TestGenerationConverter {
           .endDate(LocalDateTime.now())
           .cid(cid)
           .failReason(failReason.name())
-          .requestDto(dto)
           .status(ActivityStatus.FAILED)
           .fileName(fileName)
           .userId(userId)

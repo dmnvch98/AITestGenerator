@@ -1,0 +1,109 @@
+[
+  {
+    "id": "1",
+    "questionText": "Какой из следующих элементов является металлом?",
+    "description": "Вопрос с единственным правильным ответом.",
+    "answerOptions": [
+      {
+        "id": "11",
+        "optionText": "Сера",
+        "correct": false
+      },
+      {
+        "id": "12",
+        "optionText": "Кислород",
+        "correct": false
+      },
+      {
+        "id": "13",
+        "optionText": "Алюминий",
+        "correct": true
+      },
+      {
+        "id": "14",
+        "optionText": "Водород",
+        "correct": false
+      }
+    ],
+    "questionType": "MULTIPLE_CHOICE_SINGLE_ANSWER"
+  },
+  {
+    "id": "2",
+    "questionText": "Какие из следующих цветов присутствуют в светофоре?",
+    "description": " Вопрос с несколькими правильными ответами.",
+    "answerOptions": [
+      {
+        "id": "21",
+        "optionText": "Красный",
+        "correct": true
+      },
+      {
+        "id": "22",
+        "optionText": "Синий",
+        "correct": false
+      },
+      {
+        "id": "23",
+        "optionText": "Желтый",
+        "correct": true
+      },
+      {
+        "id": "24",
+        "optionText": "Белый",
+        "correct": false
+      },
+      {
+        "id": "25",
+        "optionText": "Зеленый",
+        "correct": true
+      }
+    ],
+    "questionType": "MULTIPLE_CHOICE_MULTIPLE_ANSWERS"
+  },
+  {
+    "id": "3",
+    "questionText": "Земля вращается вокруг Солнца.",
+    "description": "Вопрос с выбором 'верно' или 'неверно'.",
+    "answerOptions": [
+      {
+        "id": "31",
+        "optionText": "Верно",
+        "correct": true
+      },
+      {
+        "id": "32",
+        "optionText": "Неверно",
+        "correct": false
+      }
+    ],
+    "questionType": "TRUE_FALSE"
+  },
+  {
+    "id": "4",
+    "questionText": "Вода закипает при ____  градусах Цельсия.",
+    "description": "Вопрос с заполнением пропуска. Для указания пропуска необходимо использовать нижнее подчеркивание произвольное количество раз (от одного).",
+    "answerOptions": [
+      {
+        "id": "41",
+        "optionText": 90,
+        "correct": false
+      },
+      {
+        "id": "42",
+        "optionText": 100,
+        "correct": true
+      },
+      {
+        "id": "43",
+        "optionText": 120,
+        "correct": false
+      },
+      {
+        "id": "44",
+        "optionText": 500,
+        "correct": false
+      }
+    ],
+    "questionType": "FILL_IN_THE_BLANKS"
+  }
+]

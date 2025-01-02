@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {ActionIcon} from "../../../../store/types";
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import RestoreIcon from '@mui/icons-material/Restore';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Dialog from '@mui/material/Dialog';
@@ -12,25 +11,28 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import {getActionItemsList} from "../../../../components/main/data-display/helper";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
 interface ActionButtonsProps {
     onSave: () => void;
     onAddQuestion: () => void;
-    onReset: () => void;
+    onUndo: () => void;
     onExit: () => void;
     isTestModified: boolean;
     isLoading: boolean;
     onReturn: () => void;
+    undoActionsAvailable: boolean;
 }
 
 export const TestFormActions: React.FC<ActionButtonsProps> = ({
                                                                   onSave,
                                                                   onAddQuestion,
-                                                                  onReset,
+                                                                  onUndo,
                                                                   onExit,
                                                                   isTestModified,
                                                                   isLoading,
-                                                                  onReturn
+                                                                  onReturn,
+                                                                  undoActionsAvailable
                                                               }) => {
     const [dialogOpen, setDialogOpen] = useState(false); // Состояние для диалога
     const [dialogConfig, setDialogConfig] = useState<{
@@ -52,7 +54,7 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
     const actions: ActionIcon[] = [
         {
             name: 'Сохранить',
-            icon: <SaveAltIcon/>,
+            icon: <SaveOutlinedIcon/>,
             onClick: onSave,
             disabled: !isTestModified || isLoading
         },
@@ -63,14 +65,10 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
             disabled: isLoading
         },
         {
-            name: 'Сбросить',
-            icon: <RestoreIcon/>,
-            onClick: () => openDialog(
-                'Подтвердите сброс',
-                'Вы уверены, что хотите сбросить все изменения?',
-                onReset
-            ),
-            disabled: !isTestModified || isLoading
+            name: 'Отменить',
+            icon: <RestoreIcon />,
+            onClick: onUndo,
+            disabled: isLoading || !undoActionsAvailable
         },
         {
             name: 'Вернуться',

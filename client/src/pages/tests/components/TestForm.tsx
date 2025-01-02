@@ -1,18 +1,23 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {CreateTestRequestDto, Question, UserTest, useTestStore} from "../../../store/tests/testStore";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Box, Snackbar, Alert, CircularProgress, Paper} from "@mui/material";
+import {Box, CircularProgress, Paper} from "@mui/material";
 import {QuestionPaginatedView} from "../edit/components/TestDisplayMode";
-import {validateTest, createNewTest, createNewQuestion} from "../edit/utils";
+import {validateTest, createNewQuestion} from "../edit/utils";
 import {TestTitleInput} from "../edit/components/TestTitleInput";
 import {TestFormActions} from "../edit/components/TestFormActions";
 import {QuestionPagination} from "../edit/components/QuestionPagination";
 import {ContentActionsPage} from "../../../components/main/data-display/ContentActionsPage";
+import NotificationService from "../../../services/notification/AlertService";
+import {AlertMessage} from "../../../store/types";
 
 interface TestFormProps {
     initialTest: UserTest | CreateTestRequestDto;
     isLoading?: boolean;
 }
+
+const MAX_QUESTIONS_COUNT = 40;
+const MAX_ANSWERS_COUNT = 10;
 
 export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const navigate = useNavigate();
@@ -21,10 +26,22 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
-    const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id?: string }[]>([]);
+    const [invalidQuestions, setInvalidQuestions] = useState<{ index: number; message: string, id: number }[]>([]);
     const [hasSaved, setHasSaved] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [lastSavedTest, setLastSavedTest] = useState<UserTest | null>(null);
+    const [testHistory, setTestHistory] = useState<(UserTest | CreateTestRequestDto)[]>([]); // История изменений
+
+    const isTestModified = useCallback(() => {
+        return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
+    }, [localTest, lastSavedTest, initialTest]);
+
+
+    useEffect(() => {
+        if (!isTestModified()) {
+            setInvalidQuestions([]);
+        }
+    }, [isTestModified]);
 
     useEffect(() => {
         if (initialTest && !hasSaved) setLocalTest({...initialTest});
@@ -36,6 +53,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
         }
     }, []);
 
+    useEffect(() => {
+        if (currentQuestionIndex !== 0 && currentQuestionIndex  >= localTest.questions.length) {
+            setCurrentQuestionIndex(localTest.questions.length - 1);
+        }
+    }, [localTest.questions.length]);
+
     const handleSave = () => {
         const {valid, invalidQuestions} = validateTest(localTest, setCurrentQuestionIndex);
         if (valid) {
@@ -45,6 +68,7 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
                     setLocalTest(resp);
                     setLastSavedTest(resp);
                     setInvalidQuestions([]);
+                    setTestHistory([]);
                 }
             });
         } else {
@@ -52,11 +76,12 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
         }
     };
 
-    const isTestModified = () => {
-        return JSON.stringify(localTest) !== JSON.stringify(lastSavedTest ?? initialTest);
-    }
-
     const handleAddQuestion = () => {
+        if (localTest.questions.length >= MAX_QUESTIONS_COUNT) {
+            NotificationService.addAlert(new AlertMessage(`Максимальное число вопросов: ${MAX_QUESTIONS_COUNT}`, 'error'));
+            return;
+        }
+        saveToHistory(localTest);
         setLocalTest({
             ...localTest,
             questions: [...localTest.questions, createNewQuestion()],
@@ -64,7 +89,8 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
         setCurrentQuestionIndex(localTest.questions.length);
     };
 
-    const handleDeleteQuestion = (id: string) => {
+    const handleDeleteQuestion = (id: number) => {
+        saveToHistory(localTest);
         const updatedQuestions = localTest.questions.filter((q: Question) => q.id !== id);
         setCurrentQuestionIndex(updatedQuestions.length - 1);
         setLocalTest({...localTest, questions: updatedQuestions});
@@ -75,6 +101,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     }
 
     const handleQuestionChange = (updatedQuestion: Question) => {
+        if (updatedQuestion.answerOptions.length > MAX_ANSWERS_COUNT) {
+            NotificationService.addAlert(new AlertMessage(`Максимальное число ответов: ${MAX_ANSWERS_COUNT}`, 'error'));
+            return;
+        }
+        saveToHistory(localTest);
         setLocalTest(prevTest => ({
             ...prevTest,
             questions: prevTest.questions.map((q) =>
@@ -82,14 +113,6 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
             ),
         }));
     };
-
-    const handleReset = () => {
-        const resetTest = lastSavedTest ?? initialTest ?? createNewTest();
-        setLocalTest(resetTest);
-        setCurrentQuestionIndex(0);
-        setInvalidQuestions([]);
-    };
-
     const handleReturnToPrevPage = () => {
         const prevUrl = location?.state?.previousLocationPathname || '/tests';
         navigate(prevUrl);
@@ -99,31 +122,50 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
         navigate("/tests");
     }
 
+    const saveToHistory = (newState: UserTest | CreateTestRequestDto) => {
+        setTestHistory(prev => {
+            const updatedHistory = [...prev, newState];
+            return updatedHistory.length > 10 ? updatedHistory.slice(1) : updatedHistory;
+        });
+    };
+
+    const handleUndo = () => {
+        setTestHistory(prev => {
+            if (prev.length === 0) return prev;
+            const lastState = prev[prev.length - 1];
+            setLocalTest(lastState);
+            return prev.slice(0, -1);
+        });
+    };
+
     const Content = (
-        <Paper>
-            <Box sx={{ml: 4, mr: 4, pt: 2}}>
+        <Box>
+            <Box sx={{p: 2}}>
                 <TestTitleInput title={localTest.title || ""}
                                 isLoading={isLoading as boolean}
                                 onChange={(e) => setLocalTest({...localTest, title: e.target.value})}
                                 error={testTitleError}/>
             </Box>
 
-            {isLoading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                    <CircularProgress/>
-                </Box>
-            ) : (
-                <QuestionPaginatedView
-                    questions={localTest.questions}
-                    currentQuestionIndex={currentQuestionIndex}
-                    invalidQuestions={invalidQuestions}
-                    onDelete={handleDeleteQuestion}
-                    onQuestionChange={handleQuestionChange}
-                    onSelectQuestion={setCurrentQuestionIndex}
-                    editMode={true}
-                />
-            )}
-        </Paper>
+            <Paper>
+                {isLoading ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                        <CircularProgress/>
+                    </Box>
+                ) : (
+                    <QuestionPaginatedView
+                        questions={localTest.questions}
+                        currentQuestionIndex={currentQuestionIndex}
+                        invalidQuestions={invalidQuestions}
+                        onDelete={handleDeleteQuestion}
+                        onQuestionChange={handleQuestionChange}
+                        onSelectQuestion={setCurrentQuestionIndex}
+                        editMode={true}
+                    />
+                )}
+            </Paper>
+
+        </Box>
     )
 
     const Actions = (
@@ -132,10 +174,11 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
                 isLoading={isLoading as boolean}
                 onSave={handleSave}
                 onAddQuestion={handleAddQuestion}
-                onReset={handleReset}
+                onUndo={handleUndo}
                 onExit={handleExit}
                 onReturn={handleReturnToPrevPage}
                 isTestModified={isTestModified()}
+                undoActionsAvailable={testHistory.length > 0}
             />
             <QuestionPagination
                 loading={isLoading}

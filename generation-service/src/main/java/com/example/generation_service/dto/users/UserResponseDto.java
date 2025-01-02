@@ -4,6 +4,8 @@ import com.example.generation_service.models.user.UserFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class UserResponseDto {
@@ -13,5 +15,5 @@ public class UserResponseDto {
     private final String firstName;
     private final String lastName;
     private final String role;
-    private final UserFeature userFeature;
+    private final List<UserFeature> userFeatures;
 }

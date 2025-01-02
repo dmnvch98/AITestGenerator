@@ -6,6 +6,7 @@ import com.example.generation_service.exceptionHandler.enumaration.GenerationFai
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.dto.tests.GenerateTestRequestDto;
 import com.example.generation_service.models.enums.ActivityStatus;
+import com.example.generation_service.models.generation.QuestionType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,8 +19,16 @@ import java.util.stream.Collectors;
 @Mapper
 public interface ActivityConverter {
 
+  TestGenerationActivity convert(final TestGenerationActivity activity, final Set<QuestionType> processedQuestionTypes);
+
+  default TestGenerationActivity updateProcessedQuestionType(final TestGenerationActivity activity, QuestionType processedQuestionType) {
+    Set<QuestionType> processedQuestionTypes = activity.getProcessedQuestionTypes();
+    processedQuestionTypes.add(processedQuestionType);
+    return convert(activity, processedQuestionTypes);
+  }
+
   default TestGenerationActivity getWaitingActivity(final String cid, final GenerateTestRequestDto requestDto,
-                                                    final String fileName, final Long userId) {
+                                                    final String fileName, final Long userId, final Set<QuestionType> queuedQuestionTypes) {
     return TestGenerationActivity
        .builder()
        .status(ActivityStatus.WAITING)
@@ -27,6 +36,7 @@ public interface ActivityConverter {
        .requestDto(requestDto)
        .userId(userId)
        .cid(cid)
+       .queuedQuestionTypes(queuedQuestionTypes)
        .build();
   }
 
@@ -40,6 +50,7 @@ public interface ActivityConverter {
        .userId(activity.getUserId())
        .messageReceipt(messageReceipt)
        .startDate(activity.getStartDate())
+       .queuedQuestionTypes(activity.getQueuedQuestionTypes())
        .build();
   }
 

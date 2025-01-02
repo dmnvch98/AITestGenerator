@@ -15,18 +15,13 @@ class ExportService {
                 url: `/api/v1/tests/${testId}/export`,
                 method: 'POST',
                 data: dto,
-                responseType: 'blob', // Обработка бинарных данных
+                responseType: 'blob',
             });
 
-            // Нормализуем название теста и формируем имя файла
-            // const normalizedTitle = testTitle.slice(0, 100).replace(" ", "_");
-            // const filename = `${normalizedTitle}.${dto.exportFormat.toLowerCase()}`;
-
-            // Создаем и вызываем ссылку для скачивания файла
             const url = window.URL.createObjectURL(new Blob([data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', testTitle); // Используем имя файла на основе формата
+            link.setAttribute('download', testTitle);
             document.body.appendChild(link);
             link.click();
             link.parentNode?.removeChild(link);

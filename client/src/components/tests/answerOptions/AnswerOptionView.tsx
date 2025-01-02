@@ -5,7 +5,7 @@ import { AnswerOption } from "../../../store/tests/testStore";
 import Box from "@mui/material/Box";
 
 export const AnswerOptionView = ({ answerOption }: { answerOption: AnswerOption }) => {
-    const secondaryTextColor = answerOption.isCorrect ? '#006400' : '#f50057';
+    const secondaryTextColor = answerOption.correct ? '#006400' : '#f50057';
 
     const secondaryTextStyle = {
         color: secondaryTextColor,
@@ -18,7 +18,7 @@ export const AnswerOptionView = ({ answerOption }: { answerOption: AnswerOption 
                     primary={answerOption.optionText}
                     secondary={
                         <span style={secondaryTextStyle}>
-                            {answerOption.isCorrect ? 'верно' : 'неверно'}
+                            {answerOption.correct ? 'верно' : 'неверно'}
                         </span>
                     }
                 />

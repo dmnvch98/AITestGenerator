@@ -63,7 +63,7 @@ public class ActivityController {
       return activityFacade.getAllObjectsFromHashes();
     }
 
-    @GetMapping("/long-poll")
+//    @GetMapping("/long-poll")
     public ResponseEntity<Set<TestGenerationActivityResponseDto>> longPoll(final Authentication authentication) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
         final long timeout = 20000;

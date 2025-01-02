@@ -31,7 +31,6 @@ public class CommandsScheduler {
 
     if (commandOpt.isPresent()) {
       GenerateTestMessage command = commandOpt.get();
-      log.info("Processing command: {}", command.getCid());
       processCommand(command);
     }
   }

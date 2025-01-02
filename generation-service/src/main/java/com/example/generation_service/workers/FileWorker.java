@@ -3,9 +3,9 @@ package com.example.generation_service.workers;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.generation_service.converters.FileHashConverter;
 import com.example.generation_service.dto.files.FileUploadResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.enums.UploadStatus;
-import com.example.generation_service.services.FileHashService;
+import com.example.generation_service.services.FileMetadataService;
 import com.example.generation_service.services.aws.StorageClient;
 import com.example.generation_service.validators.file.FileValidator;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -27,39 +29,58 @@ public class FileWorker {
     private final StorageClient storageClient;
     private final List<FileValidator> fileValidators;
     private final FileHashConverter converter;
-    private final FileHashService fileHashService;
+    private final FileMetadataService fileHashService;
 
     @Transactional
-    public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file) {
+    public FileUploadResponseDto.FileUploadResult saveFile(final long userId, final MultipartFile file,
+                                                           final boolean overwrite, final boolean createCopy) {
         FileValidationDto validationDto;
         try {
-            validationDto = validateFile(file, userId);
+            validationDto = validateFile(file, userId, overwrite, createCopy);
         } catch (final Exception e) {
-            return buildResponse(UploadStatus.FAILED, file);
+            log.error("Validation failed for file: {} by user id: {}", file.getOriginalFilename(), userId, e);
+            return buildResponse(UploadStatus.FAILED, file, null);
         }
 
         if (!validationDto.getUploadStatus().equals(UploadStatus.SUCCESS)) {
-            return buildResponse(validationDto.getUploadStatus(), file);
+            return buildResponse(validationDto.getUploadStatus(), file, null);
         }
 
+        String originalFileName = file.getOriginalFilename();
+        String fileNameHash;
+
+        if (overwrite) {
+            final FileMetadata existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            if (existingFile != null) {
+                storageClient.deleteFile(userId, existingFile.getHashedFilename());
+                fileHashService.delete(existingFile);
+            }
+        } else if (createCopy) {
+            final FileMetadata existingFile = fileHashService.getByOriginalFilenameAndUserId(userId, originalFileName);
+            if (existingFile != null) {
+                existingFile.incrementCopiesNum();
+                originalFileName = appendPostfixBeforeExtension(originalFileName, "_копия_" + existingFile.getCopiesNum());
+            }
+        }
         try {
-            final String originalFileName = file.getOriginalFilename();
+            fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
             final ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
-
-            final String fileNameHash = DigestUtils.md5Hex(originalFileName + System.currentTimeMillis());
-
+            metadata.setContentType(file.getContentType());
+            final Map<String, String> userMetadata = new HashMap<>();
+            userMetadata.put("originalFileName", originalFileName);
+            metadata.setUserMetadata(userMetadata);
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
-            final FileHash fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
+            final FileMetadata fileHash = converter.convertToFileHash(fileNameHash, originalFileName, userId,
                     validationDto.getFileData());
 
-            fileHashService.save(fileHash);
+            final FileMetadata fileMetadata = fileHashService.save(fileHash);
+            return buildResponse(UploadStatus.SUCCESS, file, fileMetadata);
         } catch (IOException e) {
             log.error("Error when saving file: {} for user id: {}", file.getOriginalFilename(), userId, e);
-            return buildResponse(UploadStatus.FAILED, file);
+            return buildResponse(UploadStatus.FAILED, file, null);
         }
-        return buildResponse(UploadStatus.SUCCESS, file);
     }
 
     @Transactional
@@ -67,15 +88,14 @@ public class FileWorker {
         fileHashService.isExistsByHashedFilenameAndUserOrThrow(userId, hash);
         try {
             storageClient.deleteFile(userId, hash);
-            fileHashService.delete(userId, hash);
         } catch (final Exception e) {
             log.error("An error occurred when deleting file by hash [{}]", hash);
         }
     }
 
-    private FileValidationDto validateFile(final MultipartFile file, final Long userId) {
+    private FileValidationDto validateFile(final MultipartFile file, final Long userId, final boolean overwrite, final boolean createCopy) {
         log.info("Starting file validation before uploading: [{}]", file.getOriginalFilename());
-        final FileValidationDto dto = converter.convertToValidateDto(file, userId);
+        final FileValidationDto dto = converter.convertToValidateDto(file, userId, overwrite, createCopy);
         for (final FileValidator validator : fileValidators) {
             final UploadStatus validationStatus = validator.validate(dto).getUploadStatus();
             if (validationStatus != UploadStatus.SUCCESS) {
@@ -86,12 +106,27 @@ public class FileWorker {
         return dto;
     }
 
-    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file) {
+    private FileUploadResponseDto.FileUploadResult buildResponse(final UploadStatus status, final MultipartFile file, final FileMetadata fileMetadata) {
         return FileUploadResponseDto
                 .FileUploadResult
                 .builder()
                 .fileName(file.getOriginalFilename())
+                .fileMetadata(fileMetadata)
                 .status(status)
                 .build();
+    }
+
+    private String appendPostfixBeforeExtension(String fileName, String postfix) {
+        if (fileName == null || fileName.isEmpty()) {
+            return fileName;
+        }
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return fileName + postfix;
+        } else {
+            String name = fileName.substring(0, dotIndex);
+            String extension = fileName.substring(dotIndex);
+            return name + postfix + extension;
+        }
     }
 }

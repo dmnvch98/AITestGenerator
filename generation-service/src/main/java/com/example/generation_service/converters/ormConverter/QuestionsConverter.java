@@ -1,6 +1,6 @@
 package com.example.generation_service.converters.ormConverter;
 
-import com.example.generation_service.dto.tests.QuestionDto;
+import com.example.generation_service.models.test.Question;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,12 +12,12 @@ import java.util.List;
 
 @Converter(autoApply = true)
 @Slf4j
-public class QuestionsConverter implements AttributeConverter<List<QuestionDto>, String> {
+public class QuestionsConverter implements AttributeConverter<List<Question>, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(final List<QuestionDto> attribute) {
+    public String convertToDatabaseColumn(final List<Question> attribute) {
         try {
             return attribute != null && !attribute.isEmpty() ?
                     objectMapper.writeValueAsString(attribute) : "[]";
@@ -28,7 +28,7 @@ public class QuestionsConverter implements AttributeConverter<List<QuestionDto>,
     }
 
     @Override
-    public List<QuestionDto> convertToEntityAttribute(final String dbData) {
+    public List<Question> convertToEntityAttribute(final String dbData) {
         try {
             return dbData != null && !dbData.isEmpty() ?
                     objectMapper.readValue(dbData, new TypeReference<>() {}) : List.of();

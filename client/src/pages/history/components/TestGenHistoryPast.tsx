@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import {TestGenActivity, useUserStore} from "../../../store/userStore";
+import {ActivityDto, useUserStore} from "../../../store/userStore";
 import {useNavigate} from "react-router-dom";
 import {GridColDef, GridEventListener, GridSortModel} from "@mui/x-data-grid";
-import {GenericTableActions} from "../../../components/main/GenericTableActions";
+import {GenericTableActions} from "../../../components/main/data-display/GenericTableActions";
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
-import {SxProps} from "@mui/system";
-import {Theme} from "@mui/material/styles";
 import {QueryOptions} from "../../../store/types";
 import {createColumns} from "./helper";
 
@@ -49,7 +47,7 @@ export const TestGenHistoryPast = () => {
         fetchHistory(searchOptions);
     }, [paginationModel, sortModel]);
 
-    const prepareData = (): TestGenActivity[] => {
+    const prepareData = (): ActivityDto[] => {
         if (testGenHistoryPast.length > 0) {
             return testGenHistoryPast.map(item => {
                 if (!item.testTitle) {
@@ -70,23 +68,16 @@ export const TestGenHistoryPast = () => {
         }
     }
 
-    const style: SxProps<Theme> = {
-        '& .MuiDataGrid-cell:hover': {
-            cursor: 'pointer'
-        },
-    }
-
     return (
         <>
             <Box>
-                <GenericTableActions<TestGenActivity>
+                <GenericTableActions<ActivityDto>
                     data={prepareData()}
                     columns={columns}
-                    rowIdGetter={(row) => row.id}
+                    rowIdGetter={(row) => row.id || row.cid}
                     loading={loading}
                     checkboxSelection={false}
                     handleEvent={handleEvent}
-                    sx={style}
                     rowCount={totalElements}
                     paginationModel={paginationModel}
                     setPaginationModel={setPaginationModel}

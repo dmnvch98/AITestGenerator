@@ -1,13 +1,11 @@
-import {useEffect, useRef} from "react";
-import { Question, AnswerOption } from "../../../store/tests/testStore";
-import {AccordionDetails, AccordionSummary, Box, IconButton, TextField} from "@mui/material";
-import React from "react";
-import AnswerOptionEdit from "../answerOptions/AnswerOptionEdit";
-import Typography from "@mui/material/Typography";
-import {DeleteOutlineOutlined} from "@mui/icons-material";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import {v4 as uuidv4} from "uuid";
+import React, { useCallback } from "react";
+import { AnswerOption, Question } from "../../../store/tests/testStore";
+import { QuestionType } from "../../../store/tests/types";
+import { AccordionDetails, AccordionSummary, Box } from "@mui/material";
+import { QuestionHeader } from "./QuestionHeader";
+import { AnswerList } from "./AnswersList";
+import { QuestionTypeSelector } from "../../../pages/tests/edit/components/QuestionTypeSelector";
+import {getNanoTime} from "../../../pages/tests/edit/utils";
 
 export interface QuestionEditProps {
     question: Question;
@@ -15,86 +13,114 @@ export interface QuestionEditProps {
     onDelete: () => void;
     errorMessage: string;
     questionNumber?: number;
-    viewMode?: 'list' | 'paginated';
-    last?: boolean;
 }
 
-export const QuestionEdit: React.FC<QuestionEditProps> = ({ question, onQuestionChange, onDelete, errorMessage,
-                                                              questionNumber, last, viewMode }) => {
-    const errorRef = useRef<HTMLDivElement>(null);
+export const QuestionEdit: React.FC<QuestionEditProps> = ({
+                                                              question,
+                                                              onQuestionChange,
+                                                              onDelete,
+                                                              errorMessage,
+                                                              questionNumber,
+                                                          }) => {
+    const isSingleChoice = question.questionType !== QuestionType.MULTIPLE_CHOICE_MULTIPLE_ANSWERS;
+    const showActions = question.questionType !== QuestionType.TRUE_FALSE;
 
-    useEffect(() => {
-        if (errorMessage !== '' && errorRef.current) {
-            errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }, [errorMessage]);
-
-    const handleQuestionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onQuestionChange({ ...question, questionText: e.target.value });
-    };
-
-    const handleAddAnswerOption = () => {
+    const addAnswerOption = useCallback(() => {
         const newOption: AnswerOption = {
-            id: uuidv4(),
+            id: getNanoTime(),
             optionText: '',
-            isCorrect: false,
+            correct: false,
         };
         onQuestionChange({ ...question, answerOptions: [...question.answerOptions, newOption] });
-    };
+    }, [onQuestionChange, question]);
 
-    const handleAnswerOptionChange = (updatedOption: AnswerOption) => {
+    const updateAnswerOption = useCallback((updatedOption: AnswerOption) => {
         const updatedOptions = question.answerOptions.map(option =>
             option.id === updatedOption.id ? updatedOption : option
         );
         onQuestionChange({ ...question, answerOptions: updatedOptions });
-    };
+    }, [onQuestionChange, question.answerOptions]);
 
-    const handleDeleteAnswerOption = (id: string) => {
-        const updatedOptions = question.answerOptions.filter(option => option.id !== id);
+    const toggleCorrectAnswer = useCallback((updatedOption: AnswerOption) => {
+        let updatedOptions: AnswerOption[];
+
+        if (isSingleChoice) {
+            updatedOptions = question.answerOptions.map(option => ({
+                ...option,
+                correct: option.id === updatedOption.id
+            }));
+        } else {
+            updatedOptions = question.answerOptions.map(option => ({
+                ...option,
+                correct: option.id === updatedOption.id ? !option.correct : option.correct
+            }));
+        }
+
         onQuestionChange({ ...question, answerOptions: updatedOptions });
-    };
+    }, [onQuestionChange, question.answerOptions, isSingleChoice]);
+
+    const handleQuestionTypeChange = useCallback((newType: QuestionType) => {
+        let newAnswers: AnswerOption[] = question.answerOptions;
+
+        if (newType === QuestionType.TRUE_FALSE) {
+            newAnswers = [
+                { id: getNanoTime() + 1, optionText: 'Верно', correct: true },
+                { id: getNanoTime() + 2, optionText: 'Неверно', correct: false }
+            ];
+        } else if ([QuestionType.MULTIPLE_CHOICE_SINGLE_ANSWER, QuestionType.FILL_IN_THE_BLANKS].includes(newType)) {
+            let firstCorrect = false;
+            newAnswers = newAnswers.map(answer => {
+                if (answer.correct && !firstCorrect) {
+                    firstCorrect = true;
+                    return { ...answer, correct: true };
+                }
+                return { ...answer, correct: false };
+            });
+        }
+
+        onQuestionChange({
+            ...question,
+            questionType: newType,
+            answerOptions: newAnswers
+        });
+    }, [onQuestionChange, question]);
 
     return (
-        <Box sx={{ border: errorMessage ? '2px solid #ff604f' : 'none' }}>
-            <AccordionSummary aria-controls="panel1a-content" id="panel1a-header">
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                    <TextField
-                        label={"Вопрос " + questionNumber}
-                        placeholder="Введите вопрос"
-                        multiline
-                        fullWidth
-                        variant="standard"
-                        value={question.questionText}
-                        onChange={handleQuestionTextChange}
-                        sx={{ '& .MuiInputBase-input': { fontWeight: 600 }, ml: 2 }}
+        <Box sx={{ pl: 2 }}>
+            <AccordionSummary>
+                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <Box sx={{ mb: 2 }}>
+                        <QuestionHeader
+                            questionNumber={questionNumber}
+                            questionText={question.questionText}
+                            onChange={(text) => onQuestionChange({ ...question, questionText: text })}
+                            onDelete={onDelete}
+                        />
+                    </Box>
+                    <QuestionTypeSelector
+                        value={question.questionType}
+                        onChange={handleQuestionTypeChange}
                     />
-                    <IconButton onClick={onDelete}>
-                        <DeleteOutlineOutlined />
-                    </IconButton>
                 </Box>
             </AccordionSummary>
             <AccordionDetails>
-                <Box>
-                    {question.answerOptions.map((answerOption, index) => (
-                        <AnswerOptionEdit
-                            key={index}
-                            answerOption={answerOption}
-                            onOptionChange={handleAnswerOptionChange}
-                            onDelete={() => handleDeleteAnswerOption(answerOption.id as string)}
-                        />
-                    ))}
-                    <Button onClick={handleAddAnswerOption} variant="outlined">
-                        Добавить ответ
-                    </Button>
-                    {errorMessage && (
-                        <Typography ref={errorRef} color="error" variant="body2" align="left">
-                            {errorMessage}
-                        </Typography>
-                    )}
-                </Box>
+                <AnswerList
+                    answerOptions={question.answerOptions}
+                    onAnswerChange={updateAnswerOption}
+                    onDeleteAnswer={(id) =>
+                        onQuestionChange({
+                            ...question,
+                            answerOptions: question.answerOptions.filter(option => option.id !== id),
+                        })
+                    }
+                    onAddAnswer={addAnswerOption}
+                    singleChoice={isSingleChoice}
+                    questionType={question.questionType}
+                    displayActions={showActions}
+                    correctAnswerChanged={toggleCorrectAnswer}
+                    errorMessage={errorMessage}
+                />
             </AccordionDetails>
-
-            {(!last && viewMode === 'list') && <Divider sx={{ mt: 2, mb: 2 }} />}
         </Box>
     );
 };

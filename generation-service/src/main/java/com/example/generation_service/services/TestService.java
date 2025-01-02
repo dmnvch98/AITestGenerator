@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -30,6 +32,13 @@ public class TestService {
     private final TestSearchVectorRepository vectorRepository;
 
     public Test save(final Test test) {
+//        if (CollectionUtils.isNotEmpty(test.getQuestions())) {
+//            test.getQuestions().forEach(questionDto -> {
+//                if (questionDto.getAnswerOptions().size() > 1) {
+//                    Collections.shuffle(questionDto.getAnswerOptions());
+//                }
+//            });
+//        }
         testRepository.save(test);
         vectorRepository.insertSearchVector(
                 test.getId(),
@@ -37,6 +46,7 @@ public class TestService {
                 test.getTitle(),
                 test.getLanguage()
         );
+        log.info("New test saved, id=[{}]", test.getId());
         return test;
     }
 

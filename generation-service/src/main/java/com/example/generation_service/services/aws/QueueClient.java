@@ -38,9 +38,12 @@ public class QueueClient {
         }
         final Message message = messages.get(0);
         final String processingKey = IN_PROCESS_PREFIX + message.getMessageId();
-
         final String messageBody = message.getBody();
         try {
+            final Optional<String> existingProcess = redisService.getObjectAsString(processingKey, String.class);
+            if (existingProcess.isPresent()) {
+                extendVisibilityTimeout(message.getMessageId());
+            }
             redisService.saveObjectAsString(processingKey, message.getReceiptHandle());
             final GenerateTestMessage generateTestMessage = objectMapper.readValue(messageBody, GenerateTestMessage.class);
             generateTestMessage.setMessageId(message.getMessageId());

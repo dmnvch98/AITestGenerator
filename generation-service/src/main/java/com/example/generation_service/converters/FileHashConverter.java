@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.example.generation_service.dto.texts.FileHashesResponseDto;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.dto.files.FilesMetadataResponseDto;
+import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.validators.file.dto.FileValidationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,20 +19,25 @@ public interface FileHashConverter {
 
   ObjectMapper MAPPER = new ObjectMapper();
 
-  default FileHashesResponseDto convert(final List<FileHash> fileHashes) {
-    return FileHashesResponseDto.builder().fileHashes(fileHashes).build();
+  default FilesMetadataResponseDto convert(final List<FileMetadata> fileHashes) {
+    return FilesMetadataResponseDto.builder().fileHashes(fileHashes).build();
   }
 
-  default FileHashesResponseDto convert(final Page<FileHash> fileHashes) {
-    return FileHashesResponseDto.builder()
+  default FilesMetadataResponseDto convert(final Page<FileMetadata> fileHashes) {
+    return FilesMetadataResponseDto.builder()
             .fileHashes(fileHashes.getContent())
             .totalElements(fileHashes.getTotalElements())
             .totalPages(fileHashes.getTotalPages())
             .build();
   }
 
-  default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId) {
-    return FileValidationDto.builder().file(file).userId(userId).build();
+  default FileValidationDto convertToValidateDto(final MultipartFile file, final Long userId, final boolean overwrite, final boolean createCopy) {
+    return FileValidationDto.builder()
+            .file(file)
+            .userId(userId)
+            .overwrite(overwrite)
+            .createCopy(createCopy)
+            .build();
   }
 
   default String convertToFileDataJson(final Map<String, String> fileData) throws JsonProcessingException {
@@ -42,12 +47,12 @@ public interface FileHashConverter {
     return MAPPER.writeValueAsString(fileData);
   }
 
-  default FileHash convertToFileHash(
+  default FileMetadata convertToFileHash(
           final String fileNameHash,
           final String originalFileName,
           final Long userId,
           final Map<String, String> fileData) throws JsonProcessingException {
-    return FileHash.builder()
+    return FileMetadata.builder()
             .hashedFilename(fileNameHash)
             .originalFilename(originalFileName)
             .uploadTime(LocalDateTime.now())

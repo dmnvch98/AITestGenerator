@@ -1,15 +1,14 @@
 import {GridColDef, GridEventListener} from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import React, {useEffect, useState} from "react";
-import {TestGenActivity, useUserStore} from "../../../store/userStore";
-import {GenericTableActions} from "../../../components/main/GenericTableActions";
+import {ActivityDto, useUserStore} from "../../../store/userStore";
+import {GenericTableActions} from "../../../components/main/data-display/GenericTableActions";
 import {GenerationErrorModal} from "../../../components/generationErrors/GenerationErrorModal";
-import {SxProps} from "@mui/system";
-import {Theme} from "@mui/material/styles";
 import {useNavigate} from "react-router-dom";
 import {createColumns} from "./helper";
+import {Alert, Typography} from "@mui/material";
 
-const noTestTitle = '-- Недоступно --'
+const noTestTitle = 'Не установлено'
 
 export const TestGenHistoryCurrent = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -18,22 +17,12 @@ export const TestGenHistoryCurrent = () => {
 
     const {
         currentActivities,
-        initState,
         deleteFinishedUserActivitiesFromServer
     } = useUserStore();
 
     useEffect(() => {
-        let unmounted = false;
-        const isUnmounted = () => unmounted;
-
-        const fetchActivity = async () => {
-            await initState(isUnmounted);
-        };
-
-        fetchActivity();
-
         return () => {
-            unmounted = true;
+            // unmounted = true;
             deleteFinishedUserActivitiesFromServer();
         };
     }, []);
@@ -46,7 +35,7 @@ export const TestGenHistoryCurrent = () => {
 
     const columns: GridColDef[] = createColumns(handleOpenModal);
 
-    const prepareData = (): TestGenActivity[] => {
+    const prepareData = (): ActivityDto[] => {
         if (currentActivities.length > 0) {
             return currentActivities.map(item => {
                 if (!item.testTitle) {
@@ -67,23 +56,23 @@ export const TestGenHistoryCurrent = () => {
         }
     }
 
-    const style: SxProps<Theme> = {
-        '& .MuiDataGrid-cell:hover': {
-            cursor: 'pointer'
-        },
-    }
-
     return (
         <>
             <Box>
-                <GenericTableActions<TestGenActivity>
+
+                <Alert severity="info" icon={false} sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom align="left">
+                        Здесь отображаются текущие задачи по генерации тестов. Процесс выполняется в фоновом режиме, поэтому вы можете закрыть эту страницу.
+                    </Typography>
+                </Alert>
+
+                <GenericTableActions<ActivityDto>
                     data={prepareData()}
                     columns={columns}
-                    rowIdGetter={(row) => row.id}
+                    rowIdGetter={(row) => row.cid}
                     checkboxSelection={false}
                     handleEvent={handleEvent}
                     rowCount={currentActivities.length}
-                    sx={style}
                 />
             </Box>
             <GenerationErrorModal

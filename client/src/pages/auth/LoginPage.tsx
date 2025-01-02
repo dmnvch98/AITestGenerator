@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -13,8 +13,14 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const [emailValid, setEmailValid] = useState(true); // По умолчанию валидно
-  const { login, alerts, clearAlerts, deleteAlert } = useAuthStore();
+  const [emailValid, setEmailValid] = useState(true);
+  const { login, alerts, clearAlerts, deleteAlert, authenticated } = useAuthStore();
+
+    useEffect(() => {
+        if (authenticated) {
+            navigate('/generate');
+        }
+    }, []);
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -32,7 +38,7 @@ function LoginPage() {
   const handleLogin = async () => {
       const loginResult = await login(email, password);
       if (loginResult) {
-        navigate('/files');
+        navigate('/generate');
       }
   };
 
@@ -84,7 +90,7 @@ function LoginPage() {
                     autoFocus
                     value={email}
                     onChange={handleEmailChange}
-                    onBlur={handleEmailBlur} // Валидация по потере фокуса
+                    onBlur={handleEmailBlur}
                 />
                 <FormHelperText>
                   {!emailValid && email.length > 0 ? "Неверный формат" : ""}

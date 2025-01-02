@@ -28,6 +28,12 @@ export const QuestionView = ({question, last, viewMode, questionNumber}: Questio
                     />
                 ))}
             </Box>
+            {question.textReference && <Box sx={{borderLeft: 4, borderColor: 'primary.main', pl: 4, pr: 2, my: 2}}>
+                <Typography variant="subtitle2" component="blockquote" sx={{fontStyle: 'italic', fontWeight: 400}}
+                            align="left">
+                    “{question.textReference}”
+                </Typography>
+            </Box>}
             {(!last && viewMode === 'list') && <Divider sx={{mt: 2, mb: 2}}/>}
         </Box>
     );

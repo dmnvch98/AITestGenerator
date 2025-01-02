@@ -1,16 +1,16 @@
-import {v4 as uuidv4} from "uuid";
 import {ConfirmationButtonProps} from "../components/main/ConfirmationButton";
 import {GridSortDirection} from "@mui/x-data-grid/models/gridSortModel";
+import {getNanoTime} from "../pages/tests/edit/utils";
 
 export class AlertMessage {
-    id: string;
+    id: number;
     message: string;
     severity: 'success' | 'info' | 'warning' | 'error' | undefined;
     icon?: 'progress';
     closeable?: boolean = true;
 
     constructor(message: string, severity: 'success' | 'info' | 'warning' | 'error' | undefined, icon?: 'progress', closeable?: boolean) {
-        this.id = uuidv4();
+        this.id = getNanoTime();
         this.message = message;
         this.severity = severity;
         this.icon = icon;

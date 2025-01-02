@@ -1,5 +1,5 @@
 import {AlertMessage} from "../../store/types";
-import NotificationService from "../../services/notification/NotificationService";
+import NotificationService from "../../services/notification/AlertService";
 
 const validFileExtensions = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 const MAX_FILES = 5;

@@ -3,10 +3,10 @@ import {AxiosError} from "axios";
 import {
     BulkDeleteTestsRequestDto,
     CreateTestRequestDto,
-    GenerateTestRequest, TestPrintRequestDto,
-    UserTest
+    TestPrintRequestDto, UpsertTestRequestDto,
 } from "../store/tests/testStore";
 import {QueryOptions} from "../store/types";
+import {GenerateTestRequest} from "../store/tests/types";
 
 class TestService {
 
@@ -66,7 +66,7 @@ class TestService {
         }
     }
 
-    upsert = async (test: UserTest | CreateTestRequestDto) => {
+    upsert = async (test: UpsertTestRequestDto) => {
         try {
             const response = await this.axiosInstance.put("/api/v1/tests", test);
             return response.data;

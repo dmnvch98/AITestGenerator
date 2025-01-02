@@ -1,0 +1,55 @@
+{
+  "name": "questions",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "language": {
+        "type": "string",
+        "enum": [
+          "russian",
+          "english",
+          "spanish",
+          "french",
+          "german",
+          "unknown"
+        ]
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "questionText": {
+              "type": "string"
+            },
+            "correctAnswers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "textReference": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "questionText",
+            "textReference",
+            "correctAnswers"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "title",
+      "questions",
+      "language"
+    ],
+    "additionalProperties": false
+  }
+}

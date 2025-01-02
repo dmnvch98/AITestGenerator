@@ -1,14 +1,12 @@
 package com.example.generation_service.dto.tests;
 
+import com.example.generation_service.models.generation.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Getter
@@ -17,7 +15,9 @@ import java.util.UUID;
 public class QuestionDto {
 
     @Builder.Default
-    private final UUID id = UUID.randomUUID();
+    private final Long id = System.nanoTime();
     private final String questionText;
     private final List<AnswerOptionDto> answerOptions;
+    private final String textReference;
+    private final QuestionType questionType;
 }

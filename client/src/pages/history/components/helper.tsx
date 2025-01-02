@@ -16,7 +16,7 @@ export const createColumns = (handleOpenModal: (code: number) => void): GridColD
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => (
-                <StatusIndicator status={params.value}/>
+                <StatusIndicator status={params.value} readyPercentage={params.row.readyPercentage}/>
             ),
         },
         {

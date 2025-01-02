@@ -19,17 +19,17 @@ export const TestTitleInput: React.FC<TestTitleInputProps> = ({ title, onChange,
                 </Typography>
             ) : (
                 <TextField
-                    label="Заголовок теста"
                     placeholder="Введите заголовок теста"
                     fullWidth
                     multiline
                     value={title}
                     variant="standard"
+                    size="small"
                     onChange={onChange}
                     sx={{
                         "& .MuiInputBase-input": {
                             fontWeight: 600,
-                            fontSize: "22px",
+                            fontSize: "18px",
                         }
                     }}
                     error={!!error}

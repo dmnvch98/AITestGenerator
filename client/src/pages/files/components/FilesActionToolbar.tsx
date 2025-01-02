@@ -1,37 +1,24 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import {ConfirmationButton} from "../../../components/main/ConfirmationButton";
-import {SearchInput} from "../../../components/main/search/SearchInput";
+import {DebouncedSearchInput} from "../../../components/main/search/DebouncedSearchInput";
 
 interface ActionToolbarProps {
-    onAdd: () => void;
     onDelete: () => void;
-    onSearchClear: () => void;
     deleteDisabled: boolean;
-    searchValue?: string;
-    onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSearchChange: (value: string) => void;
     deleteButtonTitle?: string;
     addButtonTitle?: string;
 }
 
 export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
-                                                                     onAdd,
                                                                      onDelete,
                                                                      deleteDisabled,
-                                                                     searchValue,
-                                                                     onSearchChange,
-                                                                     onSearchClear
+                                                                     onSearchChange
                                                                  }) => {
     return (
         <Box display="flex" alignItems="center" sx={{ mb: 2 }} justifyContent="space-between">
             <Box display="flex" alignItems="center">
-                <Button
-                    sx={{ mr: 2 }}
-                    variant="outlined"
-                    onClick={onAdd}
-                >
-                    Загрузить файл
-                </Button>
                 <ConfirmationButton
                     config={{
                         buttonTitle: 'Удалить выбранное',
@@ -43,8 +30,9 @@ export const FilesActionToolbar: React.FC<ActionToolbarProps> = ({
                     onSubmit={onDelete}
                 />
             </Box>
-
-            <SearchInput searchValue={searchValue} onSearchChange={onSearchChange} onSearchClear={onSearchClear}/>
+            <Box sx={{ flex: 1, ml: 'auto', maxWidth: 300 }}>
+                <DebouncedSearchInput onSearch={onSearchChange} />
+            </Box>
         </Box>
     );
 };

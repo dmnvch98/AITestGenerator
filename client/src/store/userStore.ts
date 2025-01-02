@@ -1,40 +1,33 @@
-import {create} from "zustand";
-import UserService, {BulkActivityDeleteDto} from "../services/UserService";
-import {GenerationStatus, QueryOptions} from "./types";
+import { create } from "zustand";
+import UserService, { BulkActivityDeleteDto } from "../services/UserService";
+import { GenerationStatus, QueryOptions } from "./types";
 import TestService from "../services/TestService";
 import ActivityService from "../services/activities/ActivityService";
-
-export interface TestGenActivity {
-    uuid: string,
-    id: number,
-    startDate: Date,
-    endDate: Date,
-    status: GenerationStatus,
-    testTitle: string,
-    fileName: string,
-    testId: number,
-    failCode: number;
-    cid: string;
-}
+import { QuestionType } from "./tests/types";
+import { convertCurrentActivity } from "./helper";
 
 export interface ActivityDto {
-    uuid: string,
-    startDate: Date,
-    endDate: Date,
-    status: GenerationStatus,
-    testTitle: string,
-    fileName: string,
-    testId?: number,
+    uuid?: string;
+    id?: number;
+    startDate: Date;
+    endDate: Date;
+    status: GenerationStatus;
+    testTitle: string;
+    fileName: string;
+    testId?: number;
     failCode: number;
-    cid: string;
+    cid: number;
+    queuedQuestionTypes: QuestionType[];
+    processedQuestionTypes: QuestionType[];
+    readyPercentage?: number; // Calculated field
 }
 
 export interface UserStore {
-    currentActivities: TestGenActivity[];
-    totalPages: number,
+    currentActivities: ActivityDto[];
+    totalPages: number;
     totalElements: number;
-    testGenHistoryPast: TestGenActivity[],
-    getTestGenCurrentActivities: () => void,
+    testGenHistoryPast: ActivityDto[];
+    getTestGenCurrentActivities: () => void;
     getTestGenHistory: (options?: QueryOptions) => void;
     loading: boolean;
     setLoading: (flag: boolean) => void;
@@ -54,18 +47,20 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
     totalPages: 0,
     currentActivities: [],
     loading: false,
-    user: undefined,
+
     setLoading: (flag) => {
-        set({loading: flag})
+        set({ loading: flag });
     },
+
     getTestGenHistory: async (options?: QueryOptions) => {
-        const {history, totalPages, totalElements} = await UserService.getTestGenerationHistory(options);
-        set({testGenHistoryPast: history, totalPages, totalElements})
+        const { history, totalPages, totalElements } = await UserService.getTestGenerationHistory(options);
+        set({ testGenHistoryPast: history, totalPages, totalElements });
     },
 
     getTestGenCurrentActivities: async () => {
         const response = await TestService.getCurrentTestGenActivities();
-        set({currentActivities: response})
+        const enrichedData = convertCurrentActivity(response);
+        set({ currentActivities: enrichedData });
     },
 
     getTestGenCurrentActivitiesLongPoll: async (isUnmounted?: () => boolean) => {
@@ -75,7 +70,9 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             if (isUnmounted && isUnmounted()) return;
 
             if (Array.isArray(data) && data.length > 0) {
-                set({ currentActivities: data });
+                const enrichedData = convertCurrentActivity(data);
+                set({ currentActivities: enrichedData });
+
                 const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
                 if (inProcessJobs > 0) {
                     await getTestGenCurrentActivitiesLongPoll(isUnmounted);
@@ -98,7 +95,7 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         }
 
         const deleteDto: BulkActivityDeleteDto = {
-            cids: activitiesToDelete.map((a: ActivityDto) => a.cid)
+            cids: activitiesToDelete.map((a: ActivityDto) => a.cid),
         };
 
         await UserService.deleteCurrentUserActivities(deleteDto);
@@ -111,7 +108,13 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
         if (isUnmounted && isUnmounted()) return;
 
         if (Array.isArray(data)) {
-            set({ currentActivities: data });
+            const enrichedData = data.map((item) => ({
+                ...item,
+                readyPercentage: item.queuedQuestionTypes?.length && item.processedQuestionTypes?.length
+                    ? (100 / item.queuedQuestionTypes.length) * item.processedQuestionTypes.length
+                    : 0,
+            }));
+            set({ currentActivities: enrichedData });
         }
         if (data.length > 0) {
             const inProcessJobs = data.filter((a: ActivityDto) => !DeletableStatuses.has(a.status)).length;
@@ -120,5 +123,4 @@ export const useUserStore = create<UserStore>((set: any, get: any) => ({
             }
         }
     },
-
-}))
+}));

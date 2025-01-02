@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,6 +100,18 @@ public class RedisService {
         try {
             String json = objectMapper.writeValueAsString(object);
             redisTemplate.opsForValue().set(key, json);
+        } catch (Exception e) {
+            if (e instanceof RedisConnectionFailureException) {
+                log.error("Redis connection failure");
+            }
+            log.error("Failed to serialize object for key {}: {}", key, e.getMessage());
+        }
+    }
+
+    public <T> void saveObjectAsString(final String key, final T object, final long ttlSeconds) {
+        try {
+            String json = objectMapper.writeValueAsString(object);
+            redisTemplate.opsForValue().set(key, json, ttlSeconds, TimeUnit.SECONDS);
         } catch (Exception e) {
             if (e instanceof RedisConnectionFailureException) {
                 log.error("Redis connection failure");

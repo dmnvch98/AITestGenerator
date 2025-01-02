@@ -5,25 +5,32 @@ import com.example.generation_service.annotations.useractions.TrackAction;
 import com.example.generation_service.converters.TestConverter;
 import com.example.generation_service.converters.TestGenerationConverter;
 import com.example.generation_service.dto.tests.*;
+import com.example.generation_service.dto.tests.upsert.UpsertTestRequestDto;
+import com.example.generation_service.dto.tests.upsert.GetTestResponseDto;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
-import com.example.generation_service.generators.models.GenerateTestRequest;
+import com.example.generation_service.generators.models.GenerateTestRequestParams;
 import com.example.generation_service.models.*;
-import com.example.generation_service.models.files.FileHash;
+import com.example.generation_service.models.files.FileMetadata;
+import com.example.generation_service.models.generation.QuestionType;
+import com.example.generation_service.models.test.Question;
 import com.example.generation_service.models.test.Test;
 import com.example.generation_service.models.test.TestGeneratingHistory;
 import com.example.generation_service.services.*;
 import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.services.aws.StorageClient;
+import com.example.generation_service.services.generation.TestGenerationService;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.generation_service.utils.Utils.generateRandomCid;
 
@@ -37,13 +44,13 @@ public class TestFacade {
   private final TestGenerationService testGenerationService;
   private final TestGeneratingHistoryService historyService;
   private final CommandService commandService;
-  private final FileHashService fileHashService;
+  private final FileMetadataService fileHashService;
   private final StorageClient storageClient;
   private final FileExtractorService extractorService;
   private final TestGenerationConverter testGenerationConverter;
   private final TestGenerationActivityService activityService;
 
-  public Test save(final CreateTestRequestDto request, final Long userId) {
+  public Test save(final UpsertTestRequestDto request, final Long userId) {
     final Test test = testConverter.convert(request, userId);
     return testService.save(test);
   }
@@ -56,7 +63,7 @@ public class TestFacade {
     log.info("Received command to generation test, command=[{}]", dto);
 
     try {
-      final FileHash fileHash = Optional.ofNullable(dto)
+      final FileMetadata fileHash = Optional.ofNullable(dto)
             .map(GenerateTestRequestDto::getHashedFileName)
             .filter(StringUtils::isNotBlank)
             .map(hash -> fileHashService.getByHashedFilenameAndUserId(userId, hash))
@@ -70,7 +77,9 @@ public class TestFacade {
 
       final GenerateTestMessage message = testGenerationConverter.convert(dto, userId, hashKey, cid);
       commandService.sendCommand(message);
-      activityService.createWaitingActivity(fileHash, cid, dto, userId);
+      final Set<QuestionType> queuedQuestionTypes = dto.getParams()
+                      .stream().map(QuestionTypeQuantity::getQuestionType).collect(Collectors.toSet());
+      activityService.createWaitingActivity(fileHash, cid, dto, userId, queuedQuestionTypes);
 
     } catch (final Exception e) {
       if (e instanceof IllegalArgumentException || e instanceof ResourceNotFoundException) {
@@ -90,18 +99,41 @@ public class TestFacade {
       log.info("Received message to generate test. Message=[{}]", message);
       activityService.createInProgressActivity(message.getUserId(), message.getCid(), message.getMessageId());
 
-      final FileHash fileHash = fileHashService
+      final FileMetadata fileHash = fileHashService
             .getByHashedFilenameAndUserId(message.getUserId(), message.getHashedFileName());
       final String userContent = extractorService.getContentFromFile(fileHash, message.getUserId());
-      final GenerateTestRequest request = testGenerationConverter.convert(message, userContent, fileHash);
 
-      final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
-      testService.save(test);
+      final List<Test> tests = new ArrayList<>();
+
+      for (QuestionTypeQuantity questionTypeQuantity: message.getParams()) {
+
+        log.info("Starting test generation {}", questionTypeQuantity);
+        final GenerateTestRequestParams request = testGenerationConverter.convert(message, userContent, fileHash, questionTypeQuantity);
+        final Test test = testGenerationService.generateTest(request, getRetryContextParamsMap(message));
+
+        final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
+        activityService.updateProcessedQuestionType(currentActivity, questionTypeQuantity.getQuestionType());
+
+        tests.add(test);
+        log.info("Test generation for {} is done", questionTypeQuantity);
+      }
+
+      final List<Question> allTypesQuestions = new ArrayList<>(tests
+              .stream()
+              .flatMap(test -> test.getQuestions().stream())
+              .toList());
+      if (CollectionUtils.isNotEmpty(allTypesQuestions)) {
+        Collections.shuffle(allTypesQuestions);
+      }
+      final Test finalTest = tests.get(0);
+      finalTest.setQuestions(allTypesQuestions);
+
+      testService.save(finalTest);
 
       final TestGenerationActivity currentActivity = activityService.getActivity(message.getHashKey(), message.getCid());
-      final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, test);
+      final TestGeneratingHistory history = testGenerationConverter.getSuccessHistory(currentActivity, finalTest);
       historyService.save(history);
-      activityService.finishActivity(currentActivity, test.getId(), test.getTitle(), message.getUserId(), message.getCid());
+      activityService.finishActivity(currentActivity, finalTest.getId(), finalTest.getTitle(), message.getUserId(), message.getCid());
   }
 
   @TrackAction(ActionType.DELETE_TEST)
@@ -116,18 +148,18 @@ public class TestFacade {
     return testConverter.convert(tests);
   }
 
-  public Test findTestById(Long testId, Long userId) {
-    return testService.findAllByIdAndUserIdOrThrow(testId, userId);
+  public GetTestResponseDto findTestById(Long testId, Long userId) {
+    return testConverter.convertTest(testService.findAllByIdAndUserIdOrThrow(testId, userId));
   }
 
-  public Test upsert(final Test test, final Long userId) {
+  public GetTestResponseDto upsert(final UpsertTestRequestDto test, final Long userId) {
     final Optional<Test> existingTest = testService.findAllByIdAndUserId(test.getId(), userId);
 
     if (existingTest.isPresent()) {
       final Test updatedTest = updateTestFields(existingTest.get(), test);
-      return testService.updateTest(updatedTest, userId);
+      return testConverter.convertTest(testService.updateTest(updatedTest, userId));
     } else {
-      return testService.insertTest(testConverter.convert(test, userId), userId);
+      return testConverter.convertTest(testService.insertTest(testConverter.convert(test, userId), userId));
     }
   }
 
@@ -146,8 +178,8 @@ public class TestFacade {
     return retryContextParams;
   }
 
-  private Test updateTestFields(final Test existingTest, final Test updateTest) {
-    existingTest.setQuestions(updateTest.getQuestions());
+  private Test updateTestFields(final Test existingTest, final UpsertTestRequestDto updateTest) {
+    existingTest.setQuestions(testConverter.convertQuestions(updateTest.getQuestions()));
     if (!existingTest.getTitle().equals(updateTest.getTitle())) {
       existingTest.setTitle(updateTest.getTitle());
     }

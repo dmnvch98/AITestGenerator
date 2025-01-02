@@ -3,7 +3,9 @@ import TestService from "../../services/TestService";
 import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
-import NotificationService from "../../services/notification/NotificationService";
+import NotificationService from "../../services/notification/AlertService";
+import {GenerateTestRequest, QuestionType} from "./types";
+import {convertTest} from "./converter/testConverter";
 
 export interface UserTest {
     id: number;
@@ -14,29 +16,40 @@ export interface UserTest {
     createdAt: Date;
 }
 
+export interface UpsertTestRequestDto {
+    id?: number;
+    title: string,
+    questions: QuestionDto[]
+}
+
+export interface QuestionDto {
+    questionText: string;
+    answerOptions: AnswerOptionDto[]
+    questionType: QuestionType;
+}
+
+export interface AnswerOptionDto {
+    optionText: string;
+    correct: boolean;
+}
+
 export interface CreateTestRequestDto {
     title: string,
     questions: Question[]
 }
 
 export interface Question {
-    id?: string,
+    id: number,
     questionText: string,
     answerOptions: AnswerOption[]
+    textReference?: string;
+    questionType: QuestionType;
 }
 
 export interface AnswerOption {
-    id?: string,
+    id: number,
     optionText: string,
-    isCorrect: boolean
-}
-
-export interface GenerateTestRequest {
-    maxQuestionsCount: number,
-    answersCount: number,
-    correctAnswersCount: number,
-    hashedFileName: string,
-    originalFileName?: string
+    correct: boolean
 }
 
 export interface BulkDeleteTestsRequestDto {
@@ -68,8 +81,7 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    generateTestByFile: (request: GenerateTestRequest) => void,
-    isGenerateTestByFileQueueing: boolean,
+    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: (options?: QueryOptions) => void,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
@@ -80,6 +92,7 @@ export interface TestStore {
     getRating: (id: number) => void;
     clearState: () => void;
     printTest: () => void;
+    isLoading: boolean;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -88,7 +101,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
     totalElements: 0,
     selectedTest: undefined,
     selectedTestRating: undefined,
-    isGenerateTestByFileQueueing: false,
+    isLoading: false,
 
     clearState: () => {
         set({
@@ -101,27 +114,20 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({selectedTest: userTest});
     },
 
-    generateTestByFile: async (request) => {
-        set({isGenerateTestByFileQueueing: false});
-        const alert: AlertMessage = new AlertMessage(
-            `Файл <b>${request.originalFileName}</b> отправлен в очередь`,
-            'info',
-            'progress',
-            false
-            );
-        NotificationService.addAlert(alert);
-        const isSuccess = await TestService.generateTestByFile(request);
-        NotificationService.deleteAlert(alert);
-        if (isSuccess) {
-            NotificationService.addAlert(new AlertMessage(`Файл <b>${request.originalFileName}</b> добавлен в очередь`, 'success'));
-        } else {
-            NotificationService.addAlert(new AlertMessage(`Ошибка при добавлении <b>${request.originalFileName}</b> в очередь. Пожалуйста, попробуйте позже.`, 'error'));
-        }
-        set({isGenerateTestByFileQueueing: true});
+    generateTestByFile: async (request): Promise<boolean> => {
+        return await TestService.generateTestByFile(request);
     },
+
     getAllUserTests: async (options) => {
-        const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(options)
-        set({ tests, totalPages, totalElements })
+        const opt: QueryOptions = {
+            sortBy: options?.sortBy || 'id',
+            sortDirection: options?.sortDirection || 'desc',
+            size: options?.size || 5,
+            ...options
+        }
+        set({isLoading: true});
+        const { tests, totalPages, totalElements }: TestsResponseDto = await TestService.getUserTests(opt)
+        set({ tests, totalPages, totalElements, isLoading: false })
     },
     addAlert: (alert: AlertMessage) => {
         useNotificationStore.getState().addAlert(alert);
@@ -141,10 +147,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({deleteTestFlag: flag});
     },
     upsert: async (test): Promise<UserTest | null> => {
-        const { getAllUserTests} = get();
-        const response = await TestService.upsert(test);
+        const dto: UpsertTestRequestDto = convertTest(test);
+        const response = await TestService.upsert(dto);
         if (response) {
-            getAllUserTests();
             NotificationService.addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
             return response as UserTest;
         } else {

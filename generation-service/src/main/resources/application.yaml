@@ -1,5 +1,11 @@
 server:
   port: ${SERVER_PORT}
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keystore/localhost.p12
+    key-store-password: 123456
+    key-alias: baeldung
+    enabled: true
 
 spring:
   servlet:

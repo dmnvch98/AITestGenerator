@@ -1,0 +1,70 @@
+name: STAGE - Deploy to Elastic Beanstalk
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'From which branch to deploy'
+        required: true
+        default: 'develop'
+      version_label:
+        description: 'Version label for Elastic Beanstalk'
+        required: true
+        default: 'latest'
+
+jobs:
+  deploy-stage:
+    runs-on: ubuntu-latest
+
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#        with:
+#          ref: ${{ github.event.inputs.branch }}
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '19'
+#          distribution: 'temurin'
+#
+#      - name: Build with Maven
+#        run: mvn clean package -DskipTests
+#        working-directory: ./generation-service
+#
+#      - name: List server artifacts
+#        run: ls -la ./generation-service/target
+#
+#      - name: Deploy to Elastic Beanstalk
+#        uses: einaregilsson/beanstalk-deploy@v22
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          application_name: ${{ secrets.EB_APP_NAME }}
+#          environment_name: ${{ secrets.EB_ENV_NAME }}
+#          region: ${{ secrets.AWS_REGION }}
+#          version_label: ${{ github.event.inputs.version_label }}
+#          deployment_package: ./generation-service/target/*.jar
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install client dependencies
+        run: npm ci
+        working-directory: ./client
+
+      - name: Build client
+        run: npm run build
+        working-directory: ./client
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read
+        env:
+          SOURCE_DIR: client/build/
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_STAGE }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

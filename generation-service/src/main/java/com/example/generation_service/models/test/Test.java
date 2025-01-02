@@ -44,9 +44,10 @@ public class Test {
     @Convert(converter = QuestionsConverter.class)
     @Column(name = "questions", columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
-    private List<QuestionDto> questions;
+    private List<Question> questions;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<TestSearchVector> testSearchVectors;
+
 }
