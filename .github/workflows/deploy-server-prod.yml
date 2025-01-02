@@ -1,0 +1,53 @@
+name: PROD - Deploy to Elastic Beanstalk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (main branch only)
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+        working-directory: ./generation-service
+
+      - name: Generate version label (current date and time)
+        id: generate_version
+        run: |
+          VERSION=$(date +"%Y-%m-%d_%H%M")
+          echo "Generated version label: $VERSION"
+          echo "::set-output name=version_label::$VERSION"
+
+      - name: List files in target directory
+        run: ls -la ./generation-service/target
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME_PROD }}
+          environment_name: ${{ secrets.EB_ENV_NAME_PROD }}
+          region: ${{ secrets.AWS_REGION }}
+          version_label: ${{ steps.generate_version.outputs.version_label }}
+          deployment_package: ./generation-service/target/server.jar
