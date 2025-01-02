@@ -17,10 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v3
-#        with:
-#          ref: ${{ github.event.inputs.branch }}
 #
 #      - name: Set up JDK
 #        uses: actions/setup-java@v3
@@ -45,7 +41,16 @@ jobs:
 #          region: ${{ secrets.AWS_REGION }}
 #          version_label: ${{ github.event.inputs.version_label }}
 #          deployment_package: ./generation-service/target/*.jar
-
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+         ref: ${{ github.event.inputs.branch }}
+         
+      - name: List files
+        run: |
+          pwd
+          ls -R
+          
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
