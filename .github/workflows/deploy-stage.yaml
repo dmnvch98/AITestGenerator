@@ -69,6 +69,7 @@ jobs:
       - name: Build client
         run: |
           CI=false npm run build
+        working-directory: ./client  
 
       - name: Build client
         run: npm run build
