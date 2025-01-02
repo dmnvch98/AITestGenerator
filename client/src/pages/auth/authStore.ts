@@ -1,7 +1,6 @@
 import AuthService from "../../services/AuthService";
 import {create} from "zustand";
 import { AlertMessage } from '../../store/types';
-import NotificationService from "../../services/notification/AlertService";
 
 interface AuthStore {
     authenticated: boolean;
@@ -11,8 +10,8 @@ interface AuthStore {
     logout: () => Promise<void>;
     refresh: () => Promise<void>;
     alerts: AlertMessage[];
-    deleteAlert: (alert: AlertMessage) => void;
     clearAlerts: () => void;
+    addAlert: (alert: AlertMessage) => void;
 }
 
 const useAuthStore = create<AuthStore>((set, get) => ({
@@ -40,7 +39,8 @@ const useAuthStore = create<AuthStore>((set, get) => ({
             set({authenticated: true});
             return true;
         } else if (message) {
-            NotificationService.addAlert(new AlertMessage(message, 'error'));
+            const { addAlert } = get();
+            addAlert(new AlertMessage(message, 'error'));
         }
         return false;
     },
@@ -68,8 +68,8 @@ const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
     clearAlerts: () => set({alerts: []}),
-    deleteAlert: (alertToDelete) => set((state) => ({
-        alerts: state.alerts.filter(alert => alert.id !== alertToDelete.id)
+    addAlert: (alert: AlertMessage) => set((state) => ({
+        alerts: [...state.alerts, alert]
     })),
 }));
 

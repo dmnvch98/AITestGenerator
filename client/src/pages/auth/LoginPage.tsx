@@ -14,13 +14,17 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(true);
-  const { login, alerts, clearAlerts, deleteAlert, authenticated } = useAuthStore();
+  const { login, alerts, clearAlerts, authenticated } = useAuthStore();
 
     useEffect(() => {
         if (authenticated) {
             navigate('/generate');
         }
-    }, []);
+        return () => {
+            clearAlerts();
+        };
+    }, [authenticated]);
+
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -122,6 +126,7 @@ function LoginPage() {
             </Box>
           </Box>
           <Snackbar
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               open={alerts.length > 0}
               autoHideDuration={10000}
               onClose={clearAlerts}
@@ -130,7 +135,7 @@ function LoginPage() {
               {alerts.map(alert => (
                   <Alert key={alert.id} severity={alert.severity} sx={{mb: 0.5, textAlign: 'left'}}
                          onClose={() => {
-                           deleteAlert(alert)
+                           clearAlerts();
                          }}>
                     <span dangerouslySetInnerHTML={{__html: alert.message}}/>
                   </Alert>
