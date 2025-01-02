@@ -46,7 +46,7 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.EB_APP_NAME_PROD }}
+          application_name: ${{ secrets.EB_APP_NAME }}
           environment_name: ${{ secrets.EB_ENV_NAME_PROD }}
           region: ${{ secrets.AWS_REGION }}
           version_label: ${{ steps.generate_version.outputs.version_label }}
