@@ -58,7 +58,7 @@ jobs:
 
       - name: Install client dependencies
         run: npm ci
-        working-directory: /client
+        working-directory: ./client
 
       - name: Build client
         run: npm run build
