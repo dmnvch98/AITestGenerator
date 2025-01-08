@@ -1,10 +1,4 @@
 spring:
-  cloud:
-    aws:
-      region:
-        static: eu-central-1
-  config:
-    import: aws-secretsmanager:gentest-${spring.profiles.active}
   servlet:
     multipart:
       enabled: true

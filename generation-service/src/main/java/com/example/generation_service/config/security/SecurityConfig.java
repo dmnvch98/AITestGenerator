@@ -27,7 +27,6 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain formLoginFilterChain(final HttpSecurity http) throws Exception {
     http
-        .requiresChannel(channel -> channel.anyRequest().requiresSecure())
         .csrf(AbstractHttpConfigurer::disable)
         .cors(Customizer.withDefaults())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
