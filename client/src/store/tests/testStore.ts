@@ -4,7 +4,7 @@ import {AlertMessage, QueryOptions} from "../types";
 import TestRatingService from "../../services/TestRatingService";
 import {useNotificationStore} from "../notificationStore";
 import NotificationService from "../../services/notification/AlertService";
-import {GenerateTestRequest, QuestionType} from "./types";
+import {QuestionType} from "./types";
 import {convertTest} from "./converter/testConverter";
 
 export interface UserTest {
@@ -81,8 +81,6 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
-    //TODO-to delete
-    generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: (options?: QueryOptions) => void,
     getUserTestById: (id: number) => Promise<UserTest>,
     deleteTest: (ids: number) => void,
@@ -113,11 +111,6 @@ export const useTestStore = create<TestStore>((set, get) => ({
     },
     selectTest: (userTest: UserTest) => {
         set({selectedTest: userTest});
-    },
-
-    //TODO-to delete
-    generateTestByFile: async (request): Promise<boolean> => {
-        return await TestService.generateTestByFile(request);
     },
 
     getAllUserTests: async (options) => {

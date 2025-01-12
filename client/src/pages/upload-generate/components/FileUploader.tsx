@@ -3,16 +3,16 @@ import { Box, Alert, Typography } from '@mui/material';
 
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
-import useFileStore from "../../files/store/fileStore";
 import {DragAndDropZone} from "../../files/components/upload/components/DragAndDropZone";
 import {LoadingOverlay} from "../../files/components/upload/components/LoadingOverlay";
+import useUploadGenerateStore from "../uploadGenerateStore";
 
 interface FileUploadModalProps {
     isUploading: boolean;
 }
 
 export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) => {
-    const { filesToUpload, clearFiles, validateFilesThenUpload } = useFileStore();
+    const { filesToUpload, addFilesToUpload, clearFilesToUpload } = useUploadGenerateStore();
     const [dragOver, setDragOver] = useState(false);
     const [hoveredFileIndex, setHoveredFileIndex] = useState<number | null>(null);
 
@@ -23,9 +23,9 @@ export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) =>
                 : Array.from((event as DragEvent).dataTransfer.files);
 
         if (newFiles.length === 1) {
-            validateFilesThenUpload(newFiles);
+            addFilesToUpload(newFiles);
         } else if (newFiles.length > 1) {
-            validateFilesThenUpload([newFiles[0]]);
+            addFilesToUpload([newFiles[0]]);
         }
         if (event.type === 'change') {
             (event.target as HTMLInputElement).value = '';
@@ -90,7 +90,7 @@ export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) =>
                     }}
                     hoveredFileIndex={hoveredFileIndex}
                     onFileHover={setHoveredFileIndex}
-                    onDeleteFile={clearFiles}
+                    onDeleteFile={clearFilesToUpload}
                     getIcon={getIcon}
                 />
 
