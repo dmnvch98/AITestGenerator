@@ -50,6 +50,7 @@ module.exports = {
             'process.env.REACT_APP_SERVER_URL': JSON.stringify(process.env.REACT_APP_SERVER_URL || 'https://backend.gentesto.net'),
         })
     ],
+    devtool: false,
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),
