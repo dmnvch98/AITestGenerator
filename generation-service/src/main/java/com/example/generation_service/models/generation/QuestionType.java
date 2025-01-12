@@ -49,7 +49,7 @@ public enum QuestionType {
      */
     TRUE_FALSE(
             "True/False",
-            "A statement that needs to be evaluated as either true or false.",
+            "A statement that needs to be evaluated as either true or false, with an equal distribution of correct answers between 'True' and 'False' across all questions.",
             """
                     Example:
                     The Earth orbits the Sun.

@@ -57,7 +57,7 @@ function LoginPage() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
               ГенТест
             </Typography>
-            <Button color="inherit" onClick={() => navigate('/sign-up')}>Регистрация</Button>
+            {/*<Button color="inherit" onClick={() => navigate('/sign-up')}>Регистрация</Button>*/}
           </Toolbar>
         </AppBar>
 
