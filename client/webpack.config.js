@@ -3,13 +3,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
-    mode: 'none',
+    mode: 'production',
     entry: {
         app: path.join(__dirname, 'src', 'index.tsx')
     },
     target: 'web',
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
+        fallback: {
+            "process": require.resolve("process/browser"),
+        },
     },
     module: {
         rules: [
@@ -42,6 +45,10 @@ module.exports = {
         new webpack.ProvidePlugin({
             process: 'process/browser',
         }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+            'process.env.REACT_APP_SERVER_URL': JSON.stringify(process.env.REACT_APP_SERVER_URL || 'https://backend.gentesto.net'),
+        })
     ],
     devServer: {
         static: {
@@ -54,4 +61,4 @@ module.exports = {
             index: '/index.html',
         },
     },
-}
+};
