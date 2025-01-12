@@ -25,8 +25,4 @@ Tasks:
 
 6. Additional Requirements:
 
-- Questions of the above type should cover all the main aspects and key points of the text.
-- Vary the difficulty level of the questions, including both basic and more advanced questions.
-- Ensure clarity and comprehensibility in the formulations.
 - If a function/concept is not explicitly mentioned in the text, do not include it in the answers as confirmed.
-- In the answers, you must include all correct options from the text.
