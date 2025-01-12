@@ -1,40 +1,44 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Alert, Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography} from '@mui/material';
-import {FileUploader} from './FileUploader';
-import {GenTestParams} from '../../../components/tests/GenTestParams';
-import {GenerateTestRequest, QuestionType} from '../../../store/tests/types';
-import {useTestStore} from '../../../store/tests/testStore';
-import {LoggedInUserPage} from "../../../components/main/LoggedInUserPage";
+import {FileUploader} from './components/FileUploader';
+import {GenTestParams} from '../../components/tests/GenTestParams';
+import {GenerateTestRequest, QuestionType} from '../../store/tests/types';
+import {useTestStore} from '../../store/tests/testStore';
+import {LoggedInUserPage} from "../../components/main/LoggedInUserPage";
 import {useNavigate} from "react-router-dom";
-import NotificationService from "../../../services/notification/AlertService";
-import {AlertMessage} from "../../../store/types";
-import {FileAlreadyUploadedModal} from "./upload/components/FileAlreadyUploadedModal";
-import {TabItem, TabsPanel} from "../../../components/main/tabsPanel/TabsPanel";
-import {InfinityScrollGrid} from "./DataSearchGrid";
-import useFileStore from "../store/fileStore";
-import {FileDto, UploadStatus} from "../types";
-import {useIncidentStore} from "../../../store/alerts/alertStore";
+import NotificationService from "../../services/notification/AlertService";
+import {AlertMessage} from "../../store/types";
+import {FileAlreadyUploadedModal} from "../files/components/upload/components/FileAlreadyUploadedModal";
+import {TabItem, TabsPanel} from "../../components/main/tabsPanel/TabsPanel";
+import {InfinityScrollGrid} from "./components/DataSearchGrid";
+import useFileStore from "../files/store/fileStore";
+import {FileDto, UploadStatus} from "../files/types";
+import {useIncidentStore} from "../../store/alerts/alertStore";
+import useUploadGenerateStore from "./uploadGenerateStore";
 
 const steps = ['Выбор файла', 'Параметры генерации'];
 
 export const UploadAndGenerateTestContent: React.FC = () => {
     const navigate = useNavigate();
-    const {generateTestByFile} = useTestStore();
     const {
         getUserFiles,
         totalPages,
         totalUserFiles,
-        selectedFile,
-        setSelectedFile,
-        isLoading,
-        isFileExists,
-        filesToUpload,
-        uploadUserFiles
     } = useFileStore();
 
-    const { getIsIncidentExists, isIncidentExists } = useIncidentStore();
+    const {
+        selectedFile,
+        setSelectedFile,
+        isUploading,
+        isFileExists,
+        filesToUpload,
+        uploadUserFiles,
+        generateTestByFile,
+        isGenerationQueueing
+    } = useUploadGenerateStore();
 
-    const [isGenerationQueueing, setIsGenerationQueueing] = useState(false);
+    const {getIsIncidentExists, isIncidentExists} = useIncidentStore();
+
     const [activeStep, setActiveStep] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
@@ -51,8 +55,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     }, []);
 
     const isUploadButtonDisabled = useMemo(() => {
-        return filesToUpload.length === 0 && (isLoading || !selectedFile);
-    }, [filesToUpload, isLoading, selectedFile]);
+        return filesToUpload.length === 0 && (isUploading || !selectedFile);
+    }, [filesToUpload, isUploading, selectedFile]);
 
     const isGenerateButtonDisabled = useMemo(() => {
         return !Object.values(selection).some(item => item.selected) || isGenerationQueueing;
@@ -76,7 +80,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
 
     const handleOverride = async () => {
         setIsModalOpen(false);
-        const {status} = await uploadUserFiles({ overwrite: true });
+        const {status} = await uploadUserFiles({overwrite: true});
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
@@ -84,7 +88,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
 
     const handleCreateCopy = async () => {
         setIsModalOpen(false);
-        const {status} = await uploadUserFiles({createCopy: true });
+        const {status} = await uploadUserFiles({createCopy: true});
         if (status === UploadStatus.SUCCESS) {
             setActiveStep((prev) => prev + 1);
         }
@@ -92,7 +96,6 @@ export const UploadAndGenerateTestContent: React.FC = () => {
 
     const handleGenerationSubmit = async () => {
         if (selectedFile) {
-            setIsGenerationQueueing(true);
             const params = Object.entries(selection)
                 .filter(([_, value]) => value.selected)
                 .map(([key, value]) => ({
@@ -107,13 +110,12 @@ export const UploadAndGenerateTestContent: React.FC = () => {
             };
 
             const isSuccess = await generateTestByFile(request);
-            setIsGenerationQueueing(false);
 
             if (isSuccess) {
                 setIsExiting(true);
-                setTimeout(() => {
-                    navigate('/tests?activeTab=history');
-                }, 300);
+                // setTimeout(() => {
+                //     navigate('/tests?activeTab=history');
+                // }, 300);
                 setTimeout(() => {
                     NotificationService.addAlert(new AlertMessage('Генерация скоро начнется', 'success'));
                 }, 500);
@@ -131,7 +133,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         {
             index: 0,
             value: 0,
-            children: <Box><FileUploader isUploading={isLoading}/></Box>,
+            children: <Box><FileUploader isUploading={isUploading}/></Box>,
             title: 'Загрузить файл'
         },
         {
@@ -161,8 +163,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 <Typography variant="h5" align="left" sx={{mb: 1}}>
                     Генерация теста
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Stepper activeStep={activeStep} sx={{ width: '50%' }}>
+                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <Stepper activeStep={activeStep} sx={{width: '50%'}}>
                         {steps.map((label) => (
                             <Step key={label}>
                                 <StepLabel>{label}</StepLabel>

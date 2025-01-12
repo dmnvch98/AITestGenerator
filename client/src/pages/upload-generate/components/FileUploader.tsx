@@ -3,9 +3,9 @@ import { Box, Alert, Typography } from '@mui/material';
 
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
-import useFileStore from "../store/fileStore";
-import {DragAndDropZone} from "./upload/components/DragAndDropZone";
-import {LoadingOverlay} from "./upload/components/LoadingOverlay";
+import useFileStore from "../../files/store/fileStore";
+import {DragAndDropZone} from "../../files/components/upload/components/DragAndDropZone";
+import {LoadingOverlay} from "../../files/components/upload/components/LoadingOverlay";
 
 interface FileUploadModalProps {
     isUploading: boolean;

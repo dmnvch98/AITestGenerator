@@ -81,6 +81,7 @@ export interface TestStore {
     clearSelectedTest: () => void,
     deleteTestFlag: boolean,
     setDeleteTestFlag: (flag: boolean) => void,
+    //TODO-to delete
     generateTestByFile: (request: GenerateTestRequest) => Promise<boolean>,
     getAllUserTests: (options?: QueryOptions) => void,
     getUserTestById: (id: number) => Promise<UserTest>,
@@ -114,6 +115,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({selectedTest: userTest});
     },
 
+    //TODO-to delete
     generateTestByFile: async (request): Promise<boolean> => {
         return await TestService.generateTestByFile(request);
     },

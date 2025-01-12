@@ -16,7 +16,7 @@ import useAuthStore from "./pages/auth/authStore";
 import ServerErrorPage from "./pages/errors/ServerErrorPage";
 import {useUserStore} from "./store/userStore";
 import SseService from "./services/sse/SseService";
-import {UploadAndGenerateTest} from "./pages/files/components/UploadAndGenerateTest";
+import {UploadAndGenerateTest} from "./pages/upload-generate/UploadAndGenerateTest";
 
 const MainRoutes = () => {
     const {getTestGenCurrentActivities} = useUserStore();

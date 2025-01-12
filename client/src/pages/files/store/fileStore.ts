@@ -13,22 +13,26 @@ import {
 } from "../types";
 
 interface FileStore {
-    filesToUpload: File[];
+    //TODO-to delete
+    filesToUpload: File[]; //5
     userFiles: FileDto[];
     isLoading: boolean;
     addFiles: (files: File[]) => void;
     clearFiles: () => void;
 
     /*Server calls*/
-    uploadUserFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>;
+    //TODO-to delete
+    uploadUserFiles: (uploadOptions?: UploadOptions) => Promise<{status: UploadStatus}>; //3
     getUserFiles: (options?: QueryOptions) => Promise<FileDto[]>;
     deleteUserFile: (fileDto: FileDto) => Promise<void>;
     deleteFilesInBatch: () => void;
-    isFileExists: (fileName: string) => Promise<FileExistsResponseDto>
+    //TODO-to delete
+    isFileExists: (fileName: string) => Promise<FileExistsResponseDto> //4
     downloadFile: (fileHash: string) => Promise<void>
-
-    selectedFile: FileDto | null;
-    setSelectedFile: (file: FileDto | null) => void;
+    //TODO-to delete
+    selectedFile: FileDto | null; //1
+    //TODO-to delete
+    setSelectedFile: (file: FileDto | null) => void; //2
     selectedFileIds: number[];
     setSelectedFileIds: (fileIds: number[]) => void;
     addSelectedFileId: (fileId: number) => void;
@@ -46,9 +50,11 @@ const useFileStore = create<FileStore>((set, get) => ({
     selectedFileIds: [],
     totalUserFiles: 0,
     totalPages: 0,
+    //TODO-to delete
     selectedFile: null,
 
     addFiles: (files) => set((state) => ({filesToUpload: [...state.filesToUpload, ...files]})),
+    //TODO-to delete
     clearFiles: () => set({filesToUpload: []}),
     validateFilesThenUpload: (newFiles: File[]) => {
         const { addFiles} = get();
@@ -68,6 +74,7 @@ const useFileStore = create<FileStore>((set, get) => ({
 
         return result;
     },
+    //TODO-to delete
     uploadUserFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus }> => {
         const { filesToUpload, clearFiles } = get();
         set({ isLoading: true});
@@ -163,6 +170,7 @@ const useFileStore = create<FileStore>((set, get) => ({
         getUserFiles();
         set({isLoading: false})
     },
+    //TODO-to delete
     setSelectedFile: async (file) => {
         set({selectedFile: file});
     },

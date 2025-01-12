@@ -14,8 +14,8 @@ import {
 import { QueryOptions } from "../../../store/types";
 import { DebouncedSearchInput } from "../../../components/main/search/DebouncedSearchInput";
 import { NotFoundIcon } from "./NotFoundIcon";
-import { getFileIcon } from "./helper";
-import {FileDto} from "../types";
+import { getFileIcon } from "../../files/components/helper";
+import {FileDto} from "../../files/types";
 
 interface InfinityScrollGridProps {
     fetchData: (options: QueryOptions) => Promise<FileDto[]>;
@@ -147,7 +147,7 @@ export const InfinityScrollGrid: React.FC<InfinityScrollGridProps> = ({
                         justifyContent="center"
                         sx={{ flex: 1, height: '95%' }}
                     >
-                        <NotFoundIcon />
+                        {loading ? <CircularProgress /> : <NotFoundIcon />}
                     </Box>
                 ) : (
                     <Grid container sx={{ mt: 2 }}>
