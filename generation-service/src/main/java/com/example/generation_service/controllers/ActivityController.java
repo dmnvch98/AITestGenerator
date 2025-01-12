@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,12 @@ public class ActivityController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserActivities(final Authentication authentication, @PathVariable final String cid) {
         final Long userId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        activityFacade.deleteActivity(userId, cid);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{cid}/users/{userId}")
+    public void deleteActivityByUserIdAndCid(@PathVariable final String cid, @PathVariable Long userId) {
         activityFacade.deleteActivity(userId, cid);
     }
 

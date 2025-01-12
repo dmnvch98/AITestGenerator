@@ -50,7 +50,7 @@ const MainRoutes = () => {
                         <Route path="/generate" element={<UploadAndGenerateTest/>}/>
                         <Route path="/files" element={<Files/>}/>
                         <Route path="/500" element={<ServerErrorPage/>}/>
-                        <Route path="*" element={<Navigate to="/files" replace/>}/>
+                        <Route path="*" element={<Navigate to="/generate" replace/>}/>
                     </Routes>
                     : (
                         <Routes>

@@ -37,7 +37,7 @@ export const ActiveJobBadge = () => {
     }, [deleteFinishedUserActivitiesFromServer]);
 
     const truncateString = useCallback((str: string) => (
-        str.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str
+        str?.length > MAX_FILENAME_LENGTH ? `${str.slice(0, MAX_FILENAME_LENGTH)}...` : str
     ), []);
 
     // Генерируем JSX для списка активностей в виде таблицы
