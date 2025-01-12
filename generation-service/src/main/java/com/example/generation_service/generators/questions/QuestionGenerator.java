@@ -67,7 +67,6 @@ public abstract class QuestionGenerator {
 
         final StringSubstitutor substitutor = new StringSubstitutor(variables);
         final String contextPrompt = substitutor.replace(contextTemplate);
-        log.info("Context prompt: {}", contextPrompt);
 
         final ChatMessage context = new ChatMessage(ChatMessageRole.SYSTEM.value(), contextPrompt);
         final ChatMessage userText = new ChatMessage(ChatMessageRole.USER.value(), request.getText());

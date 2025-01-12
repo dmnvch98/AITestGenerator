@@ -165,7 +165,9 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
         try {
             const isSuccess = await TestService.generateTestByFile(request);
             if (isSuccess) {
-                NotificationService.addAlert(new AlertMessage('Генерация скоро начнется', 'success'));
+                setTimeout(() => {
+                    NotificationService.addAlert(new AlertMessage('Генерация скоро начнется', 'success'));
+                }, 600);
             } else {
                 NotificationService.addAlert(new AlertMessage(`Ошибка генерации для <b>${request.originalFileName}</b>.<br/>Пожалуйста, попробуйте позже.`, 'error'));
             }

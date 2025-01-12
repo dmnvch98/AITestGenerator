@@ -1,4 +1,3 @@
-// UploadAndGenerateTestContent.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Container, Fade, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import { FileUploader } from './components/FileUploader';
@@ -167,6 +166,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                                 setSelection={setSelection}
                                 open={true}
                                 selectedFileName={selectedFile?.originalFilename}
+                                isQueueing={isGenerationQueueing}
                                 onClose={() => setActiveStep(0)}
                             />
                         )}
