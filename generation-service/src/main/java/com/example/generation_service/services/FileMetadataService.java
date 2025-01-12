@@ -6,7 +6,7 @@ import java.util.List;
 import com.example.generation_service.exceptions.ResourceNotFoundException;
 import com.example.generation_service.models.files.FileMetadata;
 import com.example.generation_service.models.files.FileSearchVector;
-import com.example.generation_service.repositories.file.FileHashRepository;
+import com.example.generation_service.repositories.file.FileMetadataRepository;
 import com.example.generation_service.repositories.file.FileSearchVectorRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class FileMetadataService {
 
-  private final FileHashRepository repository;
+  private final FileMetadataRepository repository;
   private final FileSearchVectorRepository vectorRepository;
 
   public FileMetadata save(final FileMetadata fileHash) {
@@ -33,9 +33,9 @@ public class FileMetadataService {
     return fileHash;
   }
 
-  public void delete(final long id, final String hashedFileName) {
-    repository.deleteAllByHashedFilenameAndUserId(hashedFileName, id);
-    log.info("[{}/{}] deleted from repository", id, hashedFileName);
+  public void delete(final long userId, final String hashedFileName) {
+    repository.deleteAllByHashedFilenameAndUserId(hashedFileName, userId);
+    log.info("[{}/{}] deleted from repository", userId, hashedFileName);
   }
 
   public List<FileMetadata> getAllByUserId(final long userId) {

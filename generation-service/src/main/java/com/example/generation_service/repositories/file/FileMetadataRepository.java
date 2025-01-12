@@ -11,7 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FileHashRepository extends CrudRepository<FileMetadata, Long>, JpaSpecificationExecutor<FileMetadata> {
+public interface FileMetadataRepository extends CrudRepository<FileMetadata, Long>, JpaSpecificationExecutor<FileMetadata> {
 
     FileMetadata findByHashedFilenameAndUserId(final String hashedFilename, final Long userId);
 
