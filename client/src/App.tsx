@@ -58,7 +58,6 @@ const MainRoutes = () => {
                             {/*<Route path="/sign-up" element={<SignUp/>}/>*/}
                             <Route path="/500" element={<ServerErrorPage/>}/>
                             <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
-                            <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                         </Routes>
                     )
                 }
