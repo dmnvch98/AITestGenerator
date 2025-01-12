@@ -8,11 +8,13 @@ import SearchIcon from "@mui/icons-material/Search";
 interface DebouncedSearchInputProps {
     onSearch: (value: string) => void;
     delay?: number;
+    isLoading?: boolean;
 }
 
 export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
                                                                               onSearch,
                                                                               delay = 500,
+                                                                              isLoading= false
                                                                           }) => {
     const [searchValue, setSearchValue] = useState<string>('');
 
@@ -41,6 +43,7 @@ export const DebouncedSearchInput: React.FC<DebouncedSearchInputProps> = ({
             placeholder="Поиск"
             value={searchValue}
             onChange={handleChange}
+            disabled={isLoading}
             InputProps={{
                 startAdornment: (
                     <InputAdornment position="start">

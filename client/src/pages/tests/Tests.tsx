@@ -69,6 +69,7 @@ export const Tests = () => {
                 onDelete={handleBulkDelete}
                 deleteDisabled={selectedTestIds.length === 0}
                 onSearchChange={handleSearchChange}
+                isLoading={isLoading}
             />
             <TestTable
                 onSelectionModelChange={onMultiTestSelection}

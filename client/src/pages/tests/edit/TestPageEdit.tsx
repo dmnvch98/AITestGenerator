@@ -9,12 +9,10 @@ import NotificationService from "../../../services/notification/AlertService";
 export const TestPageEdit = () => {
     const {id} = useParams();
     const {getUserTestById, clearState} = useTestStore();
-    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
     const [testToEdit, setTestToEdit] = useState<UserTest>();
 
     const loadData = async () => {
-        setIsLoading(true);
         await getUserTestById(Number(id)).then(test => {
             if (!test) {
                 navigate('/tests');
@@ -22,9 +20,6 @@ export const TestPageEdit = () => {
             }
             setTestToEdit(test);
         });
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 200);
     };
 
     useEffect(() => {
@@ -40,7 +35,6 @@ export const TestPageEdit = () => {
     return (
         <TestForm
             initialTest={testToEdit || createNewTest()}
-            isLoading={isLoading}
         />
 
     );

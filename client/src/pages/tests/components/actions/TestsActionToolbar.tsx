@@ -10,7 +10,7 @@ interface ActionToolbarProps {
     onSearchChange: (value: string) => void;
     deleteButtonTitle?: string;
     addButtonTitle?: string;
-
+    isLoading: boolean;
 }
 
 export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
@@ -18,6 +18,7 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                                                                      onDelete,
                                                                      deleteDisabled,
                                                                      onSearchChange,
+                                                                     isLoading
                                                                  }) => {
     return (
         <Box display="flex" alignItems="center" sx={{mb: 2}} justifyContent="space-between">
@@ -26,6 +27,7 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                     sx={{mr: 2}}
                     variant="outlined"
                     onClick={onAdd}
+                    disabled={isLoading}
                 >
                     Создать тест
                 </Button>
@@ -35,14 +37,14 @@ export const TestsActionToolbar: React.FC<ActionToolbarProps> = ({
                         dialogContent: 'Вы уверены что хотите удалить выбранные тесты?',
                         dialogTitle: 'Удаление тестов',
                         variant: 'button',
-                        disabled: deleteDisabled
+                        disabled: deleteDisabled || isLoading
                     }}
                     onSubmit={onDelete}
                 />
             </Box>
 
             <Box sx={{flex: 1, ml: 'auto', maxWidth: 300}}>
-                <DebouncedSearchInput onSearch={onSearchChange}/>
+                <DebouncedSearchInput onSearch={onSearchChange} isLoading={isLoading}/>
             </Box>
         </Box>
     );

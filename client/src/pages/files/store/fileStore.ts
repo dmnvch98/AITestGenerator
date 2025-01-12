@@ -46,6 +46,7 @@ const useFileStore = create<FileStore>((set, get) => ({
     },
 
     deleteUserFile: async (fileDto: FileDto) => {
+        set({isLoading: true})
         const { getUserFiles } = get();
         const response = await FileService.deleteFile(fileDto.hashedFilename);
 
@@ -54,6 +55,7 @@ const useFileStore = create<FileStore>((set, get) => ({
             : NotificationService.addAlert(new AlertMessage(`Ошибка при удалении <b>${fileDto.originalFilename}</b>`, 'error'));
 
         getUserFiles();
+        set({isLoading: false})
     },
     addSelectedFileId: (fileId: number): void => {
         const currentFileIds = get().selectedFileIds;
@@ -70,13 +72,6 @@ const useFileStore = create<FileStore>((set, get) => ({
     },
     deleteFilesInBatch: async () => {
         set({isLoading: true})
-        const alert: AlertMessage = new AlertMessage(
-            `Удаление файлов`,
-            'info',
-            'progress',
-            false
-        );
-        NotificationService.addAlert(alert);
         const { selectedFileIds, getUserFiles, userFiles} = get();
 
         const fileHashes = userFiles
@@ -88,7 +83,6 @@ const useFileStore = create<FileStore>((set, get) => ({
             .map(fileDto => fileDto.hash);
 
         const response = await FileService.deleteFilesInBatch(fileHashes);
-        NotificationService.deleteAlert(alert);
         response === 204
             ? NotificationService.addAlert(new AlertMessage('Файлы успешно удалены', 'success'))
             : NotificationService.addAlert(new AlertMessage('Ошибка при удалении файлов', 'error'));

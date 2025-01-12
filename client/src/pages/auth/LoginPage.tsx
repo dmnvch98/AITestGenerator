@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Alert, Container, Snackbar, FormControl, FormHelperText } from '@mui/material';
 import useAuthStore from "./authStore";
+import LoadingButton from "../../components/main/buttons/LoadingButton";
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [emailValid, setEmailValid] = useState(true);
-  const { login, alerts, clearAlerts, authenticated } = useAuthStore();
+  const { login, alerts, clearAlerts, authenticated, loading } = useAuthStore();
 
     useEffect(() => {
         if (authenticated) {
@@ -40,10 +40,7 @@ function LoginPage() {
   };
 
   const handleLogin = async () => {
-      const loginResult = await login(email, password);
-      if (loginResult) {
-        navigate('/generate');
-      }
+      await login(email, password);
   };
 
   const isFormValid = () => {
@@ -114,18 +111,19 @@ function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
               </FormControl>
-              <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                  disabled={!isFormValid()}
-              >
-                Войти
-              </Button>
+                <LoadingButton
+                    label="Войти"
+                    loadingLabel="Вход..."
+                    loading={loading}
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    disabled={!isFormValid()}
+                    sx={{mt: 3, mb: 2}}
+                />
             </Box>
           </Box>
-          <Snackbar
+            <Snackbar
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               open={alerts.length > 0}
               autoHideDuration={10000}

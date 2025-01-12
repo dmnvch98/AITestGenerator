@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {ActionIcon} from "../../../../store/types";
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import RestoreIcon from '@mui/icons-material/Restore';
@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import {getActionItemsList} from "../../../../components/main/data-display/helper";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import {CircularProgress} from "@mui/material";
 
 interface ActionButtonsProps {
     onSave: () => void;
@@ -22,6 +23,7 @@ interface ActionButtonsProps {
     isLoading: boolean;
     onReturn: () => void;
     undoActionsAvailable: boolean;
+    testUpdateInProgress: boolean;
 }
 
 export const TestFormActions: React.FC<ActionButtonsProps> = ({
@@ -32,14 +34,19 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
                                                                   isTestModified,
                                                                   isLoading,
                                                                   onReturn,
-                                                                  undoActionsAvailable
+                                                                  undoActionsAvailable,
+                                                                  testUpdateInProgress
                                                               }) => {
-    const [dialogOpen, setDialogOpen] = useState(false); // Состояние для диалога
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogConfig, setDialogConfig] = useState<{
         title: string;
         content: string;
         onConfirm: () => void
     } | null>(null);
+
+    const getSaveButtonIcon = useMemo(() => {
+        return testUpdateInProgress ? <CircularProgress size={24}/> : <SaveOutlinedIcon/>;
+    }, [testUpdateInProgress])
 
     const openDialog = (title: string, content: string, onConfirm: () => void) => {
         setDialogConfig({title, content, onConfirm});
@@ -54,9 +61,9 @@ export const TestFormActions: React.FC<ActionButtonsProps> = ({
     const actions: ActionIcon[] = [
         {
             name: 'Сохранить',
-            icon: <SaveOutlinedIcon/>,
+            icon: getSaveButtonIcon,
             onClick: onSave,
-            disabled: !isTestModified || isLoading
+            disabled: !isTestModified || isLoading || testUpdateInProgress
         },
         {
             name: 'Новый вопрос',

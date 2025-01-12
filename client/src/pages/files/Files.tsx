@@ -74,6 +74,7 @@ const FilesContent = () => {
                 onDelete={deleteFilesInBatch}
                 deleteDisabled={isDeleteButtonDisabled()}
                 onSearchChange={handleSearchChange}
+                isLoading={isLoading}
             />
 
             <FilesTable

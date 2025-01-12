@@ -92,6 +92,7 @@ export interface TestStore {
     clearState: () => void;
     printTest: () => void;
     isLoading: boolean;
+    testUpdateInProgress: boolean;
 }
 
 export const useTestStore = create<TestStore>((set, get) => ({
@@ -101,6 +102,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
     selectedTest: undefined,
     selectedTestRating: undefined,
     isLoading: false,
+    testUpdateInProgress: false,
 
     clearState: () => {
         set({
@@ -128,6 +130,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
         useNotificationStore.getState().addAlert(alert);
     },
     deleteTest: async (id: number) => {
+        set({isLoading: true})
         const response = await TestService.deleteTest(id);
         const { getAllUserTests } = get();
         if (response) {
@@ -136,14 +139,17 @@ export const useTestStore = create<TestStore>((set, get) => ({
         } else {
             NotificationService.addAlert(new AlertMessage('Произошла ошибка при удалении теста', 'error'));
         }
+        set({isLoading: false})
     },
     deleteTestFlag: false,
     setDeleteTestFlag: (flag: boolean) => {
         set({deleteTestFlag: flag});
     },
     upsert: async (test): Promise<UserTest | null> => {
+        set({testUpdateInProgress: true})
         const dto: UpsertTestRequestDto = convertTest(test);
         const response = await TestService.upsert(dto);
+        set({testUpdateInProgress: false})
         if (response) {
             NotificationService.addAlert(new AlertMessage('Тест успешно обновлен', 'success'));
             return response as UserTest;
@@ -156,8 +162,9 @@ export const useTestStore = create<TestStore>((set, get) => ({
         set({selectedTest: undefined});
     },
     getUserTestById: async (id) => {
+        set({isLoading: true})
         const response = await TestService.getUserTestById(id);
-        set({selectedTest: response});
+        set({selectedTest: response, isLoading: false});
         return response;
     },
     saveTest: async (test) => {
@@ -169,6 +176,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
         }
     },
     bulkDeleteTest: async (request) => {
+        set({isLoading: true})
         const response = await TestService.bulkTestDelete(request);
         const { getAllUserTests } = get();
         if (response) {
@@ -177,6 +185,7 @@ export const useTestStore = create<TestStore>((set, get) => ({
         } else {
             NotificationService.addAlert(new AlertMessage('Произошла ошибка при удалении тестов', 'error'));
         }
+        set({isLoading: false})
     },
     updateRating: async (id, request) => {
         const { success, rating } = await TestRatingService.upsert(id, request);

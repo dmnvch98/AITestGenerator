@@ -16,7 +16,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {Button, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import Link from "@mui/material/Link";
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
@@ -24,6 +24,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import useAuthStore from "../../pages/auth/authStore";
 import {useLocation} from 'react-router-dom';
 import {ActiveJobBadge} from "./ActiveJobBadge";
+import LoadingButton from "./buttons/LoadingButton";
 
 const drawerWidth = 200;
 
@@ -104,7 +105,7 @@ interface TabIcon {
 export const SidebarHeader = ({children}: any) => {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const {logout} = useAuthStore();
+    const {logout, loading} = useAuthStore();
     const location = useLocation();
 
     const tabs: TabIcon[] = [
@@ -162,12 +163,19 @@ export const SidebarHeader = ({children}: any) => {
                                         <ActiveJobBadge/>
                                     </Box>
 
-                                    <Button
-                                        sx={{color: 'black'}}
+                                    {/*<Button*/}
+                                    {/*    sx={{color: 'black'}}*/}
+                                    {/*    onClick={logout}*/}
+                                    {/*>*/}
+                                    {/*    Выход*/}
+                                    {/*</Button>*/}
+                                    <LoadingButton
+                                        label="Выйти"
+                                        loadingLabel="Выход..."
+                                        loading={loading}
                                         onClick={logout}
-                                    >
-                                        Выход
-                                    </Button>
+                                        sx={{color: 'black'}}
+                                    />
                                 </Box>
                             </Box>
                         </Grid>

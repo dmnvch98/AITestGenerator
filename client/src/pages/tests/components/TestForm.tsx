@@ -19,10 +19,10 @@ interface TestFormProps {
 const MAX_QUESTIONS_COUNT = 40;
 const MAX_ANSWERS_COUNT = 10;
 
-export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
+export const TestForm: React.FC<TestFormProps> = ({initialTest}) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {upsert, clearState} = useTestStore();
+    const {upsert, clearState, isLoading, testUpdateInProgress} = useTestStore();
     const [localTest, setLocalTest] =
         useState<UserTest | CreateTestRequestDto>(initialTest);
     const [testTitleError] = useState<string | null>(null);
@@ -171,13 +171,14 @@ export const TestForm: React.FC<TestFormProps> = ({initialTest, isLoading}) => {
     const Actions = (
         <Box sx={{mt: -2}}>
             <TestFormActions
-                isLoading={isLoading as boolean}
+                isLoading={isLoading}
                 onSave={handleSave}
                 onAddQuestion={handleAddQuestion}
                 onUndo={handleUndo}
                 onExit={handleExit}
                 onReturn={handleReturnToPrevPage}
                 isTestModified={isTestModified()}
+                testUpdateInProgress={testUpdateInProgress}
                 undoActionsAvailable={testHistory.length > 0}
             />
             <QuestionPagination
