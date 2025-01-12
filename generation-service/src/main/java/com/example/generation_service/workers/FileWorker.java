@@ -68,7 +68,6 @@ public class FileWorker {
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
             final Map<String, String> userMetadata = new HashMap<>();
-            userMetadata.put("originalFileName", originalFileName);
             metadata.setUserMetadata(userMetadata);
             storageClient.uploadFile(userId, fileNameHash, originalFileName, file.getInputStream(), metadata);
 
