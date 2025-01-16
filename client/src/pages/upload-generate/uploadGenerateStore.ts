@@ -19,6 +19,8 @@ export interface SelectionItem {
     maxQuestions: number;
 }
 
+const FILE_UPLOAD_LIMIT_MB = 5;
+
 export interface UploadGenerateStore {
     selectedFile: FileDto | null;
     filesToUpload: File[];
@@ -26,26 +28,36 @@ export interface UploadGenerateStore {
     isUploading: boolean;
     isGenerationQueueing: boolean;
     selection: Record<QuestionType, SelectionItem>;
+    fileUploadModal: boolean;
+    activeStep: number;
+    fileUploadActiveTab: number;
 
     setSelectedFile: (file: FileDto) => void;
     setSelection: (selection: Record<QuestionType, SelectionItem>) => void;
     addFilesToUpload: (files: File[]) => void;
     removeFileFromUpload: (file: File) => void;
     clearFilesToUpload: () => void;
-    uploadUserFiles: (uploadOptions?: UploadOptions) => Promise<{ status: UploadStatus; needsConfirmation?: boolean }>;
-    confirmUpload: (uploadOptions?: UploadOptions) => Promise<UploadStatus>;
+    validateUserFile: (file: File) => Promise<{ error?: string, success: boolean }>;
+    validateAndUploadUserFile: (uploadOptions?: UploadOptions) => Promise<void>;
+    upload: (uploadOptions?: UploadOptions) => Promise<{uploadError?: string}>;
+    confirmUpload: (uploadOptions?: UploadOptions) => Promise<void>;
     isFileExists: (fileName: string) => Promise<FileExistsResponseDto>;
     generateTestByFile: () => Promise<boolean>;
+    setActiveStep: (step: number) => void;
+    setFileUploadActiveTab: (tabNumber: number) => void;
 }
 
 const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
+    activeStep: 0,
+    fileUploadActiveTab: 0,
     selectedFile: null,
     filesToUpload: [],
     uploadEnabled: false,
     isUploading: false,
     isGenerationQueueing: false,
+    fileUploadModal: false,
     selection: Object.keys(QuestionType).reduce((acc, key) => {
-        acc[key as QuestionType] = { selected: false, maxQuestions: 10 };
+        acc[key as QuestionType] = {selected: false, maxQuestions: 10};
         return acc;
     }, {} as Record<QuestionType, SelectionItem>),
 
@@ -56,7 +68,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
         set({ selection });
     },
     addFilesToUpload: (files) => {
-        set((state) => ({ filesToUpload: [...state.filesToUpload, ...files], uploadEnabled: true }));
+        set((state) => ({ filesToUpload: [...state.filesToUpload, ...files], uploadEnabled: true, selectedFile: null }));
     },
     removeFileFromUpload: (file) => {
         set((state) => ({
@@ -64,79 +76,86 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
         }));
     },
     clearFilesToUpload: () => {
-        const { selectedFile } = get();
-        set({ filesToUpload: [], uploadEnabled: Boolean(selectedFile) });
+        set({filesToUpload: []});
     },
-    uploadUserFiles: async (uploadOptions?: UploadOptions): Promise<{ status: UploadStatus; }> => {
-        set({ isUploading: true });
-        const { filesToUpload } = get();
-        if (filesToUpload.length === 0) {
-            NotificationService.addAlert(new AlertMessage('Нет файлов для загрузки.', 'error'));
-            return { status: UploadStatus.FAILED };
+    validateAndUploadUserFile: async () => {
+        set({isUploading: true});
+        const {filesToUpload, validateUserFile, upload, activeStep } = get();
+
+        const {error, success} = await validateUserFile(filesToUpload[0]);
+
+        if (error) {
+            NotificationService.addAlert(new AlertMessage(error, 'error'));
+            return;
         }
 
-        const fileName = filesToUpload[0].name;
-        const existenceResponse = await FileService.isFileExists(fileName);
+        if (!success) {
+            return;
+        }
+        const { uploadError } = await upload();
 
-        if (existenceResponse.exists) {
-            return { status: UploadStatus.ALREADY_UPLOADED };
+        if (uploadError) {
+            NotificationService.addAlert(new AlertMessage(uploadError, 'error'));
         }
 
+        set({isUploading: false, activeStep: activeStep + 1});
+    },
+    validateUserFile: async (file: File): Promise<{ error?: string, success: boolean }> => {
+        if (!file) {
+            return {error: 'Нет файлов для загрузки.', success: false};
+        }
+
+        const maxSizeInBytes = FILE_UPLOAD_LIMIT_MB * 1024 * 1024;
+        if (file.size > maxSizeInBytes) {
+            return {error: `Размер файла превышает ${FILE_UPLOAD_LIMIT_MB} МБ.`, success: false};
+        }
+
+        const {exists} = await FileService.isFileExists(file.name);
+        if (exists) {
+            set({fileUploadModal: true});
+            return {success: false};
+        }
+
+        return {success: true};
+    },
+    upload: async (uploadOptions?: UploadOptions): Promise<{ uploadError?: string }> => {
+        const {filesToUpload} = get();
         try {
             const response = (await FileService.uploadFiles(filesToUpload, uploadOptions)) as FileUploadResponseDto;
             if (response?.uploadResults?.length) {
                 const result = response.uploadResults[0];
-                const { status, fileName, fileMetadata } = result;
-                if (status !== UploadStatus.SUCCESS) {
-                    const description = UploadStatusDescriptions[status];
-                    const message = `${description} - <b>${fileName}</b>`;
-                    NotificationService.addAlert(new AlertMessage(message, 'error'));
+                const {status, fileName, fileMetadata} = result;
+                if (status == UploadStatus.SUCCESS) {
+                    set({selectedFile: fileMetadata, filesToUpload: []});
+                    return {};
                 } else {
-                    set({ selectedFile: fileMetadata, filesToUpload: [] });
+                    const description = UploadStatusDescriptions[status];
+                    return {uploadError: `${description} - <b>${fileName}</b>`};
                 }
-                return { status };
             }
-
-            return { status: UploadStatus.FAILED };
+            return {uploadError: 'Не удалось загрузить файл'};
         } catch (error) {
-            NotificationService.addAlert(new AlertMessage('Ошибка при загрузке файлов', 'error'));
-            return { status: UploadStatus.FAILED };
-        } finally {
-            set({ isUploading: false });
+            return {uploadError: 'Ошибка при загрузке файлов'};
         }
     },
-    confirmUpload: async (uploadOptions?: UploadOptions): Promise<UploadStatus> => {
-        const { filesToUpload } = get();
-        set({ isUploading: true });
+    confirmUpload: async (uploadOptions?: UploadOptions) => {
+        const {upload, activeStep} = get();
 
-        try {
-            const response = (await FileService.uploadFiles(filesToUpload, uploadOptions)) as FileUploadResponseDto;
-            if (response?.uploadResults?.length) {
-                const result = response.uploadResults[0];
-                const { status, fileName, fileMetadata } = result;
-                if (status !== UploadStatus.SUCCESS) {
-                    const description = UploadStatusDescriptions[status];
-                    const message = `${description} - <b>${fileName}</b>`;
-                    NotificationService.addAlert(new AlertMessage(message, 'error'));
-                } else {
-                    set({ selectedFile: fileMetadata, filesToUpload: [] });
-                }
-                return status;
-            }
+        set({fileUploadModal: false, isUploading: true});
 
-            return UploadStatus.FAILED;
-        } catch (error) {
-            NotificationService.addAlert(new AlertMessage('Ошибка при загрузке файлов', 'error'));
-            return UploadStatus.FAILED;
-        } finally {
-            set({ isUploading: false });
+        const { uploadError } = await upload(uploadOptions);
+
+        if (uploadError) {
+            NotificationService.addAlert(new AlertMessage(uploadError, 'error'));
         }
+
+        set({isUploading: false, activeStep: activeStep + 1});
     },
     isFileExists: async (fileName: string): Promise<FileExistsResponseDto> => {
         return await FileService.isFileExists(fileName);
     },
     generateTestByFile: async (): Promise<boolean> => {
-        const { selectedFile, selection } = get();
+        const {selectedFile, selection} = get();
         if (!selectedFile) {
             NotificationService.addAlert(new AlertMessage('Файл не выбран для генерации теста.', 'error'));
             return false;
@@ -160,7 +179,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
             params: params,
         };
 
-        set({ isGenerationQueueing: true });
+        set({isGenerationQueueing: true});
 
         try {
             const isSuccess = await TestService.generateTestByFile(request);
@@ -176,8 +195,14 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
             NotificationService.addAlert(new AlertMessage('Ошибка при генерации теста', 'error'));
             return false;
         } finally {
-            set({ isGenerationQueueing: false });
+            set({isGenerationQueueing: false});
         }
+    },
+    setActiveStep: (step) => {
+        set({activeStep: step});
+    },
+    setFileUploadActiveTab: (tab) => {
+        set({fileUploadActiveTab: tab});
     }
 }));
 

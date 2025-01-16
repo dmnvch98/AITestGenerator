@@ -36,9 +36,7 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     },
 
     login: async (email: string, password: string)=> {
-        const { loading } = get();
         set({loading: true});
-        console.log('loading before: ', loading);
         const { success, message, jwt} = await AuthService.login(email, password);
 
         if (success && jwt) {
@@ -50,7 +48,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
             addAlert(new AlertMessage(message, 'error'));
         }
         set({loading: false});
-        console.log('loading after: ', loading);
 
     },
 

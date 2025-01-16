@@ -26,66 +26,52 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         selectedFile,
         setSelectedFile,
         isUploading,
-        isFileExists,
-        filesToUpload,
-        uploadUserFiles,
-        confirmUpload,
+        validateAndUploadUserFile,
+        activeStep,
+        setActiveStep,
         generateTestByFile,
         selection,
         setSelection,
         isGenerationQueueing,
+        upload,
+        fileUploadActiveTab,
+        setFileUploadActiveTab,
         uploadEnabled
     } = useUploadGenerateStore();
 
     const { getIsIncidentExists, isIncidentExists } = useIncidentStore();
 
-    const [activeStep, setActiveStep] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
-    const [fileUploadActiveTab, setFileUploadActiveTab] = useState(0);
 
     useEffect(() => {
         getIsIncidentExists();
     }, [getIsIncidentExists]);
 
     const isUploadButtonDisabled = useMemo(() => {
-        return !uploadEnabled || isUploading;
+        return !uploadEnabled || isUploading ;
     }, [uploadEnabled, isUploading]);
 
     const isGenerateButtonDisabled = useMemo(() => {
         return !Object.values(selection).some(item => item.selected) || isGenerationQueueing;
     }, [selection, isGenerationQueueing]);
 
-    const handleFileUpload = async () => {
-        if (filesToUpload.length > 0) {
-            const { exists} = await isFileExists(filesToUpload[0].name);
-            if (exists) {
-                setIsModalOpen(true);
-                return;
+    const handleNextStep = async () => {
+        if (activeStep === 0) {
+            if (selectedFile) {
+                setActiveStep(1);
+            } else {
+                await validateAndUploadUserFile();
             }
-            const { status } = await uploadUserFiles();
-            if (status === UploadStatus.SUCCESS) {
-                setActiveStep((prev) => prev + 1);
-            }
-        } else if (selectedFile) {
-            setActiveStep((prev) => prev + 1);
         }
-    };
+    }
 
     const handleOverride = async () => {
-        setIsModalOpen(false);
-        const status = await confirmUpload({ overwrite: true });
-        if (status === UploadStatus.SUCCESS) {
-            setActiveStep((prev) => prev + 1);
-        }
+        await upload({ overwrite: true });
     };
 
     const handleCreateCopy = async () => {
-        setIsModalOpen(false);
-        const status = await confirmUpload({ createCopy: true });
-        if (status === UploadStatus.SUCCESS) {
-            setActiveStep((prev) => prev + 1);
-        }
+        await upload({ createCopy: true });
     };
 
     const handleGenerationSubmit = async () => {
@@ -175,7 +161,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             {activeStep > 0 && (
                                 <Button
-                                    onClick={() => setActiveStep((prev) => prev - 1)}
+                                    onClick={() => setActiveStep(activeStep - 1)}
                                     variant="outlined"
                                     sx={{ minWidth: '150px' }}
                                 >
@@ -185,7 +171,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                             {activeStep === 0 && (
                                 <Button
                                     variant="contained"
-                                    onClick={handleFileUpload}
+                                    onClick={handleNextStep}
                                     disabled={isUploadButtonDisabled}
                                     sx={{ minWidth: '150px' }}
                                 >
