@@ -70,15 +70,15 @@ export const GenTestParams: React.FC<ModalFormProps> = ({
 
     return (
         <Box>
-            <Alert severity="info" icon={false}>
+            <Alert severity="info" icon={false} sx={{mt: 2}}>
                 <Typography variant="body2" gutterBottom>
                     Если в тексте мало информации, число вопросов может уменьшиться.
                 </Typography>
             </Alert>
-            <Typography align="left" variant="subtitle1" sx={{mt: 1}}>
-                <strong>Файл: </strong> {selectedFileName}
+            <Typography align="left" variant="subtitle1" sx={{mt: 2}}>
+                <strong>Выбранный файл: </strong> {selectedFileName}
             </Typography>
-            <Box sx={{position: 'relative', flexGrow: 1}}>
+            <Box sx={{position: 'relative', flexGrow: 1, mt: 2}}>
                 <LoadingOverlay isUploading={isQueueing}/>
                 <TableContainer>
                     <Table>

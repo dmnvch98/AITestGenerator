@@ -28,7 +28,7 @@ export interface UploadGenerateStore {
     isUploading: boolean;
     isGenerationQueueing: boolean;
     selection: Record<QuestionType, SelectionItem>;
-    fileUploadModal: boolean;
+    fileUploadConfirmModal: boolean;
     activeStep: number;
     fileUploadActiveTab: number;
 
@@ -45,6 +45,7 @@ export interface UploadGenerateStore {
     generateTestByFile: () => Promise<boolean>;
     setActiveStep: (step: number) => void;
     setFileUploadActiveTab: (tabNumber: number) => void;
+    setFileUploadConfirmModal: (open: boolean) => void;
 }
 
 const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
@@ -55,7 +56,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
     uploadEnabled: false,
     isUploading: false,
     isGenerationQueueing: false,
-    fileUploadModal: false,
+    fileUploadConfirmModal: false,
     selection: Object.keys(QuestionType).reduce((acc, key) => {
         acc[key as QuestionType] = {selected: false, maxQuestions: 10};
         return acc;
@@ -63,6 +64,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
 
     setSelectedFile: (file) => {
         set({ selectedFile: file, uploadEnabled: true });
+        get().clearFilesToUpload();
     },
     setSelection: (selection) => {
         set({ selection });
@@ -86,19 +88,23 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
 
         if (error) {
             NotificationService.addAlert(new AlertMessage(error, 'error'));
+            set({isUploading: false});
             return;
         }
 
         if (!success) {
+            set({isUploading: false});
             return;
         }
         const { uploadError } = await upload();
 
         if (uploadError) {
             NotificationService.addAlert(new AlertMessage(uploadError, 'error'));
+        } else {
+            set({isUploading: false, activeStep: activeStep + 1});
         }
 
-        set({isUploading: false, activeStep: activeStep + 1});
+        set({isUploading: false});
     },
     validateUserFile: async (file: File): Promise<{ error?: string, success: boolean }> => {
         if (!file) {
@@ -112,7 +118,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
 
         const {exists} = await FileService.isFileExists(file.name);
         if (exists) {
-            set({fileUploadModal: true});
+            set({fileUploadConfirmModal: true});
             return {success: false};
         }
 
@@ -126,7 +132,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
                 const result = response.uploadResults[0];
                 const {status, fileName, fileMetadata} = result;
                 if (status == UploadStatus.SUCCESS) {
-                    set({selectedFile: fileMetadata, filesToUpload: []});
+                    set({selectedFile: fileMetadata});
                     return {};
                 } else {
                     const description = UploadStatusDescriptions[status];
@@ -141,7 +147,7 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
     confirmUpload: async (uploadOptions?: UploadOptions) => {
         const {upload, activeStep} = get();
 
-        set({fileUploadModal: false, isUploading: true});
+        set({fileUploadConfirmModal: false, isUploading: true});
 
         const { uploadError } = await upload(uploadOptions);
 
@@ -203,6 +209,9 @@ const useUploadGenerateStore = create<UploadGenerateStore>((set, get) => ({
     },
     setFileUploadActiveTab: (tab) => {
         set({fileUploadActiveTab: tab});
+    },
+    setFileUploadConfirmModal: (open) => {
+        set({fileUploadConfirmModal: open})
     }
 }));
 

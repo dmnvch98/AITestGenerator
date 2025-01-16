@@ -8,7 +8,7 @@ import { FileAlreadyUploadedModal } from "../files/components/upload/components/
 import { TabItem, TabsPanel } from "../../components/main/tabsPanel/TabsPanel";
 import { InfinityScrollGrid } from "./components/DataSearchGrid";
 import useFileStore from "../files/store/fileStore";
-import { FileDto, UploadStatus } from "../files/types";
+import { FileDto } from "../files/types";
 import { useIncidentStore } from "../../store/alerts/alertStore";
 import useUploadGenerateStore from "./uploadGenerateStore";
 
@@ -33,15 +33,15 @@ export const UploadAndGenerateTestContent: React.FC = () => {
         selection,
         setSelection,
         isGenerationQueueing,
-        upload,
         fileUploadActiveTab,
         setFileUploadActiveTab,
-        uploadEnabled
+        uploadEnabled,
+        fileUploadConfirmModal,
+        setFileUploadConfirmModal,
+        confirmUpload
     } = useUploadGenerateStore();
 
     const { getIsIncidentExists, isIncidentExists } = useIncidentStore();
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
@@ -67,11 +67,11 @@ export const UploadAndGenerateTestContent: React.FC = () => {
     }
 
     const handleOverride = async () => {
-        await upload({ overwrite: true });
+        await confirmUpload({ overwrite: true });
     };
 
     const handleCreateCopy = async () => {
-        await upload({ createCopy: true });
+        await confirmUpload({ createCopy: true });
     };
 
     const handleGenerationSubmit = async () => {
@@ -131,7 +131,15 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                         ))}
                     </Stepper>
                 </Box>
-                <Container maxWidth="md">
+                <Container
+                    maxWidth="md"
+                    sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}
+                >
                     {isIncidentExists &&
                         <Box sx={{ mt: 2 }}>
                             <Alert severity="error" icon={false}>
@@ -141,7 +149,7 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                             </Alert>
                         </Box>
                     }
-                    <Box sx={{ mt: 4, height: '60vh' }}>
+                    <Box sx={{ mt: 2, height: '60vh' }}>
                         {activeStep === 0
                             && <TabsPanel tabs={tabs} activeTab={fileUploadActiveTab}
                                           onTabChange={setFileUploadActiveTab} />
@@ -193,8 +201,8 @@ export const UploadAndGenerateTestContent: React.FC = () => {
                 </Container>
 
                 <FileAlreadyUploadedModal
-                    open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    open={fileUploadConfirmModal}
+                    onClose={() => setFileUploadConfirmModal(false)}
                     onOverride={handleOverride}
                     onCreateCopy={handleCreateCopy}
                 />

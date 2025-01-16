@@ -12,7 +12,7 @@ interface FileUploadModalProps {
 }
 
 export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) => {
-    const { filesToUpload, addFilesToUpload, clearFilesToUpload } = useUploadGenerateStore();
+    const { filesToUpload, addFilesToUpload, clearFilesToUpload, selectedFile } = useUploadGenerateStore();
     const [dragOver, setDragOver] = useState(false);
     const [hoveredFileIndex, setHoveredFileIndex] = useState<number | null>(null);
 
@@ -73,6 +73,12 @@ export const FileUploader: React.FC<FileUploadModalProps> = ({ isUploading }) =>
                     Изображения в файлах не учитываются при генерации.
                 </Typography>
             </Alert>
+
+            {selectedFile &&
+                <Typography align="left" sx={{mb: 2}}>
+                    <strong>Выбранный файл: </strong> {selectedFile.originalFilename}
+                </Typography>
+            }
 
             <Box sx={{ position: 'relative', flexGrow: 1 }}>
                 <LoadingOverlay isUploading={isUploading} />
