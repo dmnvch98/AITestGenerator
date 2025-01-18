@@ -1,10 +1,12 @@
 package com.example.generation_service.models.user;
 
+import com.example.generation_service.converters.ormConverter.EmulateAdminInfoConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalDateTime;
 
@@ -25,4 +27,9 @@ public class UserLoginHistory {
     private String userAgent;
     private LocalDateTime loginTime;
     private boolean success;
+
+    @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
+    @Convert(converter = EmulateAdminInfoConverter.class)
+    private EmulateAdminInfo emulateAdminInfo;
 }

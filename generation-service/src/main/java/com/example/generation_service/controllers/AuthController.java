@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 
 
 import com.example.generation_service.config.security.jwt.Jwt;
+import com.example.generation_service.config.security.service.PrincipalUser;
 import com.example.generation_service.dto.auth.CredentialsDto;
 import com.example.generation_service.dto.auth.JwtResponse;
+import com.example.generation_service.models.user.EmulateAdminInfo;
 import com.example.generation_service.models.user.User;
 import com.example.generation_service.models.user.UserLoginHistory;
 import com.example.generation_service.services.user.UserLoginHistoryService;
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
@@ -39,13 +43,37 @@ public class AuthController {
         UserLoginHistory.UserLoginHistoryBuilder loginHistoryBuilder = extractLoginInfo(credentials, request);
         if (userService.verifyUser(credentials)) {
             final User user = userService.findUserByEmail(credentials.getEmail());
-            final String accessToken = jwt.generateAccessToken(user);
+            final String accessToken = jwt.generateAccessToken(user, null);
             generateRefreshToken(user, user.getEmail(), response);
             final UserLoginHistory loginHistory = loginHistoryBuilder.success(true).build();
             loginHistoryService.save(loginHistory);
             return ResponseEntity.ok(JwtResponse.builder().accessToken(accessToken).build());
         } else {
             final UserLoginHistory loginHistory = loginHistoryBuilder.success(false).build();
+            loginHistoryService.save(loginHistory);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("users/{userId}/emulate")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<JwtResponse> getEmulateAccessToken(
+            final HttpServletRequest request,
+            final Authentication authentication,
+            @PathVariable Long userId
+    ) {
+        final Long adminUserId = ((PrincipalUser) authentication.getPrincipal()).getUserId();
+        final User adminUser = userService.findUserById(adminUserId);
+        final User emulatedUser = userService.findUserById(userId);
+        if (emulatedUser != null && adminUser != null) {
+            final EmulateAdminInfo emulateAdminInfo = EmulateAdminInfo.builder().email(adminUser.getEmail()).build();
+            final String accessToken = jwt.generateAccessToken(emulatedUser, emulateAdminInfo);
+            final UserLoginHistory.UserLoginHistoryBuilder loginHistoryBuilder = extractAdminLoginInfo(emulatedUser.getEmail(), request);
+            final UserLoginHistory loginHistory = loginHistoryBuilder.success(true).emulateAdminInfo(emulateAdminInfo).build();
+            loginHistoryService.save(loginHistory);
+            return ResponseEntity.ok(JwtResponse.builder().accessToken(accessToken).build());
+        } else {
+            final UserLoginHistory loginHistory = UserLoginHistory.builder().success(false).build();
             loginHistoryService.save(loginHistory);
             return ResponseEntity.notFound().build();
         }
@@ -66,7 +94,7 @@ public class AuthController {
             final String email = jwt.getLoginFromRefreshToken(refreshToken);
             User user = userService.findUserByEmail(email);
             if (user.getRefreshToken() != null && user.getRefreshToken().equals(refreshToken)) {
-                final String newAccessToken = jwt.generateAccessToken(user);
+                final String newAccessToken = jwt.generateAccessToken(user, null);
                 generateRefreshToken(user, user.getEmail(), response);
                 return ResponseEntity.ok(JwtResponse.builder().accessToken(newAccessToken).build());
             } else {
@@ -113,6 +141,16 @@ public class AuthController {
         final String userAgent = request.getHeader("User-Agent");
         return UserLoginHistory.builder()
                 .email(credentials.getEmail())
+                .loginTime(LocalDateTime.now())
+                .ipAddress(ipAddress)
+                .userAgent(userAgent);
+    }
+
+    private UserLoginHistory.UserLoginHistoryBuilder extractAdminLoginInfo(final String userEmail, final HttpServletRequest request) {
+        final String ipAddress = request.getRemoteAddr();
+        final String userAgent = request.getHeader("User-Agent");
+        return UserLoginHistory.builder()
+                .email(userEmail)
                 .loginTime(LocalDateTime.now())
                 .ipAddress(ipAddress)
                 .userAgent(userAgent);

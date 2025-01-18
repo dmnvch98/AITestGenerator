@@ -1,5 +1,6 @@
 package com.example.generation_service.config.security.jwt;
 
+import com.example.generation_service.models.user.EmulateAdminInfo;
 import com.example.generation_service.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,7 +26,7 @@ public class Jwt {
     @Value("${security.refresh-secret}")
     private String jwtRefreshSecret;
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(final User user, final EmulateAdminInfo emulateAdminInfo) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(40).atZone(ZoneId.systemDefault()).toInstant();
         final Date date = Date.from(accessExpirationInstant);
@@ -34,6 +35,7 @@ public class Jwt {
             .setExpiration(date)
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
             .claim("userId", user.getId())
+            .claim("emulateAdminInfo", emulateAdminInfo)
             .compact();
     }
 
