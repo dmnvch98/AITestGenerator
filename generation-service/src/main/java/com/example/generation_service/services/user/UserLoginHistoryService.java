@@ -25,4 +25,9 @@ public class UserLoginHistoryService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("loginTime").descending());
         return loginRepository.findAll(pageable);
     }
+
+    public Page<UserLoginHistory> findByEmail(int page, int size, String email) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("loginTime").descending());
+        return loginRepository.findAllByEmail(email, pageable);
+    }
 }

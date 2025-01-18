@@ -8,4 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface UserLoginRepository extends CrudRepository<UserLoginHistory, Long> {
 
     Page<UserLoginHistory> findAll(Pageable pageable);
+
+    Page<UserLoginHistory> findAllByEmail(final String email, Pageable pageable);
 }

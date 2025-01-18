@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("/login-history")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<UserLoginHistory> getLoginHistory(@RequestParam() int page, @RequestParam int size) {
-        return loginHistoryFacade.findAll(page, size);
+    public List<UserLoginHistory> getLoginHistory(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String email) {
+        return loginHistoryFacade.findAll(page, size, email);
     }
 }
