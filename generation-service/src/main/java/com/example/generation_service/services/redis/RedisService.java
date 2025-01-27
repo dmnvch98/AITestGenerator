@@ -24,10 +24,15 @@ public class RedisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public <T> void saveObjectToHash(final String key, final String subKey, final T object) {
+    public <T> void saveObjectToHash(final String key, final String subKey, final T object, String counterName) {
         try {
-            String json = objectMapper.writeValueAsString(object);
+            final Boolean exists = redisTemplate.opsForHash().hasKey(key, subKey);
+
+            final String json = objectMapper.writeValueAsString(object);
             redisTemplate.opsForHash().put(key, subKey, json);
+            if (!exists) {
+                redisTemplate.opsForValue().increment(counterName);
+            }
         } catch (Exception e) {
             if (e instanceof RedisConnectionFailureException) {
                 log.error("Redis connection failure");
@@ -83,11 +88,15 @@ public class RedisService {
         return Collections.emptySet();
     }
 
-    public void deleteObjectFromHash(final String key, final String subKey) {
+    public void deleteObjectFromHash(final String key, final String subKey, final String counterKey) {
+        redisTemplate.opsForValue().decrement(counterKey);
+
         redisTemplate.opsForHash().delete(key, subKey);
     }
 
-    public void deleteObjectsFromHash(final String key, final Collection<String> subKeys) {
+    public void deleteObjectsFromHash(final String key, final Collection<String> subKeys, final String counterKey) {
+        redisTemplate.opsForValue().decrement(counterKey, subKeys.size());
+
         redisTemplate.opsForHash().delete(key, subKeys.toArray());
     }
 
@@ -174,5 +183,13 @@ public class RedisService {
         }
 
         return resultList;
+    }
+
+    public long getKeyCount(String counterKey) {
+        final String count = redisTemplate.opsForValue().get(counterKey);
+        if (count != null) {
+            return Long.parseLong(count);
+        }
+        return 0;
     }
 }

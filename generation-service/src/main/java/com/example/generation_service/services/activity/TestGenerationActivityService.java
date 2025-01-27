@@ -26,6 +26,8 @@ import java.util.*;
 @Slf4j
 public class TestGenerationActivityService {
 
+    public static final String GENERATION_ACTIVITIES_COUNTER_NAME = "generations_number";
+
     private final CommandService commandService;
     private final ActivityConverter activityConverter;
     private final TestGenerationConverter historyConverter;
@@ -36,7 +38,7 @@ public class TestGenerationActivityService {
 
     public void saveActivity(final TestGenerationActivity activity) {
         final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
-        genericRedisService.saveObjectToHash(hashKey, activity.getCid(), activity);
+        genericRedisService.saveObjectToHash(hashKey, activity.getCid(), activity, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(activity.getUserId(), NotificationType.ACTIVITY);
     }
 
@@ -53,14 +55,14 @@ public class TestGenerationActivityService {
                                       final GenerateTestRequestDto requestDto, final Long userId, final Set<QuestionType> queuedQuestionTypes) {
         final TestGenerationActivity waitingActivity = activityConverter.getWaitingActivity(cid, requestDto, fileHash.getOriginalFilename(), userId, queuedQuestionTypes);
         final String hashKey = Utils.getGenerationHashKey(userId);
-        genericRedisService.saveObjectToHash(hashKey,cid, waitingActivity);
+        genericRedisService.saveObjectToHash(hashKey, cid, waitingActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void updateProcessedQuestionType(final TestGenerationActivity activity, final QuestionType questionType) {
         final TestGenerationActivity updatedActivity = activityConverter.updateProcessedQuestionType(activity, questionType);
         final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
-        genericRedisService.saveObjectToHash(hashKey, activity.getCid(), updatedActivity);
+        genericRedisService.saveObjectToHash(hashKey, activity.getCid(), updatedActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(activity.getUserId(), NotificationType.ACTIVITY);
     }
 
@@ -76,7 +78,7 @@ public class TestGenerationActivityService {
               );
         final TestGenerationActivity inProcessActivity = activityConverter
               .getInProgressActivity(currentActivity, messageReceipt);
-        genericRedisService.saveObjectToHash(hashKey,cid, inProcessActivity);
+        genericRedisService.saveObjectToHash(hashKey,cid, inProcessActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
@@ -85,20 +87,20 @@ public class TestGenerationActivityService {
         final TestGenerationActivity finishedActivity = activityConverter.getFinishedActivity(activity, testId, testTitle);
         final String hashKey = Utils.getGenerationHashKey(userId);
         if (finishedActivity != null) {
-            genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity);
+            genericRedisService.saveObjectToHash(hashKey, cid, finishedActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
         }
         notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void deleteUserActivity(final Long userId, final String cid) {
         final String hashKey = Utils.getGenerationHashKey(userId);
-        genericRedisService.deleteObjectFromHash(hashKey, cid);
+        genericRedisService.deleteObjectFromHash(hashKey, cid, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
     public void deleteUserActivities(final Long userId, final List<String> cids) {
         final String hashKey = Utils.getGenerationHashKey(userId);
-        genericRedisService.deleteObjectsFromHash(hashKey, cids);
+        genericRedisService.deleteObjectsFromHash(hashKey, cids, GENERATION_ACTIVITIES_COUNTER_NAME);
         notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
     }
 
@@ -116,7 +118,7 @@ public class TestGenerationActivityService {
         log.info("Failing activity=[{}]", activity);
         final TestGenerationActivity failedActivity = activityConverter.getFailedActivity(activity, failReason);
         final String hashKey = Utils.getGenerationHashKey(activity.getUserId());
-        genericRedisService.saveObjectToHash(hashKey, failedActivity.getCid(), failedActivity);
+        genericRedisService.saveObjectToHash(hashKey, failedActivity.getCid(), failedActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
         log.info("Saved failed activity=[{}]", failedActivity);
         final TestGeneratingHistory failedHistory = historyConverter.getFailedHistory(activity, failReason);
         historyService.save(failedHistory);
@@ -145,7 +147,7 @@ public class TestGenerationActivityService {
                   failReason, cid, originalFileName);
             final TestGenerationActivity failedActivity = activityConverter
                   .getFailedWaitingActivity(cid, originalFileName, failReason);
-            genericRedisService.saveObjectToHash(hashKey, cid, failedActivity);
+            genericRedisService.saveObjectToHash(hashKey, cid, failedActivity, GENERATION_ACTIVITIES_COUNTER_NAME);
             historyService.save(failedHistory);
             notificationService.sendNotificationToUser(userId, NotificationType.ACTIVITY);
         }
@@ -174,6 +176,10 @@ public class TestGenerationActivityService {
 
     public List<TestGenerationActivity> getAllObjectsFromHashes() {
         return genericRedisService.getAllObjectsFromHashes(TestGenerationActivity.class);
+    }
+
+    public Long getAllActivitiesCount() {
+        return genericRedisService.getKeyCount(GENERATION_ACTIVITIES_COUNTER_NAME);
     }
 
 }

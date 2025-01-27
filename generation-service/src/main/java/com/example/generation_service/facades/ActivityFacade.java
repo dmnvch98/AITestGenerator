@@ -3,6 +3,7 @@ package com.example.generation_service.facades;
 import com.example.generation_service.converters.ActivityConverter;
 import com.example.generation_service.dto.activity.TestGenerationActivityResponseDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityRequestDto;
+import com.example.generation_service.models.activity.AllTestGenerationActivitiesCount;
 import com.example.generation_service.models.activity.TestGenerationActivity;
 import com.example.generation_service.services.activity.TestGenerationActivityService;
 import com.example.generation_service.utils.Utils;
@@ -37,7 +38,7 @@ public class ActivityFacade {
     activityService.deleteUserActivities(userId, cids);
   }
 
-  public List<TestGenerationActivity> getAllObjectsFromHashes() {
-    return activityService.getAllObjectsFromHashes();
+  public AllTestGenerationActivitiesCount getAllActivitiesCount() {
+    return AllTestGenerationActivitiesCount.builder().count(activityService.getAllActivitiesCount()).build();
   }
 }

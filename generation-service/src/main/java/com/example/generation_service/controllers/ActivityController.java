@@ -5,7 +5,7 @@ import com.example.generation_service.dto.activity.BulkActivityDeleteDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityResponseDto;
 import com.example.generation_service.dto.activity.TestGenerationActivityRequestDto;
 import com.example.generation_service.facades.ActivityFacade;
-import com.example.generation_service.models.activity.TestGenerationActivity;
+import com.example.generation_service.models.activity.AllTestGenerationActivitiesCount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,8 +65,9 @@ public class ActivityController {
     }
 
     @GetMapping("/all")
-    public List<TestGenerationActivity> getAllActivities() {
-      return activityFacade.getAllObjectsFromHashes();
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public AllTestGenerationActivitiesCount getAllActivities() {
+      return activityFacade.getAllActivitiesCount();
     }
 
 //    @GetMapping("/long-poll")
